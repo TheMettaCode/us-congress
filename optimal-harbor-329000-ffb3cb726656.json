@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "optimal-harbor-329000",
+  "private_key_id": "ffb3cb72665614b1f4d735efb96a3193939c5a99",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCkbMZkW05h0xqZ\n/thBb1FxAtpPxCmYqAIyNTBAqFCjAH9C27OUkLsEQQO29wjn4mLBuCPBG0VBqsAB\nOibYPtbYVfB6xW77IAYVudEllTnCKs16Ht++QJfh5zAa+Ia9+bCeYyf/29GmsGSi\nfJhJAUIbHdXBLaeQS/gCITwJlb0O5RwDUaLH6kmtGn7Ym20XZXOiYW7KV5NkOj7K\nRLCa0Ltexv4kze4U5V5Cxq6cOo2nsvoBOsS0y7HNgrXV4ujRcu5MgmMSezgvs5AS\nh6sAdbsp0D2OT4bY3IqvvQpEXoRrofgLuBCBX4QLsETO9pBLH6T6jov/643/TBCT\n250xMUBLAgMBAAECggEASPwZoiFfbQ/aLoIPNxh1A597DU4rEp58/xFZ/lFYHcqS\nMri4AVmvEefUAMqt8tQr9wZIJKb4unnTKZhI9tMJ5dRb3vs1VJY17T3ihvaywSvj\nsnHy6g3c/UL0OPyZPsmPKvcjobBO4tlIilGY/UroL4YyREICL4xxJWzgK/cCCRJW\nflXeuKqZlIy54TB7vN3J5KYltPzGLfCm8Utyk75KKqcIGuMavSF9hXUhswqFnqxo\nFej/Zy9jGlWIdxcHk+9UHiu96MuVL30n7eRQUCKdLv9LjR5iiDrZ78pTfGnDDdKD\njc4o4gNcBV5+1UIJ10qBaAO4pSYfqVPOAR3Ov/A8eQKBgQDTv+ceNW7ZYgHhS/4S\nHHT0XF2vLG6iRubA4AOXwxr+4BV355gPQrk6hnbkJhj0kZmBZMarBASaVQ1HU2P2\nDWUB5YazzHEP+23vwxCeI1gSyjbe8qjF2PX/r5Ce/BxKsczPocCZtx7NVL1rEvVK\nCc6ElCCb+oNyLMRLukcT2uJGAwKBgQDGyRz4fdNRpCV0lwABYzLca0CDvndVzt7A\nHUzlDV2NElBUQm+Um4NJL1q2/5rV/GGC1YfHcWarq+YNk0ccK7UctMcIZqKp0hGC\nGWLaJ0nQXVeQ8ytPEDrvR/9wb+EKpz8GQgIAIc63dMxHHiHDfJ9OHLfumL2JnPf8\nNlJtPZbOGQKBgEwzIticIefYfRS2ZBfgZbYKByyisK11FlUSSDi03WIbAZ7EmNPl\nDwMgoGg5zYE1ZChMO7IPIBjpwn2IZNCGwXKNRowtZgJ6WHWPnMtLrMYWPui8KkAI\nc34vj7umvgejNDED5GtsmokJlaCSkfKy1L6hD5sR63uK4Jjfz/Q1MHhBAoGAJgxY\nfzeWOwowISDF334dPhNJRe4u6T2vZRY2oaDtRxM6TOZqdQdPGbL2qhBCkrK7907n\nrkUGYdWFMxP9iGbVQ6lWb0U13UtYDo7NXPQoLLmxCQ2CPJ/ep+4f9mVzrZZVed0o\nhN3zsymn7/TUgZZY55qXmhOiM7TXwm6jWEVxmAECgYBGRf5a9sldezFd44q6Cs9E\nnvYtvE4AnvObuzGoCEDw7uxt0KxqztmBjIakUhSeaR6oO9eu9J/jZa9npvoksxLY\nkpW1oOpzH9EKyW/VgfEwzSOahqRWw2sNwTW/OiSCLra2rFZ5jePcOqmDFZFziFJR\nU824G9JhTtoFH6+Lzl1zTw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-sheets@optimal-harbor-329000.iam.gserviceaccount.com",
+  "client_id": "104040241823282133853",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-sheets%40optimal-harbor-329000.iam.gserviceaccount.com"
+}

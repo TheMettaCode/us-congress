@@ -1,0 +1,3902 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:animate_do/animate_do.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:us_congress_vote_tracker/congress/market_activity_page.dart';
+import 'package:us_congress_vote_tracker/congress/member_details.dart';
+import 'package:us_congress_vote_tracker/congress/bill_search.dart';
+import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
+import 'package:us_congress_vote_tracker/constants/styles.dart';
+import 'package:us_congress_vote_tracker/constants/themes.dart';
+import 'package:us_congress_vote_tracker/constants/widgets.dart';
+import 'package:us_congress_vote_tracker/functions/functions.dart';
+import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
+import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
+import 'package:us_congress_vote_tracker/models/bill_recent_payload_model.dart';
+import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
+import 'package:us_congress_vote_tracker/models/news_article_model.dart';
+import 'package:us_congress_vote_tracker/models/office_expenses_total.dart';
+import 'package:us_congress_vote_tracker/models/order_detail.dart';
+import 'package:us_congress_vote_tracker/models/private_funded_trips_model.dart';
+import 'package:us_congress_vote_tracker/models/vote_payload_model.dart';
+import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
+import 'package:us_congress_vote_tracker/models/statements_model.dart';
+import 'package:us_congress_vote_tracker/services/congress_stock_watch/congress_stock_watch_api.dart';
+import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
+import 'package:us_congress_vote_tracker/services/congress_stock_watch/market_activity_model.dart';
+import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
+import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_api.dart';
+import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
+import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
+import 'package:us_congress_vote_tracker/services/github/promo_message/github-promo-message-model.dart';
+import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
+import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
+import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
+import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
+import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'constants/constants.dart';
+
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool appLoading = false;
+  String appLoadingText = 'Loading propaganda...';
+  List<bool> userLevels = [false, false, false];
+  bool userIsDev = false;
+  bool userIsPremium = false;
+  bool userIsLegacy = false;
+  bool devUpgraded = false;
+  bool freeTrialUsed = false;
+  bool newEcwidProducts = false;
+  List<EcwidStoreItem> ecwidProductsList = [];
+  List<Order> productOrdersList = [];
+  // bool newVersionAvailable = false;
+  String queryString = '';
+
+  bool darkTheme = false;
+
+  Container bannerAdContainer = Container();
+  // Container rewardedAdContainer = Container();
+  bool showBannerAd = true;
+  bool adLoaded = false;
+  RewardedAd rewardedAd;
+  InterstitialAd interstitialAd;
+  // bool showSupport = false;
+  bool showPremiumPromo = true;
+
+  // int numberOfPromotions = 0;
+  // int thisPromotion = 0;
+  // List<Widget> listOfPromotions = [];
+  List<GithubNotifications> githubNotificationsList = [];
+  String thisGithubNotification = '';
+  int headerImageCounter = 0;
+  bool randomImageActivated = false;
+
+  Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+  int congress = 117;
+
+  Timer thirtySecondTimer;
+
+  // ignore: unused_field
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  // ignore: unused_field
+  bool _connectionLost = false;
+  // ignore: unused_field
+  String _connectionType;
+
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  bool houseFloorLoading = true;
+  bool senateFloorLoading = true;
+  String lastRefresh = '';
+  bool dataRefresh = false;
+  bool _marketPageLoading = false;
+  double thisThirtySeconds = 0;
+
+  List<Vote> voteList = [];
+  List<UpdatedBill> billList = [];
+  List<LobbyingRepresentation> lobbyingEventsList = [];
+  List<PrivateTripResult> privatelyFundedTripsList = [];
+  List<TotalExpensesResult> officeExpensesList = [];
+  List<HouseStockWatch> houseStockWatchList = [];
+  List<SenateStockWatch> senateStockWatchList = [];
+  List<MarketActivity> marketActivityOverviewList = [];
+
+  bool loadingSenators = false;
+  bool loadingRepresentatives = false;
+
+  List<StatementsResults> statementsList = [];
+  List<NewsArticle> newsArticlesList = [];
+
+  List<FloorAction> senateFloorActions = [];
+  List<FloorAction> houseFloorActions = [];
+
+  List<ChamberMember> houseMembersList = [];
+  List<ChamberMember> houseRepublicansList = [];
+  List<ChamberMember> houseDemocratsList = [];
+  List<ChamberMember> houseIndependentsList = [];
+  List<ChamberMember> senateMembersList = [];
+  List<ChamberMember> senateRepublicansList = [];
+  List<ChamberMember> senateDemocratsList = [];
+  List<ChamberMember> senateIndependentsList = [];
+  List<ChamberMember> userCongressList = [];
+
+  List<PlaylistItem> youTubePlaylist = [];
+
+  // AnimationController animationController;
+  ScrollController scrollController = ScrollController();
+  ScrollController _videoListController = ScrollController(
+    initialScrollOffset: 0,
+    keepScrollOffset: true,
+  );
+  ScrollController newsArticleSliderController = ScrollController(
+    initialScrollOffset: 0,
+    keepScrollOffset: true,
+  );
+
+// NOTIFICATION LISTENER FLAGS
+  String onClickAction = '';
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) async {
+        if (Platform.isAndroid) WebView.platform = AndroidWebView();
+
+        await init();
+
+        executeOnClickNotificationListenerActions();
+      },
+    );
+    super.initState();
+  }
+
+  // Dispose the controller
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> init() async {
+    setState(() => appLoading = true);
+
+    await setInitialVariables();
+
+    /// BEGIN VIDEO SCROLL ANIMATIONS
+    if (youTubePlaylist.isNotEmpty) {
+      _videoListController.animateTo(
+          (youTubePlaylist.length.toDouble() - 1) * 150,
+          duration: Duration(seconds: 30),
+          curve: Curves.linear);
+    }
+
+    /// BEGIN NEWS SCROLL ANIMATIONS
+    if (newsArticlesList.isNotEmpty) {
+      newsArticleSliderController.animateTo(
+          newsArticlesList.length.toDouble() * 180,
+          duration: Duration(seconds: 120),
+          curve: Curves.linear);
+    }
+
+    /// USED TO LISTEN FOR CUSTOMER SUBSCRIPTION UPDATES
+    await RcPurchaseApi.getSubscriptionStatus();
+    Purchases.addCustomerInfoUpdateListener((purchaserInfo) async => {
+          // handle any changes to purchaserInfo
+          await RcPurchaseApi.getSubscriptionStatus()
+        });
+
+    /// CHECK FOR AND SHOW LATEST APP UPDATES
+    await Functions.showLatestUpdates(context);
+
+    /// Listen for online connection state events
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    /// LISTEN FOR NOTIFICATION EVENTS HERE
+    listenNotifications();
+
+    /// LOAD REWARDED AD
+    await loadAds(userIsPremium);
+
+    /// DETERMINE USER LEVEL
+    await Functions.getUserLevels().then((levels) => setState(() {
+          userLevels = levels;
+          userIsDev = userLevels[0];
+          userIsPremium = userLevels[1];
+          userIsLegacy = userLevels[2];
+        }));
+
+    // if (userIsPremium && freeTrialUsed)
+    await Functions.getTrialStatus(context, userIsPremium, userIsLegacy);
+
+    /// RETREIVE ALL MEMBERS DATA
+    await getMembers('all');
+
+    /// LOAD ALL APP DATA AND SET CONGRESS NUMBER
+    await getData().whenComplete(() => setState(() {
+          congress = userDatabase.get('congress');
+        }));
+
+    /// CHECK FOR USER APP USAGE REWARDS
+    await Functions.checkRewards(context, rewardedAd, userLevels);
+
+    /// IF USER IS NEW, REQUEST USAGE INFORMATION APPROVAL
+    if (!userDatabase.get('usageInfo') &&
+        !userDatabase.get('usageInfoSelected'))
+      await Functions.requestUsageInfo(context);
+
+    /// APP 1 MINUTE TIMER FUNCTION. USE TO CREATE PERIODIC
+    /// AND DERIVATIVE CLOCKS AND TIMERS
+    thirtySecondTimer =
+        Timer.periodic(Duration(seconds: 30), (Timer timer) async {
+      logger.d('***** Thirty Seconds Timer Minute Timer Initialized... *****');
+
+      /// THIRTY SECONDS TIMER
+      if (thisThirtySeconds % 0.5 == 0) {
+        logger.d(
+            '***** 30 Seconds Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        if (!randomImageActivated)
+          setState(() => randomImageActivated = !randomImageActivated);
+        // setState(() => thisPromotion = random.nextInt(numberOfPromotions));
+
+        /// SEND NOTIFICATION OF FREE PREMIUM TRIAL ENDING
+        if (userIsPremium &&
+            freeTrialUsed &&
+            ((freeTrialPromoDurationDays * 86400) -
+                    DateTime.now()
+                        .difference(DateTime.parse(
+                            userDatabase.get('freeTrialStartDate')))
+                        .inSeconds <
+                60) &&
+            ((freeTrialPromoDurationDays * 86400) -
+                    DateTime.now()
+                        .difference(DateTime.parse(
+                            userDatabase.get('freeTrialStartDate')))
+                        .inSeconds >
+                30)) {
+          await Messages.sendNotification(source: 'trial_ending');
+        }
+
+        /// DISABLE FREE PREMIUM TRIAL
+        if ((freeTrialPromoDurationDays * 1440) -
+                DateTime.now()
+                    .difference(
+                        DateTime.parse(userDatabase.get('freeTrialStartDate')))
+                    .inMinutes <=
+            0) {
+          await Functions.getTrialStatus(context, userIsPremium, userIsLegacy);
+        }
+      }
+
+      /// FIRST MINUTE TIMER
+      if (thisThirtySeconds % 1 == 0) {
+        logger.d(
+            '***** 1 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        if (showPremiumPromo)
+          setState(() => showPremiumPromo = !showPremiumPromo);
+
+        /// REVERSE SLIDER ANIMATION
+        if (_videoListController.offset >=
+            (youTubePlaylist.length.toDouble() - 1) * 150) {
+          _videoListController.animateTo(0,
+              duration: Duration(seconds: 30), curve: Curves.linear);
+        } else if (_videoListController.offset <= 30) {
+          _videoListController.animateTo(
+              (youTubePlaylist.length.toDouble() - 1) * 150,
+              duration: Duration(seconds: 30),
+              curve: Curves.linear);
+        }
+      }
+
+      /// TWO MINUTE TIMER
+      if (thisThirtySeconds % 2 == 0) {
+        logger.d(
+            '***** 2 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        /// NEWS SLIDER ANIMATION
+        if (newsArticleSliderController.offset >=
+            newsArticlesList.length.toDouble() * 180) {
+          newsArticleSliderController.jumpTo(0);
+        } else if (newsArticleSliderController.offset <= 30) {
+          newsArticleSliderController.animateTo(
+              newsArticlesList.length.toDouble() * 180,
+              duration: Duration(seconds: 120),
+              curve: Curves.linear);
+        }
+      }
+
+      /// 5 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 5 == 0) {
+        logger.d(
+            '***** 5 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        // if (!showSupport) setState(() => showSupport = !showSupport);
+
+        await loadAds(userIsPremium);
+        await getData();
+      }
+
+      /// 7 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 6 == 0) {
+        logger.d(
+            '***** 10 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        if (!showPremiumPromo)
+          setState(() => showPremiumPromo = !showPremiumPromo);
+      }
+
+      /// 10 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 10 == 0) {
+        logger.d(
+            '***** 10 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+
+        setState(() => headerImageCounter = random.nextInt(4));
+      }
+
+      /// 15 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 15 == 0) {
+        logger.d(
+            '***** 15 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+      }
+
+      /// 20 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 20 == 0) {
+        logger.d(
+            '***** 20 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+      }
+
+      /// 25 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 25 == 0) {
+        logger.d(
+            '***** 25 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
+      }
+
+      /// 30 MINUTE TIMER
+      if (thisThirtySeconds > 0 && thisThirtySeconds % 30 == 0) {
+        logger.d('***** 30 Minute Timer Triggered... *****');
+        setState(() => thisThirtySeconds = 0);
+      }
+
+      // thisMinute += 1;
+      thisThirtySeconds += 0.5;
+    });
+    setState(() => appLoading = false);
+  }
+
+  Future<void> setInitialVariables() async {
+    await userDatabase.put('appOpens', userDatabase.get('appOpens') + 1);
+    logger.d('***** App Opens: ${userDatabase.get('appOpens')} *****');
+
+    await Functions.processCredits(true,
+        isPurchased: false, isPermanent: false, creditsToAdd: 5);
+    logger.d(
+        '*****\nCREDITS: ${userDatabase.get('credits')}\nPERMANENT CREDITS: ${userDatabase.get('permCredits')}\nPURCHASED CREDITS: ${userDatabase.get('purchCredits')} *****');
+
+    /// GITHUB NOTIFICATIONS LIST
+    List<GithubNotifications> _githubNotificationsList = [];
+    String _thisGithubNotification = '';
+    try {
+      _githubNotificationsList =
+          githubMessagesFromJson(userDatabase.get('githubNotifications'))
+              .notifications;
+      _thisGithubNotification = _githubNotificationsList[random.nextInt(_githubNotificationsList.length)].message;
+      logger.d(
+          '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${githubNotificationsList.map((e) => e.title)}');
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR RETRIEVING GITHUB NOTIFICATIONS LIST DATA FROM DBASE (MAIN.DART): $e ^^^^^');
+    }
+
+    logger.d(
+        '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${githubNotificationsList.map((e) => e.title)}');
+    setState(() {
+      devUpgraded = userDatabase.get('devUpgraded');
+      freeTrialUsed = userDatabase.get('freeTrialUsed');
+      newEcwidProducts = userDatabase.get('newEcwidProducts');
+      githubNotificationsList = _githubNotificationsList;
+      thisGithubNotification = _thisGithubNotification;
+    });
+
+    /// YOUTUBE VIDEOS LIST
+    try {
+      setState(() => youTubePlaylist =
+          youTubePlaylistFromJson(userDatabase.get('youTubePlaylist')).items);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('youTubePlaylist', {});
+    }
+
+    /// NEWS ARTICLES LIST
+    try {
+      setState(() => newsArticlesList =
+          newsArticleFromJson(userDatabase.get('newsArticles')));
+      newsArticlesList.shuffle();
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING NEWS ARTICLES LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('newsArticles', {});
+    }
+
+    /// HOUSE FLOOR ACTIONS
+    try {
+      setState(() => houseFloorActions =
+          floorActionsFromJson(userDatabase.get('houseFloorActionsList'))
+              .results
+              .first
+              .floorActions);
+      logger.d('FIRST HOUSE DATE: ${houseFloorActions.first.date.toString()}');
+      setState(() => houseFloorLoading = false);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING HOUSE FLOOR LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('houseFloorActionsList', {});
+      // setState(() => houseFloorActions = []);
+    }
+
+    /// SENATE FLOOR ACTIONS
+    try {
+      setState(() => senateFloorActions =
+          floorActionsFromJson(userDatabase.get('senateFloorActionsList'))
+              .results
+              .first
+              .floorActions);
+      debugPrint(
+          'FIRST SENATE DATE: ${senateFloorActions.first.date.toString()}');
+      setState(() => senateFloorLoading = false);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING SENATE FLOOR LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('senateFloorActionsList', {});
+    }
+
+    /// LOBBYING EVENTS LIST
+    try {
+      setState(() => lobbyingEventsList =
+          lobbyEventFromJson(userDatabase.get('lobbyingEventsList'))
+              .results
+              .first
+              .lobbyingRepresentations);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING LOBBY EVENTS INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('lobbyingEventsList', {});
+    }
+
+    /// PRIVATELY FUNDED TRIPS LIST
+    try {
+      setState(() => privatelyFundedTripsList =
+          privateFundedTripFromJson(userDatabase.get('privateFundedTripsList'))
+              .results);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING PRIVATE TRIPS INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('privateFundedTripsList', {});
+    }
+
+    /// HOUSE STOCK ACTIVITY LIST
+    try {
+      setState(() => houseStockWatchList =
+          houseStockWatchFromJson(userDatabase.get('houseStockWatchList')));
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING HOUSE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('houseStockWatchList', []);
+    }
+
+    /// SENATE STOCK ACTIVITY LIST
+    try {
+      setState(() => senateStockWatchList =
+          senateStockWatchFromJson(userDatabase.get('senateStockWatchList')));
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING SENATE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('senateStockWatchList', []);
+    }
+
+    /// MARKET ACTIVITY OVERVIEW LIST
+    try {
+      setState(() => marketActivityOverviewList =
+          marketActivityFromJson(userDatabase.get('marketActivityOverview')));
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING MARKET ACTIVITY OVERVIEW INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('marketActivityOverview', {});
+    }
+
+    /// RECENT VOTES
+    try {
+      setState(() => voteList =
+          payloadFromJson(userDatabase.get('recentVotes')).results.votes);
+    } catch (e) {
+      logger
+          .w('^^^^^ ERROR DURING VOTE LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('recentVotes', {});
+    }
+
+    /// RECENT BILLS
+    try {
+      setState(() => billList =
+          recentbillsFromJson(userDatabase.get('recentBills'))
+              .results
+              .first
+              .bills);
+    } catch (e) {
+      logger
+          .w('^^^^^ ERROR DURING BILL LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('recentBills', {});
+    }
+
+    /// HOUSE MEMBERS LIST
+    try {
+      setState(() => houseMembersList =
+          memberPayloadFromJson(userDatabase.get('houseMembersList'))
+              .results
+              .first
+              .members);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING HOUSE MEMBERS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('houseMembersList', {});
+    }
+
+    /// SENATE MEMBERS LIST
+    try {
+      setState(() => senateMembersList =
+          memberPayloadFromJson(userDatabase.get('senateMembersList'))
+              .results
+              .first
+              .members);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING SENATE MEMBERS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('senateMembersList', {});
+    }
+
+    /// MEMBER STATEMENTS LIST
+    try {
+      setState(() => statementsList =
+          statementsFromJson(userDatabase.get('statementsResponse')).results);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR DURING MEMBER STATEMENTS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('statementsResponse', {});
+    }
+
+    /// ECWID STORE PRODUCTS LIST
+    try {
+      setState(() => ecwidProductsList =
+          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
+      userDatabase.put('ecwidProducts', {});
+    }
+
+    /// PRODUCT ORDERS LIST
+    try {
+      setState(() => productOrdersList =
+          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList'))
+              .orders);
+    } catch (e) {
+      logger.w(
+          '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
+    }
+  }
+
+  /// LISTENING FOR INCOMING NOTIFICATIONS
+  void listenNotifications() {
+    NotificationApi.onNotifications.stream.listen(onClickedNotification);
+  }
+
+  /// ACTIONS TO TAKE WHEN NOTIFICATION IS CLICKED
+  void onClickedNotification(String payload) async {
+    setState(() => onClickAction = payload);
+  }
+
+  void executeOnClickNotificationListenerActions() {
+    // if (onClickAction == 'product') {
+    //   showModalBottomSheet(
+    //       backgroundColor: Colors.transparent,
+    //       isScrollControlled: false,
+    //       enableDrag: true,
+    //       context: context,
+    //       builder: (context) {
+    //         return SharedWidgets.ecwidProductsListing(context,
+    //             ecwidProductsList, userDatabase, userLevels, productOrdersList);
+    //       }).then((_) => !userIsPremium &&
+    //           rewardedAd != null &&
+    //           rewardedAd.responseInfo.responseId !=
+    //               userDatabase.get('rewardedAdId')
+    //       ? AdMobLibrary().rewardedAdShow(rewardedAd)
+    //       : null);
+    // } else if (onClickAction == 'share') {
+    //   Messages.shareContent(true);
+    // }
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      logger.d(e.toString());
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+    // logger.d('***** Connectivity Result: $result *****');
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+
+    final connectedTo = result.toString().split('.')[1];
+
+    setState(() => _connectionType = connectedTo);
+
+    if (connectedTo == 'none') {
+      Messages.showMessage(
+          context: context, message: 'CONNECTION LOST', isAlert: true);
+      setState(() => _connectionLost = true);
+    } else if (thisThirtySeconds > 0 &&
+        (connectedTo == 'mobile' || connectedTo == 'wifi')) {
+      setState(() => _connectionLost = false);
+      Messages.showMessage(
+        context: context,
+        message: 'CONNECTED TO ${connectedTo.toUpperCase()}',
+        isAlert: false,
+      );
+
+      Future.delayed(Duration(seconds: 10), () async {
+        getData();
+      });
+    }
+  }
+
+  Future<void> getData() async {
+    if (!_connectionLost) {
+      setState(() {
+        dataRefresh = true;
+        randomImageActivated = false;
+      });
+
+      setState(() => appLoadingText = 'Checking for videos...');
+      await Youtube.getYouTubePlaylistItems(context: context)
+          .then((value) => setState(() => youTubePlaylist = value));
+
+      setState(() => appLoadingText = 'Retrieving latest news...');
+      await Functions.fetchNewsArticles(context: context).then((value) {
+        value.shuffle();
+        setState(() => newsArticlesList = value);
+      });
+
+      setState(() => appLoadingText = 'Checking for bill activity...');
+      await Functions.fetchBills(context: context, congress: congress)
+          .then((value) {
+        setState(() => billList = value);
+      });
+
+      setState(() => appLoadingText = 'Checking for new votes...');
+      await Functions.fetchVotes(context: context).then((value) {
+        setState(() => voteList = value);
+      });
+
+      setState(() => appLoadingText = 'Checking lobbying records...');
+      await Functions.fetchRecentLobbyEvents(context: context).then((value) {
+        List<LobbyingRepresentation> _watchedLobbyingEvents = [];
+        List<LobbyingRepresentation> _unwatchedLobbyingEvents = [];
+        List<LobbyingRepresentation> _finalLobbyingEvents = [];
+
+        value.forEach((event) {
+          if (List.from(userDatabase.get('subscriptionAlertsList')).any(
+              (element) => element
+                  .toString()
+                  .toLowerCase()
+                  .startsWith('lobby_${event.id}'.toLowerCase()))) {
+            _watchedLobbyingEvents.add(event);
+          } else {
+            _unwatchedLobbyingEvents.add(event);
+          }
+        });
+
+        _finalLobbyingEvents =
+            _watchedLobbyingEvents + _unwatchedLobbyingEvents;
+        setState(() => lobbyingEventsList = _finalLobbyingEvents);
+      });
+
+      setState(() => appLoadingText = 'Checking for private travel...');
+      await Functions.fetchPrivateFundedTravel(congress, context: context)
+          .then((value) => setState(() => privatelyFundedTripsList = value));
+
+      setState(
+          () => appLoadingText = 'Checking for Senate stock disclosures...');
+      await CongressStockWatchApi.fetchSenateStockDisclosures(context: context)
+          .then((value) => setState(() => senateStockWatchList = value));
+
+      setState(
+          () => appLoadingText = 'Checking for House stock disclosures...');
+      await CongressStockWatchApi.fetchHouseStockDisclosures(context: context)
+          .then((value) => setState(() => houseStockWatchList = value));
+
+      setState(() => appLoadingText = 'Updating market activity overview...');
+      await CongressStockWatchApi.updateMarketActivityOverview(
+              context: context,
+              allChamberMembers: houseMembersList + senateMembersList)
+          .then((value) => setState(() => marketActivityOverviewList = value));
+
+      setState(
+          () => appLoadingText = 'Checking for congressional statements...');
+      await Functions.fetchStatements(context: context).then((value) {
+        List<StatementsResults> _watchedStatements = [];
+        List<StatementsResults> _unwatchedStatements = [];
+        List<StatementsResults> _finalStatements = [];
+
+        value.forEach((statement) {
+          if (List.from(userDatabase.get('subscriptionAlertsList')).any(
+              (element) => element
+                  .toString()
+                  .toLowerCase()
+                  .startsWith('member_${statement.memberId}'.toLowerCase()))) {
+            _watchedStatements.add(statement);
+          } else {
+            _unwatchedStatements.add(statement);
+          }
+        });
+
+        _finalStatements = _watchedStatements + _unwatchedStatements;
+        setState(() => statementsList = _finalStatements);
+      });
+
+      setState(
+          () => appLoadingText = 'Checking for new house floor actions...');
+      await Functions.houseFloor(context: context).then((value) => setState(() {
+            houseFloorActions = value;
+            houseFloorLoading = false;
+          }));
+
+      setState(
+          () => appLoadingText = 'Checking for new senate floor actions...');
+      await Functions.senateFloor(context: context).then((value) {
+        if (userDatabase.get('congress') != int.parse(value.first.congress)) {
+          setState(() => congress = int.parse(value.first.congress));
+          userDatabase.put('congress', int.parse(value.first.congress));
+        }
+
+        setState(() {
+          senateFloorActions = value;
+          senateFloorLoading = false;
+        });
+      });
+
+      await EcwidStoreApi.getEcwidStoreProducts()
+          .then((value) => setState(() => ecwidProductsList = value));
+
+      await EmailjsApi.sendCapitolBabbleSocialEmail();
+
+      await userDatabase.put('lastRefresh', DateTime.now().toString());
+
+      setState(() {
+        dataRefresh = false;
+        randomImageActivated = true;
+        lastRefresh = userDatabase.get('lastRefresh');
+      });
+
+      // Future.delayed(Duration(minutes: 2), () async {
+      // Do something
+      // if (ModalRoute.of(context).isCurrent) {
+      // await AdMobLibrary().defaultInterstitial();
+      // }
+      // });
+    }
+  }
+
+  Future<void> getMembers(String chamber) async {
+    switch (chamber) {
+      case 'all':
+        setState(() {
+          loadingSenators = true;
+          loadingRepresentatives = true;
+        });
+        await Functions.getMembersList(congress, 'senate',
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+          setState(() {
+            senateMembersList = value;
+            senateRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            senateDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            senateIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
+          });
+          setState(() => loadingSenators = false);
+        });
+
+        await Functions.getMembersList(congress, 'house',
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+          setState(() {
+            houseMembersList = value;
+            houseRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            houseDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            houseIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
+          });
+          setState(() => loadingRepresentatives = false);
+        });
+        break;
+      case 'senate':
+        setState(() => loadingSenators = true);
+        await Functions.getMembersList(congress, 'senate',
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+          setState(() {
+            senateMembersList = value;
+            senateRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            senateDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            senateIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
+          });
+          setState(() => loadingSenators = false);
+        });
+        break;
+      case 'house':
+        setState(() => loadingRepresentatives = true);
+        await Functions.getMembersList(congress, 'house',
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+          setState(() {
+            houseMembersList = value;
+            houseRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            houseDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            houseIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
+          });
+          setState(() => loadingRepresentatives = false);
+        });
+        break;
+      default:
+        logger.d('***** ERROR: NO CHAMBER GIVEN FOR MEMBER REFRESH *****');
+    }
+
+    if (userDatabase.get('usageInfo') &&
+        Map<String, dynamic>.from(
+                userDatabase.get('representativesLocation'))['zip']
+            .isNotEmpty) {
+      await Functions.getUserCongress(
+              context,
+              senateMembersList + houseMembersList,
+              Map<String, dynamic>.from(
+                  userDatabase.get('representativesLocation'))['zip'])
+          .then((value) {
+        setState(() => userCongressList = value);
+      });
+    }
+  }
+
+  Future<void> loadAds(bool userIsPremium) async {
+    // if (!userIsPremium) {
+    logger.d('***** Default Rewarded Ad Start *****');
+
+    // if (userIsPremium) {
+    RewardedAd.load(
+      adUnitId: rewardedAdId,
+      request: AdRequest(nonPersonalizedAds: false, keywords: adMobKeyWords),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdFailedToLoad: (LoadAdError error) {
+          logger.d('***** Rewarded Ad failed to load: $error *****');
+          userDatabase.put('rewardedAdIsNew', false);
+          rewardedAd = null;
+        },
+        onAdLoaded: (RewardedAd rAd) {
+          // Keep a reference to the ad so you can show it later.
+          logger.d(
+              '***** Rewarded Ad loaded ${rAd.responseInfo.responseId} *****');
+          if (rAd.responseInfo.responseId != userDatabase.get('rewardedAdId')) {
+            logger.d('***** Loaded Ad is NEW! *****');
+            userDatabase.put('rewardedAdIsNew', true);
+          }
+          setState(() => rewardedAd = rAd);
+        },
+      ),
+    );
+    // }
+    if (!userIsPremium) {
+      logger.d('***** Interstitial Ad Start *****');
+      InterstitialAd.load(
+        adUnitId: interstitialAdId,
+        request: AdRequest(nonPersonalizedAds: false, keywords: adMobKeyWords),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdFailedToLoad: (LoadAdError error) {
+            logger.d('***** Interstitial Ad failed to load: $error *****');
+            userDatabase.put('interstitialAdIsNew', false);
+            interstitialAd = null;
+          },
+          onAdLoaded: (InterstitialAd iAd) {
+            // Keep a reference to the ad so you can show it later.
+            logger.d(
+                '***** Interstitial Ad loaded ${iAd.responseInfo.responseId} *****');
+            if (iAd.responseInfo.responseId !=
+                userDatabase.get('interstitialAdId')) {
+              logger.d('***** Loaded Interstitial Ad is NEW! *****');
+              userDatabase.put('interstitialAdIsNew', true);
+            }
+            setState(() => interstitialAd = iAd);
+          },
+        ),
+      );
+    }
+    // return null;
+    // } else {
+    //   logger.d('***** USER IS PREMIUM UPGRADE. NO ADS LOADED *****');
+    // }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ADMOB INFORMATION HERE
+    if (!adLoaded && !userIsPremium) {
+      final BannerAd thisBanner = AdMobLibrary().defaultBanner();
+
+      thisBanner?.load();
+
+      if (thisBanner != null) {
+        setState(() {
+          adLoaded = true;
+          bannerAdContainer =
+              AdMobLibrary().bannerContainer(thisBanner, context);
+        });
+      }
+    }
+
+    return new ValueListenableBuilder(
+        valueListenable: Hive.box(appDatabase)
+            .listenable(keys: /*userDatabase.keys.toList()*/
+                [
+          'currentAddress',
+          'representativesLocation',
+          'userIdList',
+          'subscriptionAlertsList',
+          'credits',
+          'permCredits',
+          'purchCredits',
+          'rewardedAdIsNew',
+          'interstitialRewardedAdIsNew',
+          'interstitialAdIsNew',
+          'userIsPremium',
+          'appRated',
+          'newBills',
+          'newVotes',
+          'newTrips',
+          'newHouseStock',
+          'newSenateStock',
+          'newStatements',
+          'newVideos',
+          'newLobbies',
+          'newHouseFloor',
+          'newSenateFloor',
+          'freeTrialUsed',
+          'freeTrialDismissed',
+          'newEcwidProducts',
+          'ecwidProductOrdersList',
+        ]),
+        builder: (context, box, widget) {
+          darkTheme = userDatabase.get('darkTheme');
+          freeTrialUsed = userDatabase.get('freeTrialUsed');
+          newEcwidProducts = userDatabase.get('newEcwidProducts');
+          userIsDev = List.from(userDatabase.get('userIdList')).any(
+              (element) => element.toString().contains(dotenv.env['dCode']));
+          userIsPremium = userDatabase.get('userIsPremium');
+          userIsLegacy = !userDatabase.get('userIsPremium') &&
+                  List.from(userDatabase.get('userIdList')).any((element) =>
+                      element.toString().startsWith('$oldUserIdPrefix'))
+              ? true
+              : false;
+          try {
+            productOrdersList = orderDetailListFromJson(
+                    userDatabase.get('ecwidProductOrdersList'))
+                .orders;
+          } catch (e) {
+            productOrdersList = [];
+            logger.w(
+                '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
+          }
+
+          List<String> subscriptionAlertsList =
+              List<String>.from(userDatabase.get('subscriptionAlertsList'));
+
+          List<String> memberSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('member_'))
+              .toList();
+          List<String> billSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('bill_'))
+              .toList();
+          List<String> lobbySubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('lobby_'))
+              .toList();
+          List<String> otherSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('other_'))
+              .toList();
+
+          return OrientationBuilder(builder: (context, orientation) {
+            return Container(
+              foregroundDecoration: BoxDecoration(
+                  color: !_connectionLost
+                      ? Colors.transparent
+                      : Colors.black.withOpacity(0.75),
+                  backgroundBlendMode: BlendMode.color),
+              child: new Scaffold(
+                appBar: new AppBar(
+                  leading: new GestureDetector(
+                    onTap: () => Scaffold.of(context).openEndDrawer(),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        dataRefresh
+                            ? Container(
+                                padding: const EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: republicanColor,
+                                  backgroundColor: democratColor,
+                                ),
+                              )
+                            : SizedBox.shrink(),
+                        List<String>.from(userDatabase.get('userIdList'))
+                                .last
+                                .contains(dotenv.env['dCode'])
+                            ? Icon(Icons.developer_board)
+                            : Image.asset('assets/app_icon_tower.png'),
+                      ],
+                    ),
+                  ),
+                  centerTitle: true,
+                  title: InkWell(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('$appTitle ${congress.toString()}',
+                            style: Styles.googleStyle.copyWith(fontSize: 25)),
+                        Map.from(userDatabase.get('packageInfo')).isNotEmpty &&
+                                (userDatabase.get('packageInfo')['version'] ==
+                                        null ||
+                                    userDatabase
+                                            .get('packageInfo')['version'] ==
+                                        'null')
+                            ? ''
+                            : Text(
+                                '   ${userDatabase.get('packageInfo')['version']}',
+                                style: Styles.regularStyle.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                    color: Theme.of(context).primaryColorLight),
+                              ),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    _connectionLost
+                        ? Icon(Icons.mobiledata_off)
+                        : SizedBox.shrink(),
+                    SizedBox(
+                      width: 30,
+                      child: new IconButton(
+                        iconSize: 25,
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) => Container(
+                              margin: const EdgeInsets.only(
+                                  top: 5, left: 15, right: 15),
+                              height: 400,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.15),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: TextField(
+                                      keyboardType: TextInputType.text,
+                                      textAlign: TextAlign.center,
+                                      autocorrect: true,
+                                      autofocus: true,
+                                      enableSuggestions: true,
+                                      decoration: InputDecoration.collapsed(
+                                        hintText: queryString == ''
+                                            ? 'Enter your search'
+                                            : queryString,
+                                      ),
+                                      onChanged: (val) {
+                                        queryString = val;
+                                      },
+                                    ),
+                                  ),
+                                  new ElevatedButton.icon(
+                                    icon: Icon(Icons.search),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => BillSearch(
+                                              queryString
+                                                  .toLowerCase()
+                                                  .replaceAll('.', ''),
+                                              houseStockWatchList,
+                                              senateStockWatchList),
+                                        ),
+                                      ).then((_) => !userIsPremium &&
+                                              interstitialAd != null &&
+                                              interstitialAd.responseInfo
+                                                      .responseId !=
+                                                  userDatabase
+                                                      .get('interstitialAdId')
+                                          ? AdMobLibrary().interstitialAdShow(
+                                              interstitialAd)
+                                          : null);
+                                    },
+                                    label: Text('Search'),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ).then((value) async =>
+                              await Functions.processCredits(true,
+                                  isPermanent: false));
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                        width: 30,
+                        child: IconButton(
+                          color: newEcwidProducts ? altHighlightColor : null,
+                          onPressed: () {
+                            userDatabase.put('newEcwidProducts', false);
+                            showModalBottomSheet(
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: false,
+                                enableDrag: true,
+                                context: context,
+                                builder: (context) {
+                                  return SharedWidgets.ecwidProductsListing(
+                                      context,
+                                      ecwidProductsList,
+                                      userDatabase,
+                                      userLevels,
+                                      productOrdersList);
+                                }).then((_) => !userIsPremium &&
+                                    interstitialAd != null &&
+                                    interstitialAd.responseInfo.responseId !=
+                                        userDatabase.get('interstitialAdId')
+                                ? AdMobLibrary()
+                                    .interstitialAdShow(interstitialAd)
+                                : null);
+                          },
+                          icon: new Icon(Icons.store),
+                        )),
+                    IconButton(
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                        icon: new Icon(Icons.more_vert))
+                  ],
+                ),
+                body: appLoading
+                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                        isFullScreen: true,
+                        isHomePage: true,
+                        thisGithubNotification: thisGithubNotification,
+                        backgroundImage:
+                            'assets/congress_pic_$headerImageCounter.png')
+                    : RefreshIndicator(
+                        onRefresh: getData,
+                        child: Row(
+                          children: [
+                            new Container(
+                              color: Theme.of(context).colorScheme.background,
+                              width: orientation == Orientation.landscape &&
+                                      youTubePlaylist.length > 0
+                                  ? MediaQuery.of(context).size.width * 0.58333
+                                  : MediaQuery.of(context).size.width,
+                              child: Column(
+                                children: [
+                                  _connectionLost
+                                      ? Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2),
+                                                alignment: Alignment.center,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .error,
+                                                child: Text(
+                                                  'OFFLINE',
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              darkThemeTextColor),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : SizedBox.shrink(),
+                                  userIsDev && isPeakCapitolBabblePostHours
+                                      ? Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2),
+                                                alignment: Alignment.center,
+                                                color:
+                                                    alertIndicatorColorDarkGreen,
+                                                child: Text(
+                                                  'PEAK HOURS',
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              darkThemeTextColor),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : SizedBox.shrink(),
+                                  userIsPremium && freeTrialUsed
+                                      ? InkWell(
+                                          onTap: () async => await Functions
+                                              .requestInAppPurchase(
+                                                  context, userIsPremium,
+                                                  whatToShow: 'upgrades'),
+                                          child: Container(
+                                            color: altHighlightColor,
+                                            alignment: Alignment.center,
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 4, 0, 3),
+                                            child: Text(
+                                                'FREE PREMIUM TRIAL ${freeTrialPromoDurationDays - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inDays > 1 ? 'EXPIRES IN ${freeTrialPromoDurationDays - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inDays} DAYS' : (freeTrialPromoDurationDays * 24) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inHours > 1 ? 'EXPIRES IN UNDER ${(freeTrialPromoDurationDays * 24) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inHours} HOURS' : (freeTrialPromoDurationDays * 1440) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inMinutes > 0 ? 'EXPIRES IN LESS THAN ${(freeTrialPromoDurationDays * 1440) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inMinutes} MINUTES' : 'HAS EXPIRED'}'
+                                                    .toUpperCase(),
+                                                textAlign: TextAlign.center,
+                                                style: Styles.regularStyle.copyWith(
+                                                    color:
+                                                        altHighlightAccentColorDarkRed,
+                                                    fontSize: 10,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                        )
+                                      : SizedBox.shrink(),
+                                  orientation == Orientation.landscape ||
+                                          youTubePlaylist.length == 0
+                                      ? SizedBox.shrink()
+                                      : Stack(
+                                          alignment: Alignment.centerLeft,
+                                          children: [
+                                            Center(
+                                              child: Container(
+                                                child: FadeIn(
+                                                  child: new Image.asset(
+                                                      'assets/congress_pic_$headerImageCounter.png',
+                                                      height: 120,
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                      fit: BoxFit.cover,
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
+                                                      colorBlendMode:
+                                                          BlendMode.softLight),
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 100,
+                                              foregroundDecoration:
+                                                  BoxDecoration(
+                                                border: Border(
+                                                    left: BorderSide(
+                                                        width: 2,
+                                                        color: !userDatabase
+                                                                .get(
+                                                                    'newVideos')
+                                                            ? Colors.transparent
+                                                            : userDatabase.get(
+                                                                    'darkTheme')
+                                                                ? alertIndicatorColorBrightGreen
+                                                                : altHighlightColor)),
+                                              ),
+                                              child: ListView.builder(
+                                                  primary: false,
+                                                  physics:
+                                                      BouncingScrollPhysics(),
+                                                  controller:
+                                                      _videoListController,
+                                                  shrinkWrap: true,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount:
+                                                      youTubePlaylist.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final PlaylistItem
+                                                        _thisVideo =
+                                                        youTubePlaylist[index];
+
+                                                    return Youtube()
+                                                        .youTubeVideoTile(
+                                                            context,
+                                                            youTubePlaylist,
+                                                            _thisVideo,
+                                                            index,
+                                                            orientation,
+                                                            interstitialAd,
+                                                            randomImageActivated,
+                                                            userLevels);
+                                                  }),
+                                            ),
+                                          ],
+                                        ),
+                                  Expanded(
+                                    child: new ListView(
+                                      shrinkWrap: true,
+                                      primary: false,
+                                      physics: BouncingScrollPhysics(),
+                                      children: [
+                                        userInfo(
+                                            memberSubs,
+                                            billSubs,
+                                            lobbySubs,
+                                            otherSubs,
+                                            subscriptionAlertsList),
+                                        newsArticleSlider(newsArticlesList),
+                                        houseFloorActions.isEmpty &&
+                                                senateFloorActions.isEmpty
+                                            ? SizedBox.shrink()
+                                            : floorActions(orientation),
+                                        congressInfoButtons(
+                                            subscriptionAlertsList),
+                                        marketTrades(),
+                                        userRepresentatives(orientation,
+                                            subscriptionAlertsList),
+                                        memberPublicStatements(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            /// RIGHT SIDE OF MAIN ROW
+                            orientation == Orientation.portrait ||
+                                    youTubePlaylist.length == 0
+                                ? SizedBox.shrink()
+                                : Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0.15),
+                                    width: MediaQuery.of(context).size.width *
+                                        2.5 /
+                                        6,
+                                    child: Container(
+                                      alignment: Alignment.topCenter,
+                                      child: Stack(
+                                        alignment: Alignment.topLeft,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Expanded(
+                                                child: SlideInUp(
+                                                  animate: true,
+                                                  duration: Duration(
+                                                      milliseconds: 1000),
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 2),
+                                                    foregroundDecoration:
+                                                        BoxDecoration(
+                                                      border: Border(
+                                                          top: BorderSide(
+                                                              width: 5,
+                                                              color: !userDatabase
+                                                                      .get(
+                                                                          'newVideos')
+                                                                  ? Colors
+                                                                      .transparent
+                                                                  : altHighlightColor)),
+                                                    ),
+                                                    child: ListView.builder(
+                                                        primary: false,
+                                                        physics:
+                                                            BouncingScrollPhysics(),
+                                                        controller:
+                                                            _videoListController,
+                                                        shrinkWrap: true,
+                                                        itemCount:
+                                                            youTubePlaylist
+                                                                .length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final _thisVideo =
+                                                              youTubePlaylist[
+                                                                  index];
+                                                          return Youtube()
+                                                              .youTubeVideoTile(
+                                                                  context,
+                                                                  youTubePlaylist,
+                                                                  _thisVideo,
+                                                                  index,
+                                                                  orientation,
+                                                                  interstitialAd,
+                                                                  randomImageActivated,
+                                                                  userLevels);
+                                                        }),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ),
+                      ),
+                bottomSheet: bottomSheetContent(),
+                bottomNavigationBar: new BottomAppBar(
+                  // color: Colors.transparent,
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        footerContent(orientation),
+                        SharedWidgets.createdByContainer(
+                            context, userIsPremium, userDatabase),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+        });
+  }
+
+  Future<void> homePageTextInput(BuildContext homeContext,
+      Orientation orientation, String source, String titleText) async {
+    final _formKey = GlobalKey<FormState>();
+    String _data;
+    showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return new Padding(
+                padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
+                child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      new Text(
+                        titleText,
+                        style: GoogleFonts.bangers(fontSize: 25),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom),
+                        child: new Form(
+                          key: _formKey,
+                          child: new Row(
+                            children: [
+                              new Expanded(
+                                child: new TextFormField(
+                                  keyboardType: source == 'zipCode'
+                                      ? TextInputType.number
+                                      : TextInputType.text,
+                                  validator: (val) => val == null || val.isEmpty
+                                      ? 'Enter text'
+                                      : (source == 'zipCode' &&
+                                                  val.length > 5) ||
+                                              val.length < 5 ||
+                                              val.length > 13
+                                          ? source == 'zipCode'
+                                              ? 'Zip must be 5 digits'
+                                              : source == 'userId'
+                                                  ? 'User must be 5 to 13 characters'
+                                                  : 'Must be more that 5 characters'
+                                          : null,
+                                  onChanged: (val) => setState(() => _data =
+                                      val.toLowerCase().replaceAll(' ', '')),
+                                ),
+                              ),
+                              new IconButton(
+                                  iconSize: 20,
+                                  onPressed: () async {
+                                    if (_formKey.currentState.validate()) {
+                                      Navigator.pop(context);
+                                      if (source == 'zipCode') {
+                                        await Functions.getUserCongress(
+                                          homeContext,
+                                          houseMembersList + senateMembersList,
+                                          _data,
+                                        ).then((value) {
+                                          setState(
+                                              () => userCongressList = value);
+                                        });
+                                      } else if (source == 'userId') {
+                                        List<String> _currentUserIdList =
+                                            List.from(
+                                                userDatabase.get('userIdList'));
+                                        if (!_currentUserIdList.any((element) =>
+                                            element.startsWith(
+                                                '$newUserIdPrefix$_data'))) {
+                                          _currentUserIdList.add(
+                                              '$newUserIdPrefix$_data<|:|>${DateTime.now()}');
+                                        } else if (_currentUserIdList.any(
+                                            (element) => element.startsWith(
+                                                '$newUserIdPrefix$_data'))) {
+                                          int _existingUserNameIndex =
+                                              _currentUserIdList.indexWhere(
+                                                  (element) => element.startsWith(
+                                                      '$newUserIdPrefix$_data'));
+
+                                          String _existingUserName =
+                                              _currentUserIdList.removeAt(
+                                                  _existingUserNameIndex);
+
+                                          // _currentUserIdList.removeWhere(
+                                          //     (element) => element.startsWith(
+                                          //         '$newUserIdPrefix$_data'));
+
+                                          _currentUserIdList
+                                              .add(_existingUserName);
+                                        }
+                                        userDatabase.put(
+                                            'userIdList', _currentUserIdList);
+                                      } else
+                                        logger
+                                            .d('***** Nothing to Update *****');
+                                    }
+                                  },
+                                  icon: Icon(Icons.send))
+                            ],
+                          ),
+                        ),
+                      )
+                    ]),
+              );
+            })
+        .then((_) async =>
+            await Functions.processCredits(true, isPermanent: false));
+  }
+
+  String membersSearchString = '';
+  String stateString = '';
+
+  Widget membersListContainer(
+      List<ChamberMember> allMembersList, String chamber,
+      {List<HouseStockWatch> houseStockWatchList,
+      List<SenateStockWatch> senateStockWatchList}) {
+    String shortTitle = chamber == 'Representatives' ? 'rep.' : 'sen.';
+    List<ChamberMember> _subscribedMembersList = [];
+    List<ChamberMember> _notSubscribedMembersList = [];
+    List<ChamberMember> _otherMembersList = [];
+
+    allMembersList.forEach((member) {
+      if (List.from(userDatabase.get('subscriptionAlertsList')).any((element) =>
+          element
+              .toString()
+              .toLowerCase()
+              .startsWith('member_${member.id.toLowerCase()}'))) {
+        _subscribedMembersList.add(member);
+      } else if (member.shortTitle.toLowerCase() == shortTitle) {
+        _notSubscribedMembersList.add(member);
+      } else {
+        _otherMembersList.add(member);
+      }
+    });
+
+    logger.d(
+        '***** All Members List - Short Title: $shortTitle,  Count: ${allMembersList.length} *****');
+
+    final List<ChamberMember> membersList =
+        _subscribedMembersList + _notSubscribedMembersList + _otherMembersList;
+
+    // membersList.retainWhere((element) => element.inOffice);
+
+    logger.d(
+        '***** Members List - Short Title: $shortTitle\n Sub Count: ${_subscribedMembersList.length}\n Not Sub Count: ${_notSubscribedMembersList.length}\n Other Count: ${_otherMembersList.length} *****');
+
+    List<ChamberMember> allRepublicans = membersList
+        .where((element) =>
+            element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+            element.party.toLowerCase() == 'r')
+        .toList();
+    List<ChamberMember> allDemocrats = membersList
+        .where((element) =>
+            element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+            element.party.toLowerCase() == 'd')
+        .toList();
+
+    final Color thisPartyColor = allDemocrats.length > allRepublicans.length
+        ? democratColor
+        : allDemocrats.length < allRepublicans.length
+            ? republicanColor
+            : Theme.of(context).primaryColor;
+
+    List<ChamberMember> finalMembersList = membersList;
+
+    // return ValueListenableBuilder(
+    //     valueListenable:
+    //         Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
+    //     builder: (context, box, widget) {
+    return new StatefulBuilder(builder: (context, setState) {
+      if (statesMap.entries.any((state) => state.value
+          .trim()
+          .toLowerCase()
+          .contains(membersSearchString.trim().toLowerCase()))) {
+        stateString = statesMap.entries
+            .where((element) => element.value
+                .trim()
+                .toLowerCase()
+                .contains(membersSearchString.trim().toLowerCase()))
+            .first
+            .key
+            .trim()
+            .toLowerCase();
+        // logger.d('***** State String: $stateString *****');
+      }
+
+      if (membersSearchString.isNotEmpty && stateString.isNotEmpty) {
+        finalMembersList = membersList
+            .where((member) =>
+                member
+                    .toJson()
+                    .toString()
+                    .toLowerCase()
+                    .contains(membersSearchString.trim().toLowerCase()) ||
+                member.state
+                    .trim()
+                    .toLowerCase()
+                    .contains(stateString.trim().toLowerCase()))
+            .toList();
+      } else if (membersSearchString.isNotEmpty && stateString.isEmpty) {
+        finalMembersList = membersList
+            .where((member) => member
+                .toJson()
+                .toString()
+                .toLowerCase()
+                .contains(membersSearchString.trim().toLowerCase()))
+            .toList();
+      } else if (membersSearchString.isEmpty && stateString.isEmpty) {
+        finalMembersList = membersList;
+      }
+      List<ChamberMember> finalRepublicans = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'r')
+          .toList();
+      List<ChamberMember> finalDemocrats = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'd')
+          .toList();
+      List<ChamberMember> finalIndependents = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'id')
+          .toList();
+
+      return BounceInUp(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.background,
+            image: DecorationImage(
+                opacity: 0.15,
+                image:
+                    AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.background, BlendMode.color)),
+          ),
+          child: new Column(
+            children: [
+              new Container(
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                color: thisPartyColor,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    new Expanded(
+                      child: new Text(
+                          '${finalMembersList.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} $chamber',
+                          style: GoogleFonts.bangers(
+                              color: Colors.white, fontSize: 25)),
+                    ),
+                    new Text(
+                        '${finalRepublicans.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Rep | '
+                        '${finalDemocrats.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Dem | '
+                        '${finalIndependents.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Ind',
+                        style: TextStyle(
+                            color: Color(0xffffffff),
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12)),
+                  ],
+                ),
+              ),
+              new Container(
+                // height: 30,
+                // alignment: Alignment.center,
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+                color: thisPartyColor,
+
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    new Expanded(
+                        child: new TextFormField(
+                      autofocus: false,
+                      onChanged: (val) => setState(() {
+                        membersSearchString = val;
+                        // logger.d('***** $membersSearchString *****');
+                      }),
+                      decoration: InputDecoration(
+                        filled: true,
+                        isDense: true,
+                        isCollapsed: true,
+                        fillColor: Color(0xaaffffff),
+                        hintText: 'Search',
+                        hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: thisPartyColor,
+                            fontWeight: FontWeight.bold),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                        icon: Icon(Icons.search,
+                            color: Color(0xffffffff), size: 20),
+                      ),
+                    )),
+                  ],
+                ),
+              ),
+              new Expanded(
+                child: new Scrollbar(
+                  child: new ListView.builder(
+                    controller: scrollController,
+                    physics: BouncingScrollPhysics(),
+                    primary: false,
+                    shrinkWrap: true,
+                    itemCount: finalMembersList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final thisMember = finalMembersList[index];
+                      final String thisMemberImageUrl =
+                          '${PropublicaApi().memberImageRootUrl}${thisMember.id}.jpg'
+                              .toLowerCase();
+                      logger.d('**** Image Url: $thisMemberImageUrl *****');
+                      final Color thisMemberColor =
+                          thisMember.party.toLowerCase() == 'd'
+                              ? democratColor
+                              : thisMember.party.toLowerCase() == 'r'
+                                  ? republicanColor
+                                  : independentColor;
+                      return SharedWidgets.congressionalMemberCard(
+                          thisMemberColor,
+                          thisMemberImageUrl,
+                          thisMember,
+                          context,
+                          index,
+                          houseStockWatchList,
+                          senateStockWatchList);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+    // });
+  }
+
+  Widget bottomSheetContent() {
+    return appLoading
+        ? Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+            ),
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width.toDouble(),
+            height: 35,
+            child: Text(appLoadingText,
+                style: Styles.googleStyle
+                    .copyWith(fontSize: 18, color: darkThemeTextColor)))
+        : Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+            ),
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width.toDouble(),
+            height: 35,
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 22,
+                      child: FlipInY(
+                        child: new ElevatedButton.icon(
+                          style: ButtonStyle(
+                            enableFeedback: true,
+                            backgroundColor: darkTheme
+                                ? MaterialStateProperty.all<Color>(
+                                    Theme.of(context).primaryColorDark)
+                                : altHighlightMSPColor,
+                          ),
+                          icon: newEcwidProducts
+                              ? AnimatedWidgets.flashingText(
+                                  context, 'New!', newEcwidProducts, false,
+                                  size: 13,
+                                  color: darkTheme
+                                      ? altHighlightColor
+                                      : altHighlightAccentColorDarkRed,
+                                  removeShadow: true)
+                              : FaIcon(
+                                  FontAwesomeIcons.store,
+                                  size: 13,
+                                  color: darkTheme
+                                      ? darkThemeTextColor
+                                      : altHighlightAccentColorDarkRed,
+                                ),
+                          label: Text('Shop Merch',
+                              style: TextStyle(
+                                  color: darkTheme
+                                      ? darkThemeTextColor
+                                      : altHighlightAccentColorDarkRed,
+                                  fontWeight: FontWeight.bold)),
+                          onPressed: ecwidProductsList.isEmpty
+                              ? null
+                              : () {
+                                  userDatabase.put('newEcwidProducts', false);
+                                  showModalBottomSheet(
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: false,
+                                      enableDrag: true,
+                                      context: context,
+                                      builder: (context) {
+                                        return SharedWidgets
+                                            .ecwidProductsListing(
+                                                context,
+                                                ecwidProductsList,
+                                                userDatabase,
+                                                userLevels,
+                                                productOrdersList);
+                                      }).then((_) => !userIsPremium &&
+                                          interstitialAd != null &&
+                                          interstitialAd
+                                                  .responseInfo.responseId !=
+                                              userDatabase
+                                                  .get('interstitialAdId')
+                                      ? AdMobLibrary()
+                                          .interstitialAdShow(interstitialAd)
+                                      : null);
+                                },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: SizedBox(
+                      height: 22,
+                      child: FlipInY(
+                        child: new ElevatedButton.icon(
+                          style: ButtonStyle(
+                            enableFeedback: true,
+                            backgroundColor: darkTheme
+                                ? MaterialStateProperty.all<Color>(
+                                    Theme.of(context).primaryColorDark)
+                                : altHighlightMSPColor,
+                          ),
+                          icon: Icon(
+                            Icons.volunteer_activism,
+                            size: 15,
+                            color: darkTheme
+                                ? darkThemeTextColor
+                                : altHighlightAccentColorDarkRed,
+                          ),
+                          label: Text('Support Options',
+                              style: TextStyle(
+                                  color: darkTheme
+                                      ? darkThemeTextColor
+                                      : altHighlightAccentColorDarkRed,
+                                  fontWeight: FontWeight.bold)),
+                          onPressed: () async {
+                            showModalBottomSheet(
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: false,
+                                enableDrag: true,
+                                context: context,
+                                builder: (context) {
+                                  return SharedWidgets.supportOptions(context,
+                                      userDatabase, rewardedAd, userLevels);
+                                }).then((_) => !userIsPremium &&
+                                    interstitialAd != null &&
+                                    interstitialAd.responseInfo.responseId !=
+                                        userDatabase.get('interstitialAdId')
+                                ? AdMobLibrary()
+                                    .interstitialAdShow(interstitialAd)
+                                : null);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+  }
+
+  Widget newsArticleSlider(List<NewsArticle> newsArticles) {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+        child: Container(
+          height: 55,
+          decoration: BoxDecoration(
+              color: darkTheme
+                  ? Theme.of(context).primaryColor
+                  : Theme.of(context).colorScheme.background,
+              image: DecorationImage(
+                  opacity: darkTheme ? 0.4 : 0.25,
+                  image: AssetImage(
+                      'assets/congress_pic_${randomImageActivated ? random.nextInt(4) : headerImageCounter}.png'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      darkTheme
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.background,
+                      BlendMode.color)),
+              border: Border.all(
+                  width: 1,
+                  color: darkTheme
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).colorScheme.background),
+              borderRadius: BorderRadius.circular(3)),
+          child: Row(children: [
+            // CircleAvatar(backgroundColor: Colors.purple),
+            Expanded(
+                child: ListView.builder(
+                    controller: newsArticleSliderController,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: newsArticles.length,
+                    itemBuilder: (context, index) {
+                      NewsArticle thisArticle = newsArticles[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2.5, vertical: 2.5),
+                        child: InkWell(
+                            onTap: () => Functions.linkLaunch(context,
+                                thisArticle.url, userDatabase, userIsPremium,
+                                appBarTitle: thisArticle.source,
+                                interstitialAd: interstitialAd),
+                            child: FadeInRight(
+                              child: Container(
+                                  // width: 190,
+                                  constraints: BoxConstraints(
+                                      minWidth: 100, maxWidth: 250),
+                                  padding: const EdgeInsets.all(5),
+                                  // decoration: BoxDecoration(
+                                  //     color: Theme.of(context)
+                                  //         .colorScheme
+                                  //         .background
+                                  //         .withOpacity(0.5),
+                                  //     // border: Border.all(width: 1),
+                                  //     borderRadius: BorderRadius.circular(3),
+                                  //     image: DecorationImage(
+                                  //         opacity: 0.25,
+                                  //         image: AssetImage(
+                                  //             'assets/congress_pic_$headerImageCounter.png'),
+                                  //         fit: BoxFit.cover,
+                                  //         colorFilter: ColorFilter.mode(
+                                  //             Theme.of(context).primaryColor,
+                                  //             BlendMode.color))),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 55,
+                                        // height: 25,
+                                        decoration: BoxDecoration(
+                                          // shape: BoxShape.circle,
+                                          // border: Border.all(width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/congress_pic_$headerImageCounter.png'),
+                                              fit: BoxFit.cover),
+                                        ),
+                                        foregroundDecoration: BoxDecoration(
+                                          // shape: BoxShape.circle,
+                                          border: Border.all(width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  thisArticle.imageUrl),
+                                              fit: BoxFit.cover),
+                                        ),
+                                        // child: FadeInImage(
+                                        //     width: 45,
+                                        //     height: 35,
+                                        //     placeholder: AssetImage(
+                                        //         'assets/congress_pic_$headerImageCounter.png'),
+                                        //     image: NetworkImage(
+                                        //         thisArticle.imageUrl),
+                                        //     fit: BoxFit.cover),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Flexible(
+                                        child: Text(
+                                          // thisArticle.title.length > 100
+                                          //     ? thisArticle.title
+                                          //         .replaceRange(100, null, '...')
+                                          //     :
+                                          thisArticle.title,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.regularStyle.copyWith(
+                                              fontSize: 12,
+                                              color: darkTheme
+                                                  ? darkThemeTextColor
+                                                  : null,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                            )),
+                      );
+                    })),
+            // CircleAvatar(
+            //   backgroundColor: Colors.purple,
+            // )
+          ]),
+        ));
+  }
+
+  Widget userInfo(
+      List<String> memberSubs,
+      List<String> billSubs,
+      List<String> lobbySubs,
+      List<String> otherSubs,
+      List<String> subscriptionAlertsList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          alignment: Alignment.center,
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // const SizedBox(height: 5),
+              (!userIsPremium && !userIsLegacy) ||
+                      (memberSubs.isEmpty &&
+                          billSubs.isEmpty &&
+                          lobbySubs.isEmpty &&
+                          otherSubs.isEmpty)
+                  ? SizedBox.shrink()
+                  : SizedBox(
+                      height: 22,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          // darkTheme
+                                          //     ? null
+                                          //     :
+                                          Theme.of(context)
+                                              .primaryColorDark
+                                              .withOpacity(0.5))),
+                              icon: AnimatedWidgets.flashingEye(
+                                  context,
+                                  memberSubs.isNotEmpty ||
+                                      billSubs.isNotEmpty ||
+                                      lobbySubs.isNotEmpty ||
+                                      otherSubs.isNotEmpty,
+                                  false,
+                                  animate: false,
+                                  size: 9),
+                              label: Text(
+                                  'Watching ${memberSubs.length} Members | ${billSubs.length} Bills | ${lobbySubs.length} Lobbies | ${otherSubs.length} Other Items'
+                                      .toUpperCase(),
+                                  style: Styles.regularStyle.copyWith(
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: darkTheme
+                                          ? darkThemeTextColor
+                                          : Theme.of(context)
+                                              .primaryColorDark)),
+                              // label: Text(
+                              //     ' 🧑🏽‍💼  ${memberSubs.length}   📜  ${billSubs.length}   💰  ${lobbySubs.length}' //   ✍🏽  ${otherSubs.length}'
+                              //         .toUpperCase(),
+                              //     style: Styles.regularStyle.copyWith(
+                              //         fontSize: 11,
+                              //         fontWeight: FontWeight.bold,
+                              //         color: darkTheme
+                              //             ? darkThemeTextColor
+                              //             : Theme.of(context)
+                              //                 .primaryColorDark)),
+                              onPressed: (subscriptionAlertsList.any(
+                                              (element) => element
+                                                  .toString()
+                                                  .startsWith('member_')) &&
+                                          (houseMembersList.isEmpty ||
+                                              senateMembersList.isEmpty)) ||
+                                      (subscriptionAlertsList.any((element) =>
+                                              element
+                                                  .toString()
+                                                  .startsWith('lobby_')) &&
+                                          lobbyingEventsList.isEmpty) ||
+                                      (subscriptionAlertsList.any((element) =>
+                                              element
+                                                  .toString()
+                                                  .startsWith('bill_')) &&
+                                          billList.isEmpty)
+                                  ? null
+                                  : () => showModalBottomSheet(
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: false,
+                                      enableDrag: true,
+                                      context: context,
+                                      builder: (context) {
+                                        return SharedWidgets.subscriptionsList(
+                                            context,
+                                            userDatabase,
+                                            senateMembersList +
+                                                houseMembersList,
+                                            billList,
+                                            lobbyingEventsList,
+                                            houseStockWatchList,
+                                            senateStockWatchList);
+                                      }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget marketTrades() {
+    String buyIndicator = '🟢 ';
+    String sellIndicator = '🔴 ';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        !userIsPremium
+            ? Padding(
+                padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                child: InkWell(
+                    onTap: () async => Functions.requestInAppPurchase(
+                        context, userIsPremium,
+                        whatToShow: 'upgrades'),
+                    child: BounceInDown(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 5),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                opacity: 0.15,
+                                image: AssetImage(
+                                    'assets/stock${randomImageActivated ? random.nextInt(3) : headerImageCounter}.png'),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.grey, BlendMode.color)),
+                            color: Colors.grey,
+                            border:
+                                Border.all(width: 2, color: Colors.grey[600]),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Text(
+                            'GET LATEST CONGRESSIONAL MEMBER MARKET TRADES',
+                            style: Styles.googleStyle.copyWith(
+                                fontSize: 18,
+                                color: darkTheme
+                                    ? Theme.of(context).primaryColorDark
+                                    : darkThemeTextColor)),
+                      ),
+                    )))
+            : houseStockWatchList.isEmpty && senateStockWatchList.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                    child: InkWell(
+                        onTap: () => getData(),
+                        child: ZoomIn(
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 5),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        opacity: 0.15,
+                                        image: AssetImage(
+                                            'assets/stock${random.nextInt(3)}.png'),
+                                        fit: BoxFit.cover,
+                                        colorFilter: ColorFilter.mode(
+                                            darkTheme
+                                                ? Theme.of(context)
+                                                    .primaryColorDark
+                                                : stockWatchColor,
+                                            BlendMode.color)),
+                                    color: darkTheme
+                                        ? Theme.of(context).primaryColorDark
+                                        : stockWatchColor,
+                                    border: Border.all(
+                                        width: 2,
+                                        color: darkTheme
+                                            ? Theme.of(context).primaryColorDark
+                                            : stockWatchColor),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Text(
+                                    'TAP HERE TO REFRESH MARKET TRADE DATA',
+                                    style: Styles.googleStyle.copyWith(
+                                        fontSize: 18,
+                                        color: darkThemeTextColor)),
+                              ),
+                              dataRefresh
+                                  ? LinearProgressIndicator(
+                                      color: stockWatchColor)
+                                  : const SizedBox.shrink()
+                            ],
+                          ),
+                        )))
+                : Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 10, 5, 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          child: Text(
+                              'LATEST MARKET TRADES BY CHAMBER (Reported)',
+                              style: Styles.googleStyle.copyWith(fontSize: 18)),
+                        ),
+                        const SizedBox(height: 5),
+                        FlipInY(
+                          child: InkWell(
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: darkTheme
+                                      ? Theme.of(context).primaryColorDark
+                                      : stockWatchColor,
+                                  image: DecorationImage(
+                                      opacity: 0.4,
+                                      image: AssetImage(
+                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 1}.png'),
+                                      fit: BoxFit.cover,
+                                      colorFilter: ColorFilter.mode(
+                                          darkTheme
+                                              ? Theme.of(context)
+                                                  .primaryColorDark
+                                              : stockWatchColor,
+                                          BlendMode.color)),
+                                  border: Border.all(
+                                      width: 2,
+                                      color: darkTheme
+                                          ? Theme.of(context).primaryColorDark
+                                          : stockWatchColor),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: new TextButton.icon(
+                                icon: userDatabase.get('newMarketOverview')
+                                    ? AnimatedWidgets.flashingText(
+                                        context,
+                                        '!!!',
+                                        userDatabase.get('newMarketOverview'),
+                                        false,
+                                        size: 13,
+                                        sameColor: true)
+                                    : _marketPageLoading
+                                        ? FaIcon(
+                                            FontAwesomeIcons.solidHourglass,
+                                            size: 11,
+                                            color: darkThemeTextColor,
+                                          )
+                                        : FaIcon(
+                                            FontAwesomeIcons.chartSimple,
+                                            size: 13,
+                                            color: darkThemeTextColor,
+                                          ),
+                                label: Text(
+                                    _marketPageLoading
+                                        ? 'Loading Latest Market Data...'
+                                        : 'Stock Market Activity Overview',
+                                    style: Styles.regularStyle.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkThemeTextColor)),
+                                onPressed: null,
+                              ),
+                            ),
+                            onTap: (houseStockWatchList.isEmpty &&
+                                    senateStockWatchList.isEmpty)
+                                ? null
+                                : () {
+                                    setState(() => _marketPageLoading = true);
+                                    userDatabase.put(
+                                        'newMarketOverview', false);
+                                    Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    MarketActivityPage(
+                                                        houseMembersList +
+                                                            senateMembersList,
+                                                        houseStockWatchList,
+                                                        senateStockWatchList,
+                                                        marketActivityOverviewList)))
+                                        .then((_) => setState(
+                                            () => _marketPageLoading = false));
+                                  },
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            senateStockWatchList.isEmpty
+                                ? const SizedBox.shrink()
+                                : Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        userDatabase.put(
+                                            'newSenateStock', false);
+                                        showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: false,
+                                            enableDrag: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return SharedWidgets
+                                                  .stockWatchList(
+                                                context,
+                                                false,
+                                                userDatabase,
+                                                houseStockWatchList,
+                                                senateStockWatchList,
+                                                senateMembersList +
+                                                    houseMembersList,
+                                                userIsPremium,
+                                              );
+                                            });
+
+                                        // userDatabase.put(
+                                        //     'newSenateStock', false);
+                                      },
+                                      child: SlideInRight(
+                                        child: Stack(
+                                          alignment: Alignment.topRight,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      opacity: 0.4,
+                                                      image: AssetImage(
+                                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 0}.png'),
+                                                      fit: BoxFit.cover,
+                                                      colorFilter: ColorFilter.mode(
+                                                          darkTheme
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .primaryColorDark
+                                                              : stockWatchColor,
+                                                          BlendMode.color)),
+                                                  color: darkTheme
+                                                      ? Theme.of(context)
+                                                          .primaryColorDark
+                                                      : stockWatchColor,
+                                                  border: Border.all(
+                                                      width: 2,
+                                                      color: darkTheme
+                                                          ? Theme.of(context)
+                                                              .primaryColorDark
+                                                          : stockWatchColor),
+                                                  borderRadius:
+                                                      BorderRadius.circular(3)),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: FadeInRight(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          'Sen. ${senateStockWatchList.first.senator}',
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: Styles
+                                                              .regularStyle
+                                                              .copyWith(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      darkThemeTextColor)),
+                                                      Text(
+                                                        'Exec. ${dateWithDayAndYearFormatter.format(senateStockWatchList.first.transactionDate)}',
+                                                        style: Styles
+                                                            .regularStyle
+                                                            .copyWith(
+                                                                fontSize: 11,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                color:
+                                                                    darkThemeTextColor),
+                                                      ),
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Flexible(
+                                                            child: Text(
+                                                              '${senateStockWatchList.first.type == null || senateStockWatchList.first.type == 'N/A' ? '' : senateStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : senateStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${senateStockWatchList.first.ticker == null || senateStockWatchList.first.ticker == '--' || senateStockWatchList.first.ticker == 'N/A' ? senateStockWatchList.first.assetType : '\$${senateStockWatchList.first.ticker}'}',
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: Styles
+                                                                  .regularStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          darkThemeTextColor),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: userDatabase
+                                                      .get('newSenateStock')
+                                                  ? AnimatedWidgets.flashingText(
+                                                      context,
+                                                      '!!!',
+                                                      userDatabase.get(
+                                                          'newSenateStock'),
+                                                      false,
+                                                      size: 14,
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : darkThemeTextColor)
+                                                  : FaIcon(Icons.more_vert,
+                                                      size: 14,
+                                                      color: userDatabase.get(
+                                                              'newSenateStock')
+                                                          ? altHighlightColor
+                                                          : darkThemeTextColor),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            houseStockWatchList.isEmpty ||
+                                    senateStockWatchList.isEmpty
+                                ? const SizedBox.shrink()
+                                : const SizedBox(width: 5),
+                            houseStockWatchList.isEmpty
+                                ? const SizedBox.shrink()
+                                : Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        userDatabase.put(
+                                            'newHouseStock', false);
+                                        showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: false,
+                                            enableDrag: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return SharedWidgets
+                                                  .stockWatchList(
+                                                      context,
+                                                      true,
+                                                      userDatabase,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList,
+                                                      senateMembersList +
+                                                          houseMembersList,
+                                                      userIsPremium);
+                                            });
+
+                                        // userDatabase.put(
+                                        //     'newHouseStock', false);
+                                      },
+                                      child: SlideInRight(
+                                        child: Stack(
+                                          alignment: Alignment.topRight,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                      opacity: 0.4,
+                                                      image: AssetImage(
+                                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 2}.png'),
+                                                      fit: BoxFit.cover,
+                                                      colorFilter: ColorFilter.mode(
+                                                          darkTheme
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .primaryColorDark
+                                                              : stockWatchColor,
+                                                          BlendMode.color)),
+                                                  color: darkTheme
+                                                      ? Theme.of(context)
+                                                          .primaryColorDark
+                                                      : stockWatchColor,
+                                                  border: Border.all(
+                                                      width: 2,
+                                                      color: darkTheme
+                                                          ? Theme.of(context)
+                                                              .primaryColorDark
+                                                          : stockWatchColor),
+                                                  borderRadius:
+                                                      BorderRadius.circular(3)),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: FadeInRight(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          '${houseStockWatchList.first.representative}',
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: Styles
+                                                              .regularStyle
+                                                              .copyWith(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      darkThemeTextColor)),
+                                                      Text(
+                                                        'Exec. ${dateWithDayAndYearFormatter.format(houseStockWatchList.first.transactionDate)}',
+                                                        style: Styles
+                                                            .regularStyle
+                                                            .copyWith(
+                                                                fontSize: 11,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                color:
+                                                                    darkThemeTextColor),
+                                                      ),
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        // mainAxisAlignment:
+                                                        //     MainAxisAlignment
+                                                        //         .center,
+                                                        children: [
+                                                          Flexible(
+                                                            child: Text(
+                                                              '${houseStockWatchList.first.type == null || houseStockWatchList.first.type == '--' ? '' : houseStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : houseStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${houseStockWatchList.first.ticker == null || houseStockWatchList.first.ticker == 'N/A' || houseStockWatchList.first.ticker == '--' ? houseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '') : '\$${houseStockWatchList.first.ticker}'}',
+                                                              // textAlign:
+                                                              //     TextAlign
+                                                              //         .center,
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: Styles
+                                                                  .regularStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          darkThemeTextColor),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: userDatabase
+                                                      .get('newHouseStock')
+                                                  ? AnimatedWidgets.flashingText(
+                                                      context,
+                                                      '!!!',
+                                                      userDatabase
+                                                          .get('newHouseStock'),
+                                                      false,
+                                                      size: 14,
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : darkThemeTextColor)
+                                                  : FaIcon(Icons.more_vert,
+                                                      size: 14,
+                                                      color: userDatabase.get(
+                                                              'newHouseStock')
+                                                          ? altHighlightColor
+                                                          : darkThemeTextColor),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+      ],
+    );
+  }
+
+  Widget floorActions(Orientation orientation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+          child: (houseFloorActions.isNotEmpty &&
+                      houseFloorActions.first.timestamp.isBefore(
+                          DateTime.now().subtract(Duration(days: 7)))) &&
+                  (senateFloorActions.isNotEmpty &&
+                      senateFloorActions.first.timestamp
+                          .isBefore(DateTime.now().subtract(Duration(days: 7))))
+              ? const SizedBox.shrink()
+              : Text('Latest Floor Actions',
+                  style: GoogleFonts.bangers(fontSize: 18)),
+        ),
+        houseFloorActions.isNotEmpty &&
+                houseFloorActions.first.timestamp
+                    .isBefore(DateTime.now().subtract(Duration(days: 7)))
+            ? const SizedBox.shrink()
+            : Container(
+                padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                width: orientation == Orientation.landscape
+                    ? MediaQuery.of(context).size.width * 0.58333
+                    : MediaQuery.of(context).size.width,
+                height: 75,
+                child: houseFloorLoading ||
+                        houseFloorActions == null ||
+                        houseFloorActions.length <= 0
+                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                        widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
+                    : BounceInRight(
+                        from: 75,
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.5),
+                              child: RotatedBox(
+                                  quarterTurns: -1,
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 2.5),
+                                    decoration: BoxDecoration(
+                                        color: userDatabase.get('newHouseFloor')
+                                            ? Theme.of(context).primaryColorDark
+                                            : Theme.of(context)
+                                                .highlightColor
+                                                .withOpacity(0.125),
+                                        borderRadius: BorderRadius.circular(3)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'HOUSE',
+                                            textAlign: TextAlign.center,
+                                            style: new TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: userDatabase
+                                                      .get('newHouseFloor')
+                                                  ? userDatabase
+                                                          .get('darkTheme')
+                                                      ? alertIndicatorColorBrightGreen
+                                                      : darkThemeTextColor
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: houseFloorActions.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: InkWell(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              isScrollControlled: false,
+                                              enableDrag: true,
+                                              context: context,
+                                              builder: (context) =>
+                                                  SharedWidgets.floorActionsList(
+                                                      context,
+                                                      'House',
+                                                      houseFloorActions,
+                                                      userDatabase,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList)).then(
+                                              (_) => !userIsPremium &&
+                                                      interstitialAd != null &&
+                                                      interstitialAd
+                                                              .responseInfo
+                                                              .responseId !=
+                                                          userDatabase.get(
+                                                              'interstitialAdId')
+                                                  ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                                  : null);
+
+                                          userDatabase.put(
+                                              'newHouseFloor', false);
+                                        },
+                                        child: Container(
+                                          width: orientation ==
+                                                  Orientation.landscape
+                                              ? MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5
+                                              : MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.85,
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .highlightColor
+                                                .withOpacity(0.125),
+                                            shape: BoxShape.rectangle,
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                          ),
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.all(10.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      '${dateWithTimeFormatter.format(houseFloorActions[index].timestamp.toLocal())}',
+                                                      style: new TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Flexible(
+                                                child: new Text(
+                                                  houseFloorActions[index]
+                                                      .description,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: new TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+        const SizedBox(height: 5),
+        senateFloorActions.isNotEmpty &&
+                senateFloorActions.first.timestamp
+                    .isBefore(DateTime.now().subtract(Duration(days: 7)))
+            ? const SizedBox.shrink()
+            : Container(
+                padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                width: orientation == Orientation.landscape
+                    ? MediaQuery.of(context).size.width * 0.58333
+                    : MediaQuery.of(context).size.width,
+                height: 75,
+                child: senateFloorLoading ||
+                        senateFloorActions == null ||
+                        senateFloorActions.length <= 0
+                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                        widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
+                    : BounceInRight(
+                        from: 75,
+                        delay: const Duration(milliseconds: 300),
+                        child: Stack(
+                          alignment: AlignmentDirectional.topEnd,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 2.5),
+                                  child: RotatedBox(
+                                    quarterTurns: -1,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2.5),
+                                      decoration: BoxDecoration(
+                                          color:
+                                              userDatabase.get('newSenateFloor')
+                                                  ? Theme.of(context)
+                                                      .primaryColorDark
+                                                  : Theme.of(context)
+                                                      .highlightColor
+                                                      .withOpacity(0.125),
+                                          borderRadius:
+                                              BorderRadius.circular(3)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'SENATE',
+                                              textAlign: TextAlign.center,
+                                              style: new TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: userDatabase
+                                                        .get('newSenateFloor')
+                                                    ? userDatabase
+                                                            .get('darkTheme')
+                                                        ? alertIndicatorColorBrightGreen
+                                                        : darkThemeTextColor
+                                                    : Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: BouncingScrollPhysics(),
+                                      itemCount: senateFloorActions.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 5),
+                                          child: InkWell(
+                                            onTap: () {
+                                              showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      SharedWidgets.floorActionsList(
+                                                          context,
+                                                          'Senate',
+                                                          senateFloorActions,
+                                                          userDatabase,
+                                                          houseStockWatchList,
+                                                          senateStockWatchList)).then(
+                                                  (_) => !userIsPremium &&
+                                                          interstitialAd !=
+                                                              null &&
+                                                          interstitialAd
+                                                                  .responseInfo
+                                                                  .responseId !=
+                                                              userDatabase.get(
+                                                                  'interstitialAdId')
+                                                      ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                                      : null);
+
+                                              userDatabase.put(
+                                                  'newSenateFloor', false);
+                                            },
+                                            child: new Container(
+                                              width: orientation ==
+                                                      Orientation.landscape
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.5
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.85,
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .highlightColor
+                                                    .withOpacity(0.125),
+                                                shape: BoxShape.rectangle,
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                              ),
+                                              alignment: Alignment.center,
+                                              padding: EdgeInsets.all(10.0),
+                                              child: new Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  new Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          '${dateWithTimeFormatter.format(senateFloorActions[index].timestamp.toLocal())}',
+                                                          style: new TextStyle(
+                                                            fontSize: 11,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                        Spacer(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  new Flexible(
+                                                    child: new Text(
+                                                      senateFloorActions[index]
+                                                          .description,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: new TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+      ],
+    );
+  }
+
+  Widget congressInfoButtons(List<String> subscriptionAlertsList) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: SizedBox(
+          height: 30,
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              new Expanded(
+                child: FlipInY(
+                  child: new ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Theme.of(context).primaryColorDark)),
+                      onPressed: billList == null || billList.length == 0
+                          ? null
+                          : () async {
+                              showModalBottomSheet(
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: false,
+                                  enableDrag: true,
+                                  context: context,
+                                  builder: (context) {
+                                    return SharedWidgets.recentBillsList(
+                                        context,
+                                        userDatabase,
+                                        billList,
+                                        houseStockWatchList,
+                                        senateStockWatchList);
+                                  }).then((_) => !userIsPremium &&
+                                      interstitialAd != null &&
+                                      interstitialAd.responseInfo.responseId !=
+                                          userDatabase.get('interstitialAdId')
+                                  ? AdMobLibrary()
+                                      .interstitialAdShow(interstitialAd)
+                                  : null);
+
+                              userDatabase.put('newBills', false);
+                              await Functions.processCredits(true,
+                                  isPermanent: false);
+                            },
+                      icon: userDatabase.get('newBills')
+                          ? AnimatedWidgets.flashingText(context, '!!!',
+                              userDatabase.get('newBills'), false,
+                              size: 13, sameColor: true)
+                          : FaIcon(FontAwesomeIcons.scroll,
+                              color: darkThemeTextColor, size: 12.5),
+                      label: Text('Recent Bills',
+                          style: TextStyle(color: darkThemeTextColor))),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: FlipInY(
+                  child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Theme.of(context).primaryColorDark)),
+                      onPressed: voteList.length == 0
+                          ? null
+                          : () async {
+                              showModalBottomSheet(
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: false,
+                                  enableDrag: true,
+                                  context: context,
+                                  builder: (context) {
+                                    return SharedWidgets.recentVotesList(
+                                        context,
+                                        userDatabase,
+                                        voteList,
+                                        houseStockWatchList,
+                                        senateStockWatchList);
+                                  }).then((_) => !userIsPremium &&
+                                      interstitialAd != null &&
+                                      interstitialAd.responseInfo.responseId !=
+                                          userDatabase.get('interstitialAdId')
+                                  ? AdMobLibrary()
+                                      .interstitialAdShow(interstitialAd)
+                                  : null);
+
+                              userDatabase.put('newVotes', false);
+                              await Functions.processCredits(true,
+                                  isPermanent: false);
+                            },
+                      icon: userDatabase.get('newVotes')
+                          ? AnimatedWidgets.flashingText(context, '!!!',
+                              userDatabase.get('newVotes'), false,
+                              size: 13, sameColor: true)
+                          : FaIcon(FontAwesomeIcons.gavel,
+                              color: darkThemeTextColor, size: 13),
+                      label: Text('Recent Votes',
+                          style: TextStyle(color: darkThemeTextColor))),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      new Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: SizedBox(
+          height: 30,
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              new Expanded(
+                child: FlipInY(
+                  child: new ElevatedButton.icon(
+                      style: ButtonStyle(
+                          enableFeedback: true,
+                          backgroundColor: darkTheme
+                              ? primaryMSPColorDark
+                              : senateRepublicansList.length >
+                                      senateDemocratsList.length
+                                  ? republicanMSPColor
+                                  : senateRepublicansList.length <
+                                          senateDemocratsList.length
+                                      ? democratMSPColor
+                                      : null),
+                      onPressed: senateMembersList.length == 0
+                          ? null
+                          : () async {
+                              showModalBottomSheet(
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: false,
+                                      enableDrag: true,
+                                      context: context,
+                                      builder: (context) {
+                                        return membersListContainer(
+                                            senateMembersList, 'Senators',
+                                            houseStockWatchList:
+                                                houseStockWatchList,
+                                            senateStockWatchList:
+                                                senateStockWatchList);
+                                      })
+                                  .whenComplete(() =>
+                                      setState(() => membersSearchString = ''))
+                                  .then((value) async =>
+                                      await Functions.processCredits(true,
+                                          isPermanent: false));
+                            },
+                      icon: loadingSenators
+                          ? SizedBox(
+                              width: 15,
+                              height: 15,
+                              child: new CircularProgressIndicator(
+                                strokeWidth: 1,
+                                color: republicanColor,
+                                backgroundColor: democratColor,
+                              ),
+                            )
+                          : FaIcon(FontAwesomeIcons.peopleGroup,
+                              size: 13, color: Color(0xffffffff)),
+                      label: Text('Senators',
+                          style: TextStyle(color: Color(0xffffffff)))),
+                ),
+              ),
+              const SizedBox(width: 5),
+              new Expanded(
+                child: FlipInY(
+                  child: new ElevatedButton.icon(
+                    icon: loadingRepresentatives
+                        ? SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: new CircularProgressIndicator(
+                              strokeWidth: 1,
+                              color: republicanColor,
+                              backgroundColor: democratColor,
+                            ),
+                          )
+                        : FaIcon(FontAwesomeIcons.peopleGroup,
+                            size: 13, color: Color(0xffffffff)),
+                    label: Text('Representatives',
+                        style: TextStyle(color: Color(0xffffffff))),
+                    style: ButtonStyle(
+                        enableFeedback: true,
+                        backgroundColor: darkTheme
+                            ? primaryMSPColorDark
+                            : houseRepublicansList.length >
+                                    houseDemocratsList.length
+                                ? republicanMSPColor
+                                : houseRepublicansList.length <
+                                        houseDemocratsList.length
+                                    ? democratMSPColor
+                                    : null),
+                    onPressed: houseMembersList.length == 0
+                        ? null
+                        : () async {
+                            showModalBottomSheet(
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: false,
+                                    enableDrag: true,
+                                    context: context,
+                                    builder: (context) {
+                                      return membersListContainer(
+                                          houseMembersList, 'Representatives',
+                                          houseStockWatchList:
+                                              houseStockWatchList,
+                                          senateStockWatchList:
+                                              senateStockWatchList);
+                                    })
+                                .whenComplete(() =>
+                                    setState(() => membersSearchString = ''))
+                                .then((value) async =>
+                                    await Functions.processCredits(true,
+                                        isPermanent: false));
+                          },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      Container(
+        child: new Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: SizedBox(
+            height: 30,
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                new Expanded(
+                  child: FlipInY(
+                    child: new ElevatedButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor: !userIsPremium && !userIsLegacy
+                              ? disabledMSPColorGray
+                              : darkTheme
+                                  ? primaryMSPColorDark
+                                  : lobbyingEventsList.length == 0
+                                      ? disabledMSPColorGray
+                                      : alertIndicatorMSPColorDarkGreen,
+                        ),
+                        icon: (userIsPremium || userIsLegacy) &&
+                                userDatabase.get('newLobbies')
+                            ? AnimatedWidgets.flashingText(context, '!!!',
+                                userDatabase.get('newLobbies'), false,
+                                size: 13, sameColor: true)
+                            : FaIcon(
+                                FontAwesomeIcons.moneyBills,
+                                size: 13,
+                                color: userIsPremium || userIsLegacy
+                                    ? darkThemeTextColor
+                                    : null,
+                              ),
+                        label: Text('Lobbying',
+                            style: TextStyle(
+                              color: userIsPremium || userIsLegacy
+                                  ? darkThemeTextColor
+                                  : null,
+                            )),
+                        onPressed: !userIsPremium && !userIsLegacy
+                            ? () async => Functions.requestInAppPurchase(
+                                context, userIsPremium,
+                                whatToShow: 'upgrades')
+                            : lobbyingEventsList.length == 0
+                                ? null
+                                : () async {
+                                    showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: false,
+                                        enableDrag: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return SharedWidgets.lobbyingList(
+                                            context,
+                                            userDatabase,
+                                            lobbyingEventsList,
+                                          );
+                                        }).then((_) => !userIsPremium &&
+                                            interstitialAd != null &&
+                                            interstitialAd
+                                                    .responseInfo.responseId !=
+                                                userDatabase
+                                                    .get('interstitialAdId')
+                                        ? AdMobLibrary()
+                                            .interstitialAdShow(interstitialAd)
+                                        : null);
+
+                                    userDatabase.put('newLobbies', false);
+                                    await Functions.processCredits(true,
+                                        isPermanent: false);
+                                  }),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      new Expanded(
+                        child: FlipInY(
+                          child: new ElevatedButton.icon(
+                              style: ButtonStyle(
+                                backgroundColor: !userIsPremium && !userIsLegacy
+                                    ? disabledMSPColorGray
+                                    : darkTheme
+                                        ? primaryMSPColorDark
+                                        : privatelyFundedTripsList.length == 0
+                                            ? disabledMSPColorGray
+                                            : MaterialStateProperty.all<Color>(
+                                                Color.fromARGB(
+                                                    255, 0, 80, 100)),
+                              ),
+                              icon: (userIsPremium || userIsLegacy) &&
+                                      userDatabase.get('newTrips')
+                                  ? AnimatedWidgets.flashingText(context, '!!!',
+                                      userDatabase.get('newTrips'), false,
+                                      size: 13, sameColor: true)
+                                  : FaIcon(
+                                      FontAwesomeIcons.planeDeparture,
+                                      size: 13,
+                                      color: userIsPremium || userIsLegacy
+                                          ? darkThemeTextColor
+                                          : null,
+                                    ),
+                              label: Text('Funded Travel',
+                                  style: TextStyle(
+                                    color: userIsPremium || userIsLegacy
+                                        ? darkThemeTextColor
+                                        : null,
+                                  )),
+                              onPressed: !userIsPremium && !userIsLegacy
+                                  ? () async => Functions.requestInAppPurchase(
+                                      context, userIsPremium,
+                                      whatToShow: 'upgrades')
+                                  : privatelyFundedTripsList.length == 0
+                                      ? null
+                                      : () async {
+                                          showModalBottomSheet(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              isScrollControlled: false,
+                                              enableDrag: true,
+                                              context: context,
+                                              builder: (context) {
+                                                return SharedWidgets
+                                                    .privateFundedTripsList(
+                                                        context,
+                                                        userDatabase,
+                                                        privatelyFundedTripsList,
+                                                        senateMembersList +
+                                                            houseMembersList,
+                                                        houseStockWatchList,
+                                                        senateStockWatchList,
+                                                        userIsPremium);
+                                              });
+
+                                          userDatabase.put('newTrips', false);
+                                          await Functions.processCredits(true,
+                                              isPermanent: false);
+                                        }),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget userRepresentatives(
+      Orientation orientation, List<String> subscriptionAlertsList) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      userCongressList.length == 0 || userDatabase.get('usageInfo') == false
+          ? new Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  // color: Theme.of(context).accentColor,
+                  ),
+              child: ZoomIn(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 0, 5, 2),
+                      child: new Text('FIND YOUR REPRESENTATIVES',
+                          style: GoogleFonts.bangers(fontSize: 18)),
+                    ),
+                    new Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: SizedBox(
+                        height: 30,
+                        child: userDatabase.get('usageInfo') == false ||
+                                /* (!userIsPremium &&
+                                                                    !userIsLegacy) ||*/
+                                (!statesMap.keys.contains(
+                                        Map<String, dynamic>.from(userDatabase
+                                            .get('currentAddress'))['state']) &&
+                                    !statesMap.keys.contains(
+                                        Map<String, dynamic>.from(
+                                                userDatabase.get(
+                                                    'representativesLocation'))[
+                                            'state']))
+                            ? Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    new Expanded(
+                                      child: new ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<Color>(
+                                                      Theme.of(context)
+                                                          .primaryColorDark)),
+                                          label: Text('Enter Zip',
+                                              style: TextStyle(
+                                                  color: darkThemeTextColor)),
+                                          icon: FaIcon(
+                                              FontAwesomeIcons.solidCompass,
+                                              size: 13,
+                                              color: darkThemeTextColor),
+                                          onPressed: () async =>
+                                              await Functions.requestUsageInfo(
+                                                  context)),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    new Expanded(
+                                      child: new ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                          Color>(
+                                                      Theme.of(context)
+                                                          .primaryColorDark)),
+                                          label: Text('Enter Zip',
+                                              style: TextStyle(
+                                                  color: darkThemeTextColor)),
+                                          icon: Icon(Icons.location_pin,
+                                              size: 15,
+                                              color: darkThemeTextColor),
+                                          onPressed: () {
+                                            return homePageTextInput(
+                                                context,
+                                                orientation,
+                                                'zipCode',
+                                                'Enter your 5 digit U.S. Zip Code');
+                                          }),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(width: 5),
+                                        new ElevatedButton.icon(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all<
+                                                            Color>(
+                                                        Theme.of(context)
+                                                            .primaryColorDark)),
+                                            label: Text(
+                                                'Use ${Map<String, dynamic>.from(userDatabase.get('currentAddress'))['zip']}',
+                                                style: TextStyle(
+                                                    color: darkThemeTextColor)),
+                                            icon: Icon(Icons.location_searching,
+                                                size: 15,
+                                                color: darkThemeTextColor),
+                                            onPressed: () async {
+                                              String _zip = Map<String,
+                                                      dynamic>.from(
+                                                  userDatabase.get(
+                                                      'currentAddress'))['zip'];
+                                              logger.d(
+                                                  '***** DBase update to $_zip will happen here. *****');
+                                              await Functions.getUserCongress(
+                                                      context,
+                                                      houseMembersList +
+                                                          senateMembersList,
+                                                      _zip)
+                                                  .then((value) {
+                                                setState(() =>
+                                                    userCongressList = value);
+                                              });
+                                              Functions.processCredits(true,
+                                                  isPurchased: false,
+                                                  isPermanent: false);
+                                            }),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : ZoomIn(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    // color: Theme.of(context).accentColor,
+                    ),
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 2, 10, 2),
+                      child: Row(
+                        children: [
+                          new Text(
+                              'REPRESENTATIVES FOR ZIP CODE ${Map<String, dynamic>.from(userDatabase.get('representativesLocation'))['zip']}',
+                              style: GoogleFonts.bangers(fontSize: 18)),
+                          new Spacer(),
+                          SizedBox(
+                            height: 20,
+                            child: new OutlinedButton(
+                                child: new Text('Update Zip',
+                                    style: TextStyle(fontSize: 10)),
+                                onPressed: () {
+                                  setState(() => userCongressList = []);
+                                  userDatabase.put(
+                                      'representativesLocation',
+                                      initialUserData[
+                                          'representativesLocation']);
+                                  userDatabase.put('representativesMap', {});
+                                }),
+                          ),
+                        ],
+                      ),
+                    ),
+                    new Column(
+                        // verticalDirection: VerticalDirection.up,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: userCongressList
+                            .map<Widget>((official) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0, vertical: 3),
+                                  child: new GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MemberDetail(
+                                              official.id,
+                                              houseStockWatchList,
+                                              senateStockWatchList),
+                                        ),
+                                      ).then((_) => !userIsPremium &&
+                                              interstitialAd != null &&
+                                              interstitialAd.responseInfo
+                                                      .responseId !=
+                                                  userDatabase
+                                                      .get('interstitialAdId')
+                                          ? AdMobLibrary().interstitialAdShow(
+                                              interstitialAd)
+                                          : null);
+                                    },
+                                    child: new Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topRight,
+                                            end: Alignment.bottomLeft,
+                                            colors: [
+                                              official.party == 'R'
+                                                  ? republicanColor
+                                                  : official.party == 'D'
+                                                      ? democratColor
+                                                      : independentColor,
+                                              // Colors.white,
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15),
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15),
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15)
+                                            ],
+                                          )),
+                                      child: new Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: new Container(
+                                                width: official.shortTitle
+                                                            .toLowerCase() ==
+                                                        'rep.'
+                                                    ? 30
+                                                    : 20,
+                                                height: official.shortTitle
+                                                            .toLowerCase() ==
+                                                        'rep.'
+                                                    ? 30
+                                                    : 20,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          'assets/congress_pic_$headerImageCounter.png'),
+                                                      fit: BoxFit.cover),
+                                                ),
+                                                foregroundDecoration:
+                                                    BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          'https://www.congress.gov/img/member/${official.id.toLowerCase()}.jpg'),
+                                                      fit: BoxFit.cover),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            new Text(
+                                                '${official.shortTitle} ${official.firstName} ${official.lastName} ${official.suffix != null ? official.suffix : ''}',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            AnimatedWidgets.flashingEye(
+                                                context,
+                                                subscriptionAlertsList.any(
+                                                    (element) => element
+                                                        .toLowerCase()
+                                                        .startsWith(
+                                                            'member_${official.id}'
+                                                                .toLowerCase())),
+                                                false,
+                                                size: 8,
+                                                reverseContrast: false),
+                                            const SizedBox(width: 5),
+                                            new Text(official.title,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 12)),
+                                            new Spacer(),
+                                            Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0,
+                                                        vertical: 3),
+                                                child: new Icon(
+                                                    Icons
+                                                        .person_pin_circle_rounded,
+                                                    color: Color(0xffffffff),
+                                                    size: 20))
+                                          ]),
+                                    ),
+                                  ),
+                                ))
+                            .toList()),
+                  ],
+                ),
+              ),
+            ),
+    ]);
+  }
+
+  Widget memberPublicStatements() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: new Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new Padding(
+                padding: const EdgeInsets.fromLTRB(5, 0, 10, 2),
+                child: new Text(
+                  'PUBLIC STATEMENTS',
+                  style: GoogleFonts.bangers(fontSize: 18),
+                ),
+              ),
+              statementsList == null || statementsList.length == 0
+                  ? new Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5.0, vertical: 10),
+                        child: new Column(
+                          children: [
+                            new Text('No Public Statements',
+                                style: GoogleFonts.bangers(
+                                    color: altHighlightColor,
+                                    fontSize: 25,
+                                    shadows: Styles.shadowStrokeTextGrey),
+                                textAlign: TextAlign.center),
+                          ],
+                        ),
+                      ),
+                    )
+                  : new ListView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      itemCount: statementsList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        StatementsResults thisStatement = statementsList[index];
+                        // return ValueListenableBuilder(
+                        //     valueListenable: Hive.box(appDatabase)
+                        //         .listenable(keys: userDatabase.keys.toList()),
+                        //     builder: (context, box, widget) {
+                        return new Column(
+                          children: [
+                            Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 3.0),
+                                child: SharedWidgets.statementTile(
+                                    context,
+                                    headerImageCounter,
+                                    thisStatement,
+                                    houseStockWatchList,
+                                    senateStockWatchList,
+                                    userIsPremium)),
+                          ],
+                        );
+                        // });
+                      },
+                    ),
+            ],
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget footerContent(Orientation orientation) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        orientation == Orientation.landscape
+            ? SizedBox.shrink()
+            : !userIsPremium && showBannerAd
+                ? showPremiumPromo
+                    ? BounceInUp(
+                        child: SharedWidgets.premiumUpgradeContainer(
+                            context,
+                            userIsPremium,
+                            userIsLegacy,
+                            devUpgraded,
+                            freeTrialUsed,
+                            userDatabase,
+                            color: Theme.of(context).colorScheme.primary),
+                      )
+                    : bannerAdContainer
+                : SizedBox.shrink(),
+      ],
+    );
+  }
+}

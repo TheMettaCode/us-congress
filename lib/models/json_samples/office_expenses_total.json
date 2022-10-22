@@ -1,0 +1,188 @@
+{
+    "status": "OK",
+    "copyright": "Copyright (c) 2018 Pro Publica Inc. All Rights Reserved.",
+    "category": "TRAVEL",
+    "num_results": 446,
+    "offset": 0,
+    "results": [{
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "C001096",
+        "name": "Kevin Cramer",
+        "member_uri": "https://api.propublica.org/congress/v1/members/C001096.json",
+        "amount": 43010.59,
+        "year_to_date": 110762.95,
+        "change_from_previous_quarter": 12746.87
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "M001198",
+        "name": "Roger Marshall",
+        "member_uri": "https://api.propublica.org/congress/v1/members/M001198.json",
+        "amount": 42384.22,
+        "year_to_date": 137539.14,
+        "change_from_previous_quarter": 1702.26
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "P000588",
+        "name": "Steve Pearce",
+        "member_uri": "https://api.propublica.org/congress/v1/members/P000588.json",
+        "amount": 40555.62,
+        "year_to_date": 162885.38,
+        "change_from_previous_quarter": -19226.43
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "B001245",
+        "name": "Madeleine Z. Bordallo",
+        "member_uri": "https://api.propublica.org/congress/v1/members/B001245.json",
+        "amount": 37589.65,
+        "year_to_date": 135451.42,
+        "change_from_previous_quarter": -2922.54
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "B001301",
+        "name": "Jack Bergman",
+        "member_uri": "https://api.propublica.org/congress/v1/members/B001301.json",
+        "amount": 36348.19,
+        "year_to_date": 84525.06,
+        "change_from_previous_quarter": 12766.79
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "S001176",
+        "name": "Steve Scalise",
+        "member_uri": "https://api.propublica.org/congress/v1/members/S001176.json",
+        "amount": 33928.49,
+        "year_to_date": 61647.37,
+        "change_from_previous_quarter": 19665.7
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "T000470",
+        "name": "Scott Tipton",
+        "member_uri": "https://api.propublica.org/congress/v1/members/T000470.json",
+        "amount": 32912.65,
+        "year_to_date": 87467.24,
+        "change_from_previous_quarter": 15270.7
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "B001291",
+        "name": "Brian Babin",
+        "member_uri": "https://api.propublica.org/congress/v1/members/B001291.json",
+        "amount": 32466.76,
+        "year_to_date": 69907.34,
+        "change_from_previous_quarter": 20285.23
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "R000600",
+        "name": "Amata Coleman Radewagen",
+        "member_uri": "https://api.propublica.org/congress/v1/members/R000600.json",
+        "amount": 32005.53,
+        "year_to_date": 72153.03,
+        "change_from_previous_quarter": 9099.4
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "N000181",
+        "name": "Devin Nunes",
+        "member_uri": "https://api.propublica.org/congress/v1/members/N000181.json",
+        "amount": 31575.09,
+        "year_to_date": 103492.73,
+        "change_from_previous_quarter": 3945.47
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "A000374",
+        "name": "Ralph Abraham",
+        "member_uri": "https://api.propublica.org/congress/v1/members/A000374.json",
+        "amount": 31165.13,
+        "year_to_date": 112501.01,
+        "change_from_previous_quarter": -4998.56
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "L000578",
+        "name": "Doug LaMalfa",
+        "member_uri": "https://api.propublica.org/congress/v1/members/L000578.json",
+        "amount": 30671.43,
+        "year_to_date": 88672.69,
+        "change_from_previous_quarter": 2149.88
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "G000553",
+        "name": "Al Green",
+        "member_uri": "https://api.propublica.org/congress/v1/members/G000553.json",
+        "amount": 30000.2,
+        "year_to_date": 89118.41,
+        "change_from_previous_quarter": 8427.55
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "W000816",
+        "name": "Roger Williams",
+        "member_uri": "https://api.propublica.org/congress/v1/members/W000816.json",
+        "amount": 29963.71,
+        "year_to_date": 116147.06,
+        "change_from_previous_quarter": -14442.6
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "G000565",
+        "name": "Paul Gosar",
+        "member_uri": "https://api.propublica.org/congress/v1/members/G000565.json",
+        "amount": 29833.51,
+        "year_to_date": 147523.88,
+        "change_from_previous_quarter": -18283.57
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "N000127",
+        "name": "Rick Nolan",
+        "member_uri": "https://api.propublica.org/congress/v1/members/N000127.json",
+        "amount": 29773.31,
+        "year_to_date": 70477.76,
+        "change_from_previous_quarter": 20026.73
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "C001094",
+        "name": "Paul Cook",
+        "member_uri": "https://api.propublica.org/congress/v1/members/C001094.json",
+        "amount": 29633.75,
+        "year_to_date": 68184.46,
+        "change_from_previous_quarter": 17681.83
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "G000584",
+        "name": "Greg Gianforte",
+        "member_uri": "https://api.propublica.org/congress/v1/members/G000584.json",
+        "amount": 29543.14,
+        "year_to_date": 74327.08,
+        "change_from_previous_quarter": -11288.65
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "K000376",
+        "name": "Mike Kelly",
+        "member_uri": "https://api.propublica.org/congress/v1/members/K000376.json",
+        "amount": 27638.97,
+        "year_to_date": 88892.68,
+        "change_from_previous_quarter": 5171.37
+    }, {
+        "year": 2017,
+        "quarter": 4,
+        "member_id": "L000581",
+        "name": "Brenda Lawrence",
+        "member_uri": "https://api.propublica.org/congress/v1/members/L000581.json",
+        "amount": 27606.54,
+        "year_to_date": 65956.17,
+        "change_from_previous_quarter": 14588.99
+    }]
+}

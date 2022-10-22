@@ -1,0 +1,715 @@
+{
+    "status": "OK",
+    "copyright": "Copyright (c) 2019 Pro Publica Inc. All Rights Reserved.",
+    "results": [{
+        "num_results": 20,
+        "offset": 0,
+
+        "lobbying_representations": [{
+                "lobbying_client": {
+                    "name": "Noble Energy",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "FWH and Associates LLC",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "300937236.xml",
+
+                "id": "300937236",
+                "specific_issues": ["Support for energy development in the eastern Mediterranean Sea. Support for energy development in the eastern Mediterranean Sea"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "427910001",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-26",
+                    "report_year": "2019",
+                    "report_type": "Q2",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061461.xml"
+                },
+
+                "lobbyists": [{
+                        "name": "F. Wallace Hays",
+                        "covered_position": ""
+                    },
+                    {
+                        "name": "F Wallace Hays",
+                        "covered_position": ""
+                    }
+                ]
+            },
+            {
+                "lobbying_client": {
+                    "name": "PrimeSource Building Products Inc.",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "TRADEWINS, LLC",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301016365.xml",
+
+                "id": "301016365",
+                "specific_issues": ["fastener trade issues"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "294952-1002160",
+                "house_id": "374510015",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-25",
+                    "report_year": "2019",
+                    "report_type": "Q2",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061454.xml"
+                },
+
+                "lobbyists": [{
+                    "name": "John Magnus",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "GE TRANSPORTATION",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "TRADEWINS, LLC",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "300986549.xml",
+
+                "id": "300986549",
+                "specific_issues": ["international trade/subsidy control mechanisms"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "294952-36",
+                "house_id": "374510001",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-25",
+                    "report_year": "2019",
+                    "report_type": "Q2",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061451.xml"
+                },
+
+                "lobbyists": [{
+                    "name": "John Magnus",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Materiaux Blanchet Inc.",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "TRADEWINS, LLC",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "300930684.xml",
+
+                "id": "300930684",
+                "specific_issues": ["softwood lumber trade proceeding"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "294952-1002145",
+                "house_id": "374510013",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-25",
+                    "report_year": "2019",
+                    "report_type": "Q2",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061453.xml"
+                },
+
+                "lobbyists": [{
+                        "name": "John Magnus",
+                        "covered_position": ""
+                    },
+                    {
+                        "name": "Sheridan McKinney",
+                        "covered_position": ""
+                    }
+                ]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Global SuperTanker Services LLC",
+                    "general_description": "Aerospace Wildfire control"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022199.xml",
+
+                "id": "301022199",
+                "specific_issues": ["Wildfire control issues"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070152",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061449"
+                },
+
+                "lobbyists": [{
+                    "name": "Julie Allen",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Preeclampsia Foundation",
+                    "general_description": "Healthcare"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Healthcare"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022198.xml",
+
+                "id": "301022198",
+                "specific_issues": ["Maternal mortality issues"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070151",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061447"
+                },
+
+                "lobbyists": [{
+                    "name": "Julie Allen",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "National Association of Specialty Pharmacy",
+                    "general_description": "Healthcare"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022197.xml",
+
+                "id": "301022197",
+                "specific_issues": ["Medicare Direct and Indirect Remuneration H.R. 1034, S. 640 Phair Pricing Act of 2019, S.2247 Phair Relief Act"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070150",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061443"
+                },
+
+                "lobbyists": [{
+                    "name": "Julie Allen",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Integra LifeSciences Corporation",
+                    "general_description": "Healthcare"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022196.xml",
+
+                "id": "301022196",
+                "specific_issues": ["Medicare reimbursement on wound care."],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070149",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061442"
+                },
+
+                "lobbyists": [{
+                    "name": "Julie Allen",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Vodafone Group Services Limited",
+                    "general_description": "Communications technology"
+                },
+                "lobbying_registrant": {
+                    "name": "Signal Group Consulting, LLC",
+                    "general_description": "Government relations and public affairs"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022195.xml",
+
+                "id": "301022195",
+                "specific_issues": ["Increasing 5G deployment"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "359430293",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061439"
+                },
+
+                "lobbyists": [{
+                        "name": "Noe Garcia",
+                        "covered_position": "Senior Policy Advisor, Senate Majority Leader, Bill Frist; Associate Political Director, The White House; Senior Advisor, Public Affairs, US Treasury Department; Public Liaison, US Treasury Department; Legislative Assistant, Rep Kay Bailey Hutchinson"
+                    },
+                    {
+                        "name": "Patrice Willoughby",
+                        "covered_position": "Deputy Associate Administrator Policy, General Services Administration; Executive Director, Congressional Black Caucus; CoS &amp; Counsel, Congresswoman Stephanie Tubbs Jones"
+                    }
+                ]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Cormac Group on behalf of the Foundation for Human Rights in Cuba",
+                    "general_description": "Lobbying and consulting"
+                },
+                "lobbying_registrant": {
+                    "name": "Mr. Thomas Kahn",
+                    "general_description": "Consultant and lobbyist"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022194.xml",
+
+                "id": "301022194",
+                "specific_issues": ["S.1025, Venezuala Emergency Relief, Democracy and Development Act of 2019", "H.R. 1477, Russian Venzezuala Threat Migration Act.", "H.R. 854, Humanitarian Assistance to the Venezualan People Act. ", "H.R 920, Venezuala Arms Restriction Act"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "444990001",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061438"
+                },
+
+                "lobbyists": [{
+                    "name": "Thomas Kahn",
+                    "covered_position": "Staff Director of House Budget Committee"
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "NIKE, Inc.",
+                    "general_description": "Athletic apparel and footwear."
+                },
+                "lobbying_registrant": {
+                    "name": "Capitol Counsel, LLC",
+                    "general_description": "Government affairs."
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022193.xml",
+
+                "id": "301022193",
+                "specific_issues": ["Monitoring and advocacy on issues pertaining to intellectual property protection, retail industry, trade, technology and data protection."],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "393840289",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061435"
+                },
+
+                "lobbyists": [{
+                        "name": "Joshua Kardon",
+                        "covered_position": "Chief of Staff, Senator Ron Wyden; Legislative Director/Press Secretary, Senator Ron Wyden; and Staff Director, House Government Affairs Committee."
+                    },
+                    {
+                        "name": "Lyndon Boozer",
+                        "covered_position": ""
+                    },
+                    {
+                        "name": "Drew Goesl",
+                        "covered_position": "Chief of Staff, Rep. Mike Ross;  Communications Director, Sen. Blanche Lincoln."
+                    },
+                    {
+                        "name": "Margaret Cekuta",
+                        "covered_position": "Associate Chief of Staff, Council of Economic Advisers (White House); Director for Eurasia, Russia, and Germany (USTR)."
+                    },
+                    {
+                        "name": "Warren Tryon",
+                        "covered_position": "Deputy Staff Director, House Financial Services Committee; Deputy Chief of Staff &amp; LD, Rep. Spencer Bachus."
+                    },
+                    {
+                        "name": "Ethan Pittleman",
+                        "covered_position": "Legislative Aide, Rep. Kurt Schrader."
+                    }
+                ]
+            },
+            {
+                "lobbying_client": {
+                    "name": "KARSMAN, McKENZIE & HART;  on behalf of RELVAS V. ISLAMIC REPUBLIC OF IRAN",
+                    "general_description": "Law firm"
+                },
+                "lobbying_registrant": {
+                    "name": "Edgepoint, LLC",
+                    "general_description": "Consultant"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022192.xml",
+
+                "id": "301022192",
+                "specific_issues": ["Amend legislation pertaining to compensation for victims' families of Iranian bombing of Marine barracks in 1983"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "430900010",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061430"
+                },
+
+                "lobbyists": [{
+                    "name": "David Thompson",
+                    "covered_position": "White House Advance"
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Portola Pharmaceuticals",
+                    "general_description": "Biotechnology company; focuses on drugs treating thrombosis and hematological malignancies"
+                },
+                "lobbying_registrant": {
+                    "name": "THE KPM GROUP DC LLC",
+                    "general_description": "Strategic Government Affairs, Risk Management, Government Affairs, Advocacy and Lobbying"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022191.xml",
+
+                "id": "301022191",
+                "specific_issues": ["New Technology Add-on Payment (NTAP) for Medicare; Reimbursement issues related to coding (J code and C code)"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "445060001",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061429"
+                },
+
+                "lobbyists": [{
+                    "name": "Patroski Lawson",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Facebook, Inc.",
+                    "general_description": "Technology/social media"
+                },
+                "lobbying_registrant": {
+                    "name": "FS VECTOR LLC",
+                    "general_description": "Lobbying firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022190.xml",
+
+                "id": "301022190",
+                "specific_issues": ["Issues related to blockchain policy"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "442940002",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061425"
+                },
+
+                "lobbyists": [{
+                    "name": "John Collins",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "International Myeloma Foundation",
+                    "general_description": "patient advocacy organization"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022189.xml",
+
+                "id": "301022189",
+                "specific_issues": ["H.R. 1730/ S. 741 The Cancer Drug Parity Act."],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070145",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061423"
+                },
+
+                "lobbyists": [{
+                    "name": "Jeremy Scott",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Hematology/Oncology Pharmacy Association",
+                    "general_description": "trade association"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022188.xml",
+
+                "id": "301022188",
+                "specific_issues": ["Drug price monitoring; H.R. 1730, S. 741 The Cancer Drug Parity Act."],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070146",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061422"
+                },
+
+                "lobbyists": [{
+                    "name": "Jeremy Scott",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Are You Dense Advocacy, Inc.",
+                    "general_description": "patient advocacy organization"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022187.xml",
+
+                "id": "301022187",
+                "specific_issues": ["breast health issues"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070147",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061421"
+                },
+
+                "lobbyists": [{
+                    "name": "Jeremy Scott",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Association of Rehabilitation Nurses",
+                    "general_description": "nursing association"
+                },
+                "lobbying_registrant": {
+                    "name": "Powers Pyles Sutter & Verville, P.C.",
+                    "general_description": "Law firm"
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301022186.xml",
+
+                "id": "301022186",
+                "specific_issues": ["S. 1399, H.R. 728 Title VIII Nursing Workforce Reauthorization Act of 2019; H.R. 3030 Patient-Centered Outcomes Research Extension Act of 2019"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "321070148",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "RR",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061419"
+                },
+
+                "lobbyists": [{
+                    "name": "Jeremy Scott",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Silicon Labs",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "Wsquared Strategies Llc",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "301021338.xml",
+
+                "id": "301021338",
+                "specific_issues": ["semiconductor industry semi-conductors"],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "401103967-48",
+                "house_id": "434310004",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "2A",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061441.xml"
+                },
+
+                "lobbyists": [{
+                    "name": "Wyeth Wiedeman",
+                    "covered_position": ""
+                }]
+            },
+            {
+                "lobbying_client": {
+                    "name": "Oil Companies International Marine Forum",
+                    "general_description": ""
+                },
+                "lobbying_registrant": {
+                    "name": "OIL COMPANIES INTERNATIONAL MARINE FORUM",
+                    "general_description": ""
+                },
+                "inhouse": "false",
+                "signed_date": "",
+                "effective_date": "",
+                "xml_filename": "300972643.xml",
+
+                "id": "300972643",
+                "specific_issues": [],
+                "report_type": "",
+                "report_year": "",
+                "senate_id": "",
+                "house_id": "376620000",
+
+                "latest_filing": {
+                    "filing_date": "2019-08-23",
+                    "report_year": "2019",
+                    "report_type": "Q2",
+                    "pdf_url": "http://disclosures.house.gov/ld/pdfform.aspx?id=301061427.xml"
+                },
+
+                "lobbyists": [{
+                        "name": "JAN KOPERNICKI",
+                        "covered_position": ""
+                    },
+                    {
+                        "name": "PAUL MARKIDES",
+                        "covered_position": ""
+                    },
+                    {
+                        "name": "MARTIN KELLY",
+                        "covered_position": ""
+                    }
+                ]
+            }
+        ]
+    }]
+}
