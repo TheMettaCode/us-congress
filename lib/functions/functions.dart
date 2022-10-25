@@ -966,11 +966,6 @@ class Functions {
         logger.d('***** CURRENT POSITION DATA IS NULL *****');
       }
 
-      // // GeoLocator Functions
-      // // Get Coordinates from Street Address
-      // List<Location> locations =
-      //     await locationFromAddress("Gronausestraat 710, Enschede");
-
       if (_currentPositionData.latitude != null && _currentPositionData.longitude != null) {
         logger.d('***** Determining Placemark Address *****');
         List<Placemark> placemarks = [];
@@ -1456,7 +1451,8 @@ class Functions {
             (_finalStatementsList.map((e) => e.memberId)).toList().asMap(), 'member_',
             userIsDev: userIsDev);
 
-        if (thisMember != null && (userDatabase.get('statementAlerts') || memberWatched) &&
+        if (thisMember != null &&
+            (userDatabase.get('statementAlerts') || memberWatched) &&
             (_currentStatementsList.first.title.toLowerCase() !=
                     statements.results.first.title.toLowerCase() ||
                 userDatabase.get('lastStatement').toString().toLowerCase() !=
@@ -1927,7 +1923,11 @@ class Functions {
             userIsDev: userIsDev);
 
         if ((userIsPremium || userIsLegacy) &&
-            (userDatabase.get('lobbyingAlerts') || lobbyWatched) &&
+            (userDatabase.get('lobbyingAlerts') ||
+                (lobbyWatched &&
+                    /// THIS COMPARISON CHECK IS SKETCHY
+                    !_currentLobbyingEventsList.map((e) => e.id).any((element) =>
+                        _finalLobbyingEventsList.map((e) => e.id).contains(element)))) &&
             (_currentLobbyingEventsList.first.id.toLowerCase() !=
                     _finalLobbyingEventsList.first.id.toLowerCase() ||
                 userDatabase.get('lastLobby').toString().toLowerCase() !=

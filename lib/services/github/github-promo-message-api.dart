@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import '../../../constants/constants.dart';
-import '../../../functions/functions.dart';
-import '../../notifications/notification_api.dart';
-import '../promo_message/github-promo-message-model.dart';
+import '../../constants/constants.dart';
+import '../../functions/functions.dart';
+import '../notifications/notification_api.dart';
+import '../github/github-promo-message-model.dart';
 
 class GithubApi {
   static Future<List<GithubNotifications>> getPromoMessages() async {
@@ -62,14 +62,15 @@ class GithubApi {
           _newGithubNotifications = _githubMessages.notifications;
 
           // if (_newGithubNotifications.isNotEmpty) {
-            _newGithubNotifications.sort((a, b) => a.startDate.compareTo(b.startDate));
-            _newGithubNotifications.retainWhere((element) =>
-                element.startDate.isBefore(_now) &&
-                (element.expirationDate.toString() == "" || element.expirationDate.isAfter(_now)) &&
-                element.userLevels.contains(githubApiUserLevel));
-            if (_newGithubNotifications.isNotEmpty && _newGithubNotifications.first.userLevels.contains(githubApiUserLevel)) {
-              _newUserLevelMessagesRetrieved = true;
-            }
+          _newGithubNotifications.sort((a, b) => a.startDate.compareTo(b.startDate));
+          _newGithubNotifications.retainWhere((element) =>
+              element.startDate.isBefore(_now) &&
+              (element.expirationDate.toString() == "" || element.expirationDate.isAfter(_now)) &&
+              element.userLevels.contains(githubApiUserLevel));
+          if (_newGithubNotifications.isNotEmpty &&
+              _newGithubNotifications.first.userLevels.contains(githubApiUserLevel)) {
+            _newUserLevelMessagesRetrieved = true;
+          }
           // }
 
           _currentGithubNotifications = _newGithubNotifications;
@@ -97,8 +98,6 @@ class GithubApi {
                 _messageBody,
                 _additionalData);
 
-            userDatabase.put('lastPromoNotification', '${DateTime.now()}');
-
             _newGithubNotifications.forEach((notification) => debugPrint('''
           -----
           Title: ${notification.title}
@@ -112,6 +111,7 @@ class GithubApi {
           '''));
           }
 
+          userDatabase.put('lastPromoNotification', DateTime.now().toIso8601String());
           return _newGithubNotifications;
         } else {
           debugPrint('***** CURRENT GITHUB MESSAGES ARE UP TO DATE. NO NOTIFICATIONS TO SEND');

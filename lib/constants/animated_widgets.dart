@@ -6,7 +6,7 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 
-import '../services/github/promo_message/github-promo-message-model.dart';
+import '../services/github/github-promo-message-model.dart';
 
 class AnimatedWidgets {
   static Widget starryNight(

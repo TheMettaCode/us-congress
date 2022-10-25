@@ -11,7 +11,7 @@ import 'package:us_congress_vote_tracker/models/news_article_model.dart';
 import 'package:us_congress_vote_tracker/models/order_detail.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../services/github/promo_message/github-promo-message-model.dart';
+import '../services/github/github-promo-message-model.dart';
 
 class DeveloperPage extends StatefulWidget {
   DeveloperPage({Key key, this.title}) : super(key: key);
