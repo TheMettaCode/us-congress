@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../../constants/constants.dart';
@@ -7,7 +8,7 @@ import '../notifications/notification_api.dart';
 import '../github/github-promo-message-model.dart';
 
 class GithubApi {
-  static Future<List<GithubNotifications>> getPromoMessages() async {
+  static Future<List<GithubNotifications>> getPromoMessages([BuildContext context]) async {
     Box userDatabase = Hive.box(appDatabase);
 
     List<bool> userLevels = await Functions.getUserLevels();
@@ -53,20 +54,42 @@ class GithubApi {
       debugPrint('***** GITHUB MSG API RESPONSE CODE: ${response.statusCode} *****');
       if (response.statusCode == 200) {
         GithubMessages _githubMessages = githubMessagesFromJson(response.body);
+
+        /// CHECK FOR CURRENT AND NEW DATA EQUALITY
+        bool listsAreEqual = listEquals(_githubMessages.notifications.map((e) => e.title).toList(),
+            _currentGithubNotifications.map((e) => e.title).toList());
+        debugPrint("^^^ NEW & CURRENT LISTS ARE EQUAL? $listsAreEqual");
+
         if (_githubMessages.status == "OK" &&
             _githubMessages.app == 'us-congress' &&
-            (_currentGithubNotifications.isEmpty ||
-                _githubMessages.notifications.any((msg) => msg.startDate.isAfter(
-                    _lastPromoNotification)) /* || _githubMessages.updated.isAfter(_currentGithubMessages.updated)*/)) {
+            (!listsAreEqual /*_currentGithubNotifications.isEmpty ||
+                _githubMessages.notifications
+                    .any((msg) => msg.startDate.isAfter(_lastPromoNotification))*/
+            )) {
           debugPrint('***** NEW GITHUB MESSAGES RETRIEVED');
           _newGithubNotifications = _githubMessages.notifications;
 
+          // /// CREATE LIST OF NOTIFICATIONS ADDED AFTER LAST UPDATE
+          // List<GithubNotifications> _newNotifications = _newGithubNotifications
+          //     .where((notification) => notification.startDate.isAfter(_lastPromoNotification))
+          //     .toList();
+          // if (_newNotifications.isNotEmpty) {
+          //   debugPrint(
+          //       '^^^^^ ${_newNotifications.length} NEW NOTIFICATIONS ADDED\n${_newNotifications.map((e) => e.title)}');
+          // } else {
+          //   debugPrint('^^^^^ ${_newNotifications.length} NEW NOTIFICATIONS ADDED');
+          // }
+
           // if (_newGithubNotifications.isNotEmpty) {
-          _newGithubNotifications.sort((a, b) => a.startDate.compareTo(b.startDate));
+          /// PRUNE AND SORT NOTIFICATIONS
+          _newGithubNotifications.sort((a, b) =>
+              a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
           _newGithubNotifications.retainWhere((element) =>
               element.startDate.isBefore(_now) &&
               (element.expirationDate.toString() == "" || element.expirationDate.isAfter(_now)) &&
               element.userLevels.contains(githubApiUserLevel));
+
+          /// SET 'NEW NOTIFICATIONS RETRIEVED' FLAG TO TRUE
           if (_newGithubNotifications.isNotEmpty &&
               _newGithubNotifications.first.userLevels.contains(githubApiUserLevel)) {
             _newUserLevelMessagesRetrieved = true;
@@ -86,17 +109,19 @@ class GithubApi {
             String _messageBody = _thisPromotion.message;
             String _additionalData = _thisPromotion.additionalData;
 
-            debugPrint('SENDING NEW PROMO NOTIFICATION: $_thisPromotion');
+            if (context == null || !ModalRoute.of(context).isCurrent) {
+              debugPrint('SENDING NEW PROMO NOTIFICATION: $_thisPromotion');
 
-            await NotificationApi.showBigTextNotification(
-                0,
-                'promotions',
-                'App Promotions',
-                'US Congress App Promotional Notifications',
-                'Just So You Know...',
-                _title,
-                _messageBody,
-                _additionalData);
+              await NotificationApi.showBigTextNotification(
+                  0,
+                  'promotions',
+                  'App Promotions',
+                  'US Congress App Promotional Notifications',
+                  'Just So You Know...',
+                  _title,
+                  _messageBody,
+                  _additionalData);
+            }
 
             _newGithubNotifications.forEach((notification) => debugPrint('''
           -----
@@ -107,6 +132,7 @@ class GithubApi {
           Start: ${notification.startDate}
           Exp: ${notification.expirationDate}
           Url: ${notification.url}
+          Icon: ${notification.icon}
           Additional Data: ${notification.additionalData}
           '''));
           }

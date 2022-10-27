@@ -6,7 +6,6 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 
-import '../services/github/github-promo-message-model.dart';
 
 class AnimatedWidgets {
   static Widget starryNight(
@@ -33,7 +32,7 @@ class AnimatedWidgets {
                   animate: animate,
                   infinite: infinite,
                   // delay: Duration(milliseconds: 1000),
-                  duration: Duration(milliseconds: 5000),
+                  duration: const Duration(milliseconds: 5000),
                   // spins: spins,
                   child: Icon(Icons.auto_awesome_outlined, size: size / 1.5, color: Colors.white),
                 ),
@@ -42,10 +41,10 @@ class AnimatedWidgets {
                   animate: animate,
                   // infinite: infinite,
                   // delay: Duration(milliseconds: 1000),
-                  duration: Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 500),
                   child: Swing(
                     infinite: true,
-                    duration: Duration(seconds: 10),
+                    duration: const Duration(seconds: 10),
                     child: FaIcon(FontAwesomeIcons.solidMoon,
                         size: size,
                         color: sameColorBright
@@ -62,10 +61,10 @@ class AnimatedWidgets {
           )
         : visibleWhenOff
             ? FaIcon(FontAwesomeIcons.solidSun, size: size, color: Colors.white)
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
-  static Widget jumpingingPremium(
+  static Widget jumpingPremium(
     BuildContext context,
     bool isActiveWhen,
     bool visibleWhenOff, {
@@ -79,20 +78,20 @@ class AnimatedWidgets {
         ? Swing(
             animate: animate,
             infinite: infinite,
-            delay: Duration(milliseconds: 1000),
-            duration: Duration(milliseconds: 10000),
+            delay: const Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 10000),
             child: Bounce(
               from: 5,
               animate: animate,
               infinite: infinite,
               // delay: Duration(milliseconds: 1000),
-              duration: Duration(milliseconds: 3000),
+              duration: const Duration(milliseconds: 3000),
               child: Icon(Icons.workspace_premium, size: size, color: color),
             ),
           )
         : visibleWhenOff
             ? Icon(Icons.workspace_premium, size: size, color: disabledColor)
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
   static Widget flashingEye(BuildContext context, bool isActiveWhen, bool visibleWhenOff,
@@ -110,8 +109,8 @@ class AnimatedWidgets {
         ? Flash(
             animate: animate,
             infinite: infinite,
-            delay: Duration(milliseconds: 1000),
-            duration: Duration(milliseconds: 5000),
+            delay: const Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 5000),
             child: FaIcon(FontAwesomeIcons.solidEye,
                 size: size,
                 color: sameColorBright
@@ -129,7 +128,7 @@ class AnimatedWidgets {
         : visibleWhenOff
             ? FaIcon(FontAwesomeIcons.solidEye,
                 size: size, color: Theme.of(context).primaryColorLight)
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
   static Widget flashingText(
@@ -149,8 +148,8 @@ class AnimatedWidgets {
         ? Flash(
             animate: animate,
             infinite: infinite,
-            delay: Duration(milliseconds: 2000),
-            duration: Duration(milliseconds: 5000),
+            delay: const Duration(milliseconds: 2000),
+            duration: const Duration(milliseconds: 5000),
             child: Padding(
               padding: const EdgeInsets.only(left: 3.0),
               child: Text(textToFlash,
@@ -166,7 +165,7 @@ class AnimatedWidgets {
                     shadows: Styles.shadowStrokeTextGrey,
                     fontSize: size,
                     color: Theme.of(context).disabledColor))
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
   static Widget spinningLocation(BuildContext context, bool isActive, visibleWhenOff,
@@ -185,7 +184,7 @@ class AnimatedWidgets {
             animate: animate,
             infinite: infinite,
             // delay: Duration(milliseconds: 1000),
-            duration: Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 1000),
             child: FaIcon(FontAwesomeIcons.locationCrosshairs,
                 size: size,
                 color: sameColorBright
@@ -202,7 +201,7 @@ class AnimatedWidgets {
           )
         : visibleWhenOff
             ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
   static Widget flashingInfo(BuildContext context, bool isActive, visibleWhenOff,
@@ -221,12 +220,12 @@ class AnimatedWidgets {
             animate: animate,
             infinite: infinite,
             // delay: Duration(milliseconds: 1000),
-            duration: Duration(seconds: 5),
+            duration: const Duration(seconds: 5),
             child: FaIcon(FontAwesomeIcons.circleInfo, size: size, color: color),
           )
         : visibleWhenOff
             ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
-            : SizedBox.shrink();
+            : const SizedBox.shrink();
   }
 
   static Widget circularProgressWatchtower(
@@ -251,10 +250,10 @@ class AnimatedWidgets {
         children: [
           isFullScreen
               ? FadeIn(
-                  duration: Duration(milliseconds: 1000),
+                  duration: const Duration(milliseconds: 1000),
                   child: Pulse(
-                    delay: Duration(milliseconds: 250),
-                    duration: Duration(milliseconds: 250),
+                    delay: const Duration(milliseconds: 250),
+                    duration: const Duration(milliseconds: 250),
                     // infinite: true,
                     child: Container(
                       width: MediaQuery.of(context).size.width,
@@ -280,13 +279,13 @@ class AnimatedWidgets {
                     ),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ZoomIn(
-                  child: Container(
+                  child: SizedBox(
                       width: widthAndHeight,
                       height: widthAndHeight,
                       child: Stack(
@@ -300,7 +299,7 @@ class AnimatedWidgets {
                                     ? Colors.white
                                     : republicanColor,
                             backgroundColor: isLobby
-                                ? Color.fromARGB(255, 51, 255, 0)
+                                ? const Color.fromARGB(255, 51, 255, 0)
                                 : isMarket
                                     ? Colors.transparent
                                     : democratColor,
@@ -322,7 +321,7 @@ class AnimatedWidgets {
                                 style: Styles.googleStyle
                                     .copyWith(fontSize: 20 /*, color: darkThemeTextColor*/))),
                       )
-                    : SizedBox.shrink()
+                    : const SizedBox.shrink()
               ],
             ),
           ),

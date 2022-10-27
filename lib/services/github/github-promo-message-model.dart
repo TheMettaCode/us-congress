@@ -2,6 +2,7 @@
 //
 //     final githubMessages = githubMessagesFromJson(jsonString);
 
+
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -23,9 +24,9 @@ class GithubMessages {
   final List<GithubNotifications> notifications;
 
   factory GithubMessages.fromJson(Map<String, dynamic> json) => GithubMessages(
-        app: json["app"] == null ? 'us-congress' : json["app"],
+        app: json["app"] ?? 'us-congress',
         // updated: json["updated"] == null ? DateTime.now() : DateTime.parse(json["updated"]),
-        status: json["status"] == null ? "ERR" : json["status"],
+        status: json["status"] ?? "ERR",
         notifications: json["notifications"] == null
             ? []
             : List<GithubNotifications>.from(
@@ -33,11 +34,11 @@ class GithubMessages {
       );
 
   Map<String, dynamic> toJson() => {
-        "app": app == null ? null : app,
+        "app": app,
         // "updated": updated == null
         //     ? null
         //     : "${updated.year.toString().padLeft(4, '0')}-${updated.month.toString().padLeft(2, '0')}-${updated.day.toString().padLeft(2, '0')}",
-        "status": status == null ? "ERR" : status,
+        "status": status ?? "ERR",
         "notifications":
             notifications == null ? null : List<dynamic>.from(notifications.map((x) => x.toJson())),
       };
@@ -52,6 +53,8 @@ class GithubNotifications {
     @required this.priority,
     @required this.userLevels,
     @required this.url,
+    @required this.icon,
+    @required this.supportOption,
     @required this.additionalData,
   });
 
@@ -62,6 +65,8 @@ class GithubNotifications {
   final int priority;
   final List<String> userLevels;
   final String url;
+  final String icon;
+  final bool supportOption;
   final String additionalData;
 
   factory GithubNotifications.fromJson(Map<String, dynamic> json) => GithubNotifications(
@@ -69,15 +74,16 @@ class GithubNotifications {
             ? DateTime.now()
             : DateTime.parse(json["start-date"]),
         expirationDate: json["expiration-date"] == null || json["expiration-date"] == ""
-            ? DateTime.now().add(Duration(days: 1))
+            ? DateTime.now().add(const Duration(days: 1))
             : DateTime.parse(json["expiration-date"]),
-        title: json["title"] == null ? "" : json["title"],
-        message: json["message"] == null ? "" : json["message"],
-        priority: json["priority"] == null ? null : json["priority"],
-        userLevels:
-            json["user-levels"] == null ? [] : List<String>.from(json["user-levels"].map((x) => x)),
-        url: json["url"] == null ? null : json["url"],
-        additionalData: json["additional-data"] == null ? "" : json["additional-data"],
+        title: json["title"] ?? "",
+        message: json["message"] ?? "",
+        priority: json["priority"],
+        userLevels: List<String>.from(json["user-levels"].map((x) => x)) ?? [],
+        url: json["url"] ?? "",
+        icon: json["icon"] ?? "handshake",
+        supportOption: json['support-option'] ?? false,
+        additionalData: json["additional-data"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
@@ -86,11 +92,20 @@ class GithubNotifications {
         "expiration-date": expirationDate == null
             ? DateTime.now().toIso8601String()
             : expirationDate.toIso8601String(),
-        "title": title == null ? "" : title,
-        "message": message == null ? "" : message,
-        "priority": priority == null ? 10 : priority,
+        "title": title ?? "",
+        "message": message ?? "",
+        "priority": priority ?? 10,
         "user-levels": userLevels == null ? null : List<dynamic>.from(userLevels.map((x) => x)),
-        "url": url == null ? "" : url,
-        "additional-data": additionalData == null ? "" : additionalData,
+        "url": url ?? "",
+        "icon": icon ?? "handshake",
+        "support-option": supportOption ?? false,
+        "additional-data": additionalData ?? "",
       };
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    "$startDate $expirationDate $title $message $priority $userLevels $url $icon $supportOption $additionalData)";
+    return super.toString();
+  }
 }

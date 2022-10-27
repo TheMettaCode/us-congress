@@ -36,9 +36,10 @@ import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 
+import '../services/github/github-promo-message-model.dart';
+
 class SharedWidgets {
-  static Widget createdByContainer(
-      BuildContext context, bool userIsPremium, Box userDatabase) {
+  static Widget createdByContainer(BuildContext context, bool userIsPremium, Box userDatabase) {
     return Container(
       alignment: Alignment.center,
       height: 30,
@@ -47,36 +48,34 @@ class SharedWidgets {
         children: [
           Text(
             'Created by MettaCode',
-            style: Styles.regularStyle.copyWith(
-                fontSize: 14, color: Theme.of(context).colorScheme.primary),
+            style: Styles.regularStyle
+                .copyWith(fontSize: 14, color: Theme.of(context).colorScheme.primary),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           InkWell(
-              onTap: () async => await Functions.linkLaunch(context,
-                  dotenv.env['developerWebLink'], userDatabase, userIsPremium,
+              onTap: () async => await Functions.linkLaunch(
+                  context, dotenv.env['developerWebLink'], userDatabase, userIsPremium,
                   appBarTitle: dotenv.env['developerName']),
               child: FaIcon(FontAwesomeIcons.earthAmericas,
-                  size: 13,
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.75))),
-          SizedBox(width: 8),
+                  size: 13, color: Theme.of(context).colorScheme.primary.withOpacity(0.75))),
+          const SizedBox(width: 8),
           InkWell(
-            onTap: () async => await Functions.linkLaunch(context,
-                dotenv.env['devTwitterUrl'], userDatabase, userIsPremium,
+            onTap: () async => await Functions.linkLaunch(
+                context, dotenv.env['devTwitterUrl'], userDatabase, userIsPremium,
                 appBarTitle: dotenv.env['@MettaCodeDev']),
             child: Image(
-              image: AssetImage('assets/twitter.png'),
+              image: const AssetImage('assets/twitter.png'),
               height: 14,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           InkWell(
-            onTap: () async => await Functions.linkLaunch(context,
-                dotenv.env['devGitHubUrl'], userDatabase, userIsPremium,
+            onTap: () async => await Functions.linkLaunch(
+                context, dotenv.env['devGitHubUrl'], userDatabase, userIsPremium,
                 appBarTitle: dotenv.env['devGitHubUrl']),
             child: Image(
-              image: AssetImage('assets/github.png'),
+              image: const AssetImage('assets/github.png'),
               height: 14,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
             ),
@@ -86,11 +85,10 @@ class SharedWidgets {
     );
   }
 
-  static Widget requestUsageInfoSelector(
-      BuildContext context, Box userDatabase) {
+  static Widget requestUsageInfoSelector(BuildContext context, Box userDatabase) {
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase).listenable(
-            keys: ['darkTheme', 'usageInfo', 'subscriptionAlertsList']),
+        valueListenable: Hive.box(appDatabase)
+            .listenable(keys: ['darkTheme', 'usageInfo', 'subscriptionAlertsList']),
         builder: (context, box, widget) {
           bool darkTheme = userDatabase.get('darkTheme');
           return BounceInUp(
@@ -100,7 +98,7 @@ class SharedWidgets {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -108,10 +106,9 @@ class SharedWidgets {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text('Location Data',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Location Data',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -132,9 +129,7 @@ class SharedWidgets {
                   Theme(
                     data: ThemeData(unselectedWidgetColor: Colors.grey),
                     child: CheckboxListTile(
-                      activeColor: darkTheme
-                          ? alertIndicatorColorBrightGreen
-                          : altHighlightColor,
+                      activeColor: darkTheme ? alertIndicatorColorBrightGreen : altHighlightColor,
                       dense: true,
                       enableFeedback: true,
                       secondary: AnimatedWidgets.spinningLocation(
@@ -152,13 +147,12 @@ class SharedWidgets {
                           userDatabase.put('usageInfoSelected', true);
 
                           await Functions.getDeviceInfo().then((_) async =>
-                              await Functions.getPackageInfo().then(
-                                  (_) async => await Functions.getPosition()));
+                              await Functions.getPackageInfo()
+                                  .then((_) async => await Functions.getPosition()));
 
-                          await Functions.processCredits(true,
-                              isPermanent: false, creditsToAdd: 5);
+                          await Functions.processCredits(true, isPermanent: false, creditsToAdd: 5);
 
-                          Future.delayed(Duration(milliseconds: 750), () async {
+                          Future.delayed(const Duration(milliseconds: 750), () async {
                             // Do something
                             Navigator.pop(context);
                             Messages.showMessage(
@@ -168,8 +162,8 @@ class SharedWidgets {
                                 isAlert: false);
                           });
 
-                          logger.d(
-                              '***** DBase Usage Info: ${userDatabase.get('usageInfo')} *****');
+                          logger
+                              .d('***** DBase Usage Info: ${userDatabase.get('usageInfo')} *****');
                         } else {
                           userDatabase.put('usageInfo', false);
                           userDatabase.put('usageInfoSelected', true);
@@ -178,7 +172,7 @@ class SharedWidgets {
                           userDatabase.put('representativesLocation',
                               initialUserData['representativesLocation']);
 
-                          Future.delayed(Duration(milliseconds: 750), () async {
+                          Future.delayed(const Duration(milliseconds: 750), () async {
                             // Do something
                             Navigator.maybePop(context);
                             Messages.showMessage(
@@ -187,8 +181,8 @@ class SharedWidgets {
                                     'Usage logging has been disabled. Some app features have been removed.',
                                 isAlert: false);
                           });
-                          logger.d(
-                              '***** DBase Usage Info: ${userDatabase.get('usageInfo')} *****');
+                          logger
+                              .d('***** DBase Usage Info: ${userDatabase.get('usageInfo')} *****');
                         }
                       },
                     ),
@@ -207,7 +201,7 @@ class SharedWidgets {
                               userDatabase.get('usageInfo')
                                   ? 'Activated'.toUpperCase()
                                   : 'Maybe Later'.toUpperCase(),
-                              style: TextStyle(fontSize: 12))),
+                              style: const TextStyle(fontSize: 12))),
                     ),
                   ),
                 ],
@@ -217,8 +211,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget appUpgradeDialog(BuildContext context, Box userDatabase,
-      List<Offering> offers, bool userIsPremium,
+  static Widget appUpgradeDialog(
+      BuildContext context, Box userDatabase, List<Offering> offers, bool userIsPremium,
       {String whatToShow = 'all'}) {
     List<Package> creditPackages = offers.first.availablePackages
             .where((element) => element.identifier.contains('credits'))
@@ -250,18 +244,16 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image: AssetImage(
-                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                    image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.all(5),
@@ -281,38 +273,32 @@ class SharedWidgets {
                                           : Icons.store,
                                   color: altHighlightColor,
                                   size: 20),
-                              SizedBox(width: 5),
+                              const SizedBox(width: 5),
                               Text(
                                   userIsPremium || whatToShow == 'credits'
                                       ? 'Purchase Credits'
                                       : whatToShow == 'upgrades'
                                           ? 'Premium Options'
                                           : 'Credits & Upgrades',
-                                  style: GoogleFonts.bangers(
-                                      color: Colors.white, fontSize: 25)),
-                              Spacer(),
+                                  style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
+                              const Spacer(),
                               Container(
                                 height: 22,
                                 alignment: Alignment.centerRight,
                                 child: OutlinedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                Theme.of(context)
-                                                    .primaryColorDark)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(
+                                            Theme.of(context).primaryColorDark)),
                                     onPressed: () => Navigator.pop(context),
                                     child: Text('Maybe Later'.toUpperCase(),
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: darkThemeTextColor))),
+                                        style: TextStyle(fontSize: 12, color: darkThemeTextColor))),
                               ),
                             ],
                           ),
                         ),
                         whatToShow == 'credits'
                             ? Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 3.0),
+                                padding: const EdgeInsets.symmetric(vertical: 3.0),
                                 child: Text(
                                     'Bank ➭ ${userDatabase.get('credits')} App Use | ${userDatabase.get('permCredits')} Support | ${userDatabase.get('purchCredits')} Purchased',
                                     maxLines: 1,
@@ -323,77 +309,56 @@ class SharedWidgets {
                                         fontWeight: FontWeight.normal,
                                         fontSize: 12)),
                               )
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
                           shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           children: userPackages
                               .map(
                                 (package) => Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   child: InkWell(
                                     child: Card(
                                       elevation: 0,
                                       color: darkTheme
-                                          ? Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.5)
+                                          ? Theme.of(context).highlightColor.withOpacity(0.5)
                                           : Colors.white.withOpacity(0.5),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Flexible(
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                              padding: const EdgeInsets.all(8.0),
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Text(
                                                       package.storeProduct.title
-                                                          .replaceAll(
-                                                              ' (US Congress)',
-                                                              ''),
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                  Text(
-                                                      package
-                                                          .storeProduct.description,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal)),
+                                                          .replaceAll(' (US Congress)', ''),
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold)),
+                                                  Text(package.storeProduct.description,
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.normal)),
                                                 ],
                                               ),
                                             ),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.all(10),
-                                            child: Text(
-                                                package.storeProduct.priceString,
-                                                style: Styles.regularStyle
-                                                    .copyWith(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
+                                            child: Text(package.storeProduct.priceString,
+                                                style: Styles.regularStyle.copyWith(
+                                                    fontSize: 15, fontWeight: FontWeight.bold)),
                                           ),
                                         ],
                                       ),
@@ -401,12 +366,10 @@ class SharedWidgets {
                                     onTap: () async {
                                       logger.d('MAKING PURCHASE HERE');
                                       Navigator.pop(context);
-                                      package.storeProduct.identifier
-                                              .contains('credits')
+                                      package.storeProduct.identifier.contains('credits')
                                           ? await RcPurchaseApi.productPurchase(
                                               package.storeProduct, true)
-                                          : await RcPurchaseApi.packagePurchase(
-                                              context, package);
+                                          : await RcPurchaseApi.packagePurchase(context, package);
                                     },
                                   ),
                                 ),
@@ -424,126 +387,47 @@ class SharedWidgets {
         });
   }
 
-  static Widget premiumUpgradeContainer(
-      BuildContext context,
-      bool userIsPremium,
-      bool userIsLegacy,
-      bool devUpgraded,
-      bool freeTrialUsed,
-      Box userDatabase,
+  static Widget premiumUpgradeContainer(BuildContext context, bool userIsPremium, bool userIsLegacy,
+      bool devUpgraded, bool freeTrialUsed, Box userDatabase,
       {color = const Color.fromARGB(255, 30, 150, 0)}) {
     return !freeTrialUsed && (freePremiumDaysActive || userDatabase.get('appOpens') < 5)
-        ? freeTrialContainer(context, userIsPremium, userIsLegacy, devUpgraded,
-            freeTrialUsed, userDatabase)
+        ? freeTrialContainer(
+            context, userIsPremium, userIsLegacy, devUpgraded, freeTrialUsed, userDatabase)
         : Container(
             padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
             child: Card(
               elevation: 2,
               color: alertIndicatorColorDarkGreen,
-              child: new ListTile(
+              child: ListTile(
                 enabled: true,
                 // dense: true,
-                leading: AnimatedWidgets.jumpingingPremium(
-                    context, !userIsPremium, true,
-                    animate: true,
-                    infinite: true,
-                    disabledColor: altHighlightColor,
-                    size: 25),
+                leading: AnimatedWidgets.jumpingPremium(context, !userIsPremium, true,
+                    animate: true, infinite: true, disabledColor: altHighlightColor, size: 25),
                 title: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      new Text('Premium Upgrade',
-                          style: Styles.regularStyle.copyWith(
-                              color: darkThemeTextColor,
-                              fontWeight: FontWeight.bold)),
+                      Text('Premium Upgrade',
+                          style: Styles.regularStyle
+                              .copyWith(color: darkThemeTextColor, fontWeight: FontWeight.bold)),
                       Text('• Remove advertisements\n• Enable all features',
-                          style: Styles.regularStyle.copyWith(
-                              color: darkThemeTextColor, fontSize: 12)),
+                          style: Styles.regularStyle
+                              .copyWith(color: darkThemeTextColor, fontSize: 12)),
                     ],
                   ),
                 ),
                 onTap: () {
                   Navigator.maybePop(context);
-                  Functions.requestInAppPurchase(context, userIsPremium,
-                      whatToShow: 'upgrades');
+                  Functions.requestInAppPurchase(context, userIsPremium, whatToShow: 'upgrades');
                 },
               ),
             ),
           );
   }
 
-  static Widget freePremiumDaysDialog(BuildContext context, Box userDatabase,
-      bool userIsPremium, bool userIsLegacy) {
-    // final bool _darkTheme = userDatabase.get('darkTheme');
-    final bool devUpgraded = userDatabase.get('devUpgraded');
-    final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
-
-    return BounceInUp(
-      child: Container(
-        padding: const EdgeInsets.only(bottom: 20),
-        color: Theme.of(context).colorScheme.background,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            new Container(
-              alignment: Alignment.centerLeft,
-              height: 50,
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              color: Theme.of(context).primaryColorDark,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  new Expanded(
-                    child: new Text('Premium Days Are Here!',
-                        style: GoogleFonts.bangers(
-                            color: Colors.white, fontSize: 25)),
-                  ),
-                  Container(
-                    height: 22,
-                    alignment: Alignment.centerRight,
-                    child: userDatabase.get('userIsPremium')
-                        ? SizedBox.shrink()
-                        : OutlinedButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Theme.of(context).primaryColorDark)),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              userDatabase.put('freeTrialDismissed', true);
-                            },
-                            child: Text('Maybe Later'.toUpperCase(),
-                                style: TextStyle(
-                                    fontSize: 12, color: darkThemeTextColor))),
-                  ),
-                ],
-              ),
-            ),
-            FlipInX(
-              child: ListTile(
-                title: Text(
-                    'Try $freeTrialPromoDurationDays days of Premium Status on us!',
-                    style: Styles.regularStyle
-                        .copyWith(fontWeight: FontWeight.bold)),
-                subtitle: Text(
-                  'During Premium Days, you get to try out all app features to help decide if you would like to upgrade. Take advantage of this one-time offer!',
-                ),
-              ),
-            ),
-            BounceInUp(
-                child: freeTrialContainer(context, userIsPremium, userIsLegacy,
-                    devUpgraded, freeTrialUsed, userDatabase)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static Widget freeTrialEndedDialog(BuildContext context, Box userDatabase,
-      bool userIsPremium, bool userIsLegacy) {
+  static Widget freePremiumDaysDialog(
+      BuildContext context, Box userDatabase, bool userIsPremium, bool userIsLegacy) {
     // final bool _darkTheme = userDatabase.get('darkTheme');
     final bool devUpgraded = userDatabase.get('devUpgraded');
     final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
@@ -565,27 +449,87 @@ class SharedWidgets {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: new Text('Free Trial Expired',
-                        style: GoogleFonts.bangers(
-                            color: Colors.white, fontSize: 25)),
+                    child: Text('Premium Days Are Here!',
+                        style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                   ),
                   Container(
                     height: 22,
                     alignment: Alignment.centerRight,
                     child: userDatabase.get('userIsPremium')
-                        ? SizedBox.shrink()
+                        ? const SizedBox.shrink()
                         : OutlinedButton(
                             style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Theme.of(context).primaryColorDark)),
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Theme.of(context).primaryColorDark)),
                             onPressed: () {
                               Navigator.pop(context);
                               userDatabase.put('freeTrialDismissed', true);
                             },
                             child: Text('Maybe Later'.toUpperCase(),
-                                style: TextStyle(
-                                    fontSize: 12, color: darkThemeTextColor))),
+                                style: TextStyle(fontSize: 12, color: darkThemeTextColor))),
+                  ),
+                ],
+              ),
+            ),
+            FlipInX(
+              child: ListTile(
+                title: Text('Try $freeTrialPromoDurationDays days of Premium Status on us!',
+                    style: Styles.regularStyle.copyWith(fontWeight: FontWeight.bold)),
+                subtitle: const Text(
+                  'During Premium Days, you get to try out all app features to help decide if you would like to upgrade. Take advantage of this one-time offer!',
+                ),
+              ),
+            ),
+            BounceInUp(
+                child: freeTrialContainer(context, userIsPremium, userIsLegacy, devUpgraded,
+                    freeTrialUsed, userDatabase)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget freeTrialEndedDialog(
+      BuildContext context, Box userDatabase, bool userIsPremium, bool userIsLegacy) {
+    // final bool _darkTheme = userDatabase.get('darkTheme');
+    final bool devUpgraded = userDatabase.get('devUpgraded');
+    final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
+
+    return BounceInUp(
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 20),
+        color: Theme.of(context).colorScheme.background,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              height: 50,
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              color: Theme.of(context).primaryColorDark,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text('Free Trial Expired',
+                        style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
+                  ),
+                  Container(
+                    height: 22,
+                    alignment: Alignment.centerRight,
+                    child: userDatabase.get('userIsPremium')
+                        ? const SizedBox.shrink()
+                        : OutlinedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Theme.of(context).primaryColorDark)),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              userDatabase.put('freeTrialDismissed', true);
+                            },
+                            child: Text('Maybe Later'.toUpperCase(),
+                                style: TextStyle(fontSize: 12, color: darkThemeTextColor))),
                   ),
                 ],
               ),
@@ -593,63 +537,48 @@ class SharedWidgets {
             FlipInX(
               child: ListTile(
                 title: Text('Keep Premium Status',
-                    style: Styles.regularStyle
-                        .copyWith(fontWeight: FontWeight.bold)),
-                subtitle: Text(
+                    style: Styles.regularStyle.copyWith(fontWeight: FontWeight.bold)),
+                subtitle: const Text(
                   'Upgrade now to continue premium user status and keep all app features active!',
                 ),
               ),
             ),
             BounceInUp(
-                child: premiumUpgradeContainer(context, userIsPremium,
-                    userIsLegacy, devUpgraded, freeTrialUsed, userDatabase)),
+                child: premiumUpgradeContainer(context, userIsPremium, userIsLegacy, devUpgraded,
+                    freeTrialUsed, userDatabase)),
           ],
         ),
       ),
     );
   }
 
-  static Widget freeTrialContainer(
-      BuildContext context,
-      bool userIsPremium,
-      bool userIsLegacy,
-      bool devUpgraded,
-      bool freeTrialUsed,
-      Box userDatabase) {
+  static Widget freeTrialContainer(BuildContext context, bool userIsPremium, bool userIsLegacy,
+      bool devUpgraded, bool freeTrialUsed, Box userDatabase) {
     final userIdList = List.from(userDatabase.get('userIdList'));
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
       child: Card(
         elevation: 2,
         color: altHighlightAccentColorDarkRed,
-        child: new ListTile(
+        child: ListTile(
           enabled: true,
           dense: true,
-          leading: AnimatedWidgets.jumpingingPremium(
-              context, !userIsPremium, true,
-              animate: true,
-              infinite: true,
-              disabledColor: altHighlightColor,
-              size: 20),
+          leading: AnimatedWidgets.jumpingPremium(context, !userIsPremium, true,
+              animate: true, infinite: true, disabledColor: altHighlightColor, size: 20),
           title: Padding(
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                new Text('Claim Premium Trial',
+                Text('Claim Premium Trial',
                     style: Styles.regularStyle.copyWith(
-                        color: darkThemeTextColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-                Text(
-                    'Try $freeTrialPromoDurationDays days of free premium status!',
-                    style: Styles.regularStyle
-                        .copyWith(color: darkThemeTextColor, fontSize: 12)),
+                        color: darkThemeTextColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Try $freeTrialPromoDurationDays days of free premium status!',
+                    style: Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 12)),
               ],
             ),
           ),
-          trailing: FaIcon(FontAwesomeIcons.solidHandPointer,
-              size: 16, color: darkThemeTextColor),
+          trailing: FaIcon(FontAwesomeIcons.solidHandPointer, size: 16, color: darkThemeTextColor),
           onTap: () async {
             userDatabase.put('userIsPremium', true);
             userDatabase.put('freeTrialUsed', true);
@@ -664,8 +593,7 @@ class SharedWidgets {
             /// SHOW POP UP CONFIRMATION MESSAGE
             Messages.showMessage(
                 context: context,
-                message:
-                    '$freeTrialPromoDurationDays days of Premium status has been activated!',
+                message: '$freeTrialPromoDurationDays days of Premium status has been activated!',
                 isAlert: false);
 
             /// EMAIL TRIAL STARTED NOTIFICATION TO DEVELOPER EMAIL ADDRESS
@@ -677,10 +605,8 @@ class SharedWidgets {
                     'USER STATUS => ${userIsPremium ? 'Premium' : userIsLegacy ? 'Legacy' : 'Free'} :: USER IDs => ${userIdList.map((e) => '${e.split('<|:|>')[0]} ${e.split('<|:|>')[1]} created ${dateWithTimeFormatter.format(DateTime.parse(e.split('<|:|>')[2]).toUtc())} UTC')} :: DLC => ${userDatabase.get('devLegacyCode')} - DPC => ${userDatabase.get('devPremiumCode')} - FTC => ${userDatabase.get('freeTrialCode')}',
                 additionalData2:
                     'USER EMAILs => ${List.from(userDatabase.get('userEmailList')).map((e) => '${e.split('<|:|>')[0]} added ${dateWithTimeFormatter.format(DateTime.parse(e.split('<|:|>')[1]).toUtc())} UTC')}',
-                additionalData3:
-                    'PACKAGE INFO => ${userDatabase.get('packageInfo')}',
-                additionalData4:
-                    'DEVICE INFO => ${userDatabase.get('deviceInfo')}',
+                additionalData3: 'PACKAGE INFO => ${userDatabase.get('packageInfo')}',
+                additionalData4: 'DEVICE INFO => ${userDatabase.get('deviceInfo')}',
                 additionalData5:
                     'TOTAL CREDITS => ${userDatabase.get('purchCredits')} Purch, ${userDatabase.get('permCredits')} Perm & ${userDatabase.get('credits')} Temp :: CURRENT ADDRESS => ${userDatabase.get('currentAddress')} :: LOCATION INFO => ${userDatabase.get('locationData')}',
               );
@@ -694,11 +620,9 @@ class SharedWidgets {
   }
 
   static Widget latestUpdates(BuildContext context, Box userDatabase) {
-    final bool _darkTheme = userDatabase.get('darkTheme');
-    final List<String> appUpdatesList =
-        List.from(userDatabase.get('appUpdatesList'));
-    appUpdatesList
-        .sort((a, b) => a.split('<|:|>')[2].compareTo(b.split('<|:|>')[2]));
+    final bool darkTheme = userDatabase.get('darkTheme');
+    final List<String> appUpdatesList = List.from(userDatabase.get('appUpdatesList'));
+    appUpdatesList.sort((a, b) => a.split('<|:|>')[2].compareTo(b.split('<|:|>')[2]));
     logger.d('***** APP UPDATES LIST: $appUpdatesList *****');
     return BounceInUp(
       child: Container(
@@ -708,7 +632,7 @@ class SharedWidgets {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            new Container(
+            Container(
               alignment: Alignment.centerLeft,
               height: 50,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -716,10 +640,9 @@ class SharedWidgets {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  new Expanded(
-                    child: new Text('Recently Updated',
-                        style: GoogleFonts.bangers(
-                            color: Colors.white, fontSize: 25)),
+                  Expanded(
+                    child: Text('Recently Updated',
+                        style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                   ),
                   Container(
                     height: 22,
@@ -732,8 +655,7 @@ class SharedWidgets {
                           Navigator.pop(context);
                         },
                         child: Text('Okay'.toUpperCase(),
-                            style: TextStyle(
-                                fontSize: 12, color: darkThemeTextColor))),
+                            style: TextStyle(fontSize: 12, color: darkThemeTextColor))),
                   ),
                 ],
               ),
@@ -743,20 +665,19 @@ class SharedWidgets {
                 thumbVisibility: true,
                 trackVisibility: true,
                 child: ListView(
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
                     children: appUpdatesList
                         .map(
                           (update) => FlipInX(
                             child: ListTile(
                               leading: Icon(Icons.update,
-                                  color: _darkTheme
+                                  color: darkTheme
                                       ? altHighlightColor
                                       : Theme.of(context).primaryColorDark,
                                   size: 20),
                               title: Text(update.split('<|:|>')[0],
-                                  style: Styles.regularStyle
-                                      .copyWith(fontWeight: FontWeight.bold)),
+                                  style: Styles.regularStyle.copyWith(fontWeight: FontWeight.bold)),
                               subtitle: Text(
                                 update.split('<|:|>')[1],
                               ),
@@ -779,8 +700,7 @@ class SharedWidgets {
     );
   }
 
-  static Widget ratingOptions(
-      BuildContext context, Box userDatabase, bool userIsPremium) {
+  static Widget ratingOptions(BuildContext context, Box userDatabase, bool userIsPremium) {
     return BounceInUp(
       child: Container(
         color: Theme.of(context).colorScheme.background,
@@ -788,7 +708,7 @@ class SharedWidgets {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            new Container(
+            Container(
               alignment: Alignment.centerLeft,
               height: 50,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -796,10 +716,9 @@ class SharedWidgets {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  new Expanded(
-                    child: new Text('Enjoying the app?',
-                        style: GoogleFonts.bangers(
-                            color: Colors.white, fontSize: 25)),
+                  Expanded(
+                    child: Text('Enjoying the app?',
+                        style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                   ),
                   IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -809,8 +728,7 @@ class SharedWidgets {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Text(
-                  'Please give us a rating and let us know what you think!',
+              child: Text('Please give us a rating and let us know what you think!',
                   style: Styles.regularStyle.copyWith(fontSize: 16)),
             ),
             // Expanded(
@@ -820,18 +738,13 @@ class SharedWidgets {
             //     child:
             ListView(
               shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               // crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisSize: MainAxisSize.min,
               children: [
                 FlipInX(
-                  child: ratingOptionsListTile(
-                      userDatabase,
-                      context,
-                      'google_play_icon.png',
-                      googleAppLink,
-                      'Google Play',
-                      userIsPremium),
+                  child: ratingOptionsListTile(userDatabase, context, 'google_play_icon.png',
+                      googleAppLink, 'Google Play', userIsPremium),
                 ),
                 // FlipInX(
                 //   duration: Duration(milliseconds: 500),
@@ -851,20 +764,15 @@ class SharedWidgets {
             ),
             //   ),
             // ),
-            SizedBox(height: 5)
+            const SizedBox(height: 5)
           ],
         ),
       ),
     );
   }
 
-  static Widget ratingOptionsListTile(
-      Box<dynamic> userDatabase,
-      BuildContext context,
-      String imageFileName,
-      String appLink,
-      String appStore,
-      bool userIsPremium) {
+  static Widget ratingOptionsListTile(Box<dynamic> userDatabase, BuildContext context,
+      String imageFileName, String appLink, String appStore, bool userIsPremium) {
     return FlipInX(
       child: Card(
         elevation: 0,
@@ -877,13 +785,11 @@ class SharedWidgets {
               title: Text('$appStore App Store'),
               onTap: () {
                 Navigator.pop(context);
-                Functions.linkLaunch(
-                        context, appLink, userDatabase, userIsPremium,
+                Functions.linkLaunch(context, appLink, userDatabase, userIsPremium,
                         appBarTitle: 'Thank you for your opinions!')
                     .then((_) async {
                   userDatabase.put('appRated', true);
-                  await Functions.processCredits(true,
-                      isPermanent: true, creditsToAdd: 100);
+                  await Functions.processCredits(true, isPermanent: true, creditsToAdd: 100);
                 });
               }),
         ),
@@ -891,8 +797,8 @@ class SharedWidgets {
     );
   }
 
-  static Widget supportOptions(BuildContext context, Box userDatabase,
-      RewardedAd ad, List<bool> userLevels) {
+  static Widget supportOptions(BuildContext context, Box userDatabase, RewardedAd ad,
+      List<bool> userLevels, List<GithubNotifications> githubNotificationsList) {
     // bool userIsDev = userLevels[0];
     bool userIsPremium = userDatabase.get('userIsPremium');
     bool userIsLegacy = userLevels[2];
@@ -902,6 +808,16 @@ class SharedWidgets {
     final bool darkTheme = userDatabase.get('darkTheme');
     final bool appRated = userDatabase.get('appRated');
 
+    debugPrint(
+        '^^^^ INCLUDED GITHUB NOTIFICATIONS LIST ELEMENTS: ${githubNotificationsList.length}');
+    List<GithubNotifications> thisGithubNotificationsList = githubNotificationsList;
+    thisGithubNotificationsList.retainWhere((element) => element.supportOption == true);
+    if (appRated) {
+      thisGithubNotificationsList.removeWhere((element) => element.additionalData == 'rating');
+    }
+    debugPrint(
+        '^^^^ FINAL THIS GITHUB NOTIFICATIONS LIST ELEMENTS: ${thisGithubNotificationsList.length}');
+
     return BounceInUp(
       child: Container(
         decoration: BoxDecoration(
@@ -910,14 +826,14 @@ class SharedWidgets {
               opacity: 0.15,
               image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.background, BlendMode.color)),
+              colorFilter:
+                  ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            new Container(
+            Container(
               alignment: Alignment.centerLeft,
               height: 50,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -925,10 +841,9 @@ class SharedWidgets {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  new Expanded(
-                    child: new Text('Your support is appreciated',
-                        style: GoogleFonts.bangers(
-                            color: Colors.white, fontSize: 25)),
+                  Expanded(
+                    child: Text('Your support is appreciated',
+                        style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                   ),
                   IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -936,238 +851,282 @@ class SharedWidgets {
                 ],
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            //   child: Text('Please consider...',
-            //       style: Styles.regularStyle.copyWith(fontSize: 16)),
-            // ),
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
                 trackVisibility: true,
                 child: ListView(
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    !userIsPremium /*&& !userIsLegacy*/
-                        ? FlipInY(
-                            child: premiumUpgradeContainer(
-                                context,
-                                userIsPremium,
-                                userIsLegacy,
-                                devUpgraded,
-                                freeTrialUsed,
-                                userDatabase))
-                        : SizedBox.shrink(),
-                    ad != null &&
-                            ad.responseInfo.responseId !=
-                                userDatabase.get('rewardedAdId')
-                        ? FlipInX(
-                            child: Card(
-                              elevation: 0,
-                              color: darkTheme
-                                  ? Theme.of(context)
-                                      .highlightColor
-                                      .withOpacity(0.5)
-                                  : Colors.white.withOpacity(0.5),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                child: ListTile(
-                                  leading: Icon(Icons.live_tv,
-                                      color: userDatabase.get('darkTheme') ==
-                                              true
-                                          ? altHighlightColor
-                                          : Theme.of(context).primaryColorDark,
-                                      size: 20),
-                                  trailing:
-                                      const Icon(Icons.touch_app, size: 20),
-                                  title: const Text('Watch a short ad'),
-                                  subtitle: const Text(
-                                      'Receive additional PERMANENT credits for watching!'),
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    AdMobLibrary().rewardedAdShow(ad);
-                                  },
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    // crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                          !userIsPremium /*&& !userIsLegacy*/
+                              ? FlipInY(
+                                  child: premiumUpgradeContainer(context, userIsPremium,
+                                      userIsLegacy, devUpgraded, freeTrialUsed, userDatabase))
+                              : const SizedBox.shrink(),
+                          ad != null &&
+                                  ad.responseInfo.responseId != userDatabase.get('rewardedAdId')
+                              ? FlipInX(
+                                  child: Card(
+                                    elevation: 0,
+                                    color: darkTheme
+                                        ? Theme.of(context).highlightColor.withOpacity(0.5)
+                                        : Colors.white.withOpacity(0.5),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                      child: ListTile(
+                                        leading: Icon(Icons.live_tv,
+                                            color: userDatabase.get('darkTheme') == true
+                                                ? altHighlightColor
+                                                : Theme.of(context).primaryColorDark,
+                                            size: 20),
+                                        trailing: const Icon(Icons.touch_app, size: 20),
+                                        title: const Text('Watch a short ad'),
+                                        subtitle: const Text(
+                                            'Receive additional PERMANENT credits for watching!'),
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          AdMobLibrary().rewardedAdShow(ad);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ] +
+                        thisGithubNotificationsList
+                            .map(
+                              (notification) => FlipInX(
+                                duration: const Duration(milliseconds: 1000),
+                                child: Card(
+                                  elevation: 0,
+                                  color: darkTheme
+                                      ? Theme.of(context).highlightColor.withOpacity(0.5)
+                                      : Colors.white.withOpacity(0.5),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: ListTile(
+                                      enabled: true,
+                                      enableFeedback: true,
+                                      leading: Icon(
+                                          notification.icon == 'notifications'
+                                              ? Icons.notifications
+                                              : notification.icon == 'handshake'
+                                                  ? Icons.handshake
+                                                  : notification.icon == 'star'
+                                                      ? Icons.star
+                                                      : notification.icon == 'store'
+                                                          ? Icons.store
+                                                          : notification.icon == 'credit-card'
+                                                              ? Icons.credit_card
+                                                              : notification.icon == 'trending-up'
+                                                                  ? Icons.trending_up
+                                                                  : notification.icon ==
+                                                                          'workspace-premium'
+                                                                      ? Icons.workspace_premium
+                                                                      : notification.icon ==
+                                                                              'campaign'
+                                                                          ? Icons.campaign
+                                                                          : notification.icon ==
+                                                                                  'volunteer-activism'
+                                                                              ? Icons
+                                                                                  .volunteer_activism
+                                                                              : notification.icon ==
+                                                                                      'developer-board'
+                                                                                  ? Icons
+                                                                                      .developer_board
+                                                                                  : Icons
+                                                                                      .volunteer_activism,
+                                          size: 20,
+                                          color: userDatabase.get('darkTheme') == true
+                                              ? altHighlightColor
+                                              : Theme.of(context).primaryColorDark),
+                                      title: Text(notification.title),
+                                      subtitle: Text(notification.message),
+                                      trailing: notification.url.isEmpty &&
+                                              notification.additionalData != 'share'
+                                          ? const SizedBox.shrink()
+                                          : notification.additionalData == 'share'
+                                              ? const Icon(Icons.share, size: 16)
+                                              : const Icon(Icons.launch, size: 16),
+                                      onTap: () => notification.additionalData == 'credits'
+                                          ? Functions.requestInAppPurchase(context, userIsPremium,
+                                              whatToShow: notification.additionalData)
+                                          : notification.additionalData == 'share'
+                                              ? Messages.shareContent(true)
+                                              : notification.url.isNotEmpty
+                                                  ? Functions.linkLaunch(context, notification.url,
+                                                      userDatabase, userIsPremium)
+                                                  : null,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                    FlipInX(
-                      duration: Duration(milliseconds: 1000),
-                      child: Card(
-                        elevation: 0,
-                        color: darkTheme
-                            ? Theme.of(context).highlightColor.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: ListTile(
-                            enabled: true,
-                            enableFeedback: true,
-                            leading: Icon(Icons.handshake,
-                                size: 20,
-                                color: userDatabase.get('darkTheme') == true
-                                    ? altHighlightColor
-                                    : Theme.of(context).primaryColorDark),
-                            title: Text('Share The App'),
-                            subtitle: const Text(
-                                'Receive additional PERMANENT credits for sharing the app with family, friends and colleagues!'),
-                            trailing: Icon(Icons.share, size: 16),
-                            onTap: () => Messages.shareContent(true),
-                          ),
-                        ),
-                      ),
+                            )
+                            .toList()
+                    // [
+                    //   FlipInX(
+                    //     duration: Duration(milliseconds: 1000),
+                    //     child: Card(
+                    //       elevation: 0,
+                    //       color: darkTheme
+                    //           ? Theme.of(context).highlightColor.withOpacity(0.5)
+                    //           : Colors.white.withOpacity(0.5),
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 5),
+                    //         child: ListTile(
+                    //           enabled: true,
+                    //           enableFeedback: true,
+                    //           leading: Icon(Icons.handshake,
+                    //               size: 20,
+                    //               color: userDatabase.get('darkTheme') == true
+                    //                   ? altHighlightColor
+                    //                   : Theme.of(context).primaryColorDark),
+                    //           title: Text('Share The App'),
+                    //           subtitle: const Text(
+                    //               'Receive additional PERMANENT credits for sharing the app with family, friends and colleagues!'),
+                    //           trailing: Icon(Icons.share, size: 16),
+                    //           onTap: () => Messages.shareContent(true),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   appRated
+                    //       ? SizedBox.shrink()
+                    //       : FlipInX(
+                    //           duration: Duration(milliseconds: 500),
+                    //           child: Card(
+                    //             elevation: 0,
+                    //             color: darkTheme
+                    //                 ? Theme.of(context).highlightColor.withOpacity(0.5)
+                    //                 : Colors.white.withOpacity(0.5),
+                    //             child: Padding(
+                    //               padding: const EdgeInsets.symmetric(vertical: 5),
+                    //               child: ListTile(
+                    //                 enabled: true,
+                    //                 enableFeedback: true,
+                    //                 leading: Icon(Icons.star,
+                    //                     size: 20,
+                    //                     color: userDatabase.get('darkTheme') == true
+                    //                         ? altHighlightColor
+                    //                         : Theme.of(context).primaryColorDark),
+                    //                 title: Text('Rate The App'),
+                    //                 subtitle: const Text(
+                    //                     'Let us know how we\'re doing, and if there is something we can improve on.'),
+                    //                 trailing: Icon(Icons.launch, size: 16),
+                    //                 onTap: () async {
+                    //                   Navigator.pop(context);
+                    //                   showModalBottomSheet(
+                    //                       backgroundColor: Colors.transparent,
+                    //                       isScrollControlled: false,
+                    //                       enableDrag: true,
+                    //                       context: context,
+                    //                       // constraints: BoxConstraints(
+                    //                       //     maxWidth: MediaQuery.of(context)
+                    //                       //         .size
+                    //                       //         .width),
+                    //                       builder: (context) {
+                    //                         return BounceInUp(
+                    //                             child: ratingOptions(
+                    //                                 context, userDatabase, userIsPremium));
+                    //                       });
+                    //                 },
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //   FlipInX(
+                    //     duration: Duration(milliseconds: 500),
+                    //     child: Card(
+                    //       elevation: 0,
+                    //       color: darkTheme
+                    //           ? Theme.of(context).highlightColor.withOpacity(0.5)
+                    //           : Colors.white.withOpacity(0.5),
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 5),
+                    //         child: ListTile(
+                    //           enabled: true,
+                    //           enableFeedback: true,
+                    //           leading: Icon(Icons.star,
+                    //               size: 20,
+                    //               color: userDatabase.get('darkTheme') == true
+                    //                   ? altHighlightColor
+                    //                   : Theme.of(context).primaryColorDark),
+                    //           title: Text('Get App Credits'),
+                    //           subtitle: const Text('Use app credits to buy in-app merchandise.'),
+                    //           trailing: Icon(Icons.launch, size: 16),
+                    //           onTap: () async {
+                    //             Navigator.pop(context);
+                    //             Functions.requestInAppPurchase(context, userIsPremium,
+                    //                 whatToShow: 'credits');
+                    //           },
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   FlipInX(
+                    //     duration: Duration(milliseconds: 1000),
+                    //     child: Card(
+                    //       elevation: 0,
+                    //       color: darkTheme
+                    //           ? Theme.of(context).highlightColor.withOpacity(0.5)
+                    //           : Colors.white.withOpacity(0.5),
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 5),
+                    //         child: ListTile(
+                    //           enabled: true,
+                    //           enableFeedback: true,
+                    //           leading: Icon(Icons.campaign,
+                    //               size: 20,
+                    //               color: userDatabase.get('darkTheme') == true
+                    //                   ? altHighlightColor
+                    //                   : Theme.of(context).primaryColorDark),
+                    //           title: Text('iOS GoFundMe'),
+                    //           subtitle: const Text(
+                    //               'Help us with development for an iPhone version of US Congress App by donating to our GoFundMe campaign'),
+                    //           trailing: Icon(Icons.launch, size: 16),
+                    //           onTap: () => Functions.linkLaunch(context,
+                    //               'https://gofund.me/4e761be9', userDatabase, userIsPremium,
+                    //               appBarTitle: 'iOS App GoFundMe Campaign'),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   FlipInX(
+                    //     duration: Duration(milliseconds: 1000),
+                    //     child: Card(
+                    //       elevation: 0,
+                    //       color: darkTheme
+                    //           ? Theme.of(context).highlightColor.withOpacity(0.5)
+                    //           : Colors.white.withOpacity(0.5),
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.symmetric(vertical: 5),
+                    //         child: ListTile(
+                    //           enabled: true,
+                    //           enableFeedback: true,
+                    //           leading: Icon(Icons.volunteer_activism,
+                    //               size: 20,
+                    //               color: userDatabase.get('darkTheme') == true
+                    //                   ? altHighlightColor
+                    //                   : Theme.of(context).primaryColorDark),
+                    //           title: Text('Developer Support Options'),
+                    //           subtitle: const Text(
+                    //               'Additional support options can be found on our humble website'),
+                    //           trailing: Icon(Icons.launch, size: 16),
+                    //           onTap: () => Functions.linkLaunch(context,
+                    //               dotenv.env['developerWebLink'], userDatabase, userIsPremium,
+                    //               appBarTitle: dotenv.env['developerWebLink']),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ],
                     ),
-                    appRated
-                        ? SizedBox.shrink()
-                        : FlipInX(
-                            duration: Duration(milliseconds: 500),
-                            child: Card(
-                              elevation: 0,
-                              color: darkTheme
-                                  ? Theme.of(context)
-                                      .highlightColor
-                                      .withOpacity(0.5)
-                                  : Colors.white.withOpacity(0.5),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                child: ListTile(
-                                  enabled: true,
-                                  enableFeedback: true,
-                                  leading: Icon(Icons.star,
-                                      size: 20,
-                                      color: userDatabase.get('darkTheme') ==
-                                              true
-                                          ? altHighlightColor
-                                          : Theme.of(context).primaryColorDark),
-                                  title: Text('Rate The App'),
-                                  subtitle: const Text(
-                                      'Let us know how we\'re doing, and if there is something we can improve on.'),
-                                  trailing: Icon(Icons.launch, size: 16),
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    showModalBottomSheet(
-                                        backgroundColor: Colors.transparent,
-                                        isScrollControlled: false,
-                                        enableDrag: true,
-                                        context: context,
-                                        // constraints: BoxConstraints(
-                                        //     maxWidth: MediaQuery.of(context)
-                                        //         .size
-                                        //         .width),
-                                        builder: (context) {
-                                          return BounceInUp(
-                                              child: ratingOptions(context,
-                                                  userDatabase, userIsPremium));
-                                        });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                    FlipInX(
-                      duration: Duration(milliseconds: 500),
-                      child: Card(
-                        elevation: 0,
-                        color: darkTheme
-                            ? Theme.of(context).highlightColor.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: ListTile(
-                            enabled: true,
-                            enableFeedback: true,
-                            leading: Icon(Icons.star,
-                                size: 20,
-                                color: userDatabase.get('darkTheme') == true
-                                    ? altHighlightColor
-                                    : Theme.of(context).primaryColorDark),
-                            title: Text('Get App Credits'),
-                            subtitle: const Text(
-                                'Use app credits to buy in-app merchandise.'),
-                            trailing: Icon(Icons.launch, size: 16),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              Functions.requestInAppPurchase(
-                                  context, userIsPremium,
-                                  whatToShow: 'credits');
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    FlipInX(
-                      duration: Duration(milliseconds: 1000),
-                      child: Card(
-                        elevation: 0,
-                        color: darkTheme
-                            ? Theme.of(context).highlightColor.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: ListTile(
-                            enabled: true,
-                            enableFeedback: true,
-                            leading: Icon(Icons.campaign,
-                                size: 20,
-                                color: userDatabase.get('darkTheme') == true
-                                    ? altHighlightColor
-                                    : Theme.of(context).primaryColorDark),
-                            title: Text('iOS GoFundMe'),
-                            subtitle: const Text(
-                                'Help us with development for an iPhone version of US Congress App by donating to our GoFundMe campaign'),
-                            trailing: Icon(Icons.launch, size: 16),
-                            onTap: () => Functions.linkLaunch(
-                                context,
-                                'https://gofund.me/4e761be9',
-                                userDatabase,
-                                userIsPremium,
-                                appBarTitle: 'iOS App GoFundMe Campaign'),
-                          ),
-                        ),
-                      ),
-                    ),
-                    FlipInX(
-                      duration: Duration(milliseconds: 1000),
-                      child: Card(
-                        elevation: 0,
-                        color: darkTheme
-                            ? Theme.of(context).highlightColor.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: ListTile(
-                            enabled: true,
-                            enableFeedback: true,
-                            leading: Icon(Icons.volunteer_activism,
-                                size: 20,
-                                color: userDatabase.get('darkTheme') == true
-                                    ? altHighlightColor
-                                    : Theme.of(context).primaryColorDark),
-                            title: Text('Developer Support Options'),
-                            subtitle: const Text(
-                                'Additional support options can be found on our humble website'),
-                            trailing: Icon(Icons.launch, size: 16),
-                            onTap: () => Functions.linkLaunch(
-                                context,
-                                dotenv.env['developerWebLink'],
-                                userDatabase,
-                                userIsPremium,
-                                appBarTitle: dotenv.env['developerWebLink']),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
-            SizedBox(height: 10)
+            const SizedBox(height: 10)
           ],
         ),
       ),
@@ -1183,30 +1142,28 @@ class SharedWidgets {
     logger.d('***** ALL BILLS: ${recentBills.map((e) => e.billId)} *****');
 
     // bool viewMore = false;
-    Color _thisPanelColor = Theme.of(context).primaryColorDark;
-    String _queryString = '';
+    Color thisPanelColor = Theme.of(context).primaryColorDark;
+    String queryString = '';
 
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase)
-            .listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
+        valueListenable:
+            Hive.box(appDatabase).listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
         builder: (context, box, widget) {
           logger.d(
               '***** ALL SUBSCRIPTIONS (recent bills page): ${userDatabase.get('subscriptionAlertsList')} *****');
 
-          bool _darkTheme = userDatabase.get('darkTheme');
+          bool darkTheme = userDatabase.get('darkTheme');
 
           recentBills = recentBills
-                  .where((bill) =>
-                      List.from(userDatabase.get('subscriptionAlertsList')).any(
-                          (element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith('bill_${bill.billId}'.toLowerCase())))
+                  .where((bill) => List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('bill_${bill.billId}'.toLowerCase())))
                   .toList() +
               recentBills
-                  .where((event) => !List.from(
-                          userDatabase.get('subscriptionAlertsList'))
-                      .any((element) => element
+                  .where((event) => !List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
                           .toString()
                           .toLowerCase()
                           .startsWith('bill_${event.billId}'.toLowerCase())))
@@ -1218,53 +1175,48 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image: AssetImage(
-                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                    image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text('Recent Bills',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Recent Bills',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         SizedBox(
                           height: 20,
                           child: OutlinedButton.icon(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.search,
                                 color: Colors.white,
                                 size: 12,
                               ),
                               label: Text('Search',
-                                  style: Styles.regularStyle.copyWith(
-                                      color: Colors.white, fontSize: 12)),
+                                  style: Styles.regularStyle
+                                      .copyWith(color: Colors.white, fontSize: 12)),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
                                   enableDrag: true,
                                   builder: (context) => Container(
                                     color: Colors.transparent,
-                                    margin: const EdgeInsets.only(
-                                        top: 5, left: 15, right: 15),
+                                    margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
                                     height: 400,
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Container(
                                           height: 50,
@@ -1274,43 +1226,37 @@ class SharedWidgets {
                                           margin: const EdgeInsets.symmetric(
                                               horizontal: 10, vertical: 10),
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.15),
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
+                                              color:
+                                                  Theme.of(context).primaryColor.withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(10)),
                                           child: TextField(
                                             keyboardType: TextInputType.text,
                                             textAlign: TextAlign.center,
                                             autocorrect: true,
                                             autofocus: true,
                                             enableSuggestions: true,
-                                            decoration:
-                                                InputDecoration.collapsed(
+                                            decoration: const InputDecoration.collapsed(
                                               hintText: 'Enter your search',
                                             ),
                                             onChanged: (val) {
-                                              _queryString = val;
+                                              queryString = val;
                                             },
                                           ),
                                         ),
-                                        new ElevatedButton.icon(
-                                          icon: Icon(Icons.search),
+                                        ElevatedButton.icon(
+                                          icon: const Icon(Icons.search),
                                           onPressed: () {
                                             Navigator.pop(context);
 
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    BillSearch(
-                                                        _queryString,
-                                                        houseStockWatchList,
-                                                        senateStockWatchList),
+                                                builder: (context) => BillSearch(queryString,
+                                                    houseStockWatchList, senateStockWatchList),
                                               ),
                                             );
                                           },
-                                          label: Text(
+                                          label: const Text(
                                             'Search',
                                           ),
                                         )
@@ -1336,96 +1282,75 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: recentBills
                               .map(
-                                (_thisRecentBill) => StatefulBuilder(
-                                    builder: (context, setState) {
+                                (thisRecentBill) => StatefulBuilder(builder: (context, setState) {
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       FlipInX(
                                         child: Card(
                                           elevation: 0,
-                                          color: _darkTheme
-                                              ? Theme.of(context)
-                                                  .highlightColor
-                                                  .withOpacity(0.5)
+                                          color: darkTheme
+                                              ? Theme.of(context).highlightColor.withOpacity(0.5)
                                               : Colors.white.withOpacity(0.5),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
                                             child: ListTile(
                                               dense: true,
-                                              leading: _thisRecentBill.billId
-                                                              .isNotEmpty !=
-                                                          null &&
-                                                      _thisRecentBill
-                                                          .billId.isNotEmpty &&
-                                                      List.from(userDatabase.get('subscriptionAlertsList'))
+                                              leading: thisRecentBill.billId.isNotEmpty != null &&
+                                                      thisRecentBill.billId.isNotEmpty &&
+                                                      List.from(userDatabase
+                                                              .get('subscriptionAlertsList'))
                                                           .any((element) => element
                                                               .toString()
                                                               .toLowerCase()
                                                               .toString()
                                                               .startsWith(
-                                                                  'bill_${_thisRecentBill.billId}'
+                                                                  'bill_${thisRecentBill.billId}'
                                                                       .toLowerCase()))
                                                   ? AnimatedWidgets.flashingEye(
                                                       context, true, false,
                                                       size: 16)
-                                                  : FaIcon(FontAwesomeIcons.scroll,
-                                                      size: 15),
+                                                  : const FaIcon(FontAwesomeIcons.scroll, size: 15),
                                               title: billSimpleTextGroup(
                                                   context,
-                                                  _thisPanelColor,
-                                                  _darkTheme,
-                                                  'BILL ID: ${_thisRecentBill.billId}',
-                                                  _thisRecentBill.shortTitle),
+                                                  thisPanelColor,
+                                                  darkTheme,
+                                                  'BILL ID: ${thisRecentBill.billId}',
+                                                  thisRecentBill.shortTitle),
                                               subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  SizedBox(height: 3),
+                                                  const SizedBox(height: 3),
                                                   Text(
-                                                      'Last Action: ${dateWithDayFormatter.format(_thisRecentBill.latestMajorActionDate)}\nLast Vote: ${_thisRecentBill.lastVote == null ? 'Unavailable' : dateWithDayFormatter.format(_thisRecentBill.lastVote)}',
+                                                      'Last Action: ${dateWithDayFormatter.format(thisRecentBill.latestMajorActionDate)}\nLast Vote: ${thisRecentBill.lastVote == null ? 'Unavailable' : dateWithDayFormatter.format(thisRecentBill.lastVote)}',
                                                       maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                  SizedBox(height: 3),
-                                                  Text(
-                                                      '${_thisRecentBill.latestMajorAction}',
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.bold)),
+                                                  const SizedBox(height: 3),
+                                                  Text(thisRecentBill.latestMajorAction,
                                                       maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.bold)),
                                                 ],
                                               ),
-                                              trailing: FaIcon(
-                                                  FontAwesomeIcons.binoculars,
+                                              trailing: const FaIcon(FontAwesomeIcons.binoculars,
                                                   size: 15),
                                               onTap: () => Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      BillDetail(
-                                                          _thisRecentBill
-                                                              .billUri,
-                                                          houseStockWatchList,
-                                                          senateStockWatchList),
+                                                  builder: (context) => BillDetail(
+                                                      thisRecentBill.billUri,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList),
                                                 ),
                                               ),
                                             ),
@@ -1446,8 +1371,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget billSimpleTextGroup(BuildContext context, Color headerColor,
-      bool darkTheme, String headerText, String contentText,
+  static Widget billSimpleTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText, String contentText,
       {int maxLines = 2,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -1466,51 +1391,48 @@ class SharedWidgets {
           contentText,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
-          style: Styles.regularStyle
-              .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+          style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
         ),
       ],
     );
   }
 
-  static Widget recentVotesList(
-      BuildContext context,
-      Box userDatabase,
-      List<Vote> recentVotes,
-      List<HouseStockWatch> houseStockWatchList,
-      List<SenateStockWatch> senateStockWatchList) {
+  static Widget recentVotesList(BuildContext context, Box userDatabase, List<Vote> recentVotes,
+      List<HouseStockWatch> houseStockWatchList, List<SenateStockWatch> senateStockWatchList) {
     logger.d('***** ALL VOTES: ${recentVotes.map((e) => e.bill.billId)} *****');
     List<RcPosition> positions = [];
     // bool viewMore = false;
     bool gettingRollCall = false;
-    Color _thisPanelColor = Theme.of(context).primaryColorDark;
+    Color thisPanelColor = Theme.of(context).primaryColorDark;
 
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase)
-            .listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
+        valueListenable:
+            Hive.box(appDatabase).listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
         builder: (context, box, widget) {
           logger.d(
               '***** ALL SUBSCRIPTIONS (recent votes page): ${List.from(userDatabase.get('subscriptionAlertsList')).map((e) => e.toString().split('_')[1])} *****');
 
-          bool _darkTheme = userDatabase.get('darkTheme');
-          List<Vote> _subscribed = recentVotes
-              .where((vote) =>
-                  List.from(userDatabase.get('subscriptionAlertsList')).any(
-                      (element) => element.toString().toLowerCase().startsWith(
-                          'bill_${vote.bill.billId}'.toLowerCase())))
+          bool darkTheme = userDatabase.get('darkTheme');
+          List<Vote> subscribed = recentVotes
+              .where((vote) => List.from(userDatabase.get('subscriptionAlertsList')).any(
+                  (element) => element
+                      .toString()
+                      .toLowerCase()
+                      .startsWith('bill_${vote.bill.billId}'.toLowerCase())))
               .toList();
 
-          List<Vote> _notSubscribed = recentVotes
-              .where((vote) =>
-                  !List.from(userDatabase.get('subscriptionAlertsList')).any(
-                      (element) => element.toString().toLowerCase().startsWith(
-                          'bill_${vote.bill.billId}'.toLowerCase())))
+          List<Vote> notSubscribed = recentVotes
+              .where((vote) => !List.from(userDatabase.get('subscriptionAlertsList')).any(
+                  (element) => element
+                      .toString()
+                      .toLowerCase()
+                      .startsWith('bill_${vote.bill.billId}'.toLowerCase())))
               .toList();
 
-          _subscribed.sort((a, b) => b.rollCall.compareTo(a.rollCall));
-          _notSubscribed.sort((a, b) => b.rollCall.compareTo(a.rollCall));
+          subscribed.sort((a, b) => b.rollCall.compareTo(a.rollCall));
+          notSubscribed.sort((a, b) => b.rollCall.compareTo(a.rollCall));
 
-          recentVotes = _subscribed + _notSubscribed;
+          recentVotes = subscribed + notSubscribed;
 
           return BounceInUp(
             child: Container(
@@ -1518,12 +1440,10 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image: AssetImage(
-                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                    image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1532,14 +1452,13 @@ class SharedWidgets {
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                          child: new Text('Recent Votes',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                          child: Text('Recent Votes',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -1550,152 +1469,129 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: recentVotes
                               .map(
-                                (_thisRecentVote) => StatefulBuilder(
-                                    builder: (context, setState) {
+                                (thisRecentVote) => StatefulBuilder(builder: (context, setState) {
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       FlipInX(
                                         child: Card(
                                           elevation: 0,
-                                          color: _darkTheme
-                                              ? Theme.of(context)
-                                                  .highlightColor
-                                                  .withOpacity(0.5)
+                                          color: darkTheme
+                                              ? Theme.of(context).highlightColor.withOpacity(0.5)
                                               : Colors.white.withOpacity(0.5),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
                                             child: ListTile(
                                               dense: true,
-                                              leading: _thisRecentVote.bill
-                                                          .billId.isNotEmpty &&
-                                                      List.from(userDatabase.get('subscriptionAlertsList'))
+                                              leading: thisRecentVote.bill.billId.isNotEmpty &&
+                                                      List.from(userDatabase
+                                                              .get('subscriptionAlertsList'))
                                                           .any((element) => element
                                                               .toString()
                                                               .toLowerCase()
                                                               .startsWith(
-                                                                  'bill_${_thisRecentVote.bill.billId}'
+                                                                  'bill_${thisRecentVote.bill.billId}'
                                                                       .toLowerCase()))
                                                   ? AnimatedWidgets.flashingEye(
                                                       context, true, false,
                                                       size: 13)
-                                                  : FaIcon(
-                                                      FontAwesomeIcons.gavel,
-                                                      size: 15),
+                                                  : const FaIcon(FontAwesomeIcons.gavel, size: 15),
                                               title: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   voteSimpleTextGroup(
                                                       context,
-                                                      _thisPanelColor,
-                                                      _darkTheme,
-                                                      '${_thisRecentVote.bill.billId} : ROLL CALL# ${_thisRecentVote.rollCall}',
-                                                      _thisRecentVote.question),
+                                                      thisPanelColor,
+                                                      darkTheme,
+                                                      '${thisRecentVote.bill.billId} : ROLL CALL# ${thisRecentVote.rollCall}',
+                                                      thisRecentVote.question),
                                                 ],
                                               ),
                                               subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                      '${_thisRecentVote.description}',
+                                                  Text(thisRecentVote.description,
                                                       maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                  SizedBox(height: 5),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.bold)),
+                                                  const SizedBox(height: 5),
                                                   Row(
                                                     children: [
                                                       SizedBox(
                                                         height: 20,
                                                         child: OutlinedButton(
                                                             onPressed: () {},
-                                                            child: Text(
-                                                                _thisRecentVote
-                                                                        .result
-                                                                        .toString()
-                                                                        .toLowerCase()
-                                                                        .contains(
-                                                                            'result.')
-                                                                    ? _thisRecentVote.result.toString().toUpperCase() ==
-                                                                            'RESULT.AGREED_TO'
-                                                                        ? 'AGREED'
-                                                                        : _thisRecentVote
-                                                                            .result
-                                                                            .toString()
-                                                                            .toUpperCase()
-                                                                            .replaceFirst('RESULT.',
-                                                                                '')
-                                                                    : 'RECORDED',
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            14)),
                                                             style: ButtonStyle(
                                                                 foregroundColor:
                                                                     darkThemeTextMSPColor,
-                                                                backgroundColor: _thisRecentVote.result.toString().toUpperCase() ==
+                                                                backgroundColor: thisRecentVote
+                                                                                .result
+                                                                                .toString()
+                                                                                .toUpperCase() ==
                                                                             'RESULT.PASSED' ||
-                                                                        _thisRecentVote.result.toString().toUpperCase() ==
+                                                                        thisRecentVote.result
+                                                                                .toString()
+                                                                                .toUpperCase() ==
                                                                             'RESULT.AGREED_TO'
                                                                     ? alertIndicatorMSPColorDarkGreen
-                                                                    : _thisRecentVote.result.toString().toUpperCase() ==
+                                                                    : thisRecentVote.result
+                                                                                .toString()
+                                                                                .toUpperCase() ==
                                                                             'RESULT.FAILED'
                                                                         ? errorMSPColor
-                                                                        : disabledMSPColorGray)),
+                                                                        : disabledMSPColorGray),
+                                                            child: Text(
+                                                                thisRecentVote.result
+                                                                        .toString()
+                                                                        .toLowerCase()
+                                                                        .contains('result.')
+                                                                    ? thisRecentVote.result
+                                                                                .toString()
+                                                                                .toUpperCase() ==
+                                                                            'RESULT.AGREED_TO'
+                                                                        ? 'AGREED'
+                                                                        : thisRecentVote.result
+                                                                            .toString()
+                                                                            .toUpperCase()
+                                                                            .replaceFirst(
+                                                                                'RESULT.', '')
+                                                                    : 'RECORDED',
+                                                                style: Styles.regularStyle
+                                                                    .copyWith(fontSize: 14))),
                                                       ),
-                                                      SizedBox(width: 5),
+                                                      const SizedBox(width: 5),
                                                       Text(
-                                                          '${dateWithDayFormatter.format(_thisRecentVote.date)} ${timeFormatter.format(DateTime.parse('0000-00-00 ${_thisRecentVote.time}'))}',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  fontSize: 11))
+                                                          '${dateWithDayFormatter.format(thisRecentVote.date)} ${timeFormatter.format(DateTime.parse('0000-00-00 ${thisRecentVote.time}'))}',
+                                                          style: Styles.regularStyle
+                                                              .copyWith(fontSize: 11))
                                                     ],
                                                   ),
                                                 ],
                                               ),
-                                              trailing: FaIcon(
-                                                  FontAwesomeIcons.binoculars,
+                                              trailing: const FaIcon(FontAwesomeIcons.binoculars,
                                                   size: 15),
                                               onTap: () async {
-                                                setState(() =>
-                                                    gettingRollCall = true);
+                                                setState(() => gettingRollCall = true);
                                                 bool positionsAvailable = false;
-                                                positions = await Functions
-                                                    .getRollCallPositions(
-                                                        _thisRecentVote
-                                                            .congress,
-                                                        _thisRecentVote.chamber ==
-                                                                    null ||
-                                                                _thisRecentVote
-                                                                        .chamber
-                                                                        .name
-                                                                        .toLowerCase() ==
-                                                                    'chamber.senate'
-                                                            ? 'senate'
-                                                            : 'house',
-                                                        _thisRecentVote.session,
-                                                        _thisRecentVote
-                                                            .rollCall);
+                                                positions = await Functions.getRollCallPositions(
+                                                    thisRecentVote.congress,
+                                                    thisRecentVote.chamber == null ||
+                                                            thisRecentVote.chamber.name
+                                                                    .toLowerCase() ==
+                                                                'chamber.senate'
+                                                        ? 'senate'
+                                                        : 'house',
+                                                    thisRecentVote.session,
+                                                    thisRecentVote.rollCall);
                                                 positionsAvailable =
-                                                    positions.isEmpty
-                                                        ? false
-                                                        : true;
+                                                    positions.isEmpty ? false : true;
                                                 setState(() {
                                                   gettingRollCall = false;
                                                 });
@@ -1703,16 +1599,14 @@ class SharedWidgets {
                                                 Navigator.maybePop(context);
 
                                                 await showModalBottomSheet(
-                                                  backgroundColor:
-                                                      Colors.transparent,
+                                                  backgroundColor: Colors.transparent,
                                                   isScrollControlled: true,
                                                   enableDrag: true,
                                                   context: context,
-                                                  builder: (context) =>
-                                                      SingleChildScrollView(
+                                                  builder: (context) => SingleChildScrollView(
                                                     child: getVoteTile(
                                                         userDatabase,
-                                                        _thisRecentVote,
+                                                        thisRecentVote,
                                                         positionsAvailable,
                                                         houseStockWatchList,
                                                         senateStockWatchList),
@@ -1724,8 +1618,8 @@ class SharedWidgets {
                                         ),
                                       ),
                                       gettingRollCall
-                                          ? LinearProgressIndicator()
-                                          : SizedBox.shrink(),
+                                          ? const LinearProgressIndicator()
+                                          : const SizedBox.shrink(),
                                     ],
                                   );
                                 }),
@@ -1740,8 +1634,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget voteSimpleTextGroup(BuildContext context, Color headerColor,
-      bool darkTheme, String headerText, String contentText,
+  static Widget voteSimpleTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -1760,23 +1654,18 @@ class SharedWidgets {
           contentText,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
-          style: Styles.regularStyle
-              .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+          style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
         ),
       ],
     );
   }
 
   /// VOTE TILE
-  static Widget getVoteTile(
-      Box userDatabase,
-      Vote thisVote,
-      bool rollCallAvailable,
-      List<HouseStockWatch> houseStockWatchList,
-      List<SenateStockWatch> senateStockWatchList) {
+  static Widget getVoteTile(Box userDatabase, Vote thisVote, bool rollCallAvailable,
+      List<HouseStockWatch> houseStockWatchList, List<SenateStockWatch> senateStockWatchList) {
     bool darkTheme = userDatabase.get('darkTheme');
-    bool _validUri = Uri.parse(thisVote.bill.apiUri).isAbsolute;
-    bool _gettingPositions = false;
+    bool validUri = Uri.parse(thisVote.bill.apiUri).isAbsolute;
+    bool gettingPositions = false;
 
     logger.d('^^^^^ VOTE TILE INFORMATION: ${thisVote.toJson()} ^^^^^');
     debugPrint('^^^^^ THIS VOTE RESULT: ${thisVote.result.toString()}');
@@ -1786,31 +1675,30 @@ class SharedWidgets {
     //         Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
     //     builder: (context, box, widget) {
     return StatefulBuilder(builder: (context, setState) {
-      return new Card(
+      return Card(
         elevation: 3.0,
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
             image: DecorationImage(
                 opacity: 0.15,
-                image:
-                    AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
+                image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                 fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.background, BlendMode.color)),
+                colorFilter:
+                    ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
-              new Padding(
-                padding: const EdgeInsets.all(5),
+              const Padding(
+                padding: EdgeInsets.all(5),
               ),
               SizedBox(
                 height: 30,
                 child: Row(
                   children: <Widget>[
                     thisVote.bill.billId.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 10),
+                        ? const Padding(
+                            padding: EdgeInsets.only(left: 10),
                             child: Text('CONSIDERING',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -1824,90 +1712,82 @@ class SharedWidgets {
                               color: darkTheme ? Colors.white : Colors.black,
                             ),
                             onPressed: () {},
-                            label: new Text(thisVote.bill.billId.toUpperCase(),
+                            label: Text(thisVote.bill.billId.toUpperCase(),
                                 style: Styles.voteTileTextStyle.copyWith(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      darkTheme ? Colors.white : Colors.black,
+                                  color: darkTheme ? Colors.white : Colors.black,
                                 ))),
                   ],
                 ),
               ),
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Container(
-                      margin: new EdgeInsets.symmetric(
-                          vertical: 2.5, horizontal: 10.0),
-                      child: new Text(thisVote.description,
-                          style:
-                              Styles.voteTileTextStyle.copyWith(fontSize: 14)),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 10.0),
+                      child: Text(thisVote.description,
+                          style: Styles.voteTileTextStyle.copyWith(fontSize: 14)),
                     ),
                   ),
                 ],
               ),
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Container(
-                      margin: new EdgeInsets.symmetric(
-                          vertical: 2.5, horizontal: 10.0),
-                      child: new Text('Latest Action:',
-                          style: Styles.voteTileTextStyle.copyWith(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 10.0),
+                      child: Text('Latest Action:',
+                          style: Styles.voteTileTextStyle
+                              .copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
               ),
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Container(
-                      margin: new EdgeInsets.symmetric(
-                          vertical: 2.5, horizontal: 10.0),
-                      child: new Text(thisVote.bill.latestAction,
-                          style:
-                              Styles.voteTileTextStyle.copyWith(fontSize: 14)),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 10.0),
+                      child: Text(thisVote.bill.latestAction,
+                          style: Styles.voteTileTextStyle.copyWith(fontSize: 14)),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 5),
-              new Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                child: new Container(
+                child: Container(
                   decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(3)),
-                  child: new Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      new Expanded(
+                      Expanded(
                         flex: 3,
-                        child: new Container(
-                          margin: new EdgeInsets.all(10.0),
+                        child: Container(
+                          margin: const EdgeInsets.all(10.0),
                           // width: 150.0,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              new Text('Question',
-                                  style: Styles.voteTileTextStyle.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold)),
-                              new Text(thisVote.question.toString(),
+                              Text('Question',
                                   style: Styles.voteTileTextStyle
-                                      .copyWith(fontSize: 14)),
+                                      .copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              Text(thisVote.question.toString(),
+                                  style: Styles.voteTileTextStyle.copyWith(fontSize: 14)),
                             ],
                           ),
                         ),
                       ),
-                      new Expanded(
+                      Expanded(
                         flex: 2,
-                        child: new Container(
-                          margin: new EdgeInsets.all(10.0),
+                        child: Container(
+                          margin: const EdgeInsets.all(10.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1916,76 +1796,56 @@ class SharedWidgets {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   FaIcon(
-                                      thisVote.result
-                                                  .toString()
-                                                  .toUpperCase() ==
-                                              'RESULT.FAILED'
+                                      thisVote.result.toString().toUpperCase() == 'RESULT.FAILED'
                                           ? FontAwesomeIcons.xmark
                                           : FontAwesomeIcons.checkToSlot,
                                       size: 13,
-                                      color: thisVote.result
-                                                  .toString()
-                                                  .toUpperCase() ==
+                                      color: thisVote.result.toString().toUpperCase() ==
                                               'RESULT.FAILED'
-                                          ? const Color.fromARGB(
-                                              255, 255, 17, 0)
-                                          : thisVote.result
-                                                          .toString()
-                                                          .toUpperCase() ==
+                                          ? const Color.fromARGB(255, 255, 17, 0)
+                                          : thisVote.result.toString().toUpperCase() ==
                                                       'RESULT.PASSED' ||
-                                                  thisVote.result
-                                                          .toString()
-                                                          .toUpperCase() ==
+                                                  thisVote.result.toString().toUpperCase() ==
                                                       'RESULT.AGREED_TO'
                                               ? darkTheme
                                                   ? alertIndicatorColorBrightGreen
                                                   : alertIndicatorColorDarkGreen
-                                              : const Color.fromRGBO(
-                                                  158, 158, 158, 1)),
-                                  SizedBox(width: 5),
+                                              : const Color.fromRGBO(158, 158, 158, 1)),
+                                  const SizedBox(width: 5),
                                   Text(
                                     thisVote.result == null
                                         ? 'RECORDED'
-                                        : thisVote.result
-                                                    .toString()
-                                                    .toUpperCase() ==
+                                        : thisVote.result.toString().toUpperCase() ==
                                                 'RESULT.AGREED_TO'
                                             ? 'AGREED'
-                                            : '${thisVote.result.toString().replaceFirst('Result.', '')}',
-                                    style: new TextStyle(
-                                        color: thisVote.result
-                                                        .toString()
-                                                        .toUpperCase() ==
+                                            : thisVote.result
+                                                .toString()
+                                                .replaceFirst('Result.', ''),
+                                    style: TextStyle(
+                                        color: thisVote.result.toString().toUpperCase() ==
                                                     'RESULT.PASSED' ||
-                                                thisVote.result
-                                                        .toString()
-                                                        .toUpperCase() ==
+                                                thisVote.result.toString().toUpperCase() ==
                                                     'RESULT.AGREED_TO'
                                             ? darkTheme
                                                 ? alertIndicatorColorBrightGreen
                                                 : alertIndicatorColorDarkGreen
-                                            : thisVote.result
-                                                        .toString()
-                                                        .toUpperCase() ==
+                                            : thisVote.result.toString().toUpperCase() ==
                                                     'RESULT.FAILED'
-                                                ? const Color.fromARGB(
-                                                    255, 255, 17, 0)
-                                                : const Color.fromRGBO(
-                                                    158, 158, 158, 1),
+                                                ? const Color.fromARGB(255, 255, 17, 0)
+                                                : const Color.fromRGBO(158, 158, 158, 1),
                                         fontSize: 14.0,
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
-                              new Row(
+                              Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  new Text(
+                                  Text(
                                       '${formatter.format(thisVote.date.toLocal())}\n${timeFormatter.format(DateTime.parse('${thisVote.date.toLocal().toString().split(' ')[0]} ${thisVote.time}.000'))} ET',
                                       textAlign: TextAlign.end,
-                                      style: Styles.voteTileTextStyle
-                                          .copyWith(fontSize: 10)),
+                                      style: Styles.voteTileTextStyle.copyWith(fontSize: 10)),
                                 ],
                               ),
                             ],
@@ -1996,13 +1856,13 @@ class SharedWidgets {
                   ),
                 ),
               ),
-              new Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: SizedBox(
                   height: 30,
                   child: Row(
                     children: [
-                      !_validUri
+                      !validUri
                           ? const SizedBox.shrink()
                           : Expanded(
                               child: Padding(
@@ -2010,55 +1870,43 @@ class SharedWidgets {
                                 child: OutlinedButton.icon(
                                   icon: AnimatedWidgets.flashingEye(
                                       context,
-                                      List.from(userDatabase
-                                              .get('subscriptionAlertsList'))
-                                          .any((element) => element
+                                      List.from(userDatabase.get('subscriptionAlertsList')).any(
+                                          (element) => element
                                               .toString()
-                                              .contains(thisVote.bill.billId
-                                                  .toLowerCase())),
+                                              .contains(thisVote.bill.billId.toLowerCase())),
                                       false,
                                       size: 10,
                                       reverseContrast: false),
                                   style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.15)),
-                                      foregroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Theme.of(context)
-                                                  .highlightColor)),
-                                  label: new Text('Bill Detail',
+                                      backgroundColor: MaterialStateProperty.all<Color>(
+                                          Theme.of(context).primaryColor.withOpacity(0.15)),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Theme.of(context).highlightColor)),
+                                  label: Text('Bill Detail',
                                       style: TextStyle(
                                           color: userDatabase.get('darkTheme')
                                               ? darkThemeTextColor
-                                              : Color(0xff000000))),
+                                              : const Color(0xff000000))),
                                   onPressed: () => Navigator.push(
                                     context,
-                                    new MaterialPageRoute(
-                                      builder: (context) => new BillDetail(
-                                          thisVote.bill.apiUri,
-                                          houseStockWatchList,
-                                          senateStockWatchList),
+                                    MaterialPageRoute(
+                                      builder: (context) => BillDetail(thisVote.bill.apiUri,
+                                          houseStockWatchList, senateStockWatchList),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                      new Expanded(
-                        child: new OutlinedButton.icon(
+                      Expanded(
+                        child: OutlinedButton.icon(
                             icon: rollCallAvailable
-                                ? _gettingPositions
-                                    ? AnimatedWidgets.circularProgressWatchtower(
-                                        context,
-                                        widthAndHeight: 10,
-                                        strokeWidth: 2,
-                                        isFullScreen: false)
+                                ? gettingPositions
+                                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                                        widthAndHeight: 10, strokeWidth: 2, isFullScreen: false)
                                     : Pulse(
                                         infinite: true,
-                                        delay: Duration(milliseconds: 1000),
-                                        duration: Duration(milliseconds: 500),
+                                        delay: const Duration(milliseconds: 1000),
+                                        duration: const Duration(milliseconds: 500),
                                         child: Icon(Icons.check_circle,
                                             size: 10,
                                             color: userDatabase.get('darkTheme')
@@ -2066,37 +1914,31 @@ class SharedWidgets {
                                                 : alertIndicatorColorDarkGreen),
                                       )
                                 : Icon(Icons.remove_circle,
-                                    size: 12,
-                                    color: Theme.of(context).colorScheme.error),
+                                    size: 12, color: Theme.of(context).colorScheme.error),
                             style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all<Color>(
-                                    Theme.of(context)
-                                        .primaryColor
-                                        .withOpacity(0.15)),
-                                foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Theme.of(context).highlightColor)),
+                                    Theme.of(context).primaryColor.withOpacity(0.15)),
+                                foregroundColor: MaterialStateProperty.all<Color>(
+                                    Theme.of(context).highlightColor)),
                             label: Text('Roll Call #${thisVote.rollCall}',
                                 style: TextStyle(
-                                    color: darkTheme
-                                        ? darkThemeTextColor
-                                        : Color(0xff000000))),
+                                    color:
+                                        darkTheme ? darkThemeTextColor : const Color(0xff000000))),
                             onPressed: rollCallAvailable
                                 ? () async {
                                     // if (rollCallAvailable) {
-                                    setState(() => _gettingPositions = true);
-                                    final List<RcPosition> thisVotepositions =
+                                    setState(() => gettingPositions = true);
+                                    final List<RcPosition> thisVotePositions =
                                         await Functions.getRollCallPositions(
                                             thisVote.congress,
                                             thisVote.chamber == null ||
-                                                    thisVote.chamber.name
-                                                            .toLowerCase() ==
+                                                    thisVote.chamber.name.toLowerCase() ==
                                                         'chamber.senate'
                                                 ? 'senate'
                                                 : 'house',
                                             thisVote.session,
                                             thisVote.rollCall);
-                                    setState(() => _gettingPositions = false);
+                                    setState(() => gettingPositions = false);
                                     await showModalBottomSheet(
                                       backgroundColor: Colors.transparent,
                                       enableDrag: true,
@@ -2104,13 +1946,12 @@ class SharedWidgets {
                                       context: context,
                                       builder: (context) => SafeArea(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 100),
+                                          padding: const EdgeInsets.only(top: 100),
                                           child: rollCallList(
                                               context,
                                               userDatabase,
                                               thisVote,
-                                              thisVotepositions,
+                                              thisVotePositions,
                                               houseStockWatchList,
                                               senateStockWatchList),
                                         ),
@@ -2123,9 +1964,9 @@ class SharedWidgets {
                   ),
                 ),
               ),
-              new Padding(
+              Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: new Container(
+                child: Container(
                   decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(3)),
@@ -2137,33 +1978,32 @@ class SharedWidgets {
                       Flexible(
                         flex: 1,
                         child: Container(
-                          padding: EdgeInsetsDirectional.only(end: 10),
+                          padding: const EdgeInsetsDirectional.only(end: 10),
                           decoration: BoxDecoration(
                             border: Border(
-                              right: BorderSide(
-                                  color: Colors.grey[350], width: 0.5),
+                              right: BorderSide(color: Colors.grey[350], width: 0.5),
                             ),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              new Text('Party',
+                              Text('Party',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
-                              new Text('Yeas',
+                              Text('Yeas',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
-                              new Text('Nays',
+                              Text('Nays',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
-                              new Text('No Vote',
+                              Text('No Vote',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
-                              new Text('Present',
+                              Text('Present',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
-                              new Text('Majority?',
+                              Text('Majority?',
                                   style: Styles.voteTileTextStyle
                                       .copyWith(fontWeight: FontWeight.bold)),
                             ],
@@ -2176,41 +2016,35 @@ class SharedWidgets {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            new Text(
+                            Text(
                               'Democrat',
-                              style: new TextStyle(
-                                  color:
-                                      darkTheme == true ? null : democratColor,
+                              style: TextStyle(
+                                  color: darkTheme == true ? null : democratColor,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             thisVote.democratic.yes == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.democratic.yes.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.democratic.yes.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.democratic.no == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.democratic.no.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.democratic.no.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.democratic.notVoting == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.democratic.notVoting.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.democratic.notVoting.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.democratic.present == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.democratic.present.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.democratic.present.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.democratic.majorityPosition == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    '${thisVote.democratic.majorityPosition.toString().replaceFirst('MajorityPosition.', '')}',
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(
+                                    thisVote.democratic.majorityPosition
+                                        .toString()
+                                        .replaceFirst('MajorityPosition.', ''),
                                     style: Styles.voteTileTextStyle),
                           ],
                         ),
@@ -2221,42 +2055,35 @@ class SharedWidgets {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            new Text(
+                            Text(
                               'Republican',
-                              style: new TextStyle(
-                                  color: darkTheme == true
-                                      ? null
-                                      : republicanColor,
+                              style: TextStyle(
+                                  color: darkTheme == true ? null : republicanColor,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold),
                             ),
                             thisVote.republican.yes == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.republican.yes.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.republican.yes.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.republican.no == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.republican.no.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.republican.no.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.republican.notVoting == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.republican.notVoting.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.republican.notVoting.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.republican.present == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.republican.present.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.republican.present.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.republican.majorityPosition == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    '${thisVote.republican.majorityPosition.toString().replaceFirst('MajorityPosition.', '')}',
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(
+                                    thisVote.republican.majorityPosition
+                                        .toString()
+                                        .replaceFirst('MajorityPosition.', ''),
                                     style: Styles.voteTileTextStyle),
                           ],
                         ),
@@ -2267,41 +2094,34 @@ class SharedWidgets {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            new Text(
+                            Text(
                               'Independent',
                               style: Styles.voteTileTextStyle.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: darkTheme == true
-                                      ? null
-                                      : independentColor),
+                                  color: darkTheme == true ? null : independentColor),
                             ),
                             thisVote.independent.yes == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.independent.yes.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.independent.yes.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.independent.no == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(thisVote.independent.no.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.independent.no.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.independent.notVoting == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.independent.notVoting.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.independent.notVoting.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.independent.present == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    thisVote.independent.present.toString(),
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(thisVote.independent.present.toString(),
                                     style: Styles.voteTileTextStyle),
                             thisVote.independent.majorityPosition == null
-                                ? new Text('N/A',
-                                    style: Styles.voteTileTextStyle)
-                                : new Text(
-                                    '${thisVote.independent.majorityPosition.toString().replaceFirst('null', 'N/A')}',
+                                ? Text('N/A', style: Styles.voteTileTextStyle)
+                                : Text(
+                                    thisVote.independent.majorityPosition
+                                        .toString()
+                                        .replaceFirst('null', 'N/A'),
                                     style: Styles.voteTileTextStyle),
                           ],
                         ),
@@ -2326,22 +2146,19 @@ class SharedWidgets {
       List<HouseStockWatch> houseStockWatchList,
       List<SenateStockWatch> senateStockWatchList) {
     logger.d('***** ALL MEMBERS: ${positions.length} *****');
-    final List<String> following =
-        List.from(userDatabase.get('subscriptionAlertsList'));
+    final List<String> following = List.from(userDatabase.get('subscriptionAlertsList'));
     logger.d('***** FOLLOWING: ${following.map((e) => e)} *****');
     List<RcPosition> followed = positions
-            .where((member) => following.any((element) => element
-                .toLowerCase()
-                .startsWith('member_${member.memberId.toLowerCase()}')))
+            .where((member) => following.any((element) =>
+                element.toLowerCase().startsWith('member_${member.memberId.toLowerCase()}')))
             .toList() ??
         [];
-    logger.d(
-        '***** FOLLOWED MEMBERS: ${followed.length} => ${followed.map((e) => e.name)} *****');
+    logger.d('***** FOLLOWED MEMBERS: ${followed.length} => ${followed.map((e) => e.name)} *****');
     positions.removeWhere((member) => followed.contains(member));
     logger.d('***** ALL MEMBERS REDUCED: ${positions.length} *****');
     List<RcPosition> sortedPositions = followed + positions;
     logger.d('***** FINAL MEMBERS: ${sortedPositions.length} *****');
-    Color _thisPanelColor = Theme.of(context).primaryColor;
+    Color thisPanelColor = Theme.of(context).primaryColor;
 
     return BounceInUp(
       child: Card(
@@ -2351,7 +2168,7 @@ class SharedWidgets {
               //         .listenable(keys: userDatabase.keys.toList()),
               //     builder: (context, box, widget) {
               //       return
-              new Container(
+              Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.background,
           image: DecorationImage(
@@ -2359,14 +2176,14 @@ class SharedWidgets {
               image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
               // fit: BoxFit.fitWidth,
               repeat: ImageRepeat.repeat,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.background, BlendMode.color)),
+              colorFilter:
+                  ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
         ),
-        child: new Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              color: _thisPanelColor,
+              color: thisPanelColor,
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Column(
@@ -2374,54 +2191,47 @@ class SharedWidgets {
                 children: [
                   Row(
                     children: [
-                      new Expanded(
-                        child: new Text(
-                            '${vote.bill.billId.toLowerCase() == 'nobillid' ? 'Vote Results' : vote.bill.billId}',
-                            style: GoogleFonts.bangers(
-                                color: Colors.white, fontSize: 25)),
+                      Expanded(
+                        child: Text(
+                            vote.bill.billId.toLowerCase() == 'nobillid'
+                                ? 'Vote Results'
+                                : vote.bill.billId,
+                            style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                       ),
                       SizedBox(
                         height: 22,
                         child: OutlinedButton(
                             onPressed: () {},
-                            child: Text(vote.result
-                                    .toString()
-                                    .toLowerCase()
-                                    .contains('result.')
-                                ? vote.result.toString().toUpperCase() ==
-                                        'RESULT.AGREED_TO'
+                            style: ButtonStyle(
+                                foregroundColor: darkThemeTextMSPColor,
+                                backgroundColor: vote.result.toString().toUpperCase() ==
+                                            'RESULT.PASSED' ||
+                                        vote.result.toString().toUpperCase() == 'RESULT.AGREED_TO'
+                                    ? alertIndicatorMSPColorDarkGreen
+                                    : vote.result.toString().toUpperCase() == 'RESULT.FAILED'
+                                        ? errorMSPColor
+                                        : null),
+                            child: Text(vote.result.toString().toLowerCase().contains('result.')
+                                ? vote.result.toString().toUpperCase() == 'RESULT.AGREED_TO'
                                     ? 'AGREED'
                                     : vote.result
                                         .toString()
                                         .toUpperCase()
                                         .replaceFirst('RESULT.', '')
-                                : 'VOTE RECORDED'),
-                            style: ButtonStyle(
-                                foregroundColor: darkThemeTextMSPColor,
-                                backgroundColor: vote.result
-                                                .toString()
-                                                .toUpperCase() ==
-                                            'RESULT.PASSED' ||
-                                        vote.result.toString().toUpperCase() ==
-                                            'RESULT.AGREED_TO'
-                                    ? alertIndicatorMSPColorDarkGreen
-                                    : vote.result.toString().toUpperCase() ==
-                                            'RESULT.FAILED'
-                                        ? errorMSPColor
-                                        : null)),
+                                : 'VOTE RECORDED')),
                       ),
                     ],
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Row(children: [
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
-                        child: new Text(vote.description,
+                        child: Text(vote.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Color(0xffffffff),
                                 fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.normal,
@@ -2433,11 +2243,11 @@ class SharedWidgets {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
-                        child: new Text('Question: ${vote.question}',
+                        child: Text('Question: ${vote.question}',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Color(0xffffffff),
                                 fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.bold,
@@ -2450,10 +2260,10 @@ class SharedWidgets {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
-                        child: new Text(
+                        child: Text(
                             'Yea: ${vote.total.yes} | Nay: ${vote.total.no} | Present: ${vote.total.present} | No Vote: ${vote.total.notVoting}',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Color(0xffffffff),
                                 fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.bold,
@@ -2464,11 +2274,11 @@ class SharedWidgets {
                 ],
               ),
             ),
-            new Expanded(
-              child: new GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            Expanded(
+              child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: 0.6, crossAxisCount: 5),
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   primary: false,
                   // controller: scrollController,
                   shrinkWrap: true,
@@ -2478,20 +2288,19 @@ class SharedWidgets {
                     final String thisMemberImageUrl =
                         '${PropublicaApi().memberImageRootUrl}${thisMember.memberId}.jpg'
                             .toLowerCase();
-                    final Color thisMemberColor =
-                        thisMember.party.toLowerCase() == 'd'
-                            ? democratColor
-                            : thisMember.party.toLowerCase() == 'r'
-                                ? republicanColor
-                                : independentColor;
+                    final Color thisMemberColor = thisMember.party.toLowerCase() == 'd'
+                        ? democratColor
+                        : thisMember.party.toLowerCase() == 'r'
+                            ? republicanColor
+                            : independentColor;
                     return FlipInY(
                       duration: Duration(milliseconds: 5 * index),
-                      child: new Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          new Padding(
+                          Padding(
                             padding: const EdgeInsets.all(3.0),
-                            child: new GestureDetector(
+                            child: GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -2501,13 +2310,13 @@ class SharedWidgets {
                                       senateStockWatchList),
                                 ),
                               ),
-                              child: new Stack(
+                              child: Stack(
                                 alignment: Alignment.bottomRight,
                                 children: [
-                                  new CircleAvatar(
+                                  CircleAvatar(
                                       backgroundColor: thisMemberColor,
                                       radius: 29,
-                                      child: new Container(
+                                      child: Container(
                                         decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
@@ -2517,45 +2326,41 @@ class SharedWidgets {
                                         foregroundDecoration: BoxDecoration(
                                             border: Border.all(
                                               width: 3,
-                                              color: userDatabase
-                                                          .get('darkTheme') ==
-                                                      true
-                                                  ? Color(0xffffffff)
+                                              color: userDatabase.get('darkTheme') == true
+                                                  ? const Color(0xffffffff)
                                                   : thisMemberColor,
                                             ),
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
-                                                image: NetworkImage(
-                                                    thisMemberImageUrl),
+                                                image: NetworkImage(thisMemberImageUrl),
                                                 fit: BoxFit.cover)),
                                       )),
-                                  new Column(
+                                  Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      List.from(userDatabase.get(
-                                                  'subscriptionAlertsList'))
-                                              .any((element) => element
+                                      List.from(userDatabase.get('subscriptionAlertsList')).any(
+                                              (element) => element
                                                   .toString()
                                                   .toLowerCase()
-                                                  .startsWith(
-                                                      'member_${thisMember.memberId}'
-                                                          .toLowerCase()))
-                                          ? new Stack(
+                                                  .startsWith('member_${thisMember.memberId}'
+                                                      .toLowerCase()))
+                                          ? Stack(
                                               alignment: Alignment.center,
                                               children: [
-                                                AnimatedWidgets.flashingEye(
-                                                    context, true, false,
-                                                    size: 10,
-                                                    sameColorBright: true),
+                                                AnimatedWidgets.flashingEye(context, true, false,
+                                                    size: 10, sameColorBright: true),
                                               ],
                                             )
                                           : const SizedBox.shrink(),
-                                      new Text(
-                                          '${thisMember.votePosition.toLowerCase() == 'not voting' ? 'DNV' : thisMember.votePosition.toLowerCase() == 'present' ? 'PSNT' : thisMember.votePosition}',
+                                      Text(
+                                          thisMember.votePosition.toLowerCase() == 'not voting'
+                                              ? 'DNV'
+                                              : thisMember.votePosition.toLowerCase() == 'present'
+                                                  ? 'PSNT'
+                                                  : thisMember.votePosition,
                                           style: GoogleFonts.bangers(
                                               fontSize: 20,
-                                              shadows:
-                                                  Styles.shadowStrokeTextWhite,
+                                              shadows: Styles.shadowStrokeTextWhite,
                                               color: thisMemberColor)),
                                     ],
                                   ),
@@ -2564,14 +2369,13 @@ class SharedWidgets {
                             ),
                           ),
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 3.0),
-                            child: new Text(
+                            padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                            child: Text(
                               '${thisMember.name}\n(${thisMember.state})',
                               textAlign: TextAlign.center,
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FontStyle.italic,
@@ -2591,38 +2395,35 @@ class SharedWidgets {
     );
   }
 
-  static Widget lobbyingList(BuildContext context, Box userDatabase,
-      List<LobbyingRepresentation> lobbyEvents) {
+  static Widget lobbyingList(
+      BuildContext context, Box userDatabase, List<LobbyingRepresentation> lobbyEvents) {
     logger.d('***** ALL EVENTS: ${lobbyEvents.map((e) => e.id)} *****');
 
     // bool viewMore = false;
-    Color _thisPanelColor = alertIndicatorColorDarkGreen;
-    bool _darkTheme = userDatabase.get('darkTheme');
+    Color thisPanelColor = alertIndicatorColorDarkGreen;
+    bool darkTheme = userDatabase.get('darkTheme');
 
     String queryString = '';
 
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
+        valueListenable: Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
         builder: (context, box, widget) {
           logger.d(
               '***** ALL LOBBIES (recent lobbying page): ${userDatabase.get('subscriptionAlertsList')} *****');
 
           lobbyEvents = lobbyEvents
-                  .where((event) =>
-                      List.from(userDatabase.get('subscriptionAlertsList')).any(
-                          (element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith('lobby_${event.id}'.toLowerCase())))
+                  .where((event) => List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('lobby_${event.id}'.toLowerCase())))
                   .toList() +
               lobbyEvents
-                  .where((event) =>
-                      !List.from(userDatabase.get('subscriptionAlertsList'))
-                          .any((element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith('lobby_${event.id}'.toLowerCase())))
+                  .where((event) => !List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('lobby_${event.id}'.toLowerCase())))
                   .toList();
 
           return BounceInUp(
@@ -2631,53 +2432,48 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image:
-                        AssetImage('assets/lobbying${random.nextInt(2)}.png'),
+                    image: AssetImage('assets/lobbying${random.nextInt(2)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        new Expanded(
-                          child: new Text('Recent Lobbying Filings',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Recent Lobbying Filings',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         SizedBox(
                           height: 20,
                           child: OutlinedButton.icon(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.search,
                                 color: Colors.white,
                                 size: 12,
                               ),
                               label: Text('Search',
-                                  style: Styles.regularStyle.copyWith(
-                                      color: Colors.white, fontSize: 12)),
+                                  style: Styles.regularStyle
+                                      .copyWith(color: Colors.white, fontSize: 12)),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
                                   enableDrag: true,
                                   builder: (context) => Container(
                                     color: Colors.transparent,
-                                    margin: const EdgeInsets.only(
-                                        top: 5, left: 15, right: 15),
+                                    margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
                                     height: 400,
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Container(
                                           height: 50,
@@ -2687,19 +2483,15 @@ class SharedWidgets {
                                           margin: const EdgeInsets.symmetric(
                                               horizontal: 10, vertical: 10),
                                           decoration: BoxDecoration(
-                                              color:
-                                                  alertIndicatorColorDarkGreen
-                                                      .withOpacity(0.15),
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
+                                              color: alertIndicatorColorDarkGreen.withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(10)),
                                           child: TextField(
                                             keyboardType: TextInputType.text,
                                             textAlign: TextAlign.center,
                                             autocorrect: true,
                                             autofocus: true,
                                             enableSuggestions: true,
-                                            decoration:
-                                                InputDecoration.collapsed(
+                                            decoration: const InputDecoration.collapsed(
                                               hintText: 'Enter your search',
                                             ),
                                             onChanged: (val) {
@@ -2707,11 +2499,10 @@ class SharedWidgets {
                                             },
                                           ),
                                         ),
-                                        new ElevatedButton.icon(
+                                        ElevatedButton.icon(
                                           style: ButtonStyle(
-                                              backgroundColor:
-                                                  alertIndicatorMSPColorDarkGreen),
-                                          icon: Icon(Icons.search),
+                                              backgroundColor: alertIndicatorMSPColorDarkGreen),
+                                          icon: const Icon(Icons.search),
                                           onPressed: () {
                                             Navigator.pop(context);
 
@@ -2719,12 +2510,11 @@ class SharedWidgets {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    LobbyingSearchList(
-                                                        queryString),
+                                                    LobbyingSearchList(queryString),
                                               ),
                                             );
                                           },
-                                          label: Text(
+                                          label: const Text(
                                             'Search',
                                           ),
                                         )
@@ -2747,78 +2537,57 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: lobbyEvents
                               .map(
-                                (_thisLobbyEvent) => StatefulBuilder(
-                                    builder: (context, setState) {
+                                (thisLobbyEvent) => StatefulBuilder(builder: (context, setState) {
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       FlipInX(
                                         child: Card(
                                           elevation: 0,
-                                          color: _darkTheme
-                                              ? Theme.of(context)
-                                                  .highlightColor
-                                                  .withOpacity(0.5)
+                                          color: darkTheme
+                                              ? Theme.of(context).highlightColor.withOpacity(0.5)
                                               : Colors.white.withOpacity(0.5),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
                                             child: ListTile(
                                               dense: true,
-                                              leading: List.from(userDatabase.get(
-                                                          'subscriptionAlertsList'))
+                                              leading: List.from(userDatabase
+                                                          .get('subscriptionAlertsList'))
                                                       .any((element) => element
                                                           .toString()
-                                                          .startsWith(
-                                                              'lobby_${_thisLobbyEvent.id}'
-                                                                  .toLowerCase()))
+                                                          .startsWith('lobby_${thisLobbyEvent.id}'
+                                                              .toLowerCase()))
                                                   ? AnimatedWidgets.flashingEye(
-                                                      context, true, false,
-                                                      size: 15)
-                                                  : FaIcon(
-                                                      FontAwesomeIcons
-                                                          .moneyBills,
+                                                      context, true, false, size: 15)
+                                                  : const FaIcon(FontAwesomeIcons.moneyBills,
                                                       size: 15),
                                               title: lobbySimpleTextGroup(
                                                   context,
-                                                  _thisPanelColor,
-                                                  _darkTheme,
-                                                  'CLIENT: ${_thisLobbyEvent.lobbyingClient.name}',
-                                                  _thisLobbyEvent.specificIssues ==
-                                                              null ||
-                                                          _thisLobbyEvent
-                                                              .specificIssues
-                                                              .isEmpty
+                                                  thisPanelColor,
+                                                  darkTheme,
+                                                  'CLIENT: ${thisLobbyEvent.lobbyingClient.name}',
+                                                  thisLobbyEvent.specificIssues == null ||
+                                                          thisLobbyEvent.specificIssues.isEmpty
                                                       ? 'No specific issues listed'
-                                                      : _thisLobbyEvent
-                                                          .specificIssues
-                                                          .first),
+                                                      : thisLobbyEvent.specificIssues.first),
                                               subtitle: Text(
-                                                  'FILED: ${dateWithDayFormatter.format(_thisLobbyEvent.latestFiling.filingDate)}',
+                                                  'FILED: ${dateWithDayFormatter.format(thisLobbyEvent.latestFiling.filingDate)}',
                                                   maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.normal)),
-                                              trailing: FaIcon(
-                                                  FontAwesomeIcons.binoculars,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Styles.regularStyle.copyWith(
+                                                      fontSize: 11, fontWeight: FontWeight.normal)),
+                                              trailing: const FaIcon(FontAwesomeIcons.binoculars,
                                                   size: 15),
                                               onTap: () => Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LobbyEventDetail(
-                                                    thisLobbyEventId:
-                                                        _thisLobbyEvent.id,
+                                                  builder: (context) => LobbyEventDetail(
+                                                    thisLobbyEventId: thisLobbyEvent.id,
                                                   ),
                                                 ),
                                               ),
@@ -2840,8 +2609,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget lobbySimpleTextGroup(BuildContext context, Color headerColor,
-      bool darkTheme, String headerText, String contentText,
+  static Widget lobbySimpleTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -2860,8 +2629,7 @@ class SharedWidgets {
           contentText,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
-          style: Styles.regularStyle
-              .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+          style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
         ),
       ],
     );
@@ -2875,16 +2643,15 @@ class SharedWidgets {
       List<SenateStockWatch> senateTradesList,
       List<ChamberMember> allMembersList,
       bool userIsPremium) {
-    Color _thisPanelColor = stockWatchColor;
-    bool _darkTheme = userDatabase.get('darkTheme');
+    Color thisPanelColor = stockWatchColor;
+    bool darkTheme = userDatabase.get('darkTheme');
 
     // isHouse
     //     ? userDatabase.put('newHouseStock', false)
     //     : userDatabase.put('newSenateStock', false);
 
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
+        valueListenable: Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
         builder: (context, box, widget) {
           logger.d(
               '***** ALL TRADES (recent trades page): ${userDatabase.get('subscriptionAlertsList')} *****');
@@ -2914,25 +2681,22 @@ class SharedWidgets {
                     opacity: 0.15,
                     image: AssetImage('assets/stock${random.nextInt(3)}.png'),
                     fit: BoxFit.cover,
-                    colorFilter:
-                        ColorFilter.mode(stockWatchColor, BlendMode.color)),
+                    colorFilter: ColorFilter.mode(stockWatchColor, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text(
-                              'Recent ${isHouse ? 'House' : 'Senate'} Trade Activity',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Recent ${isHouse ? 'House' : 'Senate'} Trade Activity',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -2950,42 +2714,36 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: isHouse
                               ? houseTradesList
                                   .map(
-                                    (_thisTrade) => StatefulBuilder(
-                                        builder: (context, setState) {
-                                      ChamberMember _thisMember;
+                                    (thisTrade) => StatefulBuilder(builder: (context, setState) {
+                                      ChamberMember thisMember;
                                       try {
-                                        _thisMember = allMembersList.firstWhere(
-                                            (element) =>
-                                                _thisTrade.representative
-                                                        .toLowerCase()
-                                                        // .replaceFirst('robert',
-                                                        //     'bob')
-                                                        .replaceFirst(
-                                                            'earl l.', 'buddy')
-                                                        .split(' ')[1][0] ==
-                                                    element.firstName
-                                                        .toLowerCase()[0] &&
-                                                _thisTrade.representative
+                                        thisMember = allMembersList.firstWhere((element) =>
+                                            thisTrade.representative
                                                     .toLowerCase()
-                                                    .contains(element.lastName
-                                                        .toLowerCase()));
+                                                    // .replaceFirst('robert',
+                                                    //     'bob')
+                                                    .replaceFirst('earl l.', 'buddy')
+                                                    .split(' ')[1][0] ==
+                                                element.firstName.toLowerCase()[0] &&
+                                            thisTrade.representative
+                                                .toLowerCase()
+                                                .contains(element.lastName.toLowerCase()));
                                       } catch (e) {
                                         logger.i('ERROR: $e');
                                       }
                                       return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           FlipInX(
                                             child: Card(
                                               elevation: 0,
-                                              color: _darkTheme
+                                              color: darkTheme
                                                   ? Theme.of(context)
                                                       .highlightColor
                                                       .withOpacity(0.75)
@@ -2994,143 +2752,98 @@ class SharedWidgets {
                                                       .background
                                                       .withOpacity(0.75),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
+                                                padding: const EdgeInsets.symmetric(vertical: 5),
                                                 child: Stack(
-                                                  alignment:
-                                                      Alignment.bottomRight,
+                                                  alignment: Alignment.bottomRight,
                                                   children: [
                                                     ListTile(
                                                       dense: true,
-                                                      leading: FaIcon(
-                                                          FontAwesomeIcons
-                                                              .chartLine,
+                                                      leading: FaIcon(FontAwesomeIcons.chartLine,
                                                           size: 15,
-                                                          color: _darkTheme
-                                                              ? null
-                                                              : _thisPanelColor),
+                                                          color: darkTheme ? null : thisPanelColor),
                                                       title: simpleTextGroup(
                                                           context,
-                                                          _thisPanelColor,
-                                                          _darkTheme,
+                                                          thisPanelColor,
+                                                          darkTheme,
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                  'E: ${dateWithDayAndYearFormatter.format(_thisTrade.transactionDate)}',
+                                                                  'E: ${dateWithDayAndYearFormatter.format(thisTrade.transactionDate)}',
                                                                   maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: Styles
-                                                                      .regularStyle
-                                                                      .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: _darkTheme
-                                                                        ? Colors
-                                                                            .grey
-                                                                        : _thisPanelColor,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style:
+                                                                      Styles.regularStyle.copyWith(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkTheme
+                                                                        ? Colors.grey
+                                                                        : thisPanelColor,
                                                                   )),
-                                                              Spacer(),
+                                                              const Spacer(),
                                                               Text(
-                                                                  'D: ${dateWithDayAndYearFormatter.format((_thisTrade.disclosureDate))}',
+                                                                  'D: ${dateWithDayAndYearFormatter.format((thisTrade.disclosureDate))}',
                                                                   maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: Styles
-                                                                      .regularStyle
-                                                                      .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: _darkTheme
-                                                                        ? Colors
-                                                                            .grey
-                                                                        : _thisPanelColor,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style:
+                                                                      Styles.regularStyle.copyWith(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkTheme
+                                                                        ? Colors.grey
+                                                                        : thisPanelColor,
                                                                   )),
                                                             ],
                                                           ),
-                                                          _thisTrade
-                                                              .representative),
+                                                          thisTrade.representative),
                                                       subtitle: Column(
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                            CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
-                                                              'Transaction: ${_thisTrade.type.toUpperCase().replaceFirst('_', ' ')}\nTicker: ${_thisTrade.ticker == null ? '--' : _thisTrade.ticker}\nDescription: ${_thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${_thisTrade.amount}',
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          13,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold)),
-                                                          !_thisTrade.capGainsOver200Usd
-                                                              ? const SizedBox
-                                                                  .shrink()
-                                                              : Text(
-                                                                  'Capital gains reported',
-                                                                  style: Styles
-                                                                      .regularStyle
+                                                              'Transaction: ${thisTrade.type.toUpperCase().replaceFirst('_', ' ')}\nTicker: ${thisTrade.ticker ?? '--'}\nDescription: ${thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${thisTrade.amount}',
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 13,
+                                                                  fontWeight: FontWeight.bold)),
+                                                          !thisTrade.capGainsOver200Usd
+                                                              ? const SizedBox.shrink()
+                                                              : Text('Capital gains reported',
+                                                                  style: Styles.regularStyle
                                                                       .copyWith(
-                                                                          fontSize:
-                                                                              13,
+                                                                          fontSize: 13,
                                                                           fontWeight:
                                                                               FontWeight.bold)),
                                                         ],
                                                       ),
-                                                      trailing: _thisMember ==
-                                                              null
-                                                          ? const SizedBox
-                                                              .shrink()
-                                                          : FaIcon(
-                                                              FontAwesomeIcons
-                                                                  .userTie,
+                                                      trailing: thisMember == null
+                                                          ? const SizedBox.shrink()
+                                                          : const FaIcon(FontAwesomeIcons.userTie,
                                                               size: 15),
-                                                      onTap: () =>
-                                                          _thisMember == null
-                                                              ? null
-                                                              : Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            MemberDetail(
-                                                                      _thisMember
-                                                                          .id,
-                                                                      houseTradesList,
-                                                                      senateTradesList,
-                                                                    ),
-                                                                  ),
+                                                      onTap: () => thisMember == null
+                                                          ? null
+                                                          : Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) => MemberDetail(
+                                                                  thisMember.id,
+                                                                  houseTradesList,
+                                                                  senateTradesList,
                                                                 ),
+                                                              ),
+                                                            ),
                                                     ),
                                                     IconButton(
-                                                      icon: FaIcon(
-                                                        FontAwesomeIcons
-                                                            .solidFileLines,
+                                                      icon: const FaIcon(
+                                                        FontAwesomeIcons.solidFileLines,
                                                         size: 15,
                                                       ),
-                                                      onPressed: () =>
-                                                          Functions.linkLaunch(
-                                                              context,
-                                                              _thisTrade
-                                                                  .ptrLink,
-                                                              userDatabase,
-                                                              userIsPremium,
-                                                              appBarTitle:
-                                                                  'House Trade',
-                                                              isPdf: true,
-                                                              source:
-                                                                  'stock_trade'),
+                                                      onPressed: () => Functions.linkLaunch(
+                                                          context,
+                                                          thisTrade.ptrLink,
+                                                          userDatabase,
+                                                          userIsPremium,
+                                                          appBarTitle: 'House Trade',
+                                                          isPdf: true,
+                                                          source: 'stock_trade'),
                                                     )
                                                   ],
                                                 ),
@@ -3144,45 +2857,31 @@ class SharedWidgets {
                                   .toList()
                               : senateTradesList
                                   .map(
-                                    (_thisTrade) => StatefulBuilder(
-                                        builder: (context, setState) {
-                                      ChamberMember _thisMember;
+                                    (thisTrade) => StatefulBuilder(builder: (context, setState) {
+                                      ChamberMember thisMember;
                                       try {
-                                        _thisMember = allMembersList
-                                            .firstWhere(
-                                                (element) =>
-                                                    _thisTrade
-                                                            .senator
-                                                            .toLowerCase()[0] ==
-                                                        element
-                                                            .firstName
-                                                            .toLowerCase()
-                                                            .replaceFirst(
-                                                                'mitch',
-                                                                'a. mitchell')
-                                                            .replaceFirst(
-                                                                'bill',
-                                                                'william')[0] &&
-                                                    _thisTrade.senator
-                                                        .toLowerCase()
-                                                        .contains(element
-                                                            .lastName
-                                                            .toLowerCase()));
+                                        thisMember = allMembersList.firstWhere((element) =>
+                                            thisTrade.senator.toLowerCase()[0] ==
+                                                element.firstName
+                                                    .toLowerCase()
+                                                    .replaceFirst('mitch', 'a. mitchell')
+                                                    .replaceFirst('bill', 'william')[0] &&
+                                            thisTrade.senator
+                                                .toLowerCase()
+                                                .contains(element.lastName.toLowerCase()));
                                       } catch (e) {
-                                        logger.i(
-                                            'ERROR WITH MEMBER $_thisMember: $e');
+                                        logger.i('ERROR WITH MEMBER $thisMember: $e');
                                       }
                                       // return _thisMember == null
                                       //     ? const SizedBox.shrink()
                                       //     :
                                       return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           FlipInX(
                                             child: Card(
                                               elevation: 0,
-                                              color: _darkTheme
+                                              color: darkTheme
                                                   ? Theme.of(context)
                                                       .highlightColor
                                                       .withOpacity(0.75)
@@ -3191,130 +2890,93 @@ class SharedWidgets {
                                                       .background
                                                       .withOpacity(0.75),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
+                                                padding: const EdgeInsets.symmetric(vertical: 5),
                                                 child: Stack(
-                                                  alignment:
-                                                      Alignment.bottomRight,
+                                                  alignment: Alignment.bottomRight,
                                                   children: [
                                                     ListTile(
                                                       dense: true,
-                                                      leading: FaIcon(
-                                                          FontAwesomeIcons
-                                                              .chartLine,
+                                                      leading: const FaIcon(
+                                                          FontAwesomeIcons.chartLine,
                                                           size: 15),
                                                       title: simpleTextGroup(
                                                           context,
-                                                          _thisPanelColor,
-                                                          _darkTheme,
+                                                          thisPanelColor,
+                                                          darkTheme,
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                  'E: ${dateWithDayAndYearFormatter.format(_thisTrade.transactionDate)}',
+                                                                  'E: ${dateWithDayAndYearFormatter.format(thisTrade.transactionDate)}',
                                                                   maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: Styles
-                                                                      .regularStyle
-                                                                      .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: _darkTheme
-                                                                        ? Colors
-                                                                            .grey
-                                                                        : _thisPanelColor,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style:
+                                                                      Styles.regularStyle.copyWith(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkTheme
+                                                                        ? Colors.grey
+                                                                        : thisPanelColor,
                                                                   )),
-                                                              Spacer(),
+                                                              const Spacer(),
                                                               Text(
-                                                                  'D: ${dateWithDayAndYearFormatter.format(_thisTrade.disclosureDate)}',
+                                                                  'D: ${dateWithDayAndYearFormatter.format(thisTrade.disclosureDate)}',
                                                                   maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: Styles
-                                                                      .regularStyle
-                                                                      .copyWith(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: _darkTheme
-                                                                        ? Colors
-                                                                            .grey
-                                                                        : _thisPanelColor,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style:
+                                                                      Styles.regularStyle.copyWith(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkTheme
+                                                                        ? Colors.grey
+                                                                        : thisPanelColor,
                                                                   )),
                                                             ],
                                                           ),
-                                                          'Sen. ${_thisTrade.senator}'),
+                                                          'Sen. ${thisTrade.senator}'),
                                                       subtitle: Column(
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                            CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
-                                                              'Transaction: ${_thisTrade.type.toUpperCase()}\n${_thisTrade.ticker == null || _thisTrade.ticker == '--' || _thisTrade.ticker == 'N/A' ? 'Type: ${_thisTrade.assetType == null ? 'Unknown' : _thisTrade.assetType.replaceAll(RegExp(r'<(.*)>'), '')}' : 'Ticker: ${_thisTrade.ticker}'}\nDescription: ${_thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${_thisTrade.amount}',
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          13,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold)),
+                                                              'Transaction: ${thisTrade.type.toUpperCase()}\n${thisTrade.ticker == null || thisTrade.ticker == '--' || thisTrade.ticker == 'N/A' ? 'Type: ${thisTrade.assetType == null ? 'Unknown' : thisTrade.assetType.replaceAll(RegExp(r'<(.*)>'), '')}' : 'Ticker: ${thisTrade.ticker}'}\nDescription: ${thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${thisTrade.amount}',
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 13,
+                                                                  fontWeight: FontWeight.bold)),
                                                         ],
                                                       ),
-                                                      trailing: _thisMember ==
-                                                              null
-                                                          ? const SizedBox
-                                                              .shrink()
-                                                          : FaIcon(
-                                                              FontAwesomeIcons
-                                                                  .userTie,
+                                                      trailing: thisMember == null
+                                                          ? const SizedBox.shrink()
+                                                          : const FaIcon(FontAwesomeIcons.userTie,
                                                               size: 15),
-                                                      onTap: () =>
-                                                          _thisMember == null
-                                                              ? null
-                                                              : Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => MemberDetail(
-                                                                        _thisMember
-                                                                            .id,
-                                                                        houseTradesList,
-                                                                        senateTradesList),
-                                                                  ),
-                                                                ),
+                                                      onTap: () => thisMember == null
+                                                          ? null
+                                                          : Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) => MemberDetail(
+                                                                    thisMember.id,
+                                                                    houseTradesList,
+                                                                    senateTradesList),
+                                                              ),
+                                                            ),
                                                     ),
-                                                    !_thisTrade.assetDescription
+                                                    !thisTrade.assetDescription
                                                             .toLowerCase()
-                                                            .contains(
-                                                                'scanned pdf')
-                                                        ? SizedBox.shrink()
+                                                            .contains('scanned pdf')
+                                                        ? const SizedBox.shrink()
                                                         : IconButton(
-                                                            icon: FaIcon(
-                                                              FontAwesomeIcons
-                                                                  .solidFileLines,
+                                                            icon: const FaIcon(
+                                                              FontAwesomeIcons.solidFileLines,
                                                               size: 15,
                                                             ),
-                                                            onPressed: () =>
-                                                                Functions.linkLaunch(
-                                                                    context,
-                                                                    _thisTrade
-                                                                        .ptrLink,
-                                                                    userDatabase,
-                                                                    userIsPremium,
-                                                                    appBarTitle:
-                                                                        'Senate Trade',
-                                                                    isPdf:
-                                                                        false,
-                                                                    source:
-                                                                        'stock_trade'),
+                                                            onPressed: () => Functions.linkLaunch(
+                                                                context,
+                                                                thisTrade.ptrLink,
+                                                                userDatabase,
+                                                                userIsPremium,
+                                                                appBarTitle: 'Senate Trade',
+                                                                isPdf: false,
+                                                                source: 'stock_trade'),
                                                           )
                                                   ],
                                                 ),
@@ -3335,8 +2997,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget simpleTextGroup(BuildContext context, Color headerColor,
-      bool darkTheme, Widget headerRow, String contentText,
+  static Widget simpleTextGroup(
+      BuildContext context, Color headerColor, bool darkTheme, Widget headerRow, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -3348,8 +3010,7 @@ class SharedWidgets {
           contentText,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
-          style: Styles.regularStyle
-              .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+          style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
         ),
       ],
     );
@@ -3366,7 +3027,7 @@ class SharedWidgets {
   ) {
     final bool darkTheme = userDatabase.get('darkTheme');
 
-    Color _thisPanelColor = stockWatchColor;
+    Color thisPanelColor = stockWatchColor;
     final List<String> subscriptionAlertsList =
         List.from(userDatabase.get('subscriptionAlertsList'));
 
@@ -3385,10 +3046,8 @@ class SharedWidgets {
     // String thisTradeMemberId = trade.split('_')[8];
 
     List<ChamberMember> thisDayMembersList = membersList
-        .where((member) => thisDay.memberIds
-            .toString()
-            .toLowerCase()
-            .contains(member.id.toLowerCase()))
+        .where((member) =>
+            thisDay.memberIds.toString().toLowerCase().contains(member.id.toLowerCase()))
         .toSet()
         .toList();
 
@@ -3421,9 +3080,7 @@ class SharedWidgets {
                 alignment: Alignment.centerLeft,
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                color: darkTheme
-                    ? Theme.of(context).primaryColorDark
-                    : stockWatchColor,
+                color: darkTheme ? Theme.of(context).primaryColorDark : stockWatchColor,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -3431,11 +3088,9 @@ class SharedWidgets {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text('Executed ${dateWithDayAndYearFormatter.format(thisDay.date)}',
+                              style: GoogleFonts.bangers(color: darkThemeTextColor, fontSize: 25)),
                           Text(
-                              'Executed ${dateWithDayAndYearFormatter.format(thisDay.date)}',
-                              style: GoogleFonts.bangers(
-                                  color: darkThemeTextColor, fontSize: 25)),
-                          new Text(
                               '${thisDay.trades.length} Trades | ${thisDay.tickers.toSet().length} Tickers | ${thisDayMembersList.length} Members',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -3457,58 +3112,43 @@ class SharedWidgets {
                 child: Scrollbar(
                   child: ListView(
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       children: thisDay.trades
-                          .map((_thisTrade) => FlipInX(
+                          .map((thisTrade) => FlipInX(
                                 child: Card(
                                   elevation: 0,
                                   color: darkTheme
-                                      ? Theme.of(context)
-                                          .highlightColor
-                                          .withOpacity(0.75)
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.75),
+                                      ? Theme.of(context).highlightColor.withOpacity(0.75)
+                                      : Theme.of(context).colorScheme.background.withOpacity(0.75),
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: new ListTile(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListTile(
                                       dense: false,
                                       title: simpleTextGroup(
                                           context,
-                                          _thisPanelColor,
+                                          thisPanelColor,
                                           darkTheme,
                                           Row(
                                             children: [
-                                              Text(
-                                                  '${_thisTrade.memberFullName}',
+                                              Text(thisTrade.memberFullName,
                                                   maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Styles.regularStyle.copyWith(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
-                                                    color: darkTheme
-                                                        ? Colors.grey
-                                                        : _thisPanelColor,
+                                                    color: darkTheme ? Colors.grey : thisPanelColor,
                                                   )),
-                                              Spacer(),
+                                              const Spacer(),
                                             ],
                                           ),
-                                          '${_thisTrade.tickerName == null || _thisTrade.tickerName == '--' ? '' : '\$${_thisTrade.tickerName}'} ${_thisTrade.tradeType.toUpperCase().replaceFirst('_', ' ')}'),
+                                          '${thisTrade.tickerName == null || thisTrade.tickerName == '--' ? '' : '\$${thisTrade.tickerName}'} ${thisTrade.tradeType.toUpperCase().replaceFirst('_', ' ')}'),
                                       subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                              '${_thisTrade.tickerDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${_thisTrade.dollarAmount}',
-                                              style: Styles.regularStyle
-                                                  .copyWith(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              '${thisTrade.tickerDescription.replaceAll(RegExp(r'<(.*)>'), '').replaceAll('&amp;', '&')}\nAmount: ${thisTrade.dollarAmount}',
+                                              style: Styles.regularStyle.copyWith(
+                                                  fontSize: 13, fontWeight: FontWeight.bold)),
                                         ],
                                       ),
                                       trailing: ZoomIn(
@@ -3522,22 +3162,18 @@ class SharedWidgets {
                                               decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                      width: 1,
-                                                      color:
-                                                          darkThemeTextColor),
+                                                      width: 1, color: darkThemeTextColor),
                                                   image: DecorationImage(
                                                       image: AssetImage(
                                                           'assets/stock${random.nextInt(3)}.png'),
                                                       fit: BoxFit.cover)),
-                                              foregroundDecoration:
-                                                  BoxDecoration(
-                                                border: Border.all(
-                                                    width: 1,
-                                                    color: darkThemeTextColor),
+                                              foregroundDecoration: BoxDecoration(
+                                                border:
+                                                    Border.all(width: 1, color: darkThemeTextColor),
                                                 shape: BoxShape.circle,
                                                 image: DecorationImage(
                                                     image: NetworkImage(
-                                                      '${PropublicaApi().memberImageRootUrl}${_thisTrade.memberId}.jpg'
+                                                      '${PropublicaApi().memberImageRootUrl}${thisTrade.memberId}.jpg'
                                                           .toLowerCase(),
                                                     ),
                                                     fit: BoxFit.cover),
@@ -3545,34 +3181,27 @@ class SharedWidgets {
                                             ),
                                             AnimatedWidgets.flashingEye(
                                                 context,
-                                                subscriptionAlertsList.any(
-                                                    (item) => item
-                                                        .toLowerCase()
-                                                        .contains(_thisTrade
-                                                            .memberId
-                                                            .toLowerCase())),
+                                                subscriptionAlertsList.any((item) => item
+                                                    .toLowerCase()
+                                                    .contains(thisTrade.memberId.toLowerCase())),
                                                 false,
                                                 size: 10,
                                                 sameColorBright: false),
                                           ],
                                         ),
                                       ),
-                                      onTap: () =>
-                                          _thisTrade.memberId.toLowerCase() ==
-                                                  'noid'
-                                              ? null
-                                              : Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        MemberDetail(
-                                                      _thisTrade.memberId
-                                                          .toLowerCase(),
-                                                      houseStockWatchList,
-                                                      senateStockWatchList,
-                                                    ),
-                                                  ),
+                                      onTap: () => thisTrade.memberId.toLowerCase() == 'noid'
+                                          ? null
+                                          : Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => MemberDetail(
+                                                  thisTrade.memberId.toLowerCase(),
+                                                  houseStockWatchList,
+                                                  senateStockWatchList,
                                                 ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -3602,15 +3231,15 @@ class SharedWidgets {
     // final bool devUpgraded = userDatabase.get('devUpgraded');
     // final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
 
-    List<ChamberMember> _sortedMembersList = [];
-    membersList.forEach((member) {
-      if (subscriptionAlertsList.any((element) =>
-          element.toLowerCase().contains(member.id.toLowerCase()))) {
-        _sortedMembersList.insert(0, member);
+    List<ChamberMember> sortedMembersList = [];
+    for (var member in membersList) {
+      if (subscriptionAlertsList
+          .any((element) => element.toLowerCase().contains(member.id.toLowerCase()))) {
+        sortedMembersList.insert(0, member);
       } else {
-        _sortedMembersList.add(member);
+        sortedMembersList.add(member);
       }
-    });
+    }
 
     return BounceInUp(
       child: Container(
@@ -3631,9 +3260,7 @@ class SharedWidgets {
                 alignment: Alignment.centerLeft,
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                color: darkTheme
-                    ? Theme.of(context).primaryColorDark
-                    : stockWatchColor,
+                color: darkTheme ? Theme.of(context).primaryColorDark : stockWatchColor,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -3643,11 +3270,10 @@ class SharedWidgets {
                         children: [
                           Text(
                               '${membersList.length} - \$$tickerName ${membersList.length == 1 ? 'Trader' : 'Traders'} ($period Day)',
-                              style: GoogleFonts.bangers(
-                                  color: darkThemeTextColor, fontSize: 25)),
+                              style: GoogleFonts.bangers(color: darkThemeTextColor, fontSize: 25)),
 
                           // const SizedBox(height: 3),
-                          new Text(
+                          Text(
                               !tickerDescription.contains(' - ')
                                   ? tickerDescription
                                   : tickerDescription.split(' - ')[0],
@@ -3676,23 +3302,17 @@ class SharedWidgets {
                   child: ListView(
                       // primary: true,
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      children: _sortedMembersList
-                          .map((_thisMember) => FlipInX(
+                      physics: const BouncingScrollPhysics(),
+                      children: sortedMembersList
+                          .map((thisMember) => FlipInX(
                                 child: Card(
                                   elevation: 0,
                                   color: darkTheme
-                                      ? Theme.of(context)
-                                          .highlightColor
-                                          .withOpacity(0.75)
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.75),
+                                      ? Theme.of(context).highlightColor.withOpacity(0.75)
+                                      : Theme.of(context).colorScheme.background.withOpacity(0.75),
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: new ListTile(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListTile(
                                       dense: false,
                                       leading: ZoomIn(
                                         child: Container(
@@ -3701,8 +3321,7 @@ class SharedWidgets {
                                           width: 45,
                                           decoration: BoxDecoration(
                                               // shape: BoxShape.circle,
-                                              borderRadius:
-                                                  BorderRadius.circular(3),
+                                              borderRadius: BorderRadius.circular(3),
                                               image: DecorationImage(
                                                   image: AssetImage(
                                                       'assets/congress_pic_${random.nextInt(4)}.png'),
@@ -3710,86 +3329,68 @@ class SharedWidgets {
                                           foregroundDecoration: BoxDecoration(
                                             border: Border.all(
                                               width: 1,
-                                              color: _thisMember.party
-                                                          .toLowerCase() ==
-                                                      'd'
+                                              color: thisMember.party.toLowerCase() == 'd'
                                                   ? democratColor
-                                                  : _thisMember.party
-                                                              .toLowerCase() ==
-                                                          'r'
+                                                  : thisMember.party.toLowerCase() == 'r'
                                                       ? republicanColor
                                                       : independentColor,
                                             ),
                                             // shape: BoxShape.circle,
-                                            borderRadius:
-                                                BorderRadius.circular(3),
+                                            borderRadius: BorderRadius.circular(3),
                                             image: DecorationImage(
                                                 image: NetworkImage(
-                                                    '${PropublicaApi().memberImageRootUrl}${_thisMember.id}.jpg'
+                                                    '${PropublicaApi().memberImageRootUrl}${thisMember.id}.jpg'
                                                         .toLowerCase()),
                                                 fit: BoxFit.cover),
                                           ),
                                         ),
                                       ),
-                                      trailing: new Text('${_thisMember.state}',
+                                      trailing: Text(thisMember.state,
                                           style: GoogleFonts.bangers(
                                               fontSize: 30,
                                               color: darkTheme
-                                                  ? Color(0xffffffff)
-                                                  : _thisMember.party
-                                                              .toLowerCase() ==
-                                                          'd'
+                                                  ? const Color(0xffffffff)
+                                                  : thisMember.party.toLowerCase() == 'd'
                                                       ? democratColor
-                                                      : _thisMember.party
-                                                                  .toLowerCase() ==
-                                                              'r'
+                                                      : thisMember.party.toLowerCase() == 'r'
                                                           ? republicanColor
                                                           : independentColor)),
-                                      title: new Row(
+                                      title: Row(
                                         children: [
-                                          new Text(
-                                              '${_thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${_thisMember.firstName} ${_thisMember.lastName}'),
-                                          _thisMember.suffix != null
-                                              ? new Text(
-                                                  '  ${_thisMember.suffix}')
+                                          Text(
+                                              '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName}'),
+                                          thisMember.suffix != null
+                                              ? Text('  ${thisMember.suffix}')
                                               : const SizedBox.shrink(),
                                           const SizedBox(width: 5),
                                           AnimatedWidgets.flashingEye(
                                               context,
-                                              List.from(userDatabase.get(
-                                                      'subscriptionAlertsList'))
+                                              List.from(userDatabase.get('subscriptionAlertsList'))
                                                   .any((element) => element
                                                       .toString()
                                                       .toLowerCase()
                                                       .startsWith(
-                                                          'member_${_thisMember.id.toLowerCase()}')),
+                                                          'member_${thisMember.id.toLowerCase()}')),
                                               false,
                                               size: 12)
                                         ],
                                       ),
-                                      subtitle: new Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      subtitle: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          _thisMember.leadershipRole != null &&
-                                                  _thisMember
-                                                      .leadershipRole.isNotEmpty
-                                              ? new Text(
-                                                  '${_thisMember.leadershipRole}')
+                                          thisMember.leadershipRole != null &&
+                                                  thisMember.leadershipRole.isNotEmpty
+                                              ? Text(thisMember.leadershipRole)
                                               : const SizedBox.shrink(),
-                                          _thisMember.phone != null
-                                              ? new Text('${_thisMember.phone}')
+                                          thisMember.phone != null
+                                              ? Text(thisMember.phone)
                                               : const SizedBox.shrink(),
-                                          _thisMember.twitterAccount != null
-                                              ? new Text(
-                                                  '@${_thisMember.twitterAccount}')
-                                              : _thisMember.youtubeAccount !=
-                                                      null
-                                                  ? new Text(
-                                                      '📺 ${_thisMember.youtubeAccount}')
-                                                  : _thisMember.title != null
-                                                      ? new Text(
-                                                          '${_thisMember.title}')
+                                          thisMember.twitterAccount != null
+                                              ? Text('@${thisMember.twitterAccount}')
+                                              : thisMember.youtubeAccount != null
+                                                  ? Text('📺 ${thisMember.youtubeAccount}')
+                                                  : thisMember.title != null
+                                                      ? Text(thisMember.title)
                                                       : const SizedBox.shrink(),
                                         ],
                                       ),
@@ -3798,10 +3399,8 @@ class SharedWidgets {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => MemberDetail(
-                                                _thisMember.id,
-                                                houseStockWatchList,
-                                                senateStockWatchList),
+                                            builder: (context) => MemberDetail(thisMember.id,
+                                                houseStockWatchList, senateStockWatchList),
                                           ),
                                         );
                                       },
@@ -3831,13 +3430,13 @@ class SharedWidgets {
     final List<String> subscriptionAlertsList =
         List.from(userDatabase.get('subscriptionAlertsList'));
 
-    String _thisTitle = chamber == 'house' ? 'Hon.' : 'Sen.';
-    String _thisMemberImageUrl =
+    String thisTitle = chamber == 'house' ? 'Hon.' : 'Sen.';
+    String thisMemberImageUrl =
         '${PropublicaApi().memberImageRootUrl}${member.id}.jpg'.toLowerCase();
-    Color _thisPanelColor = stockWatchColor;
+    Color thisPanelColor = stockWatchColor;
 
     debugPrint(
-        '^^^^^ MEMBER: ${member.firstName} ${member.lastName} ${member.id} $_thisMemberImageUrl\nDATA:\nChamber $chamber - Number of Days $period - House List Length ${houseStockWatchList.length} - Senate List Length ${senateStockWatchList.length}');
+        '^^^^^ MEMBER: ${member.firstName} ${member.lastName} ${member.id} $thisMemberImageUrl\nDATA:\nChamber $chamber - Number of Days $period - House List Length ${houseStockWatchList.length} - Senate List Length ${senateStockWatchList.length}');
 
     return BounceInUp(
       child: Container(
@@ -3848,7 +3447,7 @@ class SharedWidgets {
               opacity: 0.15,
               image: AssetImage('assets/stock${random.nextInt(3)}.png'),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(_thisPanelColor, BlendMode.color)),
+              colorFilter: ColorFilter.mode(thisPanelColor, BlendMode.color)),
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3872,9 +3471,7 @@ class SharedWidgets {
                   alignment: Alignment.centerLeft,
                   height: 60,
                   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  color: darkTheme
-                      ? Theme.of(context).primaryColorDark
-                      : _thisPanelColor,
+                  color: darkTheme ? Theme.of(context).primaryColorDark : thisPanelColor,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -3888,26 +3485,21 @@ class SharedWidgets {
                               width: 45,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(
-                                      width: 1, color: darkThemeTextColor),
+                                  border: Border.all(width: 1, color: darkThemeTextColor),
                                   image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/stock${random.nextInt(3)}.png'),
+                                      image: AssetImage('assets/stock${random.nextInt(3)}.png'),
                                       fit: BoxFit.cover)),
                               foregroundDecoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1, color: darkThemeTextColor),
+                                border: Border.all(width: 1, color: darkThemeTextColor),
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                    image: NetworkImage(_thisMemberImageUrl),
-                                    fit: BoxFit.cover),
+                                    image: NetworkImage(thisMemberImageUrl), fit: BoxFit.cover),
                               ),
                             ),
                             AnimatedWidgets.flashingEye(
                                 context,
-                                subscriptionAlertsList.any((item) => item
-                                    .toLowerCase()
-                                    .contains(member.id.toLowerCase())),
+                                subscriptionAlertsList.any(
+                                    (item) => item.toLowerCase().contains(member.id.toLowerCase())),
                                 false,
                                 size: 10,
                                 sameColorBright: true),
@@ -3920,14 +3512,13 @@ class SharedWidgets {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                                '$_thisTitle ${member.firstName} ${member.lastName}',
+                            Text('$thisTitle ${member.firstName} ${member.lastName}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.bangers(
-                                    color: darkThemeTextColor, fontSize: 25)),
+                                style:
+                                    GoogleFonts.bangers(color: darkThemeTextColor, fontSize: 25)),
                             // const SizedBox(height: 3),
-                            new Text(
+                            Text(
                                 'Stock Trade Executions ($period Days)\nSee Member Details For Other Securities',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -3950,80 +3541,64 @@ class SharedWidgets {
                 child: Scrollbar(
                   child: ListView(
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       children: chamber == 'house'
                           ? houseStockWatchList
-                              .map((_thisTrade) => FlipInX(
+                              .map((thisTrade) => FlipInX(
                                     child: Card(
                                       elevation: 0,
                                       color: darkTheme
-                                          ? Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.75)
+                                          ? Theme.of(context).highlightColor.withOpacity(0.75)
                                           : Theme.of(context)
                                               .colorScheme
                                               .background
                                               .withOpacity(0.75),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        child: new ListTile(
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        child: ListTile(
                                           dense: false,
                                           title: simpleTextGroup(
                                               context,
-                                              _thisPanelColor,
+                                              thisPanelColor,
                                               darkTheme,
                                               Row(
                                                 children: [
                                                   Text(
-                                                      'Executed: ${dateWithDayAndYearFormatter.format(_thisTrade.transactionDate)}',
+                                                      'Executed: ${dateWithDayAndYearFormatter.format(thisTrade.transactionDate)}',
                                                       maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: Styles.regularStyle.copyWith(
                                                         fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        fontWeight: FontWeight.bold,
                                                         color: darkTheme
                                                             ? Colors.grey
-                                                            : _thisPanelColor,
+                                                            : thisPanelColor,
                                                       )),
-                                                  Spacer(),
+                                                  const Spacer(),
                                                 ],
                                               ),
-                                              '${_thisTrade.ticker == null || _thisTrade.ticker == '--' ? '' : '\$${_thisTrade.ticker}'} ${_thisTrade.type.toUpperCase().replaceFirst('_', ' ')}'),
+                                              '${thisTrade.ticker == null || thisTrade.ticker == '--' ? '' : '\$${thisTrade.ticker}'} ${thisTrade.type.toUpperCase().replaceFirst('_', ' ')}'),
                                           subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  '${_thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAmount: ${_thisTrade.amount}',
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                              !_thisTrade.capGainsOver200Usd
+                                                  '${thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAmount: ${thisTrade.amount}',
+                                                  style: Styles.regularStyle.copyWith(
+                                                      fontSize: 13, fontWeight: FontWeight.bold)),
+                                              !thisTrade.capGainsOver200Usd
                                                   ? const SizedBox.shrink()
-                                                  : Text(
-                                                      'Capital gains reported',
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
+                                                  : Text('Capital gains reported',
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.bold)),
                                             ],
                                           ),
-                                          trailing: FaIcon(
-                                              FontAwesomeIcons.userTie,
-                                              size: 15),
+                                          trailing:
+                                              const FaIcon(FontAwesomeIcons.userTie, size: 15),
                                           onTap: () => Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  MemberDetail(
+                                              builder: (context) => MemberDetail(
                                                 member.id,
                                                 houseStockWatchList,
                                                 senateStockWatchList,
@@ -4036,43 +3611,37 @@ class SharedWidgets {
                                   ))
                               .toList()
                           : senateStockWatchList
-                              .map((_thisTrade) => FlipInX(
+                              .map((thisTrade) => FlipInX(
                                     child: Card(
                                       elevation: 0,
                                       color: darkTheme
-                                          ? Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.75)
+                                          ? Theme.of(context).highlightColor.withOpacity(0.75)
                                           : Theme.of(context)
                                               .colorScheme
                                               .background
                                               .withOpacity(0.75),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        child: new ListTile(
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        child: ListTile(
                                           dense: false,
                                           title: simpleTextGroup(
                                               context,
-                                              _thisPanelColor,
+                                              thisPanelColor,
                                               darkTheme,
                                               Row(
                                                 children: [
                                                   Text(
-                                                      'Executed: ${dateWithDayAndYearFormatter.format(_thisTrade.transactionDate)}',
+                                                      'Executed: ${dateWithDayAndYearFormatter.format(thisTrade.transactionDate)}',
                                                       maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: Styles.regularStyle.copyWith(
                                                         fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        fontWeight: FontWeight.bold,
                                                         color: darkTheme
                                                             ? Colors.grey
-                                                            : _thisPanelColor,
+                                                            : thisPanelColor,
                                                       )),
-                                                  Spacer(),
+                                                  const Spacer(),
                                                   // Text(
                                                   //     'D: ${dateWithDayAndYearFormatter.format((_thisTrade.disclosureDate))}',
                                                   //     maxLines: 1,
@@ -4089,28 +3658,22 @@ class SharedWidgets {
                                                   //     )),
                                                 ],
                                               ),
-                                              '${_thisTrade.ticker == null || _thisTrade.ticker == '--' ? '' : '\$${_thisTrade.ticker}'} ${_thisTrade.type.toUpperCase().replaceFirst('_', ' ')}'),
+                                              '${thisTrade.ticker == null || thisTrade.ticker == '--' ? '' : '\$${thisTrade.ticker}'} ${thisTrade.type.toUpperCase().replaceFirst('_', ' ')}'),
                                           subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  '${_thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAmount: ${_thisTrade.amount}',
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
+                                                  '${thisTrade.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAmount: ${thisTrade.amount}',
+                                                  style: Styles.regularStyle.copyWith(
+                                                      fontSize: 13, fontWeight: FontWeight.bold)),
                                             ],
                                           ),
-                                          trailing: FaIcon(
-                                              FontAwesomeIcons.userTie,
-                                              size: 15),
+                                          trailing:
+                                              const FaIcon(FontAwesomeIcons.userTie, size: 15),
                                           onTap: () => Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  MemberDetail(
+                                              builder: (context) => MemberDetail(
                                                 member.id,
                                                 houseStockWatchList,
                                                 senateStockWatchList,
@@ -4145,15 +3708,15 @@ class SharedWidgets {
     // final bool devUpgraded = userDatabase.get('devUpgraded');
     // final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
 
-    List<ChamberMember> _sortedMembersList = [];
-    membersList.forEach((member) {
-      if (subscriptionAlertsList.any((element) =>
-          element.toLowerCase().contains(member.id.toLowerCase()))) {
-        _sortedMembersList.insert(0, member);
+    List<ChamberMember> sortedMembersList = [];
+    for (var member in membersList) {
+      if (subscriptionAlertsList
+          .any((element) => element.toLowerCase().contains(member.id.toLowerCase()))) {
+        sortedMembersList.insert(0, member);
       } else {
-        _sortedMembersList.add(member);
+        sortedMembersList.add(member);
       }
-    });
+    }
 
     return BounceInUp(
       child: Container(
@@ -4174,17 +3737,14 @@ class SharedWidgets {
                 alignment: Alignment.centerLeft,
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                color: darkTheme
-                    ? Theme.of(context).primaryColorDark
-                    : stockWatchColor,
+                color: darkTheme ? Theme.of(context).primaryColorDark : stockWatchColor,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: new Text(
+                      child: Text(
                           '${membersList.length} - ${dollarRange.split(' - ')[0]}+ ${membersList.length == 1 ? 'Trader' : 'Traders'} ($period Day)',
-                          style: GoogleFonts.bangers(
-                              color: Colors.white, fontSize: 25)),
+                          style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                     ),
                     IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -4196,31 +3756,24 @@ class SharedWidgets {
                 child: Scrollbar(
                   child: ListView(
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      children: _sortedMembersList
-                          .map((_thisMember) => FlipInX(
+                      physics: const BouncingScrollPhysics(),
+                      children: sortedMembersList
+                          .map((thisMember) => FlipInX(
                                 child: Card(
                                   elevation: 0,
                                   color: darkTheme
-                                      ? Theme.of(context)
-                                          .highlightColor
-                                          .withOpacity(0.75)
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.75),
+                                      ? Theme.of(context).highlightColor.withOpacity(0.75)
+                                      : Theme.of(context).colorScheme.background.withOpacity(0.75),
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: new ListTile(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListTile(
                                       dense: false,
                                       leading: ZoomIn(
                                         child: Container(
                                           alignment: Alignment.topCenter,
                                           width: 45,
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(3),
+                                              borderRadius: BorderRadius.circular(3),
                                               image: DecorationImage(
                                                   image: AssetImage(
                                                       'assets/congress_pic_${random.nextInt(4)}.png'),
@@ -4228,85 +3781,67 @@ class SharedWidgets {
                                           foregroundDecoration: BoxDecoration(
                                             border: Border.all(
                                               width: 1,
-                                              color: _thisMember.party
-                                                          .toLowerCase() ==
-                                                      'd'
+                                              color: thisMember.party.toLowerCase() == 'd'
                                                   ? democratColor
-                                                  : _thisMember.party
-                                                              .toLowerCase() ==
-                                                          'r'
+                                                  : thisMember.party.toLowerCase() == 'r'
                                                       ? republicanColor
                                                       : independentColor,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(3),
+                                            borderRadius: BorderRadius.circular(3),
                                             image: DecorationImage(
                                                 image: NetworkImage(
-                                                    '${PropublicaApi().memberImageRootUrl}${_thisMember.id}.jpg'
+                                                    '${PropublicaApi().memberImageRootUrl}${thisMember.id}.jpg'
                                                         .toLowerCase()),
                                                 fit: BoxFit.cover),
                                           ),
                                         ),
                                       ),
-                                      trailing: new Text('${_thisMember.state}',
+                                      trailing: Text(thisMember.state,
                                           style: GoogleFonts.bangers(
                                               fontSize: 30,
                                               color: darkTheme
-                                                  ? Color(0xffffffff)
-                                                  : _thisMember.party
-                                                              .toLowerCase() ==
-                                                          'd'
+                                                  ? const Color(0xffffffff)
+                                                  : thisMember.party.toLowerCase() == 'd'
                                                       ? democratColor
-                                                      : _thisMember.party
-                                                                  .toLowerCase() ==
-                                                              'r'
+                                                      : thisMember.party.toLowerCase() == 'r'
                                                           ? republicanColor
                                                           : independentColor)),
-                                      title: new Row(
+                                      title: Row(
                                         children: [
-                                          new Text(
-                                              '${_thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${_thisMember.firstName} ${_thisMember.lastName}'),
-                                          _thisMember.suffix != null
-                                              ? new Text(
-                                                  '  ${_thisMember.suffix}')
+                                          Text(
+                                              '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName}'),
+                                          thisMember.suffix != null
+                                              ? Text('  ${thisMember.suffix}')
                                               : const SizedBox.shrink(),
                                           const SizedBox(width: 5),
                                           AnimatedWidgets.flashingEye(
                                               context,
-                                              List.from(userDatabase.get(
-                                                      'subscriptionAlertsList'))
+                                              List.from(userDatabase.get('subscriptionAlertsList'))
                                                   .any((element) => element
                                                       .toString()
                                                       .toLowerCase()
                                                       .startsWith(
-                                                          'member_${_thisMember.id.toLowerCase()}')),
+                                                          'member_${thisMember.id.toLowerCase()}')),
                                               false,
                                               size: 12)
                                         ],
                                       ),
-                                      subtitle: new Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      subtitle: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          _thisMember.leadershipRole != null &&
-                                                  _thisMember
-                                                      .leadershipRole.isNotEmpty
-                                              ? new Text(
-                                                  '${_thisMember.leadershipRole}')
+                                          thisMember.leadershipRole != null &&
+                                                  thisMember.leadershipRole.isNotEmpty
+                                              ? Text(thisMember.leadershipRole)
                                               : const SizedBox.shrink(),
-                                          _thisMember.phone != null
-                                              ? new Text('${_thisMember.phone}')
+                                          thisMember.phone != null
+                                              ? Text(thisMember.phone)
                                               : const SizedBox.shrink(),
-                                          _thisMember.twitterAccount != null
-                                              ? new Text(
-                                                  '@${_thisMember.twitterAccount}')
-                                              : _thisMember.youtubeAccount !=
-                                                      null
-                                                  ? new Text(
-                                                      '📺 ${_thisMember.youtubeAccount}')
-                                                  : _thisMember.title != null
-                                                      ? new Text(
-                                                          '${_thisMember.title}')
+                                          thisMember.twitterAccount != null
+                                              ? Text('@${thisMember.twitterAccount}')
+                                              : thisMember.youtubeAccount != null
+                                                  ? Text('📺 ${thisMember.youtubeAccount}')
+                                                  : thisMember.title != null
+                                                      ? Text(thisMember.title)
                                                       : const SizedBox.shrink(),
                                         ],
                                       ),
@@ -4314,10 +3849,8 @@ class SharedWidgets {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => MemberDetail(
-                                                _thisMember.id,
-                                                houseStockWatchList,
-                                                senateStockWatchList),
+                                            builder: (context) => MemberDetail(thisMember.id,
+                                                houseStockWatchList, senateStockWatchList),
                                           ),
                                         );
                                       },
@@ -4341,33 +3874,28 @@ class SharedWidgets {
       List<HouseStockWatch> houseStockWatchList,
       List<SenateStockWatch> senateStockWatchList,
       bool userIsPremium) {
-    logger.d(
-        '***** ALL TRIPS: ${privateFundedTrips.map((e) => e.documentId)} *****');
+    logger.d('***** ALL TRIPS: ${privateFundedTrips.map((e) => e.documentId)} *****');
 
     // bool viewMore = false;
-    Color _thisPanelColor = Color.fromARGB(255, 0, 80, 100);
-    bool _darkTheme = userDatabase.get('darkTheme');
+    Color thisPanelColor = const Color.fromARGB(255, 0, 80, 100);
+    bool darkTheme = userDatabase.get('darkTheme');
 
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
+        valueListenable: Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
         builder: (context, box, widget) {
           privateFundedTrips = privateFundedTrips
-                  .where((event) =>
-                      List.from(userDatabase.get('subscriptionAlertsList')).any(
-                          (element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith(
-                                  'member_${event.memberId}'.toLowerCase())))
+                  .where((event) => List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('member_${event.memberId}'.toLowerCase())))
                   .toList() +
               privateFundedTrips
-                  .where((event) =>
-                      !List.from(userDatabase.get('subscriptionAlertsList'))
-                          .any((element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith('member_${event.memberId}'.toLowerCase())))
+                  .where((event) => !List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('member_${event.memberId}'.toLowerCase())))
                   .toList();
 
           return BounceInUp(
@@ -4379,24 +3907,22 @@ class SharedWidgets {
                     image: AssetImage('assets/travel${random.nextInt(2)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text('Recent Privately Funded Travel',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Recent Privately Funded Travel',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -4407,96 +3933,78 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: privateFundedTrips
                               .map(
-                                (_thisTrip) => StatefulBuilder(
-                                    builder: (context, setState) {
-                                  final ChamberMember _thisMember =
-                                      membersList.firstWhere(((element) =>
+                                (thisTrip) => StatefulBuilder(builder: (context, setState) {
+                                  final ChamberMember thisMember = membersList.firstWhere(
+                                      ((element) =>
                                           element.id.toLowerCase() ==
-                                          _thisTrip.memberId.toLowerCase()));
+                                          thisTrip.memberId.toLowerCase()));
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       FlipInX(
                                         child: Card(
                                           elevation: 0,
-                                          color: _darkTheme
-                                              ? Theme.of(context)
-                                                  .highlightColor
-                                                  .withOpacity(0.5)
+                                          color: darkTheme
+                                              ? Theme.of(context).highlightColor.withOpacity(0.5)
                                               : Colors.white.withOpacity(0.5),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
                                             child: Stack(
                                               alignment: Alignment.bottomRight,
                                               children: [
                                                 ListTile(
                                                   dense: true,
-                                                  leading: List.from(userDatabase.get(
-                                                              'subscriptionAlertsList'))
+                                                  leading: List.from(userDatabase
+                                                              .get('subscriptionAlertsList'))
                                                           .any((element) => element
                                                               .toString()
                                                               .startsWith(
-                                                                  'member_${_thisTrip.memberId}'
+                                                                  'member_${thisTrip.memberId}'
                                                                       .toLowerCase()))
                                                       ? AnimatedWidgets.flashingEye(
-                                                          context, true, false,
-                                                          size: 15)
-                                                      : FaIcon(
-                                                          FontAwesomeIcons
-                                                              .planeDeparture,
+                                                          context, true, false, size: 15)
+                                                      : const FaIcon(
+                                                          FontAwesomeIcons.planeDeparture,
                                                           size: 15),
                                                   title: privateFundedTripTextGroup(
                                                       context,
-                                                      _thisPanelColor,
-                                                      _darkTheme,
-                                                      'Dep. ${dateWithDayFormatter.format(_thisTrip.departureDate)}',
-                                                      'Ret. ${dateWithDayFormatter.format(_thisTrip.returnDate)}',
-                                                      'Traveler: ${_thisTrip.traveler}'),
+                                                      thisPanelColor,
+                                                      darkTheme,
+                                                      'Dep. ${dateWithDayFormatter.format(thisTrip.departureDate)}',
+                                                      'Ret. ${dateWithDayFormatter.format(thisTrip.returnDate)}',
+                                                      'Traveler: ${thisTrip.traveler}'),
                                                   subtitle: Text(
-                                                      'Sponsor: ${_thisTrip.sponsor}\nDestination: ${_thisTrip.destination}\nMember Name: ${_thisMember.firstName} ${_thisMember.lastName}', //\nChamber: ${_thisTrip.chamber.name}',
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                  trailing: FaIcon(
-                                                      FontAwesomeIcons.userTie,
+                                                      'Sponsor: ${thisTrip.sponsor}\nDestination: ${thisTrip.destination}\nMember Name: ${thisMember.firstName} ${thisMember.lastName}', //\nChamber: ${_thisTrip.chamber.name}',
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.bold)),
+                                                  trailing: const FaIcon(FontAwesomeIcons.userTie,
                                                       size: 15),
                                                   onTap: () => Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          MemberDetail(
-                                                              _thisMember.id,
-                                                              houseStockWatchList,
-                                                              senateStockWatchList),
+                                                      builder: (context) => MemberDetail(
+                                                          thisMember.id,
+                                                          houseStockWatchList,
+                                                          senateStockWatchList),
                                                     ),
                                                   ),
                                                 ),
                                                 IconButton(
-                                                  icon: FaIcon(
-                                                    FontAwesomeIcons
-                                                        .solidFileLines,
+                                                  icon: const FaIcon(
+                                                    FontAwesomeIcons.solidFileLines,
                                                     size: 15,
                                                   ),
-                                                  onPressed: () =>
-                                                      Functions.linkLaunch(
-                                                          context,
-                                                          _thisTrip.pdfUrl,
-                                                          userDatabase,
-                                                          userIsPremium,
-                                                          appBarTitle:
-                                                              'Privately Funded Travel',
-                                                          isPdf: true,
-                                                          source: 'travel'),
+                                                  onPressed: () => Functions.linkLaunch(context,
+                                                      thisTrip.pdfUrl, userDatabase, userIsPremium,
+                                                      appBarTitle: 'Privately Funded Travel',
+                                                      isPdf: true,
+                                                      source: 'travel'),
                                                 )
                                               ],
                                             ),
@@ -4517,13 +4025,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget privateFundedTripTextGroup(
-      BuildContext context,
-      Color headerColor,
-      bool darkTheme,
-      String headerText1,
-      String headerText2,
-      String contentText,
+  static Widget privateFundedTripTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText1, String headerText2, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -4542,7 +4045,7 @@ class SharedWidgets {
                     fontWeight: FontWeight.bold,
                     color: darkTheme ? Colors.grey : headerColor,
                   )),
-              Spacer(),
+              const Spacer(),
               Text(headerText2,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -4557,8 +4060,7 @@ class SharedWidgets {
             contentText,
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            style: Styles.regularStyle
-                .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+            style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
           ),
         ],
       ),
@@ -4572,33 +4074,28 @@ class SharedWidgets {
       List<ChamberMember> membersList,
       List<HouseStockWatch> houseStockWatchList,
       List<SenateStockWatch> senateStockWatchList) {
-    logger.d(
-        '***** ALL EXPENSES: ${officeExpenses.map((e) => e.amount.toString())} *****');
+    logger.d('***** ALL EXPENSES: ${officeExpenses.map((e) => e.amount.toString())} *****');
 
     // bool viewMore = false;
-    Color _thisPanelColor = stockWatchColor;
-    bool _darkTheme = userDatabase.get('darkTheme');
+    Color thisPanelColor = stockWatchColor;
+    bool darkTheme = userDatabase.get('darkTheme');
 
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
+        valueListenable: Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
         builder: (context, box, widget) {
           officeExpenses = officeExpenses
-                  .where((expense) =>
-                      List.from(userDatabase.get('subscriptionAlertsList')).any(
-                          (element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith(
-                                  'member_${expense.memberId}'.toLowerCase())))
+                  .where((expense) => List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('member_${expense.memberId}'.toLowerCase())))
                   .toList() +
               officeExpenses
-                  .where((expense) =>
-                      !List.from(userDatabase.get('subscriptionAlertsList'))
-                          .any((element) => element
-                              .toString()
-                              .toLowerCase()
-                              .startsWith('member_${expense.memberId}'.toLowerCase())))
+                  .where((expense) => !List.from(userDatabase.get('subscriptionAlertsList')).any(
+                      (element) => element
+                          .toString()
+                          .toLowerCase()
+                          .startsWith('member_${expense.memberId}'.toLowerCase())))
                   .toList();
 
           return BounceInUp(
@@ -4607,18 +4104,17 @@ class SharedWidgets {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text('Past Office Expenses',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('Past Office Expenses',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -4629,71 +4125,56 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           primary: false,
                           shrinkWrap: true,
                           children: officeExpenses
                               .map(
-                                (_thisExpense) => StatefulBuilder(
-                                    builder: (context, setState) {
-                                  final ChamberMember _thisMember =
-                                      membersList.firstWhere(((element) =>
+                                (thisExpense) => StatefulBuilder(builder: (context, setState) {
+                                  final ChamberMember thisMember = membersList.firstWhere(
+                                      ((element) =>
                                           element.id.toLowerCase() ==
-                                          _thisExpense.memberId.toLowerCase()));
+                                          thisExpense.memberId.toLowerCase()));
                                   return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       FlipInX(
                                         child: Card(
                                           elevation: 0,
-                                          color: Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.15),
+                                          color: Theme.of(context).highlightColor.withOpacity(0.15),
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
                                             child: ListTile(
                                               dense: true,
-                                              leading: List.from(userDatabase.get(
-                                                          'subscriptionAlertsList'))
+                                              leading: List.from(userDatabase
+                                                          .get('subscriptionAlertsList'))
                                                       .any((element) => element
                                                           .toString()
                                                           .startsWith(
-                                                              'member_${_thisExpense.memberId}'
+                                                              'member_${thisExpense.memberId}'
                                                                   .toLowerCase()))
                                                   ? AnimatedWidgets.flashingEye(
-                                                      context, true, false,
-                                                      size: 15)
-                                                  : FaIcon(
-                                                      FontAwesomeIcons
-                                                          .moneyCheckDollar,
+                                                      context, true, false, size: 15)
+                                                  : const FaIcon(FontAwesomeIcons.moneyCheckDollar,
                                                       size: 15),
                                               title: officeExpensesTextGroup(
                                                   context,
-                                                  _thisPanelColor,
-                                                  _darkTheme,
-                                                  'Q${_thisExpense.quarter} ${_thisExpense.year}',
-                                                  '${_thisExpense.name}'
-                                                      .toUpperCase()),
+                                                  thisPanelColor,
+                                                  darkTheme,
+                                                  'Q${thisExpense.quarter} ${thisExpense.year}',
+                                                  thisExpense.name.toUpperCase()),
                                               subtitle: Text(
-                                                  'Amount: ${formatCurrency.format(_thisExpense.amount)}\nYTD: ${formatCurrency.format(_thisExpense.yearToDate)}\nChange from Prev Qtr: ${formatCurrency.format(_thisExpense.changeFromPreviousQuarter)}',
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
+                                                  'Amount: ${formatCurrency.format(thisExpense.amount)}\nYTD: ${formatCurrency.format(thisExpense.yearToDate)}\nChange from Prev Qtr: ${formatCurrency.format(thisExpense.changeFromPreviousQuarter)}',
+                                                  style: Styles.regularStyle.copyWith(
+                                                      fontSize: 13, fontWeight: FontWeight.bold)),
                                               // trailing: FaIcon(
                                               //     FontAwesomeIcons.binoculars,
                                               //     size: 15),
                                               onTap: () => Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      MemberDetail(
-                                                          _thisMember.id,
-                                                          houseStockWatchList,
-                                                          senateStockWatchList),
+                                                  builder: (context) => MemberDetail(thisMember.id,
+                                                      houseStockWatchList, senateStockWatchList),
                                                 ),
                                               ),
                                             ),
@@ -4714,8 +4195,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget officeExpensesTextGroup(BuildContext context, Color headerColor,
-      bool darkTheme, String headerText, String contentText,
+  static Widget officeExpensesTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -4740,8 +4221,7 @@ class SharedWidgets {
             contentText,
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            style: Styles.regularStyle
-                .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+            style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
           ),
         ],
       ),
@@ -4759,51 +4239,58 @@ class SharedWidgets {
       // List<dynamic> activeSubscriptions
       ) {
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase)
-            .listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
+        valueListenable:
+            Hive.box(appDatabase).listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
         builder: (context, box, widget) {
           List<dynamic> allSubscriptions = [];
-          List<dynamic> activeSubscriptions =
-              List.from(userDatabase.get('subscriptionAlertsList'));
+          List<dynamic> activeSubscriptions = List.from(userDatabase.get('subscriptionAlertsList'));
           List<dynamic> inactiveSubscriptions = [];
 
-          Color _thisPanelColor = altHighlightAccentColorDarkRed;
-          bool _darkTheme = userDatabase.get('darkTheme');
+          Color thisPanelColor = altHighlightAccentColorDarkRed;
+          bool darkTheme = userDatabase.get('darkTheme');
 
           logger.d('***** ALL SUBSCRIPTIONS: $activeSubscriptions *****');
 
-          if (activeSubscriptions.length > 0) {
-            List<dynamic> _activeSubs = [];
-            List<dynamic> _inactiveSubs = [];
-            activeSubscriptions.forEach((sub) {
+          if (activeSubscriptions.isNotEmpty) {
+            List<dynamic> activeSubs = [];
+            List<dynamic> inactiveSubs = [];
+            for (var sub in activeSubscriptions) {
               if (sub.toString().startsWith('member_') &&
-                  members.map((e) => e.id.toLowerCase()).toList().contains(
-                      '${sub.toString().split('_')[1].toLowerCase()}')) {
-                _activeSubs.add(sub);
+                  members
+                      .map((e) => e.id.toLowerCase())
+                      .toList()
+                      .contains(sub.toString().split('_')[1].toLowerCase())) {
+                activeSubs.add(sub);
                 logger.d('***** NEW MEMBER SUB: $sub *****');
               } else if (sub.toString().startsWith('bill_') &&
-                  bills.map((e) => e.billId).toList().contains(
-                      '${sub.toString().split('_')[1].toLowerCase()}')) {
-                _activeSubs.add(sub);
+                  bills
+                      .map((e) => e.billId)
+                      .toList()
+                      .contains(sub.toString().split('_')[1].toLowerCase())) {
+                activeSubs.add(sub);
                 logger.d('***** NEW BILL SUB: $sub *****');
               } else if (sub.toString().startsWith('lobby_') &&
-                  lobbies.map((e) => e.id).toList().contains(
-                      '${sub.toString().split('_')[1].toLowerCase()}')) {
-                _activeSubs.add(sub);
+                  lobbies
+                      .map((e) => e.id)
+                      .toList()
+                      .contains(sub.toString().split('_')[1].toLowerCase())) {
+                activeSubs.add(sub);
                 logger.d('***** NEW LOBBY SUB: $sub *****');
               } else {
-                _inactiveSubs.add(sub);
+                inactiveSubs.add(sub);
               }
-            });
+            }
 
-            activeSubscriptions = _activeSubs;
+            activeSubscriptions = activeSubs;
             logger.d('***** FINAL ACTIVE SUBS: $activeSubscriptions *****');
-            inactiveSubscriptions = _inactiveSubs;
+            inactiveSubscriptions = inactiveSubs;
             logger.d('***** FINAL INACTIVE SUBS: $inactiveSubscriptions *****');
-            allSubscriptions = _activeSubs + _inactiveSubs;
+            allSubscriptions = activeSubs + inactiveSubs;
 
             logger.d('***** FINAL ALL SUBS: $allSubscriptions *****');
-          } else if (activeSubscriptions.length == 0) Navigator.pop(context);
+          } else if (activeSubscriptions.isEmpty) {
+            Navigator.pop(context);
+          }
 
           return BounceInUp(
             child: Container(
@@ -4811,54 +4298,54 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image: AssetImage(
-                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                    image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                           Expanded(
-                            child: new Text(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
                                 'Watching ${allSubscriptions.length} Items',
-                                style: GoogleFonts.bangers(
-                                    color: Colors.white, fontSize: 25),),
-                          ),
-
-                        ],
-                      ),
+                                style: GoogleFonts.bangers(color: Colors.white, fontSize: 25),
+                              ),
+                            ),
+                          ],
+                        ),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                          Expanded(
-                            child:  Text(
-                              '${allSubscriptions.where((element) => element.toString().startsWith('bill_')).length} Bills | '
+                              Expanded(
+                                child: Text(
+                                  '${allSubscriptions.where((element) => element.toString().startsWith('bill_')).length} Bills | '
                                   '${allSubscriptions.where((element) => element.toString().startsWith('lobby_')).length} Lobbies | '
                                   '${allSubscriptions.where((element) => element.toString().startsWith('member_')).length} Members | '
                                   '${allSubscriptions.where((element) => element.toString().startsWith('other_')).length} Other Items',
-                              style: TextStyle(
-                                  color: Color(0xffffffff),
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 12),),)
-                        ]),
-                    ],),
+                                  style: const TextStyle(
+                                      color: Color(0xffffffff),
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 12),
+                                ),
+                              )
+                            ]),
+                      ],
+                    ),
                   ),
                   // new Container(
                   //   // height: 30,
@@ -4900,292 +4387,267 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: ListView(
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         primary: false,
                         shrinkWrap: true,
                         children: activeSubscriptions
                                 .map(
-                                  (_thisActiveSubscription) => FlipInX(
-                                    duration: Duration(milliseconds: 1000),
+                                  (thisActiveSubscription) => FlipInX(
+                                    duration: const Duration(milliseconds: 1000),
                                     child: Card(
                                       elevation: 0,
-                                      color: _darkTheme
-                                          ? Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.5)
+                                      color: darkTheme
+                                          ? Theme.of(context).highlightColor.withOpacity(0.5)
                                           : Colors.white.withOpacity(0.5),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
                                         child: ListTile(
                                             dense: true,
-                                            leading: _thisActiveSubscription
+                                            leading: thisActiveSubscription
                                                     .toString()
                                                     .startsWith('bill_')
-                                                ? FaIcon(FontAwesomeIcons.scroll,
-                                                    size: 15)
-                                                : _thisActiveSubscription
+                                                ? const FaIcon(FontAwesomeIcons.scroll, size: 15)
+                                                : thisActiveSubscription
                                                         .toString()
                                                         .startsWith('member_')
-                                                    ? Icon(Icons.person,
-                                                        size: 20)
-                                                    : _thisActiveSubscription
+                                                    ? const Icon(Icons.person, size: 20)
+                                                    : thisActiveSubscription
                                                             .toString()
-                                                            .startsWith(
-                                                                'lobby_')
-                                                        ? FaIcon(FontAwesomeIcons.moneyBills,
+                                                            .startsWith('lobby_')
+                                                        ? const FaIcon(FontAwesomeIcons.moneyBills,
                                                             size: 15)
-                                                        : _thisActiveSubscription
+                                                        : thisActiveSubscription
                                                                 .toString()
-                                                                .startsWith(
-                                                                    'other_')
-                                                            ? FaIcon(FontAwesomeIcons.featherPointed,
+                                                                .startsWith('other_')
+                                                            ? const FaIcon(
+                                                                FontAwesomeIcons.featherPointed,
                                                                 size: 15)
-                                                            : FaIcon(FontAwesomeIcons.ghost,
+                                                            : const FaIcon(FontAwesomeIcons.ghost,
                                                                 size: 15),
-                                            title:
-                                                _thisActiveSubscription
-                                                        .toString()
-                                                        .startsWith('member_')
-                                                    ? Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                              'Member'
-                                                                  .toUpperCase(),
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color: _darkTheme
-                                                                          ? null
-                                                                          : _thisPanelColor)),
-                                                          Text(
-                                                            '${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).shortTitle} ${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).firstName} ${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).lastName} (${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).party})',
-                                                            style: Styles
-                                                                .regularStyle
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    : _thisActiveSubscription
-                                                            .toString()
-                                                            .startsWith('bill_')
-                                                        ? Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                        'Bill'
-                                                                            .toUpperCase(),
-                                                                        style: Styles.regularStyle.copyWith(
-                                                                            fontSize:
-                                                                                12,
-                                                                            color: _darkTheme
-                                                                                ? null
-                                                                                : _thisPanelColor)),
-                                                                  ),
-                                                                  Text(
-                                                                      '${dateWithDayFormatter.format(bills.firstWhere((b) => _thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).latestMajorActionDate)}',
-                                                                      style: Styles
-                                                                          .regularStyle
-                                                                          .copyWith(
-                                                                              fontSize: 10))
-                                                                ],
-                                                              ),
-                                                              Text(
-                                                                '${bills.firstWhere((b) => _thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).billSlug.toUpperCase()}',
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : _thisActiveSubscription
-                                                                .toString()
-                                                                .startsWith(
-                                                                    'lobby_')
-                                                            ? Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        child: Text(
-                                                                            'Lobbying'
-                                                                                .toUpperCase(),
-                                                                            style:
-                                                                                Styles.regularStyle.copyWith(fontSize: 12, color: _darkTheme ? null : _thisPanelColor)),
-                                                                      ),
-                                                                      Text(
-                                                                          '${dateWithDayFormatter.format(lobbies.firstWhere((l) => _thisActiveSubscription.toString().toLowerCase().contains('lobby_${l.id.toLowerCase()}')).latestFiling.filingDate)}',
-                                                                          style: Styles
-                                                                              .regularStyle
-                                                                              .copyWith(fontSize: 10))
-                                                                    ],
-                                                                  ),
-                                                                  Text(
-                                                                    '${lobbies.firstWhere((l) => _thisActiveSubscription.toString().toLowerCase().contains('lobby_${l.id.toLowerCase()}')).lobbyingClient.name}',
-                                                                    style: Styles
-                                                                        .regularStyle
-                                                                        .copyWith(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.bold),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            : Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Unknown Subscription',
-                                                                    style: Styles
-                                                                        .regularStyle
-                                                                        .copyWith(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.bold),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                            subtitle: _thisActiveSubscription
+                                            title: thisActiveSubscription
                                                     .toString()
                                                     .startsWith('member_')
                                                 ? Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
+                                                      Text('Member'.toUpperCase(),
+                                                          style: Styles.regularStyle.copyWith(
+                                                              fontSize: 12,
+                                                              color: darkTheme
+                                                                  ? null
+                                                                  : thisPanelColor)),
                                                       Text(
-                                                        '${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).state} ${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).title}\n'
-                                                        '${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).phone}\n${members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).leadershipRole == null ? members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).office : members.firstWhere((m) => _thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).leadershipRole}',
-                                                        maxLines: 3,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: Styles
-                                                            .regularStyle
-                                                            .copyWith(
-                                                                fontSize: 13),
+                                                        '${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).shortTitle} ${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).firstName} ${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).lastName} (${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).party})',
+                                                        style: Styles.regularStyle.copyWith(
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   )
-                                                : _thisActiveSubscription.toString().startsWith('bill_')
+                                                : thisActiveSubscription
+                                                        .toString()
+                                                        .startsWith('bill_')
                                                     ? Column(
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                            CrossAxisAlignment.start,
                                                         children: [
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment.start,
+                                                            children: [
+                                                              Expanded(
+                                                                child: Text('Bill'.toUpperCase(),
+                                                                    style: Styles.regularStyle
+                                                                        .copyWith(
+                                                                            fontSize: 12,
+                                                                            color: darkTheme
+                                                                                ? null
+                                                                                : thisPanelColor)),
+                                                              ),
+                                                              Text(
+                                                                  dateWithDayFormatter.format(bills
+                                                                      .firstWhere((b) =>
+                                                                          thisActiveSubscription
+                                                                              .toString()
+                                                                              .toLowerCase()
+                                                                              .contains(
+                                                                                  'bill_${b.billId.toLowerCase()}'))
+                                                                      .latestMajorActionDate),
+                                                                  style: Styles.regularStyle
+                                                                      .copyWith(fontSize: 10))
+                                                            ],
+                                                          ),
                                                           Text(
-                                                            '${bills.firstWhere((b) => _thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).shortTitle}\n'
-                                                            '${dateWithDayFormatter.format(bills.firstWhere((b) => _thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).latestMajorActionDate)}',
-                                                            maxLines: 3,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: Styles
-                                                                .regularStyle
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        13),
+                                                            bills
+                                                                .firstWhere((b) =>
+                                                                    thisActiveSubscription
+                                                                        .toString()
+                                                                        .toLowerCase()
+                                                                        .contains(
+                                                                            'bill_${b.billId.toLowerCase()}'))
+                                                                .billSlug
+                                                                .toUpperCase(),
+                                                            style: Styles.regularStyle.copyWith(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold),
                                                           ),
                                                         ],
                                                       )
-                                                    : _thisActiveSubscription.toString().startsWith('lobby_')
+                                                    : thisActiveSubscription
+                                                            .toString()
+                                                            .startsWith('lobby_')
                                                         ? Column(
                                                             crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                CrossAxisAlignment.start,
                                                             children: [
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                        'Lobbying'.toUpperCase(),
+                                                                        style: Styles.regularStyle
+                                                                            .copyWith(
+                                                                                fontSize: 12,
+                                                                                color: darkTheme
+                                                                                    ? null
+                                                                                    : thisPanelColor)),
+                                                                  ),
+                                                                  Text(
+                                                                      dateWithDayFormatter.format(lobbies
+                                                                          .firstWhere((l) =>
+                                                                              thisActiveSubscription
+                                                                                  .toString()
+                                                                                  .toLowerCase()
+                                                                                  .contains(
+                                                                                      'lobby_${l.id.toLowerCase()}'))
+                                                                          .latestFiling
+                                                                          .filingDate),
+                                                                      style: Styles.regularStyle
+                                                                          .copyWith(fontSize: 10))
+                                                                ],
+                                                              ),
                                                               Text(
-                                                                '${lobbies.firstWhere((l) => _thisActiveSubscription.toString().toLowerCase().contains('lobby_${l.id.toLowerCase()}')).specificIssues.first}',
-                                                                maxLines: 3,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            13),
+                                                                lobbies
+                                                                    .firstWhere((l) =>
+                                                                        thisActiveSubscription
+                                                                            .toString()
+                                                                            .toLowerCase()
+                                                                            .contains(
+                                                                                'lobby_${l.id.toLowerCase()}'))
+                                                                    .lobbyingClient
+                                                                    .name,
+                                                                style: Styles.regularStyle.copyWith(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold),
                                                               ),
                                                             ],
                                                           )
                                                         : Column(
                                                             crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                                CrossAxisAlignment.start,
                                                             children: [
                                                               Text(
-                                                                'Unknown Details',
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            13),
+                                                                'Unknown Subscription',
+                                                                style: Styles.regularStyle.copyWith(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold),
                                                               ),
                                                             ],
                                                           ),
-                                            trailing: new Switch(
-                                              inactiveThumbColor:
-                                                  Theme.of(context)
-                                                      .disabledColor,
-                                              activeColor: _thisPanelColor,
+                                            subtitle: thisActiveSubscription
+                                                    .toString()
+                                                    .startsWith('member_')
+                                                ? Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        '${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).state} ${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).title}\n'
+                                                        '${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).phone}\n${members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).leadershipRole ?? members.firstWhere((m) => thisActiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).office}',
+                                                        maxLines: 3,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: Styles.regularStyle
+                                                            .copyWith(fontSize: 13),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : thisActiveSubscription
+                                                        .toString()
+                                                        .startsWith('bill_')
+                                                    ? Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            '${bills.firstWhere((b) => thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).shortTitle}\n'
+                                                            '${dateWithDayFormatter.format(bills.firstWhere((b) => thisActiveSubscription.toString().toLowerCase().contains('bill_${b.billId.toLowerCase()}')).latestMajorActionDate)}',
+                                                            maxLines: 3,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: Styles.regularStyle
+                                                                .copyWith(fontSize: 13),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : thisActiveSubscription
+                                                            .toString()
+                                                            .startsWith('lobby_')
+                                                        ? Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                lobbies
+                                                                    .firstWhere((l) =>
+                                                                        thisActiveSubscription
+                                                                            .toString()
+                                                                            .toLowerCase()
+                                                                            .contains(
+                                                                                'lobby_${l.id.toLowerCase()}'))
+                                                                    .specificIssues
+                                                                    .first,
+                                                                maxLines: 3,
+                                                                overflow: TextOverflow.ellipsis,
+                                                                style: Styles.regularStyle
+                                                                    .copyWith(fontSize: 13),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                'Unknown Details',
+                                                                style: Styles.regularStyle
+                                                                    .copyWith(fontSize: 13),
+                                                              ),
+                                                            ],
+                                                          ),
+                                            trailing: Switch(
+                                              inactiveThumbColor: Theme.of(context).disabledColor,
+                                              activeColor: thisPanelColor,
                                               value: true,
                                               onChanged: (_) async {
-                                                if (allSubscriptions.contains(
-                                                    _thisActiveSubscription)) {
-                                                  allSubscriptions.remove(
-                                                      _thisActiveSubscription);
+                                                if (allSubscriptions
+                                                    .contains(thisActiveSubscription)) {
+                                                  allSubscriptions.remove(thisActiveSubscription);
                                                   userDatabase.put(
-                                                      'subscriptionAlertsList',
-                                                      allSubscriptions);
-                                                  await Functions
-                                                      .processCredits(true,
-                                                          isPermanent: false);
+                                                      'subscriptionAlertsList', allSubscriptions);
+                                                  await Functions.processCredits(true,
+                                                      isPermanent: false);
                                                   logger.d(
-                                                      '***** DBase $_thisActiveSubscription Subscription removed from ${userDatabase.get('subscriptionAlertsList')} *****');
+                                                      '***** DBase $thisActiveSubscription Subscription removed from ${userDatabase.get('subscriptionAlertsList')} *****');
                                                 } else if (!allSubscriptions
-                                                    .contains(
-                                                        _thisActiveSubscription)) {
-                                                  allSubscriptions.add(
-                                                      _thisActiveSubscription);
+                                                    .contains(thisActiveSubscription)) {
+                                                  allSubscriptions.add(thisActiveSubscription);
                                                   userDatabase.put(
-                                                      'subscriptionAlertsList',
-                                                      allSubscriptions);
-                                                  await Functions
-                                                      .processCredits(true,
-                                                          isPermanent: false);
+                                                      'subscriptionAlertsList', allSubscriptions);
+                                                  await Functions.processCredits(true,
+                                                      isPermanent: false);
                                                   logger.d(
-                                                      '***** DBase $_thisActiveSubscription Subscription added to ${userDatabase.get('subscriptionAlertsList')} *****');
+                                                      '***** DBase $thisActiveSubscription Subscription added to ${userDatabase.get('subscriptionAlertsList')} *****');
                                                 } else {
                                                   logger.d(
-                                                      '***** COULD NOT PROCESS SUBSCRIPTION $_thisActiveSubscription... NOTHING DONE HERE. *****');
+                                                      '***** COULD NOT PROCESS SUBSCRIPTION $thisActiveSubscription... NOTHING DONE HERE. *****');
                                                 }
                                               },
                                             ),
@@ -5199,7 +4661,7 @@ class SharedWidgets {
                                               //                 'lobby_${l.id.toLowerCase()}'))
                                               //     .id);
                                               // Navigator.pop(context);
-                                              _thisActiveSubscription
+                                              thisActiveSubscription
                                                       .toString()
                                                       .startsWith('member_')
                                                   ? Navigator.push(
@@ -5207,19 +4669,19 @@ class SharedWidgets {
                                                       MaterialPageRoute(
                                                         builder: (context) => MemberDetail(
                                                             members
-                                                                .firstWhere((m) => _thisActiveSubscription
-                                                                    .toString()
-                                                                    .toLowerCase()
-                                                                    .contains(m
-                                                                        .id
-                                                                        .toLowerCase()))
+                                                                .firstWhere((m) =>
+                                                                    thisActiveSubscription
+                                                                        .toString()
+                                                                        .toLowerCase()
+                                                                        .contains(
+                                                                            m.id.toLowerCase()))
                                                                 .id
                                                                 .toLowerCase(),
                                                             houseStockWatchList,
                                                             senateStockWatchList),
                                                       ),
                                                     )
-                                                  : _thisActiveSubscription
+                                                  : thisActiveSubscription
                                                           .toString()
                                                           .startsWith('bill_')
                                                       ? Navigator.push(
@@ -5227,32 +4689,32 @@ class SharedWidgets {
                                                           MaterialPageRoute(
                                                             builder: (context) => BillDetail(
                                                                 bills
-                                                                    .firstWhere((b) => _thisActiveSubscription
-                                                                        .toString()
-                                                                        .toLowerCase()
-                                                                        .contains(
-                                                                            'bill_${b.billId.toLowerCase()}'))
+                                                                    .firstWhere((b) =>
+                                                                        thisActiveSubscription
+                                                                            .toString()
+                                                                            .toLowerCase()
+                                                                            .contains(
+                                                                                'bill_${b.billId.toLowerCase()}'))
                                                                     .billUri,
                                                                 houseStockWatchList,
                                                                 senateStockWatchList),
                                                           ),
                                                         )
-                                                      : _thisActiveSubscription
+                                                      : thisActiveSubscription
                                                               .toString()
-                                                              .startsWith(
-                                                                  'lobby_')
+                                                              .startsWith('lobby_')
                                                           ? Navigator.push(
                                                               context,
                                                               MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        LobbyEventDetail(
+                                                                builder: (context) =>
+                                                                    LobbyEventDetail(
                                                                   thisLobbyEventId: lobbies
-                                                                      .firstWhere((l) => _thisActiveSubscription
-                                                                          .toString()
-                                                                          .toLowerCase()
-                                                                          .contains(
-                                                                              'lobby_${l.id.toLowerCase()}'))
+                                                                      .firstWhere((l) =>
+                                                                          thisActiveSubscription
+                                                                              .toString()
+                                                                              .toLowerCase()
+                                                                              .contains(
+                                                                                  'lobby_${l.id.toLowerCase()}'))
                                                                       .id,
                                                                 ),
                                                               ),
@@ -5268,21 +4730,16 @@ class SharedWidgets {
                             [
                               FlipInX(
                                 child: inactiveSubscriptions.isEmpty
-                                    ? SizedBox.shrink()
+                                    ? const SizedBox.shrink()
                                     : Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2),
+                                        padding: const EdgeInsets.symmetric(vertical: 2),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text('Archived'.toUpperCase(),
-                                                style: Styles.regularStyle
-                                                    .copyWith(
-                                                        fontSize: 10,
-                                                        color: _darkTheme
-                                                            ? null
-                                                            : _thisPanelColor)),
+                                                style: Styles.regularStyle.copyWith(
+                                                    fontSize: 10,
+                                                    color: darkTheme ? null : thisPanelColor)),
                                             // Divider(),
                                           ],
                                         ),
@@ -5291,158 +4748,123 @@ class SharedWidgets {
                             ] +
                             inactiveSubscriptions
                                 .map(
-                                  (_inactiveSubscription) => FlipInX(
+                                  (inactiveSubscription) => FlipInX(
                                     child: Card(
                                       elevation: 0,
-                                      color: _darkTheme
-                                          ? Theme.of(context)
-                                              .highlightColor
-                                              .withOpacity(0.5)
+                                      color: darkTheme
+                                          ? Theme.of(context).highlightColor.withOpacity(0.5)
                                           : Colors.white.withOpacity(0.5),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
                                         child: ListTile(
                                           dense: true,
-                                          leading: FaIcon(
-                                              FontAwesomeIcons.boxArchive,
-                                              size: 15),
-                                          title: _inactiveSubscription
+                                          leading:
+                                              const FaIcon(FontAwesomeIcons.boxArchive, size: 15),
+                                          title: inactiveSubscription
                                                   .toString()
                                                   .startsWith('member_')
                                               ? Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text('Member'.toUpperCase(),
-                                                        style: Styles
-                                                            .regularStyle
-                                                            .copyWith(
-                                                                fontSize: 12,
-                                                                color:
-                                                                    _thisPanelColor)),
+                                                        style: Styles.regularStyle.copyWith(
+                                                            fontSize: 12, color: thisPanelColor)),
                                                     Text(
-                                                      '${members.firstWhere((m) => _inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).shortTitle} ${members.firstWhere((m) => _inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).firstName} ${members.firstWhere((m) => _inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).lastName} (${members.firstWhere((m) => _inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).party})',
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                      '${members.firstWhere((m) => inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).shortTitle} ${members.firstWhere((m) => inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).firstName} ${members.firstWhere((m) => inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).lastName} (${members.firstWhere((m) => inactiveSubscription.toString().toLowerCase().contains(m.id.toLowerCase())).party})',
+                                                      style: Styles.regularStyle.copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.bold),
                                                     ),
                                                   ],
                                                 )
-                                              : _inactiveSubscription
-                                                      .toString()
-                                                      .startsWith('bill_')
+                                              : inactiveSubscription.toString().startsWith('bill_')
                                                   ? Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Row(
                                                           children: [
                                                             Expanded(
-                                                              child: Text(
-                                                                  'Bill'
-                                                                      .toUpperCase(),
-                                                                  style: Styles
-                                                                      .regularStyle
+                                                              child: Text('Bill'.toUpperCase(),
+                                                                  style: Styles.regularStyle
                                                                       .copyWith(
-                                                                          fontSize:
-                                                                              12,
-                                                                          color: _darkTheme
+                                                                          fontSize: 12,
+                                                                          color: darkTheme
                                                                               ? null
-                                                                              : _thisPanelColor)),
+                                                                              : thisPanelColor)),
                                                             ),
                                                             Text(
-                                                                '${dateWithDayFormatter.format(DateTime.parse(_inactiveSubscription.toString().split('_')[4]))}',
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            10))
+                                                                dateWithDayFormatter.format(
+                                                                    DateTime.parse(
+                                                                        inactiveSubscription
+                                                                            .toString()
+                                                                            .split('_')[4])),
+                                                                style: Styles.regularStyle
+                                                                    .copyWith(fontSize: 10))
                                                           ],
                                                         ),
                                                         Text(
-                                                          '${_inactiveSubscription.toString().split('_')[1].toUpperCase()}',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
+                                                          inactiveSubscription
+                                                              .toString()
+                                                              .split('_')[1]
+                                                              .toUpperCase(),
+                                                          style: Styles.regularStyle.copyWith(
+                                                              fontSize: 14,
+                                                              fontWeight: FontWeight.bold),
                                                         ),
                                                       ],
                                                     )
-                                                  : _inactiveSubscription
+                                                  : inactiveSubscription
                                                           .toString()
                                                           .startsWith('lobby_')
                                                       ? Column(
                                                           crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                              CrossAxisAlignment.start,
                                                           children: [
                                                             Row(
                                                               children: [
                                                                 Expanded(
                                                                   child: Text(
-                                                                      'Lobbying'
-                                                                          .toUpperCase(),
-                                                                      style: Styles.regularStyle.copyWith(
-                                                                          fontSize:
-                                                                              12,
-                                                                          color: _darkTheme
-                                                                              ? null
-                                                                              : _thisPanelColor)),
+                                                                      'Lobbying'.toUpperCase(),
+                                                                      style: Styles.regularStyle
+                                                                          .copyWith(
+                                                                              fontSize: 12,
+                                                                              color: darkTheme
+                                                                                  ? null
+                                                                                  : thisPanelColor)),
                                                                 ),
                                                                 Text(
-                                                                    '${dateWithDayFormatter.format(DateTime.parse(_inactiveSubscription.toString().split('_')[5]))}',
-                                                                    style: Styles
-                                                                        .regularStyle
-                                                                        .copyWith(
-                                                                            fontSize:
-                                                                                10))
+                                                                    dateWithDayFormatter.format(
+                                                                        DateTime.parse(
+                                                                            inactiveSubscription
+                                                                                .toString()
+                                                                                .split('_')[5])),
+                                                                    style: Styles.regularStyle
+                                                                        .copyWith(fontSize: 10))
                                                               ],
                                                             ),
                                                             Text(
-                                                              '${_inactiveSubscription.toString().split('_')[2]}'
+                                                              inactiveSubscription
+                                                                  .toString()
+                                                                  .split('_')[2]
                                                                   .toUpperCase(),
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 14,
+                                                                  fontWeight: FontWeight.bold),
                                                             ),
                                                           ],
                                                         )
                                                       : Column(
                                                           crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                              CrossAxisAlignment.start,
                                                           children: [
-                                                            Text(
-                                                                'Unknown'
-                                                                    .toUpperCase(),
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            12)),
+                                                            Text('Unknown'.toUpperCase(),
+                                                                style: Styles.regularStyle
+                                                                    .copyWith(fontSize: 12)),
                                                             Text(
                                                               'Unknown Subscription',
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 14,
+                                                                  fontWeight: FontWeight.bold),
                                                             ),
                                                           ],
                                                         ),
@@ -5459,109 +4881,88 @@ class SharedWidgets {
                                               //             .copyWith(fontSize: 13),
                                               //       )
                                               //     :
-                                              _inactiveSubscription
-                                                      .toString()
-                                                      .startsWith('bill_')
+                                              inactiveSubscription.toString().startsWith('bill_')
                                                   ? Text(
-                                                      '${_inactiveSubscription.toString().split('_')[2]}',
+                                                      inactiveSubscription.toString().split('_')[2],
                                                       maxLines: 3,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                                                      overflow: TextOverflow.ellipsis,
                                                       style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 13),
+                                                          .copyWith(fontSize: 13),
                                                     )
-                                                  : _inactiveSubscription
+                                                  : inactiveSubscription
                                                           .toString()
                                                           .startsWith('lobby_')
                                                       ? Text(
-                                                          '${_inactiveSubscription.toString().split('_')[3]}',
+                                                          inactiveSubscription
+                                                              .toString()
+                                                              .split('_')[3],
                                                           maxLines: 3,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  fontSize: 13),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          style: Styles.regularStyle
+                                                              .copyWith(fontSize: 13),
                                                         )
                                                       : Text(
                                                           'Unknown Details',
                                                           maxLines: 3,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  fontSize: 13),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          style: Styles.regularStyle
+                                                              .copyWith(fontSize: 13),
                                                         ),
-                                          trailing: new Switch(
-                                            inactiveThumbColor:
-                                                Theme.of(context).disabledColor,
-                                            activeColor: _thisPanelColor,
+                                          trailing: Switch(
+                                            inactiveThumbColor: Theme.of(context).disabledColor,
+                                            activeColor: thisPanelColor,
                                             value: true,
                                             onChanged: (_) async {
-                                              if (allSubscriptions.contains(
-                                                  _inactiveSubscription)) {
-                                                allSubscriptions.remove(
-                                                    _inactiveSubscription);
+                                              if (allSubscriptions.contains(inactiveSubscription)) {
+                                                allSubscriptions.remove(inactiveSubscription);
                                                 userDatabase.put(
-                                                    'subscriptionAlertsList',
-                                                    allSubscriptions);
+                                                    'subscriptionAlertsList', allSubscriptions);
 
-                                                await Functions.processCredits(
-                                                    true);
+                                                await Functions.processCredits(true);
                                                 logger.d(
-                                                    '***** DBase $_inactiveSubscription Subscription removed from ${userDatabase.get('subscriptionAlertsList')} *****');
+                                                    '***** DBase $inactiveSubscription Subscription removed from ${userDatabase.get('subscriptionAlertsList')} *****');
                                               } else if (!allSubscriptions
-                                                  .contains(
-                                                      _inactiveSubscription)) {
-                                                allSubscriptions
-                                                    .add(_inactiveSubscription);
+                                                  .contains(inactiveSubscription)) {
+                                                allSubscriptions.add(inactiveSubscription);
                                                 userDatabase.put(
-                                                    'subscriptionAlertsList',
-                                                    allSubscriptions);
-                                                await Functions.processCredits(
-                                                    true);
+                                                    'subscriptionAlertsList', allSubscriptions);
+                                                await Functions.processCredits(true);
                                                 logger.d(
-                                                    '***** DBase $_inactiveSubscription Subscription added to ${userDatabase.get('subscriptionAlertsList')} *****');
+                                                    '***** DBase $inactiveSubscription Subscription added to ${userDatabase.get('subscriptionAlertsList')} *****');
                                               } else {
                                                 logger.d(
-                                                    '***** COULD NOT PROCESS SUBSCRIPTION $_inactiveSubscription... NOTHING DONE HERE. *****');
+                                                    '***** COULD NOT PROCESS SUBSCRIPTION $inactiveSubscription... NOTHING DONE HERE. *****');
                                               }
                                             },
                                           ),
                                           onTap: () {
-                                            _inactiveSubscription
-                                                    .toString()
-                                                    .startsWith('member_')
+                                            inactiveSubscription.toString().startsWith('member_')
                                                 ? Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) => MemberDetail(
-                                                          _inactiveSubscription
+                                                          inactiveSubscription
                                                               .toString()
                                                               .split('_')[1],
                                                           houseStockWatchList,
                                                           senateStockWatchList),
                                                     ),
                                                   )
-                                                : _inactiveSubscription
+                                                : inactiveSubscription
                                                         .toString()
                                                         .startsWith('bill_')
                                                     ? Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) => BillDetail(
-                                                                _inactiveSubscription
+                                                                inactiveSubscription
                                                                     .toString()
-                                                                    .split(
-                                                                        '_')[3],
+                                                                    .split('_')[3],
                                                                 houseStockWatchList,
                                                                 senateStockWatchList)))
-                                                    : _inactiveSubscription
+                                                    : inactiveSubscription
                                                             .toString()
-                                                            .startsWith(
-                                                                'lobby_')
+                                                            .startsWith('lobby_')
                                                         ? Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
@@ -5569,10 +4970,9 @@ class SharedWidgets {
                                                                   LobbyEventDetail(
                                                                 // null,
                                                                 thisLobbyEventId:
-                                                                    _inactiveSubscription
+                                                                    inactiveSubscription
                                                                         .toString()
-                                                                        .split(
-                                                                            '_')[1],
+                                                                        .split('_')[1],
                                                               ),
                                                             ),
                                                           )
@@ -5615,8 +5015,8 @@ class SharedWidgets {
 
           logger.i(chamber);
 
-          Color _thisPanelColor = Theme.of(context).primaryColorDark;
-          bool _darkTheme = userDatabase.get('darkTheme');
+          Color thisPanelColor = Theme.of(context).primaryColorDark;
+          bool darkTheme = userDatabase.get('darkTheme');
 
           return BounceInUp(
             child: Container(
@@ -5624,28 +5024,25 @@ class SharedWidgets {
                 color: Theme.of(context).colorScheme.background,
                 image: DecorationImage(
                     opacity: 0.15,
-                    image: AssetImage(
-                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                    image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.background,
-                        BlendMode.color)),
+                        Theme.of(context).colorScheme.background, BlendMode.color)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.centerLeft,
                     height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    color: _thisPanelColor,
+                    color: thisPanelColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        new Expanded(
-                          child: new Text('$chamber Floor Actions',
-                              style: GoogleFonts.bangers(
-                                  color: Colors.white, fontSize: 25)),
+                        Expanded(
+                          child: Text('$chamber Floor Actions',
+                              style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
                         ),
                         IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -5656,58 +5053,45 @@ class SharedWidgets {
                   Expanded(
                     child: Scrollbar(
                       child: SingleChildScrollView(
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         primary: false,
                         // shrinkWrap: true,
                         child: Column(
                             children: floorActionsList
                                 .map(
-                                  (_thisFloorAction) => Container(
-                                    // key: actionKey,
-                                    child: FlipInX(
-                                      child: Card(
-                                        elevation: 0,
-                                        color: _darkTheme
-                                            ? Theme.of(context)
-                                                .highlightColor
-                                                .withOpacity(0.5)
-                                            : Colors.white.withOpacity(0.5),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 5),
-                                          child: ListTile(
-                                            dense: true,
-                                            leading: FaIcon(
-                                                FontAwesomeIcons.bullhorn,
-                                                size: 15),
-                                            title: floorActionsSimpleTextGroup(
-                                                context,
-                                                _thisPanelColor,
-                                                _darkTheme,
-                                                '${dateWithTimeFormatter.format(_thisFloorAction.timestamp)}',
-                                                _thisFloorAction.description),
-                                            trailing: _thisFloorAction
-                                                    .billIds.isEmpty
-                                                ? SizedBox.shrink()
-                                                : FaIcon(
-                                                    FontAwesomeIcons.binoculars,
-                                                    size: 15),
-                                            onTap: () =>
-                                                _thisFloorAction.billIds.isEmpty
-                                                    ? null
-                                                    : Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => BillSearch(
-                                                              _thisFloorAction
-                                                                  .billIds.first
-                                                                  .split(
-                                                                      '-')[0],
-                                                              houseStockWatchList,
-                                                              senateStockWatchList),
-                                                        ),
-                                                      ),
-                                          ),
+                                  (thisFloorAction) => FlipInX(
+                                    child: Card(
+                                      elevation: 0,
+                                      color: darkTheme
+                                          ? Theme.of(context).highlightColor.withOpacity(0.5)
+                                          : Colors.white.withOpacity(0.5),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: ListTile(
+                                          dense: true,
+                                          leading:
+                                              const FaIcon(FontAwesomeIcons.bullhorn, size: 15),
+                                          title: floorActionsSimpleTextGroup(
+                                              context,
+                                              thisPanelColor,
+                                              darkTheme,
+                                              dateWithTimeFormatter
+                                                  .format(thisFloorAction.timestamp),
+                                              thisFloorAction.description),
+                                          trailing: thisFloorAction.billIds.isEmpty
+                                              ? const SizedBox.shrink()
+                                              : const FaIcon(FontAwesomeIcons.binoculars, size: 15),
+                                          onTap: () => thisFloorAction.billIds.isEmpty
+                                              ? null
+                                              : Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => BillSearch(
+                                                        thisFloorAction.billIds.first.split('-')[0],
+                                                        houseStockWatchList,
+                                                        senateStockWatchList),
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                     ),
@@ -5724,8 +5108,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget floorActionsSimpleTextGroup(BuildContext context,
-      Color headerColor, bool darkTheme, String headerText, String contentText,
+  static Widget floorActionsSimpleTextGroup(BuildContext context, Color headerColor, bool darkTheme,
+      String headerText, String contentText,
       {int maxLines = 3,
       double contentFontSize = 14,
       FontWeight contentFontWeight = FontWeight.bold}) {
@@ -5744,8 +5128,7 @@ class SharedWidgets {
           contentText,
           // maxLines: maxLines,
           // overflow: TextOverflow.ellipsis,
-          style: Styles.regularStyle
-              .copyWith(fontSize: 14, fontWeight: contentFontWeight),
+          style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: contentFontWeight),
         ),
       ],
     );
@@ -5763,11 +5146,10 @@ class SharedWidgets {
     final chamber = statement.chamber.toString().replaceFirst('Chamber.', '');
     final memberId = statement.memberId.toLowerCase();
     return StatefulBuilder(builder: (context, setState) {
-      dynamic thisMemberImage =
-          NetworkImage('https://www.congress.gov/img/member/$memberId.jpg');
+      dynamic thisMemberImage = NetworkImage('https://www.congress.gov/img/member/$memberId.jpg');
       return FlipInX(
         animate: true,
-        child: new Container(
+        child: Container(
           decoration: BoxDecoration(
             // borderRadius: BorderRadius.circular(5),
             border: Border(
@@ -5781,7 +5163,7 @@ class SharedWidgets {
             )),
           ),
           alignment: Alignment.center,
-          child: new Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               InkWell(
@@ -5791,22 +5173,19 @@ class SharedWidgets {
                         ? republicanColor
                         : independentColor,
                 onTap: () async {
-                  Functions.linkLaunch(
-                          context, statement.url, userDatabase, userIsPremium,
+                  Functions.linkLaunch(context, statement.url, userDatabase, userIsPremium,
                           appBarTitle: statement.title)
-                      .then((value) async =>
-                          await Functions.processCredits(true));
+                      .then((value) async => await Functions.processCredits(true));
                 },
-                child: new Container(
+                child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).highlightColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(5),
-                        topRight: Radius.circular(5)),
+                    borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(5), topRight: Radius.circular(5)),
                   ),
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(5),
-                  child: new Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
@@ -5816,40 +5195,35 @@ class SharedWidgets {
                             context,
                             MaterialPageRoute(
                               builder: (context) => MemberDetail(
-                                  statement.memberId,
-                                  houseStockWatchList,
-                                  senateStockWatchList),
+                                  statement.memberId, houseStockWatchList, senateStockWatchList),
                             ),
                           );
                         },
-                        child: new Stack(
+                        child: Stack(
                           alignment: Alignment.bottomLeft,
                           children: [
-                            new Container(
+                            Container(
                               height: 55,
                               width: 45,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
-                                image: new DecorationImage(
-                                    image: AssetImage(
-                                        'assets/congress_pic_$profileDefaultNumber.png'),
+                                image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/congress_pic_$profileDefaultNumber.png'),
                                     fit: BoxFit.cover,
                                     colorFilter: ColorFilter.mode(
                                         userDatabase.get('darkTheme')
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
+                                            ? Theme.of(context).colorScheme.primary
                                             : Colors.transparent,
                                         BlendMode.color)),
                               ),
                               foregroundDecoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
-                                image: new DecorationImage(
+                                image: DecorationImage(
                                     image: thisMemberImage,
                                     fit: BoxFit.cover,
-                                    onError: (error, stackTrace) => setState(
-                                        () => thisMemberImage = AssetImage(
-                                            'assets/intro_background.png'))),
+                                    onError: (error, stackTrace) => setState(() => thisMemberImage =
+                                        const AssetImage('assets/intro_background.png'))),
                               ),
                             ),
                             Padding(
@@ -5861,26 +5235,23 @@ class SharedWidgets {
                                     //     .primaryColor
                                     //     .withOpacity(0.75),
                                     borderRadius: BorderRadius.circular(3)),
-                                child: new Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    SizedBox(width: 3),
-                                    new FaIcon(
+                                    const SizedBox(width: 3),
+                                    const FaIcon(
                                       FontAwesomeIcons.solidIdCard,
                                       size: 9,
                                       color: Color(0xffffffff),
                                     ),
-                                    SizedBox(width: 3),
+                                    const SizedBox(width: 3),
                                     AnimatedWidgets.flashingEye(
                                         context,
-                                        List.from(userDatabase
-                                                .get('subscriptionAlertsList'))
-                                            .any((element) => element
+                                        List.from(userDatabase.get('subscriptionAlertsList')).any(
+                                            (element) => element
                                                 .toString()
                                                 .toLowerCase()
-                                                .startsWith(
-                                                    'member_${memberId.toLowerCase()}')),
+                                                .startsWith('member_${memberId.toLowerCase()}')),
                                         false,
                                         size: 9,
                                         sameColorBright: true),
@@ -5893,13 +5264,13 @@ class SharedWidgets {
                       ),
                       const SizedBox(width: 5),
                       Expanded(
-                        child: new Padding(
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: new Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              new Wrap(
+                              Wrap(
                                 alignment: WrapAlignment.spaceBetween,
                                 children: [
                                   Text(
@@ -5910,9 +5281,8 @@ class SharedWidgets {
                                     softWrap: true,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
-                                    style: new TextStyle(
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontSize: 12.0, fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -5921,21 +5291,19 @@ class SharedWidgets {
                                 children: [
                                   Text(
                                     '${chamber.toLowerCase() == 'house' ? 'Hon.' : 'Sen.'} ${statement.name}  of  ${statement.state}',
-                                    style: new TextStyle(
-                                        fontSize: 10.0,
-                                        fontWeight: FontWeight.normal),
+                                    style: const TextStyle(
+                                        fontSize: 10.0, fontWeight: FontWeight.normal),
                                   ),
                                   const Spacer(),
                                   Text(
                                     formatter.format(statement.date),
-                                    style: new TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.normal),
                                   ),
                                   const SizedBox(width: 5),
-                                  const Icon(Icons.launch,
-                                      size: 10, color: Colors.grey),
+                                  const Icon(Icons.launch, size: 10, color: Colors.grey),
                                 ],
                               ),
                             ],
@@ -5962,17 +5330,17 @@ class SharedWidgets {
       List<HouseStockWatch> houseStockWatchList,
       List<SenateStockWatch> senateStockWatchList) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
-    bool _darkTheme = userDatabase.get('darkTheme');
+    bool darkTheme = userDatabase.get('darkTheme');
     return FlipInX(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       child: Card(
         elevation: 0,
-        color: _darkTheme
+        color: darkTheme
             ? Theme.of(context).highlightColor.withOpacity(0.5)
             : Colors.white.withOpacity(0.5),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: new ListTile(
+          child: ListTile(
             dense: false,
             leading: ZoomIn(
               child: Container(
@@ -5983,8 +5351,7 @@ class SharedWidgets {
                     // shape: BoxShape.circle,
                     borderRadius: BorderRadius.circular(3),
                     image: DecorationImage(
-                        image: AssetImage(
-                            'assets/congress_pic_${random.nextInt(4)}.png'),
+                        image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                         fit: BoxFit.cover)),
                 foregroundDecoration: BoxDecoration(
                   border: Border.all(
@@ -5993,52 +5360,45 @@ class SharedWidgets {
                   ),
                   // shape: BoxShape.circle,
                   borderRadius: BorderRadius.circular(3),
-                  image: DecorationImage(
-                      image: NetworkImage(thisMemberImageUrl),
-                      fit: BoxFit.cover),
+                  image:
+                      DecorationImage(image: NetworkImage(thisMemberImageUrl), fit: BoxFit.cover),
                 ),
               ),
             ),
-            trailing: new Text('${thisMember.state}',
+            trailing: Text(thisMember.state,
                 style: GoogleFonts.bangers(
-                    fontSize: 30,
-                    color: _darkTheme ? Color(0xffffffff) : thisMemberColor)),
-            title: new Row(
+                    fontSize: 30, color: darkTheme ? const Color(0xffffffff) : thisMemberColor)),
+            title: Row(
               children: [
-                new Text(
+                Text(
                     '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName}'),
                 thisMember.suffix != null
-                    ? new Text('  ${thisMember.suffix}')
+                    ? Text('  ${thisMember.suffix}')
                     : const SizedBox.shrink(),
                 const SizedBox(width: 5),
                 AnimatedWidgets.flashingEye(
                     context,
-                    List.from(userDatabase.get('subscriptionAlertsList')).any(
-                        (element) => element
-                            .toString()
-                            .toLowerCase()
-                            .startsWith(
-                                'member_${thisMember.id.toLowerCase()}')),
+                    List.from(userDatabase.get('subscriptionAlertsList')).any((element) => element
+                        .toString()
+                        .toLowerCase()
+                        .startsWith('member_${thisMember.id.toLowerCase()}')),
                     false,
                     size: 11)
               ],
             ),
-            subtitle: new Column(
+            subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                thisMember.leadershipRole != null &&
-                        thisMember.leadershipRole.isNotEmpty
-                    ? new Text('${thisMember.leadershipRole}')
+                thisMember.leadershipRole != null && thisMember.leadershipRole.isNotEmpty
+                    ? Text(thisMember.leadershipRole)
                     : const SizedBox.shrink(),
-                thisMember.phone != null
-                    ? new Text('${thisMember.phone}')
-                    : const SizedBox.shrink(),
+                thisMember.phone != null ? Text(thisMember.phone) : const SizedBox.shrink(),
                 thisMember.twitterAccount != null
-                    ? new Text('@${thisMember.twitterAccount}')
+                    ? Text('@${thisMember.twitterAccount}')
                     : thisMember.youtubeAccount != null
-                        ? new Text('📺 ${thisMember.youtubeAccount}')
+                        ? Text('📺 ${thisMember.youtubeAccount}')
                         : thisMember.title != null
-                            ? new Text('${thisMember.title}')
+                            ? Text(thisMember.title)
                             : const SizedBox.shrink(),
               ],
             ),
@@ -6047,8 +5407,8 @@ class SharedWidgets {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MemberDetail(
-                      thisMember.id, houseStockWatchList, senateStockWatchList),
+                  builder: (context) =>
+                      MemberDetail(thisMember.id, houseStockWatchList, senateStockWatchList),
                 ),
               );
             },
@@ -6071,7 +5431,7 @@ class SharedWidgets {
     // bool userIsLegacy = userLevels[2];
 
     final bool darkTheme = userDatabase.get('darkTheme');
-    final Color _thisPanelColor = Theme.of(context).primaryColorDark;
+    final Color thisPanelColor = Theme.of(context).primaryColorDark;
     // final int productIndex = random.nextInt(ecwidProductsList.length);
     // userDatabase.put('newEcwidProducts', false);
 
@@ -6082,8 +5442,7 @@ class SharedWidgets {
     /// SHOULD BE ABLE TO REMOVE 10/15/22 TODO
     ecwidProductsList.removeWhere((item) => !item.enabled);
     if (!userIsDev) {
-      ecwidProductsList
-          .removeWhere((item) => item.name.toLowerCase().contains('[dev]'));
+      ecwidProductsList.removeWhere((item) => item.name.toLowerCase().contains('[dev]'));
     }
 
     ecwidProductsList.sort((a, b) => a.showOnFrontpage
@@ -6099,8 +5458,8 @@ class SharedWidgets {
               opacity: 0.15,
               image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.background, BlendMode.color)),
+              colorFilter:
+                  ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -6110,7 +5469,7 @@ class SharedWidgets {
                 alignment: Alignment.centerLeft,
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                color: _thisPanelColor,
+                color: thisPanelColor,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -6119,10 +5478,8 @@ class SharedWidgets {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('US Congress App Merch',
-                              style: GoogleFonts.bangers(
-                                  color: darkThemeTextColor, fontSize: 25)),
-                          new Text(
-                              '${ecwidProductsList.length} Products Provided By SCAPEGOATS™ USA',
+                              style: GoogleFonts.bangers(color: darkThemeTextColor, fontSize: 25)),
+                          Text('${ecwidProductsList.length} Products Provided By SCAPEGOATS™ USA',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -6134,7 +5491,7 @@ class SharedWidgets {
                       ),
                     ),
                     productOrdersList.isEmpty
-                        ? SizedBox.shrink()
+                        ? const SizedBox.shrink()
                         : SizedBox(
                             width: 30,
                             child: IconButton(
@@ -6151,8 +5508,7 @@ class SharedWidgets {
                                         darkTheme,
                                       );
                                     }),
-                                icon: Icon(Icons.history,
-                                    color: darkThemeTextColor)),
+                                icon: Icon(Icons.history, color: darkThemeTextColor)),
                           ),
                     IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -6160,35 +5516,32 @@ class SharedWidgets {
                   ],
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Expanded(
                   child: Scrollbar(
                 child: GridView.builder(
                     scrollDirection: Axis.vertical,
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: ecwidProductsList.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 5.0,
                       mainAxisSpacing: 5.0,
                     ),
                     itemBuilder: (context, index) {
-                      EcwidStoreItem _thisItem = ecwidProductsList[index];
-                      int _daysListed = DateTime.now()
-                          .difference(DateTime.parse(_thisItem.created))
-                          .inDays
-                          .abs();
-                      bool _itemIsNew = _daysListed <= 14;
-                      bool _itemIsFeatured =
-                          _thisItem.showOnFrontpage != null &&
-                              _thisItem.showOnFrontpage >= 0 &&
-                              _thisItem.showOnFrontpage < maxEcwidProductCount;
+                      EcwidStoreItem thisItem = ecwidProductsList[index];
+                      int daysListed =
+                          DateTime.now().difference(DateTime.parse(thisItem.created)).inDays.abs();
+                      bool itemIsNew = daysListed <= 14;
+                      bool itemIsFeatured = thisItem.showOnFrontpage != null &&
+                          thisItem.showOnFrontpage >= 0 &&
+                          thisItem.showOnFrontpage < maxEcwidProductCount;
                       debugPrint(
-                          '^^^^^ NAME: ${_thisItem.name}\nCREATED: ${_thisItem.created}\nUPDATED: ${_thisItem.updated}\nDAYS LISTED: $_daysListed\nITEM IS NEW: $_itemIsNew\nSKU: ${_thisItem.sku}\nATTRIBUTES: ${_thisItem.attributes}\nCATEGORIES: ${_thisItem.categories.map((e) => e.id)}\nCOMBINATIONS: ${_thisItem.combinations}\nCHOICES: ${_thisItem.options.map((e) => e.choices.map((c) => c.text))}\nFAV COUNT: ${_thisItem.favorites.count}\nFAV DISPLAYED: ${_thisItem.favorites.displayedCount}');
+                          '^^^^^ NAME: ${thisItem.name}\nCREATED: ${thisItem.created}\nUPDATED: ${thisItem.updated}\nDAYS LISTED: $daysListed\nITEM IS NEW: $itemIsNew\nSKU: ${thisItem.sku}\nATTRIBUTES: ${thisItem.attributes}\nCATEGORIES: ${thisItem.categories.map((e) => e.id)}\nCOMBINATIONS: ${thisItem.combinations}\nCHOICES: ${thisItem.options.map((e) => e.choices.map((c) => c.text))}\nFAV COUNT: ${thisItem.favorites.count}\nFAV DISPLAYED: ${thisItem.favorites.displayedCount}');
 
                       debugPrint(
-                          '^^^^^ OPTIONS: ${_thisItem.options.map((e) => e.name.toString())}');
+                          '^^^^^ OPTIONS: ${thisItem.options.map((e) => e.name.toString())}');
                       return FadeIn(
                           child: InkWell(
                               onTap: () async => await showModalBottomSheet(
@@ -6197,11 +5550,7 @@ class SharedWidgets {
                                     isScrollControlled: false,
                                     context: context,
                                     builder: (context) => ecwidProductDetail(
-                                        context,
-                                        userDatabase,
-                                        darkTheme,
-                                        _thisItem,
-                                        userLevels),
+                                        context, userDatabase, darkTheme, thisItem, userLevels),
                                   ),
                               child: Stack(
                                 alignment: Alignment.topLeft,
@@ -6213,16 +5562,12 @@ class SharedWidgets {
                                         padding: const EdgeInsets.all(3),
                                         decoration: BoxDecoration(
                                             color: darkTheme
-                                                ? Theme.of(context)
-                                                    .primaryColor
-                                                    .withOpacity(0.5)
-                                                : Colors.white
-                                                    .withOpacity(0.75),
-                                            borderRadius:
-                                                BorderRadius.circular(3)),
+                                                ? Theme.of(context).primaryColor.withOpacity(0.5)
+                                                : Colors.white.withOpacity(0.75),
+                                            borderRadius: BorderRadius.circular(3)),
                                         child: Text(
-                                            _thisItem.inStock
-                                                ? _thisItem.unlimited
+                                            thisItem.inStock
+                                                ? thisItem.unlimited
                                                     ? 'In Stock'
                                                     : 'In Stock'
                                                 : 'Out Of Stock',
@@ -6232,10 +5577,30 @@ class SharedWidgets {
                                             style: Styles.regularStyle.copyWith(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
-                                              color: darkTheme
-                                                  ? null
-                                                  : _thisPanelColor,
+                                              color: darkTheme ? null : thisPanelColor,
                                             )),
+                                      ),
+                                    ),
+                                    footer: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                            color: darkTheme
+                                                ? Theme.of(context).primaryColor.withOpacity(0.5)
+                                                : Colors.white.withOpacity(0.75),
+                                            borderRadius: BorderRadius.circular(3)),
+                                        child: Text(
+                                          thisItem.name,
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.regularStyle.copyWith(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: darkTheme ? null : thisPanelColor,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     child: Container(
@@ -6264,8 +5629,7 @@ class SharedWidgets {
                                             : 'assets/app_icon.png'),
                                         fit: BoxFit.cover,
                                         placeholderFit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            '${_thisItem.imageUrl}'),
+                                        image: NetworkImage(thisItem.imageUrl),
                                       ),
                                       //   child: ZoomIn(
                                       //     // from: 10,
@@ -6287,54 +5651,25 @@ class SharedWidgets {
                                       //     ),
                                       //   ),
                                     ),
-                                    footer: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(3),
-                                        decoration: BoxDecoration(
-                                            color: darkTheme
-                                                ? Theme.of(context)
-                                                    .primaryColor
-                                                    .withOpacity(0.5)
-                                                : Colors.white
-                                                    .withOpacity(0.75),
-                                            borderRadius:
-                                                BorderRadius.circular(3)),
-                                        child: Text(
-                                          '${_thisItem.name}',
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Styles.regularStyle.copyWith(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: darkTheme
-                                                ? null
-                                                : _thisPanelColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                     child: Row(
                                       children: [
                                         AnimatedWidgets.flashingText(
-                                            context, 'New!', _itemIsNew, false,
+                                            context, 'New!', itemIsNew, false,
                                             animate: true,
                                             size: 14,
                                             color: altHighlightColor,
                                             sameColor: true),
-                                        Spacer(),
-                                        _itemIsFeatured
+                                        const Spacer(),
+                                        itemIsFeatured
                                             ? Icon(
                                                 FontAwesomeIcons.solidStar,
                                                 size: 10,
                                                 color: altHighlightColor,
                                               )
-                                            : SizedBox.shrink()
+                                            : const SizedBox.shrink()
                                       ],
                                     ),
                                   ),
@@ -6359,19 +5694,17 @@ class SharedWidgets {
     bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase).listenable(
-            keys: ['usageInfo', 'credits', 'permCredits', 'purchCredits']),
+        valueListenable: Hive.box(appDatabase)
+            .listenable(keys: ['usageInfo', 'credits', 'permCredits', 'purchCredits']),
         builder: (context, box, widget) {
-          Color _thisPanelColor = Theme.of(context).primaryColorDark;
-          NetworkImage _thisProductImageUrl =
-              NetworkImage(thisEcwidProduct.imageUrl);
+          Color thisPanelColor = Theme.of(context).primaryColorDark;
+          NetworkImage thisProductImageUrl = NetworkImage(thisEcwidProduct.imageUrl);
           bool usageInfo = userDatabase.get('usageInfo');
           int credits = userDatabase.get('credits');
           int permCredits = userDatabase.get('permCredits');
           int purchCredits = userDatabase.get('purchCredits');
           int totalCredits = credits + permCredits + purchCredits;
-          int creditsRequired =
-              (thisEcwidProduct.price * ecwidProductCreditMultiplier).toInt();
+          int creditsRequired = (thisEcwidProduct.price * ecwidProductCreditMultiplier).toInt();
           bool canBuy = totalCredits >= creditsRequired;
 
           return BounceInUp(
@@ -6383,17 +5716,16 @@ class SharedWidgets {
                   color: Theme.of(context).colorScheme.background,
                   image: DecorationImage(
                       opacity: 0.5,
-                      image: AssetImage('assets/intro_background.png'),
+                      image: const AssetImage('assets/intro_background.png'),
                       fit: BoxFit.cover,
                       colorFilter: ColorFilter.mode(
-                          Theme.of(context).colorScheme.background,
-                          BlendMode.color)),
+                          Theme.of(context).colorScheme.background, BlendMode.color)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: new Column(
+                  child: Column(
                     children: <Widget>[
-                      Container(
+                      SizedBox(
                         height: 125,
                         width: MediaQuery.of(context).size.width,
                         // decoration: BoxDecoration(
@@ -6410,59 +5742,45 @@ class SharedWidgets {
                                 Flexible(
                                     flex: 1,
                                     child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0, 10, 10, 10),
+                                      padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
                                       child: ZoomIn(
                                         child: Pulse(
-                                          duration: Duration(milliseconds: 400),
-                                          delay: Duration(milliseconds: 1500),
+                                          duration: const Duration(milliseconds: 400),
+                                          delay: const Duration(milliseconds: 1500),
                                           child: GestureDetector(
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
-                                                    image: _thisProductImageUrl,
-                                                    fit: BoxFit.cover),
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
+                                                    image: thisProductImageUrl, fit: BoxFit.cover),
+                                                borderRadius: BorderRadius.circular(5),
                                               ),
                                             ),
                                             onTap: () => showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent,
+                                                backgroundColor: Colors.transparent,
                                                 isScrollControlled: true,
                                                 enableDrag: false,
                                                 context: context,
                                                 builder: (context) {
                                                   return BounceInUp(
                                                     child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         InteractiveViewer(
                                                           constrained: true,
                                                           child: FadeInImage(
-                                                            placeholder: AssetImage(
-                                                                darkTheme
-                                                                    ? 'assets/app_icon_gray.png'
-                                                                    : 'assets/app_icon.png'),
+                                                            placeholder: AssetImage(darkTheme
+                                                                ? 'assets/app_icon_gray.png'
+                                                                : 'assets/app_icon.png'),
                                                             fit: BoxFit.cover,
-                                                            placeholderFit:
-                                                                BoxFit.cover,
-                                                            image:
-                                                                _thisProductImageUrl,
+                                                            placeholderFit: BoxFit.cover,
+                                                            image: thisProductImageUrl,
                                                           ),
                                                         ),
-                                                        SizedBox(height: 10),
+                                                        const SizedBox(height: 10),
                                                         IconButton(
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context),
-                                                            icon: Icon(
-                                                                Icons
-                                                                    .cancel_outlined,
-                                                                color:
-                                                                    darkThemeTextColor)),
+                                                            onPressed: () => Navigator.pop(context),
+                                                            icon: Icon(Icons.cancel_outlined,
+                                                                color: darkThemeTextColor)),
                                                       ],
                                                     ),
                                                   );
@@ -6474,11 +5792,9 @@ class SharedWidgets {
                                 Flexible(
                                   flex: 2,
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
                                           child: Text(
@@ -6487,53 +5803,41 @@ class SharedWidgets {
                                             maxLines: 5,
                                             overflow: TextOverflow.ellipsis,
                                             style: Styles.regularStyle.copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                                fontSize: 16, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                         Text(
                                           'Price: $creditsRequired Credits',
-                                          style: Styles.regularStyle.copyWith(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
+                                          style: Styles.regularStyle
+                                              .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                                         ),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Credits Available: $totalCredits',
-                                              style: Styles.regularStyle
-                                                  .copyWith(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: !canBuy
-                                                          ? darkTheme
-                                                              ? null
-                                                              : Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .error
-                                                          : darkTheme
-                                                              ? alertIndicatorColorBrightGreen
-                                                              : alertIndicatorColorDarkGreen),
+                                              style: Styles.regularStyle.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: !canBuy
+                                                      ? darkTheme
+                                                          ? null
+                                                          : Theme.of(context).colorScheme.error
+                                                      : darkTheme
+                                                          ? alertIndicatorColorBrightGreen
+                                                          : alertIndicatorColorDarkGreen),
                                             ),
-                                            SizedBox(width: 20),
+                                            const SizedBox(width: 20),
                                             Tooltip(
                                               preferBelow: true,
                                               enableFeedback: true,
-                                              showDuration:
-                                                  Duration(seconds: 3),
-                                              triggerMode:
-                                                  TooltipTriggerMode.tap,
+                                              showDuration: const Duration(seconds: 3),
+                                              triggerMode: TooltipTriggerMode.tap,
                                               message:
                                                   'Get credits fast by sharing & rating the app, or purchase them directly!',
-                                              margin: const EdgeInsets.only(
-                                                  left: 100, right: 30),
+                                              margin: const EdgeInsets.only(left: 100, right: 30),
                                               child: Icon(Icons.info,
-                                                  size: 14,
-                                                  color: darkThemeTextColor),
+                                                  size: 14, color: darkThemeTextColor),
                                             ),
                                           ],
                                         ),
@@ -6554,16 +5858,13 @@ class SharedWidgets {
                                         Icon(FontAwesomeIcons.share,
                                             size: 16,
                                             color: darkTheme
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
+                                                ? Theme.of(context).colorScheme.primary
                                                 : Colors.white),
                                         Icon(FontAwesomeIcons.share,
                                             size: 15,
                                             color: darkTheme
                                                 ? alertIndicatorColorBrightGreen
-                                                : Theme.of(context)
-                                                    .primaryColorDark),
+                                                : Theme.of(context).primaryColorDark),
                                       ],
                                     ),
                                     onTap: () => Messages.shareContent(false,
@@ -6571,13 +5872,12 @@ class SharedWidgets {
                                         message:
                                             'I thought you might be interested in this awesome product! Check it out at ${thisEcwidProduct.url}'),
                                   ),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   AnimatedWidgets.flashingText(
                                       context,
                                       'New!',
                                       DateTime.now()
-                                              .difference(DateTime.parse(
-                                                  thisEcwidProduct.created))
+                                              .difference(DateTime.parse(thisEcwidProduct.created))
                                               .inDays <=
                                           18,
                                       false,
@@ -6618,22 +5918,19 @@ class SharedWidgets {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
-                            border: Border.all(
-                                width: 1,
-                                color: _thisPanelColor.withOpacity(0.5)),
+                            border: Border.all(width: 1, color: thisPanelColor.withOpacity(0.5)),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Scrollbar(
                             child: SingleChildScrollView(
-                              physics: BouncingScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
                               child: Text(
                                 thisEcwidProduct.description
                                     .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ''),
                                 // maxLines: 5,
                                 // overflow: TextOverflow.ellipsis,
-                                style: Styles.regularStyle.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal),
+                                style: Styles.regularStyle
+                                    .copyWith(fontSize: 14, fontWeight: FontWeight.normal),
                               ),
                             ),
                           ),
@@ -6643,84 +5940,67 @@ class SharedWidgets {
                         padding: const EdgeInsets.only(top: 10),
                         child: SizedBox(
                           height: 25,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    child: Text(
-                                      'Maybe Later',
-                                      style: Styles.regularStyle.copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                          color: darkTheme
-                                              ? darkThemeTextColor
-                                              : _thisPanelColor),
-                                    ),
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.transparent),
-                                    ),
-                                    onPressed: () =>
-                                        Navigator.maybePop(context),
-                                  ),
+                          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(Colors.transparent),
                                 ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    child: Text(
+                                onPressed: () => Navigator.maybePop(context),
+                                child: Text(
+                                  'Maybe Later',
+                                  style: Styles.regularStyle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: darkTheme ? darkThemeTextColor : thisPanelColor),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all<Color>(
                                       thisEcwidProduct.inStock
-                                          ? canBuy
-                                              ? 'I Need This'
-                                              : 'Purchase Credits'
-                                          : 'Out Of Stock',
-                                      style: Styles.regularStyle.copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: darkThemeTextColor),
-                                    ),
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              thisEcwidProduct.inStock
-                                                  ? _thisPanelColor
-                                                  : _thisPanelColor
-                                                      .withOpacity(0.25)),
-                                    ),
-                                    onPressed: thisEcwidProduct.inStock
-                                        ? canBuy
-                                            ? !usageInfo
-                                                ? () =>
-                                                    Functions.requestUsageInfo(
-                                                        context)
-                                                : () {
-                                                    Navigator.pop(context);
-                                                    Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EcwidOrderPage(
-                                                            title:
-                                                                'Product Order Details',
-                                                            creditsToBuy:
-                                                                creditsRequired,
-                                                            productId:
-                                                                thisEcwidProduct
-                                                                    .id,
-                                                            product:
-                                                                thisEcwidProduct,
-                                                          ),
-                                                        ));
-                                                  }
-                                            : () =>
-                                                Functions.requestInAppPurchase(
-                                                    context, userIsPremium,
-                                                    whatToShow: 'credits')
-                                        : () => null,
-                                  ),
-                                )
-                              ]),
+                                          ? thisPanelColor
+                                          : thisPanelColor.withOpacity(0.25)),
+                                ),
+                                onPressed: thisEcwidProduct.inStock
+                                    ? canBuy
+                                        ? !usageInfo
+                                            ? () => Functions.requestUsageInfo(context)
+                                            : () {
+                                                Navigator.pop(context);
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => EcwidOrderPage(
+                                                        title: 'Product Order Details',
+                                                        creditsToBuy: creditsRequired,
+                                                        productId: thisEcwidProduct.id,
+                                                        product: thisEcwidProduct,
+                                                      ),
+                                                    ));
+                                              }
+                                        : () => Functions.requestInAppPurchase(
+                                            context, userIsPremium,
+                                            whatToShow: 'credits')
+                                    : () => null,
+                                child: Text(
+                                  thisEcwidProduct.inStock
+                                      ? canBuy
+                                          ? 'I Need This'
+                                          : 'Purchase Credits'
+                                      : 'Out Of Stock',
+                                  style: Styles.regularStyle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: darkThemeTextColor),
+                                ),
+                              ),
+                            )
+                          ]),
                         ),
                       ),
                     ],
@@ -6742,16 +6022,14 @@ class SharedWidgets {
     bool userIsDev = userLevels[0];
     // bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
-    Color _thisPanelColor = Theme.of(context).primaryColorDark;
+    Color thisPanelColor = Theme.of(context).primaryColorDark;
     // final List<String> subscriptionAlertsList =
     //     List.from(userDatabase.get('subscriptionAlertsList'));
 
     /// PRODUCT ORDERS LIST
     List<Order> orders = [];
     try {
-      orders =
-          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList'))
-              .orders;
+      orders = orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders;
     } catch (e) {
       logger.w(
           '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
@@ -6764,10 +6042,10 @@ class SharedWidgets {
           color: Theme.of(context).colorScheme.background,
           image: DecorationImage(
               opacity: 0.4,
-              image: AssetImage('assets/intro_background.png'),
+              image: const AssetImage('assets/intro_background.png'),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.background, BlendMode.color)),
+              colorFilter:
+                  ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -6777,7 +6055,7 @@ class SharedWidgets {
                 alignment: Alignment.centerLeft,
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                color: _thisPanelColor,
+                color: thisPanelColor,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -6786,10 +6064,8 @@ class SharedWidgets {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('In-App Product Purchases',
-                              style: GoogleFonts.bangers(
-                                  color: darkThemeTextColor, fontSize: 25)),
-                          new Text(
-                              '${orders.length} ${orders.length == 1 ? 'Purchase' : 'Purchases'}',
+                              style: GoogleFonts.bangers(color: darkThemeTextColor, fontSize: 25)),
+                          Text('${orders.length} ${orders.length == 1 ? 'Purchase' : 'Purchases'}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -6810,39 +6086,27 @@ class SharedWidgets {
                 child: Scrollbar(
                   child: ListView(
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       children: orders
-                          .map((_thisOrder) => FlipInX(
+                          .map((thisOrder) => FlipInX(
                                 child: Card(
                                   elevation: 0,
                                   color: darkTheme
-                                      ? Theme.of(context)
-                                          .highlightColor
-                                          .withOpacity(0.75)
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.75),
+                                      ? Theme.of(context).highlightColor.withOpacity(0.75)
+                                      : Theme.of(context).colorScheme.background.withOpacity(0.75),
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
                                     child: Dismissible(
-                                      key: ValueKey(_thisOrder.orderId),
+                                      key: ValueKey(thisOrder.orderId),
                                       secondaryBackground: Container(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 20),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .error,
+                                          color: Theme.of(context).colorScheme.error,
                                           child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Spacer(),
-                                                Icon(
-                                                    Icons
-                                                        .delete_forever_rounded,
+                                                const Spacer(),
+                                                Icon(Icons.delete_forever_rounded,
                                                     color: darkThemeTextColor)
                                               ])),
                                       background: Container(
@@ -6850,27 +6114,22 @@ class SharedWidgets {
                                               vertical: 5, horizontal: 20),
                                           color: alertIndicatorColorDarkGreen,
                                           child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Icon(Icons.agriculture_rounded,
                                                     color: darkThemeTextColor),
-                                                Spacer(),
+                                                const Spacer(),
                                               ])),
                                       onDismissed: userIsDev
                                           ? (direction) {
-                                              if (direction ==
-                                                  DismissDirection.endToStart) {
-                                                orders.removeWhere((item) =>
-                                                    item.orderId ==
-                                                    _thisOrder.orderId);
+                                              if (direction == DismissDirection.endToStart) {
+                                                orders.removeWhere(
+                                                    (item) => item.orderId == thisOrder.orderId);
                                                 try {
                                                   userDatabase.put(
                                                       'ecwidProductOrdersList',
                                                       orderDetailListToJson(
-                                                          OrderDetailList(
-                                                              orders: orders)));
+                                                          OrderDetailList(orders: orders)));
                                                   Messages.showMessage(
                                                       context: context,
                                                       message:
@@ -6880,12 +6139,10 @@ class SharedWidgets {
                                                   debugPrint(
                                                       'ERROR SAVING UPDATES ORDERS LIST TO DBASE (widgets): $e');
                                                 }
-                                              } else if (direction ==
-                                                  DismissDirection.startToEnd) {
+                                              } else if (direction == DismissDirection.startToEnd) {
                                                 Messages.showMessage(
                                                     context: context,
-                                                    message:
-                                                        'You swiped right!!!',
+                                                    message: 'You swiped right!!!',
                                                     isAlert: false);
                                               }
                                             }
@@ -6894,40 +6151,32 @@ class SharedWidgets {
                                         dense: false,
                                         title: simpleTextGroup(
                                             context,
-                                            _thisPanelColor,
+                                            thisPanelColor,
                                             darkTheme,
                                             Row(
                                               children: [
                                                 Text(
-                                                    'ID: ${_thisOrder.orderId}_ms:${_thisOrder.orderDate.millisecond}'
+                                                    'ID: ${thisOrder.orderId}_ms:${thisOrder.orderDate.millisecond}'
                                                         .toUpperCase(),
                                                     maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: Styles.regularStyle
-                                                        .copyWith(
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: Styles.regularStyle.copyWith(
                                                       fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: darkTheme
-                                                          ? Colors.grey
-                                                          : _thisPanelColor,
+                                                      fontWeight: FontWeight.bold,
+                                                      color:
+                                                          darkTheme ? Colors.grey : thisPanelColor,
                                                     )),
-                                                Spacer(),
+                                                const Spacer(),
                                               ],
                                             ),
-                                            '${_thisOrder.productName}'),
+                                            thisOrder.productName),
                                         subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                                'Order Date: ${dateWithTimeFormatter.format(_thisOrder.orderDate)}\nOptions: ${_thisOrder.productOptions}\nPrice: ${_thisOrder.productPrice}',
-                                                style: Styles.regularStyle
-                                                    .copyWith(
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
+                                                'Order Date: ${dateWithTimeFormatter.format(thisOrder.orderDate)}\nOptions: ${thisOrder.productOptions}\nPrice: ${thisOrder.productPrice}',
+                                                style: Styles.regularStyle.copyWith(
+                                                    fontSize: 13, fontWeight: FontWeight.bold)),
                                           ],
                                         ),
                                         trailing: ZoomIn(
@@ -6955,15 +6204,11 @@ class SharedWidgets {
                                               //     width: 1,
                                               //     color: darkThemeTextColor),
                                               // shape: BoxShape.circle,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
+                                              borderRadius: BorderRadius.circular(5),
                                               image: DecorationImage(
-                                                  image: _thisOrder.orderId
-                                                          .startsWith('EPO')
-                                                      ? NetworkImage(_thisOrder
-                                                          .productImageUrl)
-                                                      : AssetImage(
-                                                          'assets/app_icon.png'),
+                                                  image: thisOrder.orderId.startsWith('EPO')
+                                                      ? NetworkImage(thisOrder.productImageUrl)
+                                                      : const AssetImage('assets/app_icon.png'),
                                                   fit: BoxFit.fitWidth),
                                             ),
                                           ),

@@ -87,7 +87,7 @@ void main() async {
   await NotificationApi.init();
   await RcPurchaseApi.init();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 
   // Register to receive BackgroundFetch events after app is terminated.
   // Requires {stopOnTerminate: false, enableHeadless: true}
@@ -95,11 +95,13 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key key}) : super(key: key);
+
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
   Box userDatabase = Hive.box(appDatabase);
 
@@ -114,7 +116,7 @@ class _MyAppState extends State<MyApp> {
 
   // ignore: unused_field
   int _status = 0;
-  List<DateTime> _events = [];
+  final List<DateTime> _events = [];
 
   bool showAlertOptions = false;
 
@@ -143,7 +145,6 @@ class _MyAppState extends State<MyApp> {
       await Functions.getPosition();
       await Functions.getDeviceInfo();
       await Functions.getPackageInfo();
-      // await GithubApi.getPromoMessages();
     });
     super.initState();
     initBgFetchPlatformState();
@@ -206,7 +207,7 @@ class _MyAppState extends State<MyApp> {
       // This is the fetch-event callback.
       logger.d("[BackgroundFetch] Event received $taskId");
       setState(() {
-        _events.insert(0, new DateTime.now());
+        _events.insert(0, DateTime.now());
       });
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
       // for taking too long in the background.
@@ -250,21 +251,21 @@ class _MyAppState extends State<MyApp> {
           userIsPremium = userDatabase.get('userIsPremium');
           userIsLegacy = !userDatabase.get('userIsPremium') &&
                   List.from(userDatabase.get('userIdList'))
-                      .any((element) => element.toString().startsWith('$oldUserIdPrefix'))
+                      .any((element) => element.toString().startsWith(oldUserIdPrefix))
               ? true
               : false;
-          return new MaterialApp(
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: "US Congress",
             theme: userDatabase.get('darkTheme') ? darkThemeData : defaultThemeData,
             home: userDatabase.get('onboarding') == true
-                ? new OnBoardingPage()
-                : new Scaffold(
+                ? OnBoardingPage()
+                : Scaffold(
                     endDrawer: OrientationBuilder(builder: (context, orientation) {
                       return SafeArea(
-                        child: new Drawer(
+                        child: Drawer(
                           backgroundColor: Theme.of(context).colorScheme.primary,
-                          child: new Container(
+                          child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).primaryColorDark,
                             ),
@@ -276,7 +277,7 @@ class _MyAppState extends State<MyApp> {
                                     : Container(
                                         color: Theme.of(context).colorScheme.primary,
                                         // height: 125,
-                                        child: new Stack(
+                                        child: Stack(
                                           alignment: Alignment.bottomCenter,
                                           children: [
                                             FadeIn(
@@ -299,7 +300,7 @@ class _MyAppState extends State<MyApp> {
                                                         ? Expanded(
                                                             child: OutlinedButton.icon(
                                                                 icon:
-                                                                    Icon(Icons.ad_units, size: 10),
+                                                                    const Icon(Icons.ad_units, size: 10),
                                                                 label: Padding(
                                                                   padding: const EdgeInsets.all(3),
                                                                   child: Text(
@@ -349,7 +350,7 @@ class _MyAppState extends State<MyApp> {
                                                                         .colorScheme
                                                                         .background
                                                                         .withOpacity(0.85))),
-                                                        icon: FaIcon(FontAwesomeIcons.coins,
+                                                        icon: const FaIcon(FontAwesomeIcons.coins,
                                                             size: 10),
                                                         label: Padding(
                                                           padding: const EdgeInsets.all(3),
@@ -479,7 +480,7 @@ class _MyAppState extends State<MyApp> {
                                       color: darkTheme
                                           ? Theme.of(context).colorScheme.background
                                           : Theme.of(context).colorScheme.primary,
-                                      child: new ListTile(
+                                      child: ListTile(
                                         enabled: true,
                                         enableFeedback: true,
                                         dense: true,
@@ -531,12 +532,12 @@ class _MyAppState extends State<MyApp> {
                                                           ],
                                                         )
                                                       : const SizedBox.shrink(),
-                                                  Spacer(),
+                                                  const Spacer(),
                                                   Text(
                                                       userIdList.last.split('<|:|>')[1] ==
                                                               dotenv.env['dCode']
                                                           ? 'MettaCode Dev'.toUpperCase()
-                                                          : '${userIdList.last.split('<|:|>')[1]}'
+                                                          : userIdList.last.split('<|:|>')[1]
                                                               .toUpperCase(),
                                                       style: Styles.regularStyle.copyWith(
                                                           color: darkThemeTextColor, fontSize: 12)),
@@ -557,7 +558,7 @@ class _MyAppState extends State<MyApp> {
                                 ),
                                 !userIsPremium
                                     ? BounceInRight(
-                                        duration: Duration(milliseconds: 800),
+                                        duration: const Duration(milliseconds: 800),
                                         child: SharedWidgets.premiumUpgradeContainer(
                                             context,
                                             userIsPremium,
@@ -572,19 +573,19 @@ class _MyAppState extends State<MyApp> {
                                     isCommenting
                                         ? const SizedBox.shrink()
                                         : BounceInRight(
-                                            duration: Duration(milliseconds: 400),
-                                            child: new ListTile(
+                                            duration: const Duration(milliseconds: 400),
+                                            child: ListTile(
                                               enabled: true,
                                               dense: true,
                                               leading: FaIcon(FontAwesomeIcons.bug,
                                                   size: 12, color: darkThemeTextColor),
-                                              title: new Text(
+                                              title: Text(
                                                   commentSent
                                                       ? 'Your message was sent'
                                                       : 'Report A Bug',
                                                   style: Styles.regularStyle
                                                       .copyWith(color: darkThemeTextColor)),
-                                              subtitle: new Text(
+                                              subtitle: Text(
                                                   commentSent
                                                       ? 'Tap to send another'
                                                       : 'Or message the development team',
@@ -605,21 +606,21 @@ class _MyAppState extends State<MyApp> {
                                   ],
                                 ),
                                 Expanded(
-                                  child: new ListView(
+                                  child: ListView(
                                     shrinkWrap: true,
-                                    physics: BouncingScrollPhysics(),
+                                    physics: const BouncingScrollPhysics(),
                                     children: <Widget>[
                                       BounceInRight(
-                                        duration: Duration(milliseconds: 800),
-                                        child: new ListTile(
+                                        duration: const Duration(milliseconds: 800),
+                                        child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: new Icon(FontAwesomeIcons.share,
+                                          leading: Icon(FontAwesomeIcons.share,
                                               size: 15, color: darkThemeTextColor),
-                                          title: new Text('Share The App',
+                                          title: Text('Share The App',
                                               style: Styles.regularStyle
                                                   .copyWith(color: darkThemeTextColor)),
-                                          subtitle: new Text(
+                                          subtitle: Text(
                                               'Receive credits for sharing with others',
                                               style: Styles.regularStyle.copyWith(
                                                   color: darkThemeTextColor, fontSize: 12)),
@@ -632,16 +633,16 @@ class _MyAppState extends State<MyApp> {
                                       appRated
                                           ? const SizedBox.shrink()
                                           : BounceInRight(
-                                              duration: Duration(milliseconds: 1000),
-                                              child: new ListTile(
+                                              duration: const Duration(milliseconds: 1000),
+                                              child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: new Icon(FontAwesomeIcons.star,
+                                                leading: Icon(FontAwesomeIcons.star,
                                                     size: 15, color: darkThemeTextColor),
-                                                title: new Text('Rate The App',
+                                                title: Text('Rate The App',
                                                     style: Styles.regularStyle
                                                         .copyWith(color: darkThemeTextColor)),
-                                                subtitle: new Text(
+                                                subtitle: Text(
                                                     'Receive credits for rating US Congress App',
                                                     style: Styles.regularStyle.copyWith(
                                                         color: darkThemeTextColor, fontSize: 12)),
@@ -662,13 +663,13 @@ class _MyAppState extends State<MyApp> {
                                       ecwidProductsList.isEmpty
                                           ? const SizedBox.shrink()
                                           : BounceInRight(
-                                              duration: Duration(milliseconds: 600),
-                                              child: new ListTile(
+                                              duration: const Duration(milliseconds: 600),
+                                              child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: new Icon(FontAwesomeIcons.store,
+                                                leading: Icon(FontAwesomeIcons.store,
                                                     size: 15, color: darkThemeTextColor),
-                                                title: new Text('Shop Merchandise',
+                                                title: Text('Shop Merchandise',
                                                     style: Styles.regularStyle
                                                         .copyWith(color: darkThemeTextColor)),
                                                 subtitle: productOrdersList.isEmpty
@@ -721,13 +722,13 @@ class _MyAppState extends State<MyApp> {
                                   ),
                                 ),
                                 BounceInRight(
-                                  duration: Duration(milliseconds: 1200),
-                                  child: new ListTile(
+                                  duration: const Duration(milliseconds: 1200),
+                                  child: ListTile(
                                     enabled: true,
                                     enableFeedback: true,
-                                    leading: new FaIcon(FontAwesomeIcons.gear,
+                                    leading: FaIcon(FontAwesomeIcons.gear,
                                         size: 13, color: darkThemeTextColor),
-                                    title: new Text('Settings',
+                                    title: Text('Settings',
                                         style: Styles.regularStyle
                                             .copyWith(color: darkThemeTextColor)),
                                     onTap: () async {
@@ -743,13 +744,13 @@ class _MyAppState extends State<MyApp> {
                                 List.from(userDatabase.get('userIdList'))
                                         .any((element) => element.toString().contains(devCode))
                                     ? FadeInRight(
-                                        duration: Duration(milliseconds: 2000),
-                                        child: new ListTile(
+                                        duration: const Duration(milliseconds: 2000),
+                                        child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: new Icon(Icons.developer_board,
+                                          leading: Icon(Icons.developer_board,
                                               size: 15, color: darkThemeTextColor),
-                                          title: new Text('Developer Page',
+                                          title: Text('Developer Page',
                                               style: Styles.regularStyle
                                                   .copyWith(color: darkThemeTextColor)),
                                           onTap: () async {
@@ -772,7 +773,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                     }),
-                    body: new HomePage(title: "US Congress")),
+                    body: const HomePage(title: "US Congress")),
           );
         });
   }
@@ -785,12 +786,12 @@ class _MyAppState extends State<MyApp> {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.5),
-              borderRadius: BorderRadius.all(Radius.circular(5)),
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
                   opacity: 0.15,
                   image: AssetImage('assets/congress_pic_$commentBoxImageIndex.png'),
                   fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(Colors.grey, BlendMode.color)),
+                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.color)),
             ),
             child: Form(
               key: _formKey,
@@ -800,21 +801,21 @@ class _MyAppState extends State<MyApp> {
                     keyboardType: TextInputType.emailAddress,
                     textCapitalization: TextCapitalization.none,
                     decoration: InputDecoration(
-                        errorStyle: TextStyle(color: Colors.white),
+                        errorStyle: const TextStyle(color: Colors.white),
                         hintText: 'Your email',
                         hintStyle:
                             Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
                         counterStyle: TextStyle(color: darkThemeTextColor)),
                     style: TextStyle(color: darkThemeTextColor),
-                    validator: (_val) =>
+                    validator: (val) =>
                         // _val.isEmpty ||
                         //         !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                         //             .hasMatch(_val)
                         //     ? "Enter a valid email"
                         //     : null,
-                        EmailValidator.validate(_val) ? null : "Please enter a valid email",
-                    onChanged: (_email) {
-                      setState(() => userEmail = _email);
+                        EmailValidator.validate(val) ? null : "Please enter a valid email",
+                    onChanged: (email) {
+                      setState(() => userEmail = email);
                       logger.d(userEmail);
                     },
                   ),
@@ -829,16 +830,16 @@ class _MyAppState extends State<MyApp> {
                             ? 300
                             : 200,
                     decoration: InputDecoration(
-                        errorStyle: TextStyle(color: Colors.white),
+                        errorStyle: const TextStyle(color: Colors.white),
                         hintText: 'Your comment',
                         hintStyle:
                             Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
                         counterStyle: TextStyle(color: darkThemeTextColor)),
                     style: TextStyle(color: darkThemeTextColor),
-                    validator: (_val) =>
-                        _val.isEmpty || _val.length < 10 ? 'Not enough information' : null,
-                    onChanged: (_comment) {
-                      setState(() => userComment = _comment);
+                    validator: (val) =>
+                        val.isEmpty || val.length < 10 ? 'Not enough information' : null,
+                    onChanged: (comment) {
+                      setState(() => userComment = comment);
                       logger.d(userComment);
                     },
                   ),
@@ -853,12 +854,12 @@ class _MyAppState extends State<MyApp> {
                           TextButton(
                               style: ButtonStyle(
                                   foregroundColor: darkThemeTextMSPColor,
-                                  padding: MaterialStateProperty.all(EdgeInsets.all(5))),
+                                  padding: MaterialStateProperty.all(const EdgeInsets.all(5))),
                               onPressed: () => setState(() {
                                     isCommenting = false;
                                     userComment = '';
                                   }),
-                              child: Text('Cancel')),
+                              child: const Text('Cancel')),
                           const SizedBox(width: 5),
                           ElevatedButton.icon(
                               style: ButtonStyle(
@@ -931,31 +932,31 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> drawerTextInput(BuildContext context, String titleText, String devLegacyCode,
       String devPremiumCode, String freeTrialCode) async {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     final String devCode = dotenv.env['dCode'];
-    String _data;
+    String data;
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
         builder: (context) {
-          return new Padding(
+          return Padding(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
-            child: new Column(
+            child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  new Text(
+                  Text(
                     titleText,
                     style: GoogleFonts.bangers(fontSize: 25),
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: new Form(
-                      key: _formKey,
-                      child: new Row(
+                    child: Form(
+                      key: formKey,
+                      child: Row(
                         children: [
-                          new Expanded(
-                            child: new TextFormField(
+                          Expanded(
+                            child: TextFormField(
                               keyboardType: TextInputType.text,
                               validator: (val) => val == null || val.isEmpty
                                   ? 'Enter text'
@@ -968,48 +969,48 @@ class _MyAppState extends State<MyApp> {
                                       : 'What shall we call you?',
                                   errorStyle:
                                       TextStyle(color: darkTheme ? altHighlightColor : null)),
-                              onChanged: (val) => setState(() => _data = val.replaceAll(' ', '')),
+                              onChanged: (val) => setState(() => data = val.replaceAll(' ', '')),
                             ),
                           ),
-                          new IconButton(
+                          IconButton(
                               iconSize: 18,
                               icon: Icon(!userIsPremium &&
                                       !userIsLegacy &&
-                                      _data != devCode &&
-                                      _data != devLegacyCode &&
-                                      _data != devPremiumCode &&
-                                      _data != freeTrialCode
+                                      data != devCode &&
+                                      data != devLegacyCode &&
+                                      data != devPremiumCode &&
+                                      data != freeTrialCode
                                   ? Icons.workspace_premium
                                   : Icons.send),
                               onPressed: !userIsPremium &&
                                       !userIsLegacy &&
-                                      _data != devCode &&
-                                      _data != devLegacyCode &&
-                                      _data != devPremiumCode &&
-                                      _data != freeTrialCode
+                                      data != devCode &&
+                                      data != devLegacyCode &&
+                                      data != devPremiumCode &&
+                                      data != freeTrialCode
                                   ? () {
                                       Navigator.pop(context);
                                       Functions.requestInAppPurchase(context, userIsPremium,
                                           whatToShow: 'upgrades');
                                     }
                                   : () async {
-                                      if (_formKey.currentState.validate()) {
+                                      if (formKey.currentState.validate()) {
                                         Navigator.pop(context);
 
-                                        if (_data == devLegacyCode) {
-                                          List<String> _userIdList =
+                                        if (data == devLegacyCode) {
+                                          List<String> userIdList =
                                               List.from(userDatabase.get('userIdList'));
-                                          _userIdList.insert(0, oldUserIDTag);
+                                          userIdList.insert(0, oldUserIDTag);
                                           userDatabase.put('devLegacyCode',
                                               'DLC${random.nextInt(900000) + 100000}');
-                                          userDatabase.put('userIdList', _userIdList);
+                                          userDatabase.put('userIdList', userIdList);
                                           userDatabase.put('devUpgraded', true);
-                                        } else if (_data == devPremiumCode) {
+                                        } else if (data == devPremiumCode) {
                                           userDatabase.put('userIsPremium', true);
                                           userDatabase.put('devUpgraded', true);
                                           userDatabase.put('devPremiumCode',
                                               'DPC${random.nextInt(900000) + 100000}');
-                                        } else if (_data == freeTrialCode) {
+                                        } else if (data == freeTrialCode) {
                                           userDatabase.put('userIsPremium', true);
                                           userDatabase.put('freeTrialUsed', true);
                                           userDatabase.put(
@@ -1017,27 +1018,28 @@ class _MyAppState extends State<MyApp> {
                                           userDatabase.put('freeTrialCode',
                                               'FTC${random.nextInt(900000) + 100000}');
                                         } else {
-                                          List<String> _currentUserIdList =
+                                          List<String> currentUserIdList =
                                               List.from(userDatabase.get('userIdList'));
-                                          if (!_currentUserIdList.any((element) =>
-                                              element.startsWith('$newUserIdPrefix$_data'))) {
-                                            _currentUserIdList.add(
-                                                '$newUserIdPrefix$_data<|:|>${DateTime.now()}');
-                                          } else if (_currentUserIdList.any((element) =>
-                                              element.startsWith('$newUserIdPrefix$_data'))) {
-                                            int _existingUserNameIndex =
-                                                _currentUserIdList.indexWhere((element) =>
-                                                    element.startsWith('$newUserIdPrefix$_data'));
+                                          if (!currentUserIdList.any((element) =>
+                                              element.startsWith('$newUserIdPrefix$data'))) {
+                                            currentUserIdList.add(
+                                                '$newUserIdPrefix$data<|:|>${DateTime.now()}');
+                                          } else if (currentUserIdList.any((element) =>
+                                              element.startsWith('$newUserIdPrefix$data'))) {
+                                            int existingUserNameIndex =
+                                                currentUserIdList.indexWhere((element) =>
+                                                    element.startsWith('$newUserIdPrefix$data'));
 
-                                            String _existingUserName =
-                                                _currentUserIdList.removeAt(_existingUserNameIndex);
+                                            String existingUserName =
+                                                currentUserIdList.removeAt(existingUserNameIndex);
 
-                                            _currentUserIdList.add(_existingUserName);
+                                            currentUserIdList.add(existingUserName);
                                           }
-                                          userDatabase.put('userIdList', _currentUserIdList);
+                                          userDatabase.put('userIdList', currentUserIdList);
                                         }
-                                      } else
+                                      } else {
                                         logger.d('***** Data is invalid *****');
+                                      }
                                     })
                         ],
                       ),

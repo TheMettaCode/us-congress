@@ -14,14 +14,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../services/github/github-promo-message-model.dart';
 
 class DeveloperPage extends StatefulWidget {
-  DeveloperPage({Key key, this.title}) : super(key: key);
+  const DeveloperPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _DeveloperPageState createState() => _DeveloperPageState();
+  DeveloperPageState createState() => DeveloperPageState();
 }
 
-class _DeveloperPageState extends State<DeveloperPage> {
+class DeveloperPageState extends State<DeveloperPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
@@ -91,9 +91,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
   List<GithubNotifications> githubNotifications = [];
 
   final String freeTrialTestDate =
-      '${DateTime.now().subtract(Duration(days: 3))}';
+      '${DateTime.now().subtract(const Duration(days: 3))}';
   final String freeTrialExpiredDate =
-      '${DateTime.now().subtract(Duration(days: 7))}';
+      '${DateTime.now().subtract(const Duration(days: 7))}';
   final String freeTrialExpiringSoonDate =
       '${DateTime.now().subtract(Duration(seconds: freeTrialPromoDurationDays * 86400 - 60))}';
 
@@ -107,7 +107,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           userIsSubscribed = userDatabase.get('userIsSubscribed');
           userIsLegacy = !userDatabase.get('userIsPremium') &&
                   List.from(userDatabase.get('userIdList')).any((element) =>
-                      element.toString().startsWith('$oldUserIdPrefix'))
+                      element.toString().startsWith(oldUserIdPrefix))
               ? true
               : false;
           try {
@@ -129,7 +129,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           return SafeArea(
               child: Scaffold(
             appBar: AppBar(
-              title: Text('Developer Test Page'),
+              title: const Text('Developer Test Page'),
             ),
             body: _loading
                 ? AnimatedWidgets.circularProgressWatchtower(context,
@@ -173,12 +173,12 @@ class _DeveloperPageState extends State<DeveloperPage> {
                               freeTrialUsed
                             ],
                             children: [
-                              Text('Premium '),
-                              Text('| Legacy '),
-                              Text('| Rated '),
-                              Text('| Dev Upgrd '),
+                              const Text('Premium '),
+                              const Text('| Legacy '),
+                              const Text('| Rated '),
+                              const Text('| Dev Upgrd '),
                               Text('| Prod ${ecwidStoreItems.length} '),
-                              Text('| Trial'),
+                              const Text('| Trial'),
                             ],
                           ),
                         ),
@@ -188,7 +188,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                             // thumbVisibility: true,
                             child: ListView(
                               shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
                               primary: false,
                               // crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -217,7 +217,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('Legacy Toggle'),
+                                  title: const Text('Legacy Toggle'),
                                   onTap: () {
                                     List<String> _userIdList = List.from(
                                         userDatabase.get('userIdList'));
@@ -249,7 +249,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('Dev Upgrade Toggle'),
+                                  title: const Text('Dev Upgrade Toggle'),
                                   subtitle: Text(
                                       'DLCODE: ${userDatabase.get('devLegacyCode')} DPCODE: ${userDatabase.get('devPremiumCode')}\nFTCODE: ${userDatabase.get('freeTrialCode')}'),
                                   onTap: () {
@@ -269,7 +269,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('App Rating Toggle'),
+                                  title: const Text('App Rating Toggle'),
                                   onTap: () {
                                     bool _appRated = !appRated;
                                     userDatabase.put('appRated', _appRated);
@@ -286,7 +286,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('Free Trial Used Toggle'),
+                                  title: const Text('Free Trial Used Toggle'),
                                   subtitle: Text(
                                       'Date Started : ${dateWithTimeAndSecondsFormatter.format(DateTime.parse(userDatabase.get('freeTrialStartDate')).toLocal())}'
                                           .toUpperCase()),
@@ -294,9 +294,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                     bool _freeTrialUsed = !freeTrialUsed;
                                     userDatabase.put(
                                         'freeTrialUsed', _freeTrialUsed);
-                                    if (_freeTrialUsed)
+                                    if (_freeTrialUsed) {
                                       userDatabase.put('freeTrialStartDate',
                                           freeTrialTestDate);
+                                    }
                                   },
                                   onLongPress: () {
                                     // bool _freeTrialUsed = freeTrialUsed;
@@ -324,7 +325,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('Free Trial Dismissed Toggle'),
+                                  title: const Text('Free Trial Dismissed Toggle'),
                                   onTap: () {
                                     bool _freeTrialDismissed =
                                         !freeTrialDismissed;
@@ -344,7 +345,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title: Text('Pop-Up With Image Test'),
+                                  title: const Text('Pop-Up With Image Test'),
                                   onTap: () async {
                                     Messages.showMessage(
                                         context: context,
@@ -368,125 +369,122 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                 //       productOrdersList.length.toString(),
                                 //       style: Styles.googleStyle),
                                 // )),
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: InkWell(
-                                          child: Card(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(
-                                                  '+100 Use Credits',
-                                                  textAlign: TextAlign.center),
-                                            ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        child: const Card(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                                '+100 Use Credits',
+                                                textAlign: TextAlign.center),
                                           ),
-                                          onTap: () {
-                                            int credits =
-                                                userDatabase.get('credits');
+                                        ),
+                                        onTap: () {
+                                          int credits =
+                                              userDatabase.get('credits');
+                                          userDatabase.put(
+                                              'credits', credits + 100);
+                                        },
+                                      ),
+                                    ),
+                                    // SizedBox(width: 5),
+                                    Expanded(
+                                      child: InkWell(
+                                        child: const Card(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                                '-100 Use Credits',
+                                                textAlign: TextAlign.center),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          int credits =
+                                              userDatabase.get('credits');
+                                          if (credits >= 100) {
                                             userDatabase.put(
-                                                'credits', credits + 100);
-                                          },
-                                        ),
+                                                'credits', credits - 100);
+                                          }
+                                        },
                                       ),
-                                      // SizedBox(width: 5),
-                                      Expanded(
-                                        child: InkWell(
-                                          child: Card(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(
-                                                  '-100 Use Credits',
-                                                  textAlign: TextAlign.center),
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            int credits =
-                                                userDatabase.get('credits');
-                                            if (credits >= 100)
-                                              userDatabase.put(
-                                                  'credits', credits - 100);
-                                          },
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 20.0),
-                                        child: Text(
-                                            '${userDatabase.get('credits')}',
-                                            style: Styles.googleStyle),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10, right: 20.0),
+                                      child: Text(
+                                          '${userDatabase.get('credits')}',
+                                          style: Styles.googleStyle),
+                                    ),
+                                  ],
                                 ),
                                 capitolBabbleNotificationsList.isEmpty
-                                    ? SizedBox.shrink()
-                                    : Container(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: InkWell(
-                                                child: Card(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: Text(
-                                                        'Remove First Babble',
-                                                        textAlign:
-                                                            TextAlign.center),
-                                                  ),
-                                                ),
-                                                onTap: () {
-                                                  capitolBabbleNotificationsList
-                                                      .removeAt(0);
-                                                  userDatabase.put(
-                                                      'capitolBabbleNotificationsList',
-                                                      capitolBabbleNotificationsList);
-                                                },
+                                    ? const SizedBox.shrink()
+                                    : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: InkWell(
+                                            child: const Card(
+                                              child: Padding(
+                                                padding:
+                                                    EdgeInsets.all(
+                                                        10),
+                                                child: Text(
+                                                    'Remove First Babble',
+                                                    textAlign:
+                                                        TextAlign.center),
                                               ),
                                             ),
-                                            // SizedBox(width: 5),
-                                            Expanded(
-                                              child: InkWell(
-                                                child: Card(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: Text(
-                                                        'Remove Last Babble',
-                                                        textAlign:
-                                                            TextAlign.center),
-                                                  ),
-                                                ),
-                                                onTap: () {
-                                                  capitolBabbleNotificationsList
-                                                      .removeLast();
-                                                  userDatabase.put(
-                                                      'capitolBabbleNotificationsList',
-                                                      capitolBabbleNotificationsList);
-                                                },
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10, right: 20.0),
-                                              child: Text(
-                                                  capitolBabbleNotificationsList
-                                                      .length
-                                                      .toString(),
-                                                  style: Styles.googleStyle),
-                                            ),
-                                          ],
+                                            onTap: () {
+                                              capitolBabbleNotificationsList
+                                                  .removeAt(0);
+                                              userDatabase.put(
+                                                  'capitolBabbleNotificationsList',
+                                                  capitolBabbleNotificationsList);
+                                            },
+                                          ),
                                         ),
-                                      ),
+                                        // SizedBox(width: 5),
+                                        Expanded(
+                                          child: InkWell(
+                                            child: const Card(
+                                              child: Padding(
+                                                padding:
+                                                    EdgeInsets.all(
+                                                        10),
+                                                child: Text(
+                                                    'Remove Last Babble',
+                                                    textAlign:
+                                                        TextAlign.center),
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              capitolBabbleNotificationsList
+                                                  .removeLast();
+                                              userDatabase.put(
+                                                  'capitolBabbleNotificationsList',
+                                                  capitolBabbleNotificationsList);
+                                            },
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 20.0),
+                                          child: Text(
+                                              capitolBabbleNotificationsList
+                                                  .length
+                                                  .toString(),
+                                              style: Styles.googleStyle),
+                                        ),
+                                      ],
+                                    ),
                                 thisNewsArticle == null
-                                    ? SizedBox.shrink()
+                                    ? const SizedBox.shrink()
                                     : Card(
                                         child: ListTile(
                                           dense: true,
@@ -514,7 +512,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                         ),
                                       ),
                                 thisGithubNotification == null
-                                    ? SizedBox.shrink()
+                                    ? const SizedBox.shrink()
                                     : Card(
                                         child: ListTile(
                                           dense: true,
@@ -575,22 +573,22 @@ class _DeveloperPageState extends State<DeveloperPage> {
                                                               darkThemeTextColor)),
                                             ],
                                           ),
-                                          Divider(),
+                                          const Divider(),
                                           Text(
                                               'SUBS: ${userDatabase.get('subscriptionAlertsList')}'),
-                                          SizedBox(height: 3),
+                                          const SizedBox(height: 3),
                                           Text(
                                               'BACKUP: ${userDatabase.get('subscriptionAlertsListBackup')}'),
-                                          SizedBox(height: 3),
+                                          const SizedBox(height: 3),
                                           Text(
                                               'ECWID ITEMS: ${ecwidStoreItems.map((e) => e.name)}'),
                                           // SizedBox(height: 3),
                                           // Text(
                                           //     'TWITTER API DATA: \n$twitterData'),
-                                          SizedBox(height: 3),
+                                          const SizedBox(height: 3),
                                           Text(
                                               '${capitolBabbleNotificationsList.length} STORED BABBLE NOTIFICATIONS: \n${capitolBabbleNotificationsList.map((e) => e.toString().split('<|:|>')[1])}'),
-                                          SizedBox(height: 3),
+                                          const SizedBox(height: 3),
                                         ],
                                       )),
                                 ),

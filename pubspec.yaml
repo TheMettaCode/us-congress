@@ -37,6 +37,7 @@ dependencies:
   ffi: ^2.0.1
   flutter_dotenv: ^5.0.2
   flutter_linkify: ^5.0.2
+  flutter_lints: ^2.0.1
   flutter_local_notifications: ^12.0.2
   font_awesome_flutter: ^10.2.1
   geocoding: ^2.0.5
