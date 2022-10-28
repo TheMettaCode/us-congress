@@ -882,7 +882,7 @@ class SharedWidgets {
                                                 ? altHighlightColor
                                                 : Theme.of(context).primaryColorDark,
                                             size: 20),
-                                        trailing: const Icon(Icons.touch_app, size: 20),
+                                        trailing: const Icon(Icons.touch_app, size: 16),
                                         title: const Text('Watch a short ad'),
                                         subtitle: const Text(
                                             'Receive additional PERMANENT credits for watching!'),
@@ -945,14 +945,13 @@ class SharedWidgets {
                                               : Theme.of(context).primaryColorDark),
                                       title: Text(notification.title),
                                       subtitle: Text(notification.message),
-                                      trailing: notification.url.isEmpty &&
-                                              notification.additionalData != 'share'
-                                          ? const SizedBox.shrink()
-                                          : notification.additionalData == 'share'
-                                              ? const Icon(Icons.share, size: 16)
-                                              : notification.additionalData == 'credits'
-                                          ? const Icon(Icons.touch_app, size: 16)
-                                          : const Icon(Icons.launch, size: 16),
+                                      trailing: notification.additionalData == 'share'
+                                          ? const Icon(Icons.share, size: 16)
+                                          : notification.additionalData == 'credits'
+                                              ? const Icon(Icons.touch_app, size: 16)
+                                              : notification.url.isNotEmpty
+                                                  ? const Icon(Icons.launch, size: 16)
+                                                  : const SizedBox.shrink(),
                                       onTap: () => notification.additionalData == 'credits'
                                           ? Functions.requestInAppPurchase(context, userIsPremium,
                                               whatToShow: notification.additionalData)

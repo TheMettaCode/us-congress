@@ -379,7 +379,7 @@ class HomePageState extends State<HomePage> {
     String _thisGithubNotification = '';
     try {
       _githubNotificationsList =
-          githubDataFromJson(userDatabase.get('githubNotifications')).notifications;
+          githubDataFromJson(userDatabase.get('githubData')).notifications;
       _thisGithubNotification =
           _githubNotificationsList[random.nextInt(_githubNotificationsList.length)].message;
       logger.d(

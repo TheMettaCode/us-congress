@@ -52,7 +52,7 @@ class DeveloperPageState extends State<DeveloperPage> {
         _newsArticles[random.nextInt(_newsArticles.length)];
 
     List<GithubNotifications> _githubNotifications =
-        githubDataFromJson(userDatabase.get('githubNotifications'))
+        githubDataFromJson(userDatabase.get('githubData'))
             .notifications;
     GithubNotifications _thisGithubNotification =
         _githubNotifications[random.nextInt(_githubNotifications.length)];
