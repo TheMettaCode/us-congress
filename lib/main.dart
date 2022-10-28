@@ -868,7 +868,7 @@ class MyAppState extends State<MyApp> {
                                       : MaterialStateProperty.all<Color>(
                                           Theme.of(context).colorScheme.primary)),
                               icon: commentSending
-                                  ? AnimatedWidgets.circularProgressWatchtower(context,
+                                  ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                                       widthAndHeight: 11, strokeWidth: 1, isFullScreen: false)
                                   : Icon(Icons.send, size: 10, color: darkThemeTextColor),
                               onPressed: () async {

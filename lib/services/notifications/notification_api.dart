@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
 
 class NotificationApi {
   static final flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   static Future init({bool initScheduled = false}) async {
-    final androidSetting =
+    const androidSetting =
         AndroidInitializationSettings('@drawable/ic_notification');
-    final iOSSetting = DarwinInitializationSettings();
-    final settings =
+    const iOSSetting = DarwinInitializationSettings();
+    const settings =
         InitializationSettings(android: androidSetting, iOS: iOSSetting);
     await flutterLocalNotificationsPlugin.initialize(
       settings,
@@ -67,7 +66,7 @@ class NotificationApi {
   //       ledColor: color,
   //       enableVibration: true,
   //       styleInformation: BigTextStyleInformation(bigText,
-  //           contentTitle: title, summaryText: 'by Mettacode'),
+  //           contentTitle: title, summaryText: 'by MettaCode'),
   //       priority: Priority.defaultPriority,
   //     ),
   //     iOS: IOSNotificationDetails(),
@@ -92,13 +91,13 @@ class NotificationApi {
         importance: Importance.max,
         enableLights: true,
         icon: '@drawable/ic_notification',
-        largeIcon: DrawableResourceAndroidBitmap('app_icon_round'),
+        largeIcon: const DrawableResourceAndroidBitmap('app_icon_round'),
         styleInformation: BigTextStyleInformation(bigTextBody,
             contentTitle: bigTextTitle, summaryText: bigTextSummaryTitle),
         enableVibration: true,
         groupKey: channelId);
-    var iOS = DarwinNotificationDetails();
-    var platform = new NotificationDetails(android: android, iOS: iOS);
+    var iOS = const DarwinNotificationDetails();
+    var platform = NotificationDetails(android: android, iOS: iOS);
     // _notificationsList.insert(0,
     //     '${DateTime.now().toUtc()}<|:|>$bigTextTitle<|:|>$bigTextBody<|:|>${additionalData.toString()}');
     // if (_notificationsList.length > 20) _notificationsList.removeLast();
@@ -111,7 +110,7 @@ class NotificationApi {
   }
 
   static Future<void> showBigPictureNotification() async {
-    var bigPictureStyleInformation = BigPictureStyleInformation(
+    var bigPictureStyleInformation = const BigPictureStyleInformation(
       DrawableResourceAndroidBitmap("flutter_devs"),
       largeIcon: DrawableResourceAndroidBitmap("flutter_devs"),
       contentTitle: 'flutter devs',
@@ -129,23 +128,23 @@ class NotificationApi {
 
   static Future<void> scheduleNotification() async {
     var scheduledNotificationDateTime =
-        DateTime.now().add(Duration(seconds: 5));
+        DateTime.now().add(const Duration(seconds: 5));
     AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+        const AndroidNotificationDetails(
       'channel id',
       'channel name',
       icon: 'flutter_devs',
       largeIcon: DrawableResourceAndroidBitmap('@drawable/ic_notification'),
     );
     DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails();
+        const DarwinNotificationDetails();
     NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
     // UILocalNotificationDateInterpretation uiLocalNotificationDateInterpretation = ;
     await flutterLocalNotificationsPlugin.zonedSchedule(
         0,
-        'Sechedule Title',
+        'Schedule Title',
         'Schedule Body',
         scheduledNotificationDateTime,
         platformChannelSpecifics,
@@ -155,7 +154,7 @@ class NotificationApi {
 
   static Future<void> showNotificationMediaStyle() async {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+        const AndroidNotificationDetails(
       'media channel id',
       'media channel name',
       color: Colors.red,

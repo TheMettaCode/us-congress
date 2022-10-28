@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Styles {
-  static final regularStyle = TextStyle(
+  static const regularStyle = TextStyle(
     // textStyle: TextStyle(
     // color: Colors.white,
     fontSize: 16,
@@ -18,7 +18,7 @@ class Styles {
   );
 
   static final googleStyle = GoogleFonts.bangers(
-    textStyle: TextStyle(
+    textStyle: const TextStyle(
         // color: Colors.white,
         fontSize: 20,
         fontWeight: FontWeight.normal),
@@ -31,7 +31,7 @@ class Styles {
     // ],
   );
 
-  static final TextStyle voteTileTextStyle = new TextStyle(fontSize: 12.0);
+  static const TextStyle voteTileTextStyle = TextStyle(fontSize: 12.0);
 
   static final List<BoxShadow> containerShadow = [
     // BoxShadow(
@@ -44,7 +44,7 @@ class Styles {
     //     offset: Offset(2, -2),
     //     blurRadius: 1,
     //     color: Color(0xff424242)),
-    BoxShadow(
+    const BoxShadow(
         // bottomRight
         offset: Offset(2, 2),
         blurRadius: 3,
@@ -60,44 +60,44 @@ class Styles {
   static final List<Shadow> shadowStrokeTextGrey = [
     Shadow(
         // bottomLeft
-        offset: Offset(-1, -1),
+        offset: const Offset(-1, -1),
         blurRadius: 1,
-        color: Color(0xff424242).withOpacity(0.5)),
+        color: const Color(0xff424242).withOpacity(0.5)),
     Shadow(
         // bottomRight
-        offset: Offset(1, -1),
+        offset: const Offset(1, -1),
         blurRadius: 1,
-        color: Color(0xff424242).withOpacity(0.5)),
+        color: const Color(0xff424242).withOpacity(0.5)),
     Shadow(
         // topRight
-        offset: Offset(1, 1),
+        offset: const Offset(1, 1),
         blurRadius: 1,
-        color: Color(0xff424242).withOpacity(0.5)),
+        color: const Color(0xff424242).withOpacity(0.5)),
     Shadow(
       // topLeft
-      offset: Offset(-1, 1),
+      offset: const Offset(-1, 1),
       blurRadius: 1,
-      color: Color(0xff424242).withOpacity(0.5),
+      color: const Color(0xff424242).withOpacity(0.5),
     )
   ];
 
   static final List<Shadow> shadowStrokeTextWhite = [
-    Shadow(
+    const Shadow(
         // bottomLeft
         offset: Offset(-1, -1),
         blurRadius: 1,
         color: Color(0xffffffff)),
-    Shadow(
+    const Shadow(
         // bottomRight
         offset: Offset(1, -1),
         blurRadius: 1,
         color: Color(0xffffffff)),
-    Shadow(
+    const Shadow(
         // topRight
         offset: Offset(1, 1),
         blurRadius: 1,
         color: Color(0xffffffff)),
-    Shadow(
+    const Shadow(
       // topLeft
       offset: Offset(-1, 1),
       blurRadius: 1,

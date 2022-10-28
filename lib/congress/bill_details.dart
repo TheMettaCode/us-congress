@@ -23,13 +23,13 @@ class BillDetail extends StatefulWidget {
   final String url;
   final List<HouseStockWatch> houseStockWatchList;
   final List<SenateStockWatch> senateStockWatchList;
-  BillDetail(this.url, this.houseStockWatchList, this.senateStockWatchList);
+  const BillDetail(this.url, this.houseStockWatchList, this.senateStockWatchList, {Key key}) : super(key: key);
 
   @override
-  _BillDetailState createState() => new _BillDetailState();
+  BillDetailState createState() => BillDetailState();
 }
 
-class _BillDetailState extends State<BillDetail> {
+class BillDetailState extends State<BillDetail> {
   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
   bool _isLoading = true;
   bool userIsPremium = false;
@@ -58,7 +58,7 @@ class _BillDetailState extends State<BillDetail> {
       userIsPremium = userDatabase.get('userIsPremium');
       userIsLegacy = !userDatabase.get('userIsPremium') &&
           List.from(userDatabase.get('userIdList')).any(
-              (element) => element.toString().startsWith('$oldUserIdPrefix'));
+              (element) => element.toString().startsWith(oldUserIdPrefix));
       houseStockWatchList = widget.houseStockWatchList;
       senateStockWatchList = widget.senateStockWatchList;
     });
@@ -70,13 +70,13 @@ class _BillDetailState extends State<BillDetail> {
       subscriptionAlertsList =
           List.from(userDatabase.get('subscriptionAlertsList'));
       memberContainerColor = Theme.of(context).primaryColor.withOpacity(0.15);
-      memberContainerTextColor = Color(0xffffffff);
+      memberContainerTextColor = const Color(0xffffffff);
     });
 
     await PropublicaApi.fetchSingleBill(widget.url.toLowerCase())
         .then((bills) => setState(() => billInfoList = bills));
 
-    if (billInfoList.length > 0) {
+    if (billInfoList.isNotEmpty) {
       setState(() => _isLoading = false);
     }
   }
@@ -104,15 +104,15 @@ class _BillDetailState extends State<BillDetail> {
       appBar: AppBar(
         centerTitle: true,
         title:
-            new Text('Bill Detail', style: GoogleFonts.bangers(fontSize: 25)),
+            Text('Bill Detail', style: GoogleFonts.bangers(fontSize: 25)),
         actions: <Widget>[
-          new IconButton(
-              icon: Icon(Icons.share),
+          IconButton(
+              icon: const Icon(Icons.share),
               onPressed: () async => await Messages.shareContent(true))
         ],
       ),
       body: _isLoading || bill == null
-          ? AnimatedWidgets.circularProgressWatchtower(context,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
               isFullScreen: true)
           : ValueListenableBuilder(
               valueListenable: Hive.box(appDatabase).listenable(keys: [
@@ -125,14 +125,15 @@ class _BillDetailState extends State<BillDetail> {
                 dynamic sponsorImage = NetworkImage(
                     'https://www.congress.gov/img/member/${bill.first.sponsorId.toLowerCase()}.jpg');
 
-                String _thisBillString =
+                String thisBillString =
                     'bill_${bill.first.billId}_${bill.first.shortTitle}_${bill.first.billUri}_${bill.first.latestMajorActionDate}_bill';
 
-                return new RefreshIndicator(
+                return RefreshIndicator(
+                  onRefresh: getBillData,
                   child: Container(
                     color: Theme.of(context).colorScheme.background,
-                    child: new ListView(
-                      physics: new BouncingScrollPhysics(),
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
                       children: [
                         FadeIn(
                           child: Image.asset(
@@ -144,27 +145,27 @@ class _BillDetailState extends State<BillDetail> {
                         ),
                         Container(
                           margin: const EdgeInsets.all(5.0),
-                          child: new Card(
+                          child: Card(
                             elevation: 0.0,
-                            child: new Column(
+                            child: Column(
                               children: <Widget>[
-                                new Container(
+                                Container(
                                   color: Theme.of(context)
                                       .primaryColor
                                       .withOpacity(0.15),
                                   child: Padding(
                                     padding: const EdgeInsets.all(5),
-                                    child: new Row(
+                                    child: Row(
                                       children: <Widget>[
-                                        FaIcon(FontAwesomeIcons.scroll,
+                                        const FaIcon(FontAwesomeIcons.scroll,
                                             size: 13),
-                                        SizedBox(width: 10),
-                                        new Expanded(
-                                          child: new Container(
-                                            margin: new EdgeInsets.all(5.0),
-                                            child: new Text(
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Container(
+                                            margin: const EdgeInsets.all(5.0),
+                                            child: Text(
                                               bill.first.bill,
-                                              style: new TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 16.0,
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -173,7 +174,7 @@ class _BillDetailState extends State<BillDetail> {
                                         userIsPremium || userIsLegacy
                                             ? SizedBox(
                                                 height: 20,
-                                                child: new ElevatedButton.icon(
+                                                child: ElevatedButton.icon(
                                                   icon: AnimatedWidgets.flashingEye(
                                                       context,
                                                       List.from(userDatabase.get(
@@ -212,7 +213,7 @@ class _BillDetailState extends State<BillDetail> {
                                                                 'bill_${bill.first.billId}'
                                                                     .toLowerCase()))) {
                                                       subscriptionAlertsList
-                                                          .add(_thisBillString);
+                                                          .add(thisBillString);
                                                       userDatabase.put(
                                                           'subscriptionAlertsList',
                                                           subscriptionAlertsList);
@@ -250,12 +251,12 @@ class _BillDetailState extends State<BillDetail> {
                                                               .primaryColorDark)),
                                                 ),
                                               )
-                                            : SizedBox.shrink(),
+                                            : const SizedBox.shrink(),
                                       ],
                                     ),
                                   ),
                                 ),
-                                new Container(
+                                Container(
                                   color: userDatabase.get('darkTheme') == true
                                       ? memberContainerColor
                                       : bill.first.sponsorParty.toLowerCase() ==
@@ -270,17 +271,17 @@ class _BillDetailState extends State<BillDetail> {
                                                       'i'
                                                   ? independentColor
                                                   : memberContainerColor,
-                                  child: new Padding(
+                                  child: Padding(
                                     padding: const EdgeInsets.all(10),
-                                    child: new Row(
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        new Column(
+                                        Column(
                                           children: [
-                                            new GestureDetector(
+                                            GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
@@ -294,7 +295,7 @@ class _BillDetailState extends State<BillDetail> {
                                                   ),
                                                 );
                                               },
-                                              child: new Container(
+                                              child: Container(
                                                 height: 85,
                                                 width: 60,
                                                 decoration: BoxDecoration(
@@ -332,18 +333,18 @@ class _BillDetailState extends State<BillDetail> {
                                             ),
                                           ],
                                         ),
-                                        new Padding(
+                                        Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 10),
-                                          child: new Column(
+                                          child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              new Text(
+                                              Text(
                                                 'Sponsored by:',
-                                                style: new TextStyle(
+                                                style: TextStyle(
                                                     color:
                                                         memberContainerTextColor,
                                                     // color: Colors.black,
@@ -351,28 +352,28 @@ class _BillDetailState extends State<BillDetail> {
                                                     fontWeight:
                                                         FontWeight.normal),
                                               ),
-                                              new SizedBox(height: 1),
-                                              new Row(
+                                              const SizedBox(height: 1),
+                                              Row(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                 children: [
-                                                  new Text(
+                                                  Text(
                                                     '${bill.first.sponsorTitle.replaceFirst('Rep.', 'Hon.')} ${bill.first.sponsor} of ${bill.first.sponsorState}',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 14.0,
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
-                                                  new SizedBox(width: 5),
-                                                  new CircleAvatar(
+                                                  const SizedBox(width: 5),
+                                                  CircleAvatar(
                                                     radius: 8,
                                                     backgroundColor:
                                                         Theme.of(context)
                                                             .primaryColor
                                                             .withOpacity(0.15),
-                                                    child: new CircleAvatar(
+                                                    child: CircleAvatar(
                                                       backgroundColor: bill
                                                                   .first
                                                                   .sponsorParty
@@ -385,9 +386,9 @@ class _BillDetailState extends State<BillDetail> {
                                                               ? republicanColor
                                                               : independentColor,
                                                       radius: 7,
-                                                      child: new Text(
+                                                      child: Text(
                                                         bill.first.sponsorParty,
-                                                        style: new TextStyle(
+                                                        style: const TextStyle(
                                                             leadingDistribution:
                                                                 TextLeadingDistribution
                                                                     .even,
@@ -402,39 +403,39 @@ class _BillDetailState extends State<BillDetail> {
                                                   ),
                                                 ],
                                               ),
-                                              new SizedBox(height: 8),
+                                              const SizedBox(height: 8),
                                               Row(
                                                 children: [
-                                                  new Text(
+                                                  Text(
                                                     'Co-Sponsors: ',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
-                                                  new Text(
+                                                  Text(
                                                     bill.first.cosponsorsByParty
                                                                 .d !=
                                                             null
                                                         ? '${bill.first.cosponsorsByParty.d} Dem.'
                                                         : '0 Dem',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
-                                                  new SizedBox(width: 10),
-                                                  new Text(
+                                                  const SizedBox(width: 10),
+                                                  Text(
                                                     bill.first.cosponsorsByParty
                                                                 .r !=
                                                             null
                                                         ? '${bill.first.cosponsorsByParty.r} Rep.'
                                                         : '0 Rep.',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
@@ -446,20 +447,20 @@ class _BillDetailState extends State<BillDetail> {
                                               // new SizedBox(height: 8),
                                               Row(
                                                 children: [
-                                                  new Text(
+                                                  Text(
                                                     'Sponsors Withdrawn: ',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
-                                                  new Text(
+                                                  Text(
                                                     bill.first
                                                         .withdrawnCosponsors
                                                         .toString(),
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
@@ -470,19 +471,19 @@ class _BillDetailState extends State<BillDetail> {
                                               ),
                                               Wrap(
                                                 children: [
-                                                  new Text(
+                                                  Text(
                                                     'Votes: ',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
-                                                  new Text(
+                                                  Text(
                                                     bill.first.votes.length
                                                         .toString(),
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color:
                                                             memberContainerTextColor,
                                                         fontSize: 12.0,
@@ -499,19 +500,19 @@ class _BillDetailState extends State<BillDetail> {
                                   ),
                                 ),
                                 bill.first.primarySubject.isEmpty
-                                    ? new SizedBox.shrink()
-                                    : new Column(
+                                    ? const SizedBox.shrink()
+                                    : Column(
                                         children: [
-                                          new Row(
+                                          Row(
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
+                                              Expanded(
+                                                child: Container(
                                                   margin:
-                                                      new EdgeInsets.fromLTRB(
+                                                      const EdgeInsets.fromLTRB(
                                                           10, 10, 10, 0),
-                                                  child: new Text(
+                                                  child: const Text(
                                                     'Subject',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         fontSize: 14.0,
                                                         fontWeight:
                                                             FontWeight.bold),
@@ -520,16 +521,16 @@ class _BillDetailState extends State<BillDetail> {
                                               ),
                                             ],
                                           ),
-                                          new Row(
+                                          Row(
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
+                                              Expanded(
+                                                child: Container(
                                                   margin:
-                                                      new EdgeInsets.fromLTRB(
+                                                      const EdgeInsets.fromLTRB(
                                                           10, 0, 10, 0),
-                                                  child: new Text(
+                                                  child: Text(
                                                     bill.first.primarySubject,
-                                                    style: new TextStyle(
+                                                    style: const TextStyle(
                                                         fontSize: 14.0,
                                                         fontWeight:
                                                             FontWeight.normal),
@@ -540,15 +541,15 @@ class _BillDetailState extends State<BillDetail> {
                                           ),
                                         ],
                                       ),
-                                new Row(
+                                Row(
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.fromLTRB(
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.fromLTRB(
                                             10, 10, 10, 0),
-                                        child: new Text(
+                                        child: Text(
                                           bill.first.shortTitle,
-                                          style: new TextStyle(
+                                          style: const TextStyle(
                                               // color: Colors.black,
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
@@ -557,15 +558,15 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.fromLTRB(
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.fromLTRB(
                                             10, 0, 10, 0),
-                                        child: new Text(
+                                        child: Text(
                                           bill.first.title,
-                                          style: new TextStyle(
+                                          style: const TextStyle(
                                               // color: Colors.black,
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.normal),
@@ -574,17 +575,17 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.only(
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
                                             top: 10, left: 10.0),
-                                        child: new Text(
+                                        child: const Text(
                                           'Latest Action:',
-                                          style: new TextStyle(
+                                          style: TextStyle(
                                               // color: Colors.blue[900],
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
@@ -593,20 +594,18 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.fromLTRB(
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.fromLTRB(
                                             10, 0, 10, 0),
-                                        child: new Text(
-                                          bill.first.latestMajorAction +
-                                              '  ' +
-                                              formatter.format(bill
-                                                  .first.latestMajorActionDate),
-                                          style: new TextStyle(
+                                        child: Text(
+                                          '${bill.first.latestMajorAction}  ${formatter.format(bill
+                                                  .first.latestMajorActionDate)}',
+                                          style: const TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -615,18 +614,18 @@ class _BillDetailState extends State<BillDetail> {
                                   ],
                                 ),
                                 bill.first.committees.isEmpty
-                                    ? new SizedBox.shrink()
-                                    : new Column(
+                                    ? const SizedBox.shrink()
+                                    : Column(
                                         children: [
-                                          new Row(
+                                          Row(
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
-                                                  margin: new EdgeInsets.only(
+                                              Expanded(
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(
                                                       top: 10, left: 10.0),
-                                                  child: new Text(
+                                                  child: const Text(
                                                     'Committee: ',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         // color: Colors.black,
                                                         fontSize: 14.0,
                                                         fontWeight:
@@ -636,16 +635,16 @@ class _BillDetailState extends State<BillDetail> {
                                               ),
                                             ],
                                           ),
-                                          new Row(
+                                          Row(
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
+                                              Expanded(
+                                                child: Container(
                                                   margin:
-                                                      new EdgeInsets.fromLTRB(
+                                                      const EdgeInsets.fromLTRB(
                                                           10, 0, 10, 0),
-                                                  child: new Text(
+                                                  child: Text(
                                                     bill.first.committees,
-                                                    style: new TextStyle(
+                                                    style: const TextStyle(
                                                         // color: Colors.black,
                                                         fontSize: 14.0,
                                                         fontWeight:
@@ -657,17 +656,17 @@ class _BillDetailState extends State<BillDetail> {
                                           ),
                                         ],
                                       ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.only(
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
                                             top: 10, left: 10.0),
-                                        child: new Text(
+                                        child: const Text(
                                           'Passage:',
-                                          style: new TextStyle(
+                                          style: TextStyle(
                                               // color: Colors.blue[900],
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
@@ -676,21 +675,20 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.only(left: 10.0),
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.only(left: 10.0),
                                         child: bill.first.housePassage == null
-                                            ? new Text(
+                                            ? const Text(
                                                 'Introduced: Date not available')
-                                            : new Text(
-                                                'Introduced: ' +
-                                                    formatter.format(bill
-                                                        .first.introducedDate),
-                                                style: new TextStyle(
+                                            : Text(
+                                                'Introduced: ${formatter.format(bill
+                                                        .first.introducedDate)}',
+                                                style: const TextStyle(
                                                     // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
@@ -700,21 +698,20 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.only(left: 10.0),
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.only(left: 10.0),
                                         child: bill.first.housePassage == null
-                                            ? new Text(
+                                            ? const Text(
                                                 'House: Date not available')
-                                            : new Text(
-                                                'House: ' +
-                                                    formatter.format(bill
-                                                        .first.housePassage),
-                                                style: new TextStyle(
+                                            : Text(
+                                                'House: ${formatter.format(bill
+                                                        .first.housePassage)}',
+                                                style: const TextStyle(
                                                     // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
@@ -724,21 +721,20 @@ class _BillDetailState extends State<BillDetail> {
                                     ),
                                   ],
                                 ),
-                                new Row(
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    new Expanded(
-                                      child: new Container(
-                                        margin: new EdgeInsets.only(left: 10.0),
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.only(left: 10.0),
                                         child: bill.first.senatePassage == null
-                                            ? new Text(
+                                            ? const Text(
                                                 'Senate: Date not available')
-                                            : new Text(
-                                                'Senate: ' +
-                                                    formatter.format(bill
-                                                        .first.senatePassage),
-                                                style: new TextStyle(
+                                            : Text(
+                                                'Senate: ${formatter.format(bill
+                                                        .first.senatePassage)}',
+                                                style: const TextStyle(
                                                     // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
@@ -749,22 +745,22 @@ class _BillDetailState extends State<BillDetail> {
                                   ],
                                 ),
                                 bill.first.summary.isEmpty
-                                    ? new SizedBox.shrink()
-                                    : new Column(
+                                    ? const SizedBox.shrink()
+                                    : Column(
                                         children: [
-                                          new Row(
+                                          Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
-                                                  margin: new EdgeInsets.only(
+                                              Expanded(
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(
                                                       top: 10, left: 10.0),
-                                                  child: new Text(
+                                                  child: const Text(
                                                     'Summary:',
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         fontSize: 14.0,
                                                         fontWeight:
                                                             FontWeight.bold),
@@ -773,20 +769,20 @@ class _BillDetailState extends State<BillDetail> {
                                               ),
                                             ],
                                           ),
-                                          new Row(
+                                          Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              new Expanded(
-                                                child: new Container(
+                                              Expanded(
+                                                child: Container(
                                                   margin:
-                                                      new EdgeInsets.fromLTRB(
+                                                      const EdgeInsets.fromLTRB(
                                                           10, 0, 10, 0),
-                                                  child: new Text(
+                                                  child: Text(
                                                     bill.first.summary,
-                                                    style: new TextStyle(
+                                                    style: const TextStyle(
                                                         // color: Colors.black,
                                                         fontSize: 14.0),
                                                   ),
@@ -796,29 +792,29 @@ class _BillDetailState extends State<BillDetail> {
                                           ),
                                         ],
                                       ),
-                                new Padding(
+                                Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: new Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      new Text('Additional details:',
-                                          style: new TextStyle(
+                                      const Text('Additional details:',
+                                          style: TextStyle(
                                               // color: Colors.black,
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold)),
-                                      new SizedBox(width: 10),
-                                      new RichText(
-                                        text: new TextSpan(
-                                          style: new TextStyle(
+                                      const SizedBox(width: 10),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(
                                               color: Colors.blue,
                                               fontSize: 12.0,
                                               decoration:
                                                   TextDecoration.underline,
                                               fontWeight: FontWeight.bold),
                                           text: 'congress.gov',
-                                          recognizer: new TapGestureRecognizer()
+                                          recognizer: TapGestureRecognizer()
                                             ..onTap = () {
                                               launchUrl(Uri.parse(bill
                                                   .first.congressdotgovUrl
@@ -826,12 +822,12 @@ class _BillDetailState extends State<BillDetail> {
                                             },
                                         ),
                                       ),
-                                      SizedBox(width: 10),
+                                      const SizedBox(width: 10),
                                       bill.first.gpoPdfUri == null
-                                          ? SizedBox.shrink()
+                                          ? const SizedBox.shrink()
                                           : RichText(
-                                              text: new TextSpan(
-                                                style: new TextStyle(
+                                              text: TextSpan(
+                                                style: TextStyle(
                                                     color:
                                                         bill.first.gpoPdfUri ==
                                                                 null
@@ -849,7 +845,7 @@ class _BillDetailState extends State<BillDetail> {
                                                         FontWeight.bold),
                                                 text: 'gpo pdf',
                                                 recognizer:
-                                                    new TapGestureRecognizer()
+                                                    TapGestureRecognizer()
                                                       ..onTap = bill.first
                                                                   .gpoPdfUri ==
                                                               null
@@ -874,7 +870,6 @@ class _BillDetailState extends State<BillDetail> {
                       ],
                     ),
                   ),
-                  onRefresh: getBillData,
                 );
               },
             ),
@@ -886,7 +881,7 @@ class _BillDetailState extends State<BillDetail> {
             mainAxisSize: MainAxisSize.min,
             children: [
               !showBannerAd || userIsPremium
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : bannerAdContainer,
               SharedWidgets.createdByContainer(
                   context, userIsPremium, userDatabase),

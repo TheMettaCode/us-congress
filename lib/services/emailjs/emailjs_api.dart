@@ -69,22 +69,23 @@ class EmailjsApi {
         capitolBabbleNotificationsList.isNotEmpty &&
         ((isPeakCapitolBabblePostHours &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
-                    .subtract(Duration(minutes: capitolBabbleDelayMinutes)))) ||
+                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes)))) ||
             (capitolBabbleNotificationsList.any((element) =>
                     element.split('<|:|>')[3].toLowerCase() == 'high') &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
                     DateTime.now().subtract(
-                        Duration(minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
+                        const Duration(minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
             (capitolBabbleNotificationsList.any((element) =>
                     element.split('<|:|>')[3].toLowerCase() == 'medium') &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
-                    DateTime.now().subtract(Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
+                    DateTime.now().subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
       capitolBabbleNotificationsList
           .sort((a, b) => a.split('<|:|>')[3].compareTo(b.split('<|:|>')[3]));
 
-      if (capitolBabbleNotificationsList.length > 20)
+      if (capitolBabbleNotificationsList.length > 20) {
         capitolBabbleNotificationsList.removeRange(
             20, capitolBabbleNotificationsList.length);
+      }
 
       final serviceId = dotenv.env['CBSERVICEID'];
       final templateId = dotenv.env['CBTEMPLATEID'];
@@ -123,8 +124,8 @@ class EmailjsApi {
               'user_id': publicKey,
               'template_params': {
                 'subject': subject.isNotEmpty && messageBody.isNotEmpty
-                    ? subject + '#capitolbabble'
-                    : _nextBabbleSubject + '#capitolbabble',
+                    ? '$subject#capitolbabble'
+                    : '$_nextBabbleSubject#capitolbabble',
                 'message': _finalMessage,
               }
             }));
@@ -139,9 +140,10 @@ class EmailjsApi {
       } catch (error) {
         debugPrint('ERROR SENDING EMAILJS TO CAPITOL BABBLE: $error');
       }
-    } else
+    } else {
       debugPrint(
           'CAPITOL BABBLE SOCIALS EMAIL NOT SENT. PEAK HOURS IS ${isPeakCapitolBabblePostHours.toString().toUpperCase()} AND LAST BABBLE SENT WAS ${dateWithTimeFormatter.format(DateTime.parse(userDatabase.get('lastCapitolBabble')))}');
+    }
   }
 
   /// SEND FREE TRIAL STARTED EMAIL

@@ -9,24 +9,39 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:us_congress_vote_tracker/models/lobby_search_model.dart';
 import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 
+import '../functions/functions.dart';
+
 class LobbyingSearchList extends StatefulWidget {
   final String lobbyingSearchString;
-  LobbyingSearchList(this.lobbyingSearchString);
+  const LobbyingSearchList(this.lobbyingSearchString, {Key key}) : super(key: key);
 
   @override
-  _LobbySearchListState createState() => new _LobbySearchListState();
+  LobbySearchListState createState() => LobbySearchListState();
 }
 
-class _LobbySearchListState extends State<LobbyingSearchList> {
+class LobbySearchListState extends State<LobbyingSearchList> {
+  Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
   bool _isLoading = true;
   List<LobbyingSearchRepresentation> lobbyingSearchList = [];
-  // Container bannerAdContainer = Container();
-  // bool showBannerAd = true;
+
+  List<bool> userLevels = [false, false, false];
+  bool userIsDev = false;
+  bool userIsPremium = false;
+  bool userIsLegacy = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      /// DETERMINE USER LEVEL
+      await Functions.getUserLevels().then((levels) => setState(() {
+        userLevels = levels;
+        userIsDev = userLevels[0];
+        userIsPremium = userLevels[1];
+        userIsLegacy = userLevels[2];
+      }));
+
+      /// FETCH SEARCH ITEMS
       await getLobbyingSearchList();
     });
   }
@@ -86,11 +101,11 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
   Widget build(BuildContext context) {
     String lobbyingSearchString = widget.lobbyingSearchString;
 
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: alertIndicatorColorDarkGreen,
-        title: new Text(
+        title: Text(
             lobbyingSearchString.isEmpty
                 ? 'Lobbying Search'
                 : 'Search for $lobbyingSearchString',
@@ -98,7 +113,7 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -130,19 +145,17 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                             autofocus: true,
                             enableSuggestions: true,
                             decoration: InputDecoration.collapsed(
-                              hintText: lobbyingSearchString != null
-                                  ? lobbyingSearchString
-                                  : 'Enter your search',
+                              hintText: lobbyingSearchString ?? 'Enter your search',
                             ),
                             onChanged: (val) {
                               lobbyingSearchString = val;
                             },
                           ),
                         ),
-                        new ElevatedButton.icon(
+                        ElevatedButton.icon(
                           style: ButtonStyle(
                               backgroundColor: alertIndicatorMSPColorDarkGreen),
-                          icon: Icon(Icons.search),
+                          icon: const Icon(Icons.search),
                           onPressed: () {
                             Navigator.pop(context);
 
@@ -154,7 +167,7 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                               ),
                             );
                           },
-                          label: Text(
+                          label: const Text(
                             'Search',
                             // style: TextStyle(color: Colors.white),
                           ),
@@ -167,11 +180,12 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
         ],
       ),
       body: _isLoading
-          ? AnimatedWidgets.circularProgressWatchtower(context,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
               isLobby: true, isFullScreen: true)
-          : lobbyingSearchList.length > 0
+          : lobbyingSearchList.isNotEmpty
               ? RefreshIndicator(
-                  child: new Container(
+                  onRefresh: getLobbyingSearchList,
+                  child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.background,
                       image: DecorationImage(
@@ -184,12 +198,12 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                               Theme.of(context).colorScheme.background,
                               BlendMode.color)),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
                     alignment: Alignment.center,
-                    child: new ListView.separated(
-                      physics: BouncingScrollPhysics(),
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
                       separatorBuilder: (context, index) {
-                        return Divider(height: 0, color: Colors.transparent);
+                        return const Divider(height: 0, color: Colors.transparent);
                       },
                       itemCount: lobbyingSearchList.length,
                       // scrollDirection: Axis.vertical,
@@ -198,7 +212,6 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                       },
                     ),
                   ),
-                  onRefresh: getLobbyingSearchList,
                 )
               : Center(
                   child: Text('No Search Results',
@@ -209,16 +222,16 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
 
   Widget _getLobbyingSearchTile(int index) {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    List<String> _subscriptions =
+    List<String> subscriptions =
         List.from(userDatabase.get('subscriptionAlertsList'));
     var lobby = lobbyingSearchList[index];
     return Container(
       // color: Colors.grey,
       margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-      child: new Card(
+      child: Card(
         color: Theme.of(context).colorScheme.background,
         elevation: 0.0,
-        child: new Column(
+        child: Column(
           children: <Widget>[
             InkWell(
               splashColor: Colors.grey,
@@ -230,11 +243,11 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                         barrierDismissible: true,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Details'),
-                            content: Text('Details not available.'),
+                            title: const Text('Details'),
+                            content: const Text('Details not available.'),
                             actions: [
                               TextButton(
-                                child: Text('Close'),
+                                child: const Text('Close'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
@@ -254,16 +267,16 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                         ),
                       );
                     },
-              child: new Column(
+              child: Column(
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.topLeft,
-                    margin: new EdgeInsets.all(5.0),
-                    child: new Column(
+                    margin: const EdgeInsets.all(5.0),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        new Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -272,18 +285,18 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  new Text(
+                                  Text(
                                     'ID: ${lobby.id}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: new TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  SizedBox(width: 3),
+                                  const SizedBox(width: 3),
                                   AnimatedWidgets.flashingEye(
                                       context,
-                                      _subscriptions.any((element) => element
+                                      subscriptions.any((element) => element
                                           .toLowerCase()
                                           .startsWith(
                                               'lobby_${lobby.id.toLowerCase()}')),
@@ -294,12 +307,12 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                             ),
                             Flexible(
                               flex: 3,
-                              child: new Text(
-                                '${lobby.lobbyingClient.name}'.toUpperCase(),
+                              child: Text(
+                                lobby.lobbyingClient.name.toUpperCase(),
                                 textAlign: TextAlign.right,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: new TextStyle(
+                                style: const TextStyle(
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -317,43 +330,41 @@ class _LobbySearchListState extends State<LobbyingSearchList> {
                             // ),
                           ],
                         ),
-                        new SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: lobby.specificIssues
                               .map(
                                 (e) => Text(
                                   '• $e',
-                                  style: new TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 12.0,
                                       fontWeight: FontWeight.normal),
                                 ),
                               )
                               .toList(),
                         ),
-                        new SizedBox(height: 5),
-                        new Row(
+                        const SizedBox(height: 5),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             lobby.signedDate == null || lobby.signedDate.isEmpty
-                                ? new Text('')
-                                : new Text(
-                                    'Signed > ' +
-                                        formatter.format(
-                                            DateTime.parse(lobby.signedDate)),
-                                    style: new TextStyle(
+                                ? const Text('')
+                                : Text(
+                                    'Signed > ${formatter.format(
+                                            DateTime.parse(lobby.signedDate))}',
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.normal),
                                   ),
                             lobby.effectiveDate == null ||
                                     lobby.effectiveDate.isEmpty
-                                ? new Text('')
-                                : new Text(
-                                    'Effective > ' +
-                                        formatter.format(DateTime.parse(
-                                            lobby.effectiveDate)),
-                                    style: new TextStyle(
+                                ? const Text('')
+                                : Text(
+                                    'Effective > ${formatter.format(DateTime.parse(
+                                            lobby.effectiveDate))}',
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.normal),

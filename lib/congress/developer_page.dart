@@ -132,7 +132,7 @@ class DeveloperPageState extends State<DeveloperPage> {
               title: const Text('Developer Test Page'),
             ),
             body: _loading
-                ? AnimatedWidgets.circularProgressWatchtower(context,
+                ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                     isFullScreen: true)
                 : Container(
                     color: Theme.of(context).colorScheme.background,

@@ -16,14 +16,14 @@ class BillSearch extends StatefulWidget {
   final String queryString;
   final List<HouseStockWatch> houseStockWatchList;
   final List<SenateStockWatch> senateStockWatchList;
-  BillSearch(
-      this.queryString, this.houseStockWatchList, this.senateStockWatchList);
+  const BillSearch(
+      this.queryString, this.houseStockWatchList, this.senateStockWatchList, {Key key}) : super(key: key);
 
   @override
-  _BillSearchState createState() => new _BillSearchState();
+  BillSearchState createState() => BillSearchState();
 }
 
-class _BillSearchState extends State<BillSearch> {
+class BillSearchState extends State<BillSearch> {
   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
   bool _isLoading = true;
   bool userIsPremium = false;
@@ -46,7 +46,7 @@ class _BillSearchState extends State<BillSearch> {
       userIsPremium = userDatabase.get('userIsPremium');
       userIsLegacy = !userDatabase.get('userIsPremium') &&
           List.from(userDatabase.get('userIdList')).any(
-              (element) => element.toString().startsWith('$oldUserIdPrefix'));
+              (element) => element.toString().startsWith(oldUserIdPrefix));
       houseStockWatchList = widget.houseStockWatchList;
       senateStockWatchList = widget.senateStockWatchList;
     });
@@ -71,16 +71,16 @@ class _BillSearchState extends State<BillSearch> {
   Widget build(BuildContext context) {
     String queryString = widget.queryString;
 
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: new Text(
+        title: Text(
             queryString.isEmpty ? 'Bill Search' : 'Search for $queryString',
             style: GoogleFonts.bangers(fontSize: 25)),
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -113,17 +113,15 @@ class _BillSearchState extends State<BillSearch> {
                             autofocus: true,
                             enableSuggestions: true,
                             decoration: InputDecoration.collapsed(
-                              hintText: queryString != null
-                                  ? queryString
-                                  : 'Enter your search',
+                              hintText: queryString ?? 'Enter your search',
                             ),
                             onChanged: (val) {
                               queryString = val;
                             },
                           ),
                         ),
-                        new ElevatedButton.icon(
-                          icon: Icon(Icons.search),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.search),
                           onPressed: () {
                             Navigator.pop(context);
 
@@ -135,7 +133,7 @@ class _BillSearchState extends State<BillSearch> {
                               ),
                             );
                           },
-                          label: Text(
+                          label: const Text(
                             'Search',
                             // style: TextStyle(color: Colors.white),
                           ),
@@ -148,11 +146,12 @@ class _BillSearchState extends State<BillSearch> {
         ],
       ),
       body: _isLoading
-          ? AnimatedWidgets.circularProgressWatchtower(context,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
               isFullScreen: true)
-          : billQueryList.length > 0
+          : billQueryList.isNotEmpty
               ? RefreshIndicator(
-                  child: new Container(
+                  onRefresh: getBillQueryList,
+                  child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.background,
                       image: DecorationImage(
@@ -165,12 +164,12 @@ class _BillSearchState extends State<BillSearch> {
                               Theme.of(context).colorScheme.background,
                               BlendMode.color)),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
                     alignment: Alignment.center,
-                    child: new ListView.separated(
-                      physics: BouncingScrollPhysics(),
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
                       separatorBuilder: (context, index) {
-                        return Divider(
+                        return const Divider(
                           height: 0,
                           color: Colors.transparent,
                         );
@@ -182,7 +181,6 @@ class _BillSearchState extends State<BillSearch> {
                       },
                     ),
                   ),
-                  onRefresh: getBillQueryList,
                 )
               : Center(
                   child: Text('No Search Results',
@@ -194,15 +192,15 @@ class _BillSearchState extends State<BillSearch> {
   Widget _getQueryTile(int index) {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     var thisBillQuery = billQueryList[index];
-    List<String> _subscriptions =
+    List<String> subscriptions =
         List.from(userDatabase.get('subscriptionAlertsList'));
     return Container(
       // color: Colors.grey,
       margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-      child: new Card(
+      child: Card(
         color: Theme.of(context).colorScheme.background,
         elevation: 0.0,
-        child: new Column(
+        child: Column(
           children: <Widget>[
             InkWell(
               splashColor: Colors.grey,
@@ -214,11 +212,11 @@ class _BillSearchState extends State<BillSearch> {
                         barrierDismissible: true,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Details'),
-                            content: Text('Details not available.'),
+                            title: const Text('Details'),
+                            content: const Text('Details not available.'),
                             actions: [
                               TextButton(
-                                child: Text('Close'),
+                                child: const Text('Close'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
@@ -239,32 +237,32 @@ class _BillSearchState extends State<BillSearch> {
                         ),
                       );
                     },
-              child: new Column(
+              child: Column(
                 children: [
-                  new Container(
+                  Container(
                     alignment: Alignment.topLeft,
-                    margin: new EdgeInsets.all(5.0),
-                    child: new Column(
+                    margin: const EdgeInsets.all(5.0),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        new Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                new Text(
+                                Text(
                                   thisBillQuery.number,
-                                  style: new TextStyle(
+                                  style: const TextStyle(
                                       // color: Colors.black,
                                       fontSize: 12.0,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                SizedBox(width: 3),
+                                const SizedBox(width: 3),
                                 AnimatedWidgets.flashingEye(
                                     context,
-                                    _subscriptions.any((element) => element
+                                    subscriptions.any((element) => element
                                         .toLowerCase()
                                         .startsWith(
                                             'bill_${thisBillQuery.billId.toLowerCase()}')),
@@ -272,11 +270,11 @@ class _BillSearchState extends State<BillSearch> {
                                     size: 10),
                               ],
                             ),
-                            new Text(
+                            Text(
                               thisBillQuery.active.toString() == 'true'
                                   ? 'ACTIVE'
                                   : 'INACTIVE',
-                              style: new TextStyle(
+                              style: TextStyle(
                                   color:
                                       thisBillQuery.active.toString() == 'true'
                                           ? Colors.green
@@ -286,36 +284,34 @@ class _BillSearchState extends State<BillSearch> {
                             ),
                           ],
                         ),
-                        new SizedBox(height: 2),
-                        new Text(
+                        const SizedBox(height: 2),
+                        Text(
                           thisBillQuery.title,
-                          style: new TextStyle(
+                          style: const TextStyle(
                               // color: Colors.black,
                               fontSize: 12.0,
                               fontWeight: FontWeight.normal),
                         ),
-                        new SizedBox(height: 5),
-                        new Row(
+                        const SizedBox(height: 5),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             thisBillQuery.introducedDate == null
-                                ? new Text('')
-                                : new Text(
-                                    'Intr > ' +
-                                        formatter.format(
-                                            thisBillQuery.introducedDate),
-                                    style: new TextStyle(
+                                ? const Text('')
+                                : Text(
+                                    'Intr > ${formatter.format(
+                                            thisBillQuery.introducedDate)}',
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.normal),
                                   ),
                             thisBillQuery.latestMajorActionDate == null
-                                ? new Text('')
-                                : new Text(
-                                    'Last > ' +
-                                        formatter.format(thisBillQuery
-                                            .latestMajorActionDate),
-                                    style: new TextStyle(
+                                ? const Text('')
+                                : Text(
+                                    'Last > ${formatter.format(thisBillQuery
+                                            .latestMajorActionDate)}',
+                                    style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.normal),

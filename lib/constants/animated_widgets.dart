@@ -6,6 +6,8 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 
+import '../functions/functions.dart';
+import '../services/github/usc-app-data-model.dart';
 
 class AnimatedWidgets {
   static Widget starryNight(
@@ -229,14 +231,16 @@ class AnimatedWidgets {
   }
 
   static Widget circularProgressWatchtower(
-    BuildContext context, {
+    BuildContext context,
+    Box userDatabase,
+    bool userIsPremium, {
     double widthAndHeight = 48,
     double strokeWidth = 5,
     bool isMarket = false,
     bool isLobby = false,
     bool isFullScreen = false,
     bool isHomePage = false,
-    String thisGithubNotification = '',
+    GithubNotifications thisGithubNotification,
     String backgroundImage = '',
     // Color color = const Color.fromARGB(255, 51, 255, 0),
   }) {
@@ -312,14 +316,20 @@ class AnimatedWidgets {
                         ],
                       )),
                 ),
-                isHomePage && thisGithubNotification.isNotEmpty
-                    ? SlideInUp(
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Text(thisGithubNotification,
-                                textAlign: TextAlign.center,
-                                style: Styles.googleStyle
-                                    .copyWith(fontSize: 20 /*, color: darkThemeTextColor*/))),
+                isHomePage && thisGithubNotification.title.isNotEmpty
+                    ? InkWell(
+                        onTap: () => thisGithubNotification.url.isEmpty
+                            ? null
+                            : Functions.linkLaunch(
+                                context, thisGithubNotification.url, userDatabase, userIsPremium),
+                        child: SlideInUp(
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              child: Text(thisGithubNotification.title,
+                                  textAlign: TextAlign.center,
+                                  style: Styles.regularStyle
+                                      .copyWith(fontSize: 20 /*, color: darkThemeTextColor*/))),
+                        ),
                       )
                     : const SizedBox.shrink()
               ],

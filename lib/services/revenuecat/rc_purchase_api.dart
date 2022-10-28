@@ -39,7 +39,7 @@ class RcPurchaseApi {
     try {
       final products = await Purchases.getProducts(productIds);
 
-      return products == null ? [] : products;
+      return products ?? [];
     } catch (e) {
       return [];
     }

@@ -28,7 +28,7 @@ class PropublicaApi {
   static Future<List<MemberResult>> fetchMember(memberId) async {
     if (memberId != null && memberId != '') {
       final authority = PropublicaApi().authority;
-      final url = PropublicaApi().memberDetailsApi + memberId + '.json';
+      final url = '${PropublicaApi().memberDetailsApi + memberId}.json';
       final headers = PropublicaApi().apiHeaders;
 
       final response =
@@ -37,7 +37,7 @@ class PropublicaApi {
       if (response.statusCode == 200) {
         Members members = membersFromJson(response.body);
         if (members.status == 'OK') {
-          logger.d('Member Details ' + members.status);
+          logger.d('Member Details ${members.status}');
           return members.results;
         } else {
           return [];
@@ -71,7 +71,7 @@ class PropublicaApi {
       logger.d('***** Lobbying Query String: $queryString *****');
       LobbyingSearch lobbyingSearch = lobbyingSearchFromJson(response.body);
       if (lobbyingSearch.status == 'OK') {
-        logger.d('Search ' + lobbyingSearch.status);
+        logger.d('Search ${lobbyingSearch.status}');
         logger.d(lobbyingSearch.results.first.lobbyingRepresentations.length
             .toString());
         List<LobbyingSearchRepresentation> lobbyingSearchRepresentation =
@@ -145,7 +145,7 @@ class PropublicaApi {
       logger.d('***** Query String: $queryString *****');
       Query query = queryFromJson(response.body);
       if (query.status == 'OK') {
-        logger.d('Search ' + query.status);
+        logger.d('Search ${query.status}');
         logger.d(query.results.first.bills.length.toString());
         List<Bill> bills = query.results.first.bills;
         logger.d('***** Bills: ${bills.map((e) => e.title)} *****');
@@ -202,7 +202,7 @@ class PropublicaApi {
         '***** PRIVATE TRIPS BY MEMBER API RESPONSE CODE: ${response.statusCode} *****');
 
     if (response.statusCode == 200) {
-      logger.d('***** PRIVATE TRIPS BY MEMBER RETREIVAL SUCCESS! *****');
+      logger.d('***** PRIVATE TRIPS BY MEMBER RETRIEVAL SUCCESS! *****');
       PrivateTripsByMember privateTripsByMember =
           privateTripsByMemberFromJson(response.body);
       if (privateTripsByMember.status == 'OK') {

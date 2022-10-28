@@ -18,13 +18,13 @@ import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart
 class LobbyEventDetail extends StatefulWidget {
   // final LobbyingRepresentation thisLobbyEvent;
   final String thisLobbyEventId;
-  LobbyEventDetail(/*this.thisLobbyEvent,*/ {this.thisLobbyEventId = ''});
+  const LobbyEventDetail(/*this.thisLobbyEvent,*/ {Key key, this.thisLobbyEventId = ''}) : super(key: key);
 
   @override
-  _LobbyEventDetailState createState() => new _LobbyEventDetailState();
+  LobbyEventDetailState createState() => LobbyEventDetailState();
 }
 
-class _LobbyEventDetailState extends State<LobbyEventDetail> {
+class LobbyEventDetailState extends State<LobbyEventDetail> {
   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
   bool _isLoading = false;
   bool userIsPremium = false;
@@ -56,7 +56,7 @@ class _LobbyEventDetailState extends State<LobbyEventDetail> {
       userIsPremium = userDatabase.get('userIsPremium');
       userIsLegacy = !userDatabase.get('userIsPremium') &&
           List.from(userDatabase.get('userIdList')).any(
-              (element) => element.toString().startsWith('$oldUserIdPrefix'));
+              (element) => element.toString().startsWith(oldUserIdPrefix));
       // thisLobbyEvent = widget.thisLobbyEvent;
       _isLoading = true;
       _thisPanelColor = alertIndicatorColorDarkGreen;
@@ -102,20 +102,20 @@ class _LobbyEventDetailState extends State<LobbyEventDetail> {
       appBar: AppBar(
         backgroundColor: alertIndicatorColorDarkGreen,
         centerTitle: true,
-        title: new Text('Lobbying Details',
+        title: Text('Lobbying Details',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.bangers(fontSize: 25)),
         actions: <Widget>[
-          new IconButton(
-              icon: Icon(Icons.share),
+          IconButton(
+              icon: const Icon(Icons.share),
               onPressed: () async => await Messages.shareContent(true))
         ],
       ),
       body: Container(
         color: Theme.of(context).colorScheme.background,
         child: thisSpecificLobbyEvent == null || _isLoading
-            ? AnimatedWidgets.circularProgressWatchtower(context,
+            ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                 isLobby: true, isFullScreen: true)
             : fetchedEventDetails(
                 context,
@@ -135,7 +135,7 @@ class _LobbyEventDetailState extends State<LobbyEventDetail> {
             mainAxisSize: MainAxisSize.min,
             children: [
               !showBannerAd || userIsPremium
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : bannerAdContainer,
               SharedWidgets.createdByContainer(
                   context, userIsPremium, userDatabase),
@@ -150,8 +150,8 @@ class _LobbyEventDetailState extends State<LobbyEventDetail> {
 fetchedEventDetails(
     BuildContext context,
     Box userDatabase,
-    bool _darkTheme,
-    Color _thisPanelColor,
+    bool darkTheme,
+    Color thisPanelColor,
     SpecificLobbyResult thisSpecificLobbyEvent,
     bool userIsPremium,
     bool userIsLegacy,
@@ -164,51 +164,51 @@ fetchedEventDetails(
         'subscriptionAlertsList'
       ]),
       builder: (context, box, widget) {
-        List<String> _subscriptionAlertsList =
+        List<String> subscriptionAlertsList =
             List.from(userDatabase.get('subscriptionAlertsList'));
-        final String _thisLobbyEventString =
+        final String thisLobbyEventString =
             'lobby_${thisSpecificLobbyEvent.id}_${thisSpecificLobbyEvent.lobbyingClient.name}_${thisSpecificLobbyEvent.specificIssues.first}_${thisSpecificLobbyEvent.lobbyingRegistrant.name}_${thisSpecificLobbyEvent.filings.first.filingDate}_lobby';
 
         return ListView(
-          physics: new BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           children: [
             FadeIn(
-              child: new Image.asset(randomBackgroundImageString,
+              child: Image.asset(randomBackgroundImageString,
                   color: alertIndicatorColorDarkGreen,
                   height: 125,
                   fit: BoxFit.cover,
                   colorBlendMode: BlendMode.softLight),
             ),
-            new Container(
+            Container(
               margin: const EdgeInsets.all(5.0),
-              child: new Card(
+              child: Card(
                 elevation: 0.0,
-                child: new Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    new Container(
+                    Container(
                       color: alertIndicatorColorDarkGreen.withOpacity(0.15),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: new Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             // new Expanded(
                             //   child: new
                             Container(
-                              margin: new EdgeInsets.all(10.0),
-                              child: new Text(
+                              margin: const EdgeInsets.all(10.0),
+                              child: Text(
                                 'Lobbying ID#: ${thisSpecificLobbyEvent.id}',
-                                style: new TextStyle(
+                                style: const TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
                             // ),
                             userIsPremium || userIsLegacy
-                                ? new SizedBox(
+                                ? SizedBox(
                                     height: 20,
-                                    child: new ElevatedButton.icon(
+                                    child: ElevatedButton.icon(
                                       style: ButtonStyle(
                                         backgroundColor:
                                             alertIndicatorMSPColorDarkGreen,
@@ -239,17 +239,17 @@ fetchedEventDetails(
                                             color: Colors.white, fontSize: 17),
                                       ),
                                       onPressed: () async {
-                                        if (!_subscriptionAlertsList.any(
+                                        if (!subscriptionAlertsList.any(
                                             (element) => element
                                                 .toLowerCase()
                                                 .startsWith(
                                                     'lobby_${thisSpecificLobbyEvent.id}'
                                                         .toLowerCase()))) {
-                                          _subscriptionAlertsList
-                                              .add(_thisLobbyEventString);
+                                          subscriptionAlertsList
+                                              .add(thisLobbyEventString);
                                           userDatabase.put(
                                               'subscriptionAlertsList',
-                                              _subscriptionAlertsList);
+                                              subscriptionAlertsList);
 
                                           // if (!userDatabase
                                           //     .get('lobbyingAlerts'))
@@ -261,7 +261,7 @@ fetchedEventDetails(
                                           logger.d(
                                               '^^^^^ SUBSCRIPTIONS (add) TO DBASE: ${userDatabase.get('subscriptionAlertsList')} ^^^^^');
                                         } else {
-                                          _subscriptionAlertsList.removeWhere(
+                                          subscriptionAlertsList.removeWhere(
                                               (element) => element
                                                   .toLowerCase()
                                                   .startsWith(
@@ -269,7 +269,7 @@ fetchedEventDetails(
                                                           .toLowerCase()));
                                           userDatabase.put(
                                               'subscriptionAlertsList',
-                                              _subscriptionAlertsList);
+                                              subscriptionAlertsList);
 
                                           logger.d(
                                               '^^^^^ SUBSCRIPTIONS (remove) FROM DBASE: ${userDatabase.get('subscriptionAlertsList')} ^^^^^');
@@ -277,136 +277,134 @@ fetchedEventDetails(
                                       },
                                     ),
                                   )
-                                : SizedBox.shrink(),
+                                : const SizedBox.shrink(),
                           ],
                         ),
                       ),
                     ),
-                    new Container(
-                      child: new Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            // new Padding(
-                            //   padding: const EdgeInsets.all(0.0),
-                            //   child: new Column(
-                            //     children: [
-                            //       new GestureDetector(
-                            //         // onTap: () {
-                            //         // Navigator.push(
-                            //         //   context,
-                            //         //   MaterialPageRoute(
-                            //         //     builder: (context) =>
-                            //         //         LobbyEventDetail(
-                            //         //             memberId: bill
-                            //         //                 .first.sponsorId),
-                            //         //   ),
-                            //         // );
-                            //         // },
-                            //         child: new Container(
-                            //           height: 85,
-                            //           width: 60,
-                            //           decoration: BoxDecoration(
-                            //             borderRadius:
-                            //                 BorderRadius.circular(3),
-                            //             image: DecorationImage(
-                            //               fit: BoxFit.cover,
-                            //               image: AssetImage(
-                            //                   'assets/lobbying.png'),
-                            //             ),
-                            //           ),
-                            //           // foregroundDecoration: BoxDecoration(
-                            //           //   borderRadius:
-                            //           //       BorderRadius.circular(3),
-                            //           //   image: DecorationImage(
-                            //           //     fit: BoxFit.cover,
-                            //           //     image:
-                            //           //         NetworkImage(eventImageUrl),
-                            //           //   ),
-                            //           // ),
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
-                            Expanded(
-                              child: Container(
-                                color: alertIndicatorColorDarkGreen
-                                    .withOpacity(0.15),
-                                child: new Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                  child: new Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      /// CLIENT INFORMATION
-                                      thisSpecificLobbyEvent
-                                              .lobbyingClient.name.isEmpty
-                                          ? SizedBox.shrink()
-                                          : ListTile(
-                                              // isThreeLine: true,
-                                              dense: true,
-                                              contentPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      0, 0, 0, 0),
-                                              enableFeedback: true,
-                                              enabled: true,
-                                              title: Text(
-                                                  'Client'.toUpperCase(),
-                                                  // maxLines: 1,
-                                                  // overflow: TextOverflow
-                                                  //     .ellipsis,
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: _darkTheme
-                                                        ? null
-                                                        : _thisPanelColor,
-                                                  )),
-                                              subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      '${thisSpecificLobbyEvent.lobbyingClient.name}',
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                  thisSpecificLobbyEvent
-                                                          .lobbyingClient
-                                                          .generalDescription
-                                                          .isEmpty
-                                                      ? SizedBox.shrink()
-                                                      : Text(
-                                                          '${thisSpecificLobbyEvent.lobbyingClient.generalDescription}',
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold)),
-                                                ],
-                                              ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          // new Padding(
+                          //   padding: const EdgeInsets.all(0.0),
+                          //   child: new Column(
+                          //     children: [
+                          //       new GestureDetector(
+                          //         // onTap: () {
+                          //         // Navigator.push(
+                          //         //   context,
+                          //         //   MaterialPageRoute(
+                          //         //     builder: (context) =>
+                          //         //         LobbyEventDetail(
+                          //         //             memberId: bill
+                          //         //                 .first.sponsorId),
+                          //         //   ),
+                          //         // );
+                          //         // },
+                          //         child: new Container(
+                          //           height: 85,
+                          //           width: 60,
+                          //           decoration: BoxDecoration(
+                          //             borderRadius:
+                          //                 BorderRadius.circular(3),
+                          //             image: DecorationImage(
+                          //               fit: BoxFit.cover,
+                          //               image: AssetImage(
+                          //                   'assets/lobbying.png'),
+                          //             ),
+                          //           ),
+                          //           // foregroundDecoration: BoxDecoration(
+                          //           //   borderRadius:
+                          //           //       BorderRadius.circular(3),
+                          //           //   image: DecorationImage(
+                          //           //     fit: BoxFit.cover,
+                          //           //     image:
+                          //           //         NetworkImage(eventImageUrl),
+                          //           //   ),
+                          //           // ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          Expanded(
+                            child: Container(
+                              color: alertIndicatorColorDarkGreen
+                                  .withOpacity(0.15),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    /// CLIENT INFORMATION
+                                    thisSpecificLobbyEvent
+                                            .lobbyingClient.name.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : ListTile(
+                                            // isThreeLine: true,
+                                            dense: true,
+                                            contentPadding:
+                                                const EdgeInsets.fromLTRB(
+                                                    0, 0, 0, 0),
+                                            enableFeedback: true,
+                                            enabled: true,
+                                            title: Text(
+                                                'Client'.toUpperCase(),
+                                                // maxLines: 1,
+                                                // overflow: TextOverflow
+                                                //     .ellipsis,
+                                                style: Styles.regularStyle
+                                                    .copyWith(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: darkTheme
+                                                      ? null
+                                                      : thisPanelColor,
+                                                )),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    thisSpecificLobbyEvent.lobbyingClient.name,
+                                                    style: Styles.regularStyle
+                                                        .copyWith(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                thisSpecificLobbyEvent
+                                                        .lobbyingClient
+                                                        .generalDescription
+                                                        .isEmpty
+                                                    ? const SizedBox.shrink()
+                                                    : Text(
+                                                        thisSpecificLobbyEvent.lobbyingClient.generalDescription,
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: Styles
+                                                            .regularStyle
+                                                            .copyWith(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                              ],
                                             ),
-                                    ],
-                                  ),
+                                          ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -416,7 +414,7 @@ fetchedEventDetails(
                         children: [
                           /// REGISTRANT INFORMATION
                           thisSpecificLobbyEvent.lobbyingRegistrant.name.isEmpty
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
@@ -431,14 +429,14 @@ fetchedEventDetails(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
                                         color:
-                                            _darkTheme ? null : _thisPanelColor,
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                          '${thisSpecificLobbyEvent.lobbyingRegistrant.name}',
+                                          thisSpecificLobbyEvent.lobbyingRegistrant.name,
                                           // maxLines: 3,
                                           // overflow: TextOverflow.ellipsis,
                                           style: Styles.regularStyle.copyWith(
@@ -446,9 +444,9 @@ fetchedEventDetails(
                                               fontWeight: FontWeight.bold)),
                                       thisSpecificLobbyEvent.lobbyingRegistrant
                                               .generalDescription.isEmpty
-                                          ? SizedBox.shrink()
+                                          ? const SizedBox.shrink()
                                           : Text(
-                                              '${thisSpecificLobbyEvent.lobbyingRegistrant.generalDescription}',
+                                              thisSpecificLobbyEvent.lobbyingRegistrant.generalDescription,
                                               // maxLines: 3,
                                               // overflow: TextOverflow.ellipsis,
                                               style: Styles.regularStyle
@@ -462,7 +460,7 @@ fetchedEventDetails(
 
                           /// SPECIFIC ISSUES
                           thisSpecificLobbyEvent.specificIssues.isEmpty
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
@@ -477,7 +475,7 @@ fetchedEventDetails(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
                                         color:
-                                            _darkTheme ? null : _thisPanelColor,
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
                                     crossAxisAlignment:
@@ -499,7 +497,7 @@ fetchedEventDetails(
 
                           /// LIST OF LOBBYISTS INFO
                           thisSpecificLobbyEvent.lobbyists.first.name.isEmpty
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
@@ -514,7 +512,7 @@ fetchedEventDetails(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
                                         color:
-                                            _darkTheme ? null : _thisPanelColor,
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
                                     crossAxisAlignment:
@@ -524,7 +522,7 @@ fetchedEventDetails(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text('${e.name}',
+                                                Text(e.name,
                                                     style: Styles.regularStyle
                                                         .copyWith(
                                                             fontSize: 14,
@@ -534,7 +532,7 @@ fetchedEventDetails(
                                                 Wrap(
                                                   children: [
                                                     // SizedBox(width: 3),
-                                                    Text('${e.coveredPosition}',
+                                                    Text(e.coveredPosition,
                                                         style: Styles
                                                             .regularStyle
                                                             .copyWith(
@@ -544,7 +542,7 @@ fetchedEventDetails(
                                                                         .normal)),
                                                   ],
                                                 ),
-                                                SizedBox(height: 3),
+                                                const SizedBox(height: 3),
                                               ],
                                             ))
                                         .toList(),
@@ -565,7 +563,7 @@ fetchedEventDetails(
                                   style: Styles.regularStyle.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.normal,
-                                    color: _darkTheme ? null : _thisPanelColor,
+                                    color: darkTheme ? null : thisPanelColor,
                                   )),
                               subtitle: Text(
                                   'Event ID: ${thisSpecificLobbyEvent.id.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.id.toString()}\nHouse ID: ${thisSpecificLobbyEvent.houseId.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.houseId.toString()}\nSenate ID: ${thisSpecificLobbyEvent.senateId.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.senateId.toString()}',
@@ -578,7 +576,7 @@ fetchedEventDetails(
                           /// EFFECTIVE DATES
                           thisSpecificLobbyEvent.signedDate.isEmpty &&
                                   thisSpecificLobbyEvent.effectiveDate.isEmpty
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
@@ -593,7 +591,7 @@ fetchedEventDetails(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
                                         color:
-                                            _darkTheme ? null : _thisPanelColor,
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Text(
                                       'Signed: ${thisSpecificLobbyEvent.signedDate.isEmpty ? 'Date Not Available' : thisSpecificLobbyEvent.signedDate.toString()}\nEffective: ${thisSpecificLobbyEvent.effectiveDate.isEmpty ? 'Date Not Available' : thisSpecificLobbyEvent.effectiveDate.toString()}',
@@ -616,7 +614,7 @@ fetchedEventDetails(
                                 style: Styles.regularStyle.copyWith(
                                   fontSize: 12,
                                   fontWeight: FontWeight.normal,
-                                  color: _darkTheme ? null : _thisPanelColor,
+                                  color: darkTheme ? null : thisPanelColor,
                                 )),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -649,7 +647,7 @@ fetchedEventDetails(
                                                   FontAwesomeIcons
                                                       .solidFileLines,
                                                   size: 10,
-                                                  color: _thisPanelColor)
+                                                  color: thisPanelColor)
                                             ],
                                           ),
                                         ),

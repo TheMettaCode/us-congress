@@ -33,7 +33,7 @@ class Youtube {
     bool darkTheme = userDatabase.get('darkTheme');
     bool isCapitolBabble =
         thisVideo.snippet.videoOwnerChannelTitle == 'Capitol Babble';
-    Color capitolBabbleDark = Color.fromARGB(255, 77, 0, 70);
+    Color capitolBabbleDark = const Color.fromARGB(255, 77, 0, 70);
     Color tileColor = isCapitolBabble
         ? capitolBabbleDark
         : darkTheme
@@ -62,7 +62,7 @@ class Youtube {
     // } else {
       _controller = YoutubePlayerController(
         initialVideoId: thisVideo.snippet.resourceId.videoId,
-        flags: YoutubePlayerFlags(
+        flags: const YoutubePlayerFlags(
           autoPlay: true,
           mute: false,
           loop: false,
@@ -166,7 +166,7 @@ class Youtube {
             image: isCapitolBabble
                 ? DecorationImage(
                     opacity: 0.3,
-                    image: AssetImage('assets/capitol_babble_bg.png'),
+                    image: const AssetImage('assets/capitol_babble_bg.png'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(tileColor, BlendMode.color))
                 : DecorationImage(
@@ -267,7 +267,7 @@ class Youtube {
                       userIsPremium,
                     );
                   },
-                  icon: FaIcon(FontAwesomeIcons.youtube,
+                  icon: const FaIcon(FontAwesomeIcons.youtube,
                       size: 10, color: darkThemeTextColor),
                   label: Text(
                     thisVideo.snippet.videoOwnerChannelTitle,
@@ -301,7 +301,7 @@ class Youtube {
     // bool darkTheme = userDatabase.get('darkTheme');
     bool isCapitolBabble =
         _thisVideo.snippet.videoOwnerChannelTitle == 'Capitol Babble';
-    Color capitolBabbleDark = Color.fromARGB(255, 77, 0, 70);
+    Color capitolBabbleDark = const Color.fromARGB(255, 77, 0, 70);
     // Color capitolBabbleMainColor = Colors.purple;
 
     Color tileColor = isCapitolBabble
@@ -343,8 +343,9 @@ class Youtube {
                   await Functions.processCredits(true, isPermanent: false);
                   if (interstitialAd != null &&
                       interstitialAd.responseInfo.responseId !=
-                          userDatabase.get('interstitialAdId'))
+                          userDatabase.get('interstitialAdId')) {
                     AdMobLibrary().interstitialAdShow(interstitialAd);
+                  }
                 }),
         child: ZoomIn(
           child: Container(
@@ -354,7 +355,7 @@ class Youtube {
               image: isCapitolBabble
                   ? DecorationImage(
                       opacity: 0.3,
-                      image: AssetImage('assets/capitol_babble_bg.png'),
+                      image: const AssetImage('assets/capitol_babble_bg.png'),
                       fit: BoxFit.cover,
                       colorFilter: ColorFilter.mode(tileColor, BlendMode.color))
                   : DecorationImage(
@@ -459,7 +460,7 @@ class Youtube {
                                   color: textColor),
                             ),
                             technicalDifficulties
-                                ? SizedBox.shrink()
+                                ? const SizedBox.shrink()
                                 : Expanded(
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -472,7 +473,7 @@ class Youtube {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            FaIcon(FontAwesomeIcons.youtube,
+                                            const FaIcon(FontAwesomeIcons.youtube,
                                                 size: 10,
                                                 color: darkThemeTextColor),
                                             Text(
@@ -522,7 +523,7 @@ class Youtube {
                                       color: textColor),
                                 ),
                                 technicalDifficulties
-                                    ? SizedBox.shrink()
+                                    ? const SizedBox.shrink()
                                     : Expanded(
                                         child: Column(
                                           mainAxisAlignment:
@@ -536,7 +537,7 @@ class Youtube {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                FaIcon(FontAwesomeIcons.youtube,
+                                                const FaIcon(FontAwesomeIcons.youtube,
                                                     size: 10,
                                                     color: darkThemeTextColor),
                                                 Text(
@@ -601,8 +602,8 @@ class Youtube {
     if (_currentPlaylistItems.isEmpty ||
         DateTime.parse(userDatabase.get('lastRefresh').toString()).isBefore(
             DateTime.now().subtract(context == null
-                ? Duration(hours: 1)
-                : Duration(minutes: 25)))) {
+                ? const Duration(hours: 1)
+                : const Duration(minutes: 25)))) {
       debugPrint('***** GENERATING LIST OF YOUTUBE PLAYLIST ITEMS  *****');
       final response = await http.get(
         Uri.parse(
@@ -615,7 +616,7 @@ class Youtube {
         final YouTubePlaylist youTubePlaylistResponse =
             youTubePlaylistFromJson(response.body);
 
-        if (youTubePlaylistResponse.items.length > 0) {
+        if (youTubePlaylistResponse.items.isNotEmpty) {
           _finalPlaylistItems = youTubePlaylistResponse.items;
 
           _finalPlaylistItems.removeWhere((video) =>
@@ -630,9 +631,9 @@ class Youtube {
 
             if (userIsDev) {
               final String messageBody =
-                  '${_finalPlaylistItems.first.snippet.title.length > 175 ? _finalPlaylistItems.first.snippet.title.replaceRange(175, null, '...') : _finalPlaylistItems.first.snippet.title}';
+                  _finalPlaylistItems.first.snippet.title.length > 175 ? _finalPlaylistItems.first.snippet.title.replaceRange(175, null, '...') : _finalPlaylistItems.first.snippet.title;
               final String subject =
-                  '${_finalPlaylistItems.first.snippet.title.length > 200 ? _finalPlaylistItems.first.snippet.title.replaceRange(200, null, '...') : _finalPlaylistItems.first.snippet.title}';
+                  _finalPlaylistItems.first.snippet.title.length > 200 ? _finalPlaylistItems.first.snippet.title.replaceRange(200, null, '...') : _finalPlaylistItems.first.snippet.title;
 
               List<String> capitolBabbleNotificationsList = List<String>.from(
                   userDatabase.get('capitolBabbleNotificationsList'));
@@ -643,8 +644,9 @@ class Youtube {
             }
           }
 
-          if (_currentPlaylistItems.isEmpty)
+          if (_currentPlaylistItems.isEmpty) {
             _currentPlaylistItems = _finalPlaylistItems;
+          }
 
           try {
             logger.d('***** SAVING NEW PLAYLIST TO DBASE *****');

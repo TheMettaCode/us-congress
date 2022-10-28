@@ -21,17 +21,17 @@ import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_st
 import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 
 class MemberDetail extends StatefulWidget {
-  MemberDetail(
-      this.memberId, this.memberHouseStockTrades, this.memberSenateStockTrades);
+  const MemberDetail(
+      this.memberId, this.memberHouseStockTrades, this.memberSenateStockTrades, {Key key}) : super(key: key);
   final String memberId;
   final List<HouseStockWatch> memberHouseStockTrades;
   final List<SenateStockWatch> memberSenateStockTrades;
 
   @override
-  _MemberDetailState createState() => new _MemberDetailState();
+  MemberDetailState createState() => MemberDetailState();
 }
 
-class _MemberDetailState extends State<MemberDetail> {
+class MemberDetailState extends State<MemberDetail> {
   bool _isLoading = true;
   String _loadingTextString = 'Fetching member data...';
   List<bool> userIs = [false, false, false];
@@ -142,8 +142,9 @@ class _MemberDetailState extends State<MemberDetail> {
             context, widget.memberId)
         .then((value) => setState(() => memberPrivateTravel = value));
     if (userIsPremium &&
-        thisMember.roles.first.chamber.toLowerCase() == 'house')
+        thisMember.roles.first.chamber.toLowerCase() == 'house') {
       await determineExpenses();
+    }
     // }
 
     setState(() {
@@ -159,46 +160,46 @@ class _MemberDetailState extends State<MemberDetail> {
   Future<void> determineExpenses() async {
     /// DETERMINING VALID EXPENSES PERIOD HERE
     setState(() => _loadingTextString = 'Fetching office expenses...');
-    List<MemberExpensesResult> _memberOfficeExpenses = [];
-    int _attempts = 0;
-    int _thisYear = DateTime.now().year;
-    int _thisMonth = DateTime.now().month;
-    int _thisQuarter = _thisMonth >= 1 && _thisMonth < 4
+    List<MemberExpensesResult> tempMemberOfficeExpenses = [];
+    int attempts = 0;
+    int thisYear = DateTime.now().year;
+    int thisMonth = DateTime.now().month;
+    int thisQuarter = thisMonth >= 1 && thisMonth < 4
         ? 1
-        : _thisMonth >= 4 && _thisMonth < 7
+        : thisMonth >= 4 && thisMonth < 7
             ? 2
-            : _thisMonth >= 7 && _thisMonth < 10
+            : thisMonth >= 7 && thisMonth < 10
                 ? 3
                 : 4;
 
-    while (_memberOfficeExpenses.length < 1 && _attempts < 4) {
-      logger.i('ATTEMPT $_attempts for  Q$_thisQuarter $_thisYear');
+    while (tempMemberOfficeExpenses.isEmpty && attempts < 4) {
+      logger.i('ATTEMPT $attempts for  Q$thisQuarter $thisYear');
       await PropublicaApi.fetchMemberOfficeExpenses(
-              widget.memberId.toLowerCase(), _thisYear, _thisQuarter)
+              widget.memberId.toLowerCase(), thisYear, thisQuarter)
           .then((value) {
         setState(() {
-          _memberOfficeExpenses = value;
-          memberOfficeExpensesYear = _thisYear;
-          memberOfficeExpensesQuarter = _thisQuarter;
+          tempMemberOfficeExpenses = value;
+          memberOfficeExpensesYear = thisYear;
+          memberOfficeExpensesQuarter = thisQuarter;
         });
-        _thisYear = _thisQuarter - 1 == 0 ? _thisYear - 1 : _thisYear;
-        _thisQuarter = _thisQuarter - 1 == 0 ? 4 : _thisQuarter - 1;
-        _attempts++;
+        thisYear = thisQuarter - 1 == 0 ? thisYear - 1 : thisYear;
+        thisQuarter = thisQuarter - 1 == 0 ? 4 : thisQuarter - 1;
+        attempts++;
       });
       setState(() {
-        memberOfficeExpenses = _memberOfficeExpenses;
+        memberOfficeExpenses = tempMemberOfficeExpenses;
       });
     }
 
     logger.i('CALCULATING TOTAL EXPENSES');
     setState(() => _loadingTextString =
         'Calculating total expenses for most recent quarter...');
-    List<double> _memberOfficeExpensesAmounts =
-        _memberOfficeExpenses.map((e) => e.amount).toList();
-    double _expensesTotal = _memberOfficeExpensesAmounts.fold<double>(
+    List<double> memberOfficeExpensesAmounts =
+        tempMemberOfficeExpenses.map((e) => e.amount).toList();
+    double expensesTotal = memberOfficeExpensesAmounts.fold<double>(
         0.0, (previousValue, element) => previousValue + element);
-    memberOfficeExpensesTotal = _expensesTotal;
-    logger.i('TOTAL EXPENSES $_expensesTotal');
+    memberOfficeExpensesTotal = expensesTotal;
+    logger.i('TOTAL EXPENSES $expensesTotal');
   }
 
   @override
@@ -221,17 +222,17 @@ class _MemberDetailState extends State<MemberDetail> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: new Text('Member Details',
+        title: Text('Member Details',
             style: GoogleFonts.bangers(fontSize: 25)),
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       body: _isLoading || thisMember == null
           ? Center(
               child: FadeIn(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 child: Pulse(
-                  delay: Duration(milliseconds: 500),
-                  duration: Duration(milliseconds: 500),
+                  delay: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 500),
                   // infinite: true,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
@@ -250,7 +251,7 @@ class _MemberDetailState extends State<MemberDetail> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
+                        SizedBox(
                           width: 48,
                           height: 48,
                           child: Stack(
@@ -269,7 +270,7 @@ class _MemberDetailState extends State<MemberDetail> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                         Text(_loadingTextString,
@@ -284,1440 +285,1413 @@ class _MemberDetailState extends State<MemberDetail> {
               valueListenable: Hive.box(appDatabase)
                   .listenable(keys: ['darkTheme', 'subscriptionAlertsList']),
               builder: (context, box, widget) {
-                String _thisMemberString = 'member_${thisMember.id}_member';
+                String thisMemberString = 'member_${thisMember.id}_member';
                 return Container(
                   color: Theme.of(context).colorScheme.background,
-                  child: new ListView(
+                  child: ListView(
                     primary: true,
-                    physics: new BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     children: [
                       FadeIn(
-                        child: new Image.asset(
+                        child: Image.asset(
                             'assets/congress_pic_${random.nextInt(4)}.png',
                             color: Theme.of(context).primaryColor,
                             height: 125,
                             fit: BoxFit.cover,
                             colorBlendMode: BlendMode.softLight),
                       ),
-                      new Container(
-                        child: new Card(
-                          elevation: 0.0,
-                          child: new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Container(
-                                padding: new EdgeInsets.all(5.0),
-                                color: Theme.of(context)
-                                    .primaryColor
-                                    .withOpacity(0.15),
-                                child: new Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    new Text(
-                                      '${thisMember.roles.first.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} ${thisMember.suffix == null || thisMember.suffix.isEmpty ? '' : thisMember.suffix}'
-                                          .toUpperCase(),
-                                      style: new TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    new Spacer(),
-                                    userIsPremium || userIsLegacy
-                                        ? new SizedBox(
-                                            height: 20,
-                                            child: new ElevatedButton.icon(
-                                              icon: AnimatedWidgets.flashingEye(
-                                                  context,
-                                                  List<String>.from(
-                                                          userDatabase.get(
-                                                              'subscriptionAlertsList'))
+                      Card(
+                        elevation: 0.0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              padding: const EdgeInsets.all(5.0),
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.15),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    '${thisMember.roles.first.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} ${thisMember.suffix == null || thisMember.suffix.isEmpty ? '' : thisMember.suffix}'
+                                        .toUpperCase(),
+                                    style: const TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Spacer(),
+                                  userIsPremium || userIsLegacy
+                                      ? SizedBox(
+                                          height: 20,
+                                          child: ElevatedButton.icon(
+                                            icon: AnimatedWidgets.flashingEye(
+                                                context,
+                                                List<String>.from(
+                                                        userDatabase.get(
+                                                            'subscriptionAlertsList'))
+                                                    .any((element) => element
+                                                        .toLowerCase()
+                                                        .startsWith(
+                                                            'member_${thisMember.memberId}'
+                                                                .toLowerCase())),
+                                                true,
+                                                size: 11,
+                                                sameColorBright: true),
+                                            label: Text(
+                                              List<String>.from(userDatabase.get(
+                                                          'subscriptionAlertsList'))
                                                       .any((element) => element
                                                           .toLowerCase()
                                                           .startsWith(
                                                               'member_${thisMember.memberId}'
-                                                                  .toLowerCase())),
-                                                  true,
-                                                  size: 11,
-                                                  sameColorBright: true),
-                                              label: Text(
-                                                List<String>.from(userDatabase.get(
-                                                            'subscriptionAlertsList'))
-                                                        .any((element) => element
-                                                            .toLowerCase()
-                                                            .startsWith(
-                                                                'member_${thisMember.memberId}'
-                                                                    .toLowerCase()))
-                                                    ? 'ON'
-                                                    : 'OFF',
-                                                style: GoogleFonts.bangers(
-                                                    color: Colors.white,
-                                                    fontSize: 17),
-                                              ),
-                                              onPressed: () async {
-                                                if (!List.from(userDatabase.get(
-                                                        'subscriptionAlertsList'))
-                                                    .any((element) => element
+                                                                  .toLowerCase()))
+                                                  ? 'ON'
+                                                  : 'OFF',
+                                              style: GoogleFonts.bangers(
+                                                  color: Colors.white,
+                                                  fontSize: 17),
+                                            ),
+                                            onPressed: () async {
+                                              if (!List.from(userDatabase.get(
+                                                      'subscriptionAlertsList'))
+                                                  .any((element) => element
+                                                      .toString()
+                                                      .toLowerCase()
+                                                      .startsWith(
+                                                          'member_${thisMember.memberId}'
+                                                              .toLowerCase()))) {
+                                                subscriptionAlertsList
+                                                    .add(thisMemberString);
+                                                userDatabase.put(
+                                                    'subscriptionAlertsList',
+                                                    subscriptionAlertsList);
+
+                                                // if (!userDatabase
+                                                //     .get('memberAlerts'))
+                                                //   userDatabase.put(
+                                                //       'memberAlerts', true);
+
+                                                await Functions
+                                                    .processCredits(true);
+                                              } else {
+                                                subscriptionAlertsList.removeWhere(
+                                                    (element) => element
                                                         .toString()
                                                         .toLowerCase()
                                                         .startsWith(
                                                             'member_${thisMember.memberId}'
-                                                                .toLowerCase()))) {
-                                                  subscriptionAlertsList
-                                                      .add(_thisMemberString);
-                                                  userDatabase.put(
-                                                      'subscriptionAlertsList',
-                                                      subscriptionAlertsList);
-
-                                                  // if (!userDatabase
-                                                  //     .get('memberAlerts'))
-                                                  //   userDatabase.put(
-                                                  //       'memberAlerts', true);
-
-                                                  await Functions
-                                                      .processCredits(true);
-                                                } else {
-                                                  subscriptionAlertsList.removeWhere(
-                                                      (element) => element
-                                                          .toString()
-                                                          .toLowerCase()
-                                                          .startsWith(
-                                                              'member_${thisMember.memberId}'
-                                                                  .toLowerCase()));
-                                                  userDatabase.put(
-                                                      'subscriptionAlertsList',
-                                                      subscriptionAlertsList);
-                                                }
-                                              },
-                                              style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStateProperty.all<
-                                                          Color>(Theme.of(
-                                                              context)
-                                                          .primaryColorDark)),
-                                            ),
-                                          )
-                                        : SizedBox.shrink(),
-                                  ],
-                                ),
+                                                                .toLowerCase()));
+                                                userDatabase.put(
+                                                    'subscriptionAlertsList',
+                                                    subscriptionAlertsList);
+                                              }
+                                            },
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all<
+                                                        Color>(Theme.of(
+                                                            context)
+                                                        .primaryColorDark)),
+                                          ),
+                                        )
+                                      : const SizedBox.shrink(),
+                                ],
                               ),
-                              // Divider(),
-                              new Container(
-                                color: userDatabase.get('darkTheme') == true
-                                    ? memberContainerColor
-                                    : thisMember.currentParty.toLowerCase() ==
-                                            'd'
-                                        ? democratColor
-                                        : thisMember.currentParty
-                                                    .toLowerCase() ==
-                                                'r'
-                                            ? republicanColor
-                                            : thisMember.currentParty
-                                                        .toLowerCase() ==
-                                                    'i'
-                                                ? independentColor
-                                                : memberContainerColor,
-                                child: new Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: new Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      new Padding(
-                                        padding: const EdgeInsets.all(0.0),
-                                        child: new Column(
-                                          children: [
-                                            new Container(
-                                              height: 130,
-                                              width: 100,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          'assets/congress_pic_${random.nextInt(4)}.png'),
-                                                      fit: BoxFit.cover,
-                                                      colorFilter: ColorFilter.mode(
-                                                          userDatabase.get(
-                                                                  'darkTheme')
-                                                              ? Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .primary
-                                                              : Colors
-                                                                  .transparent,
-                                                          BlendMode.color))),
-                                              foregroundDecoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  image: DecorationImage(
-                                                      image: new NetworkImage(
-                                                          'https://www.congress.gov/img/member/${thisMember.memberId.toLowerCase()}.jpg'),
-                                                      fit: BoxFit.cover)),
-                                            ),
-                                          ],
-                                        ),
+                            ),
+                            // Divider(),
+                            Container(
+                              color: userDatabase.get('darkTheme') == true
+                                  ? memberContainerColor
+                                  : thisMember.currentParty.toLowerCase() ==
+                                          'd'
+                                      ? democratColor
+                                      : thisMember.currentParty
+                                                  .toLowerCase() ==
+                                              'r'
+                                          ? republicanColor
+                                          : thisMember.currentParty
+                                                      .toLowerCase() ==
+                                                  'i'
+                                              ? independentColor
+                                              : memberContainerColor,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(0.0),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 130,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                image: DecorationImage(
+                                                    image: AssetImage(
+                                                        'assets/congress_pic_${random.nextInt(4)}.png'),
+                                                    fit: BoxFit.cover,
+                                                    colorFilter: ColorFilter.mode(
+                                                        userDatabase.get(
+                                                                'darkTheme')
+                                                            ? Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .primary
+                                                            : Colors
+                                                                .transparent,
+                                                        BlendMode.color))),
+                                            foregroundDecoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                image: DecorationImage(
+                                                    image: NetworkImage(
+                                                        'https://www.congress.gov/img/member/${thisMember.memberId.toLowerCase()}.jpg'),
+                                                    fit: BoxFit.cover)),
+                                          ),
+                                        ],
                                       ),
-                                      new Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: new Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            new Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                new Text(
-                                                  thisMember.currentParty == 'D'
-                                                      ? 'Democrat'
-                                                      : thisMember.currentParty ==
-                                                              'R'
-                                                          ? 'Republican'
-                                                          : 'Independent',
-                                                  style: new TextStyle(
-                                                      color:
-                                                          memberContainerTextColor,
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                            new Container(
-                                              child: new Text(
-                                                '${thisMember.roles.first.chamber} - ${thisMember.roles.first.title}',
-                                                style: new TextStyle(
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                thisMember.currentParty == 'D'
+                                                    ? 'Democrat'
+                                                    : thisMember.currentParty ==
+                                                            'R'
+                                                        ? 'Republican'
+                                                        : 'Independent',
+                                                style: TextStyle(
                                                     color:
                                                         memberContainerTextColor,
-                                                    fontSize: 14.0,
+                                                    fontSize: 16.0,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                            ),
-                                            new Container(
-                                              child: new Text(
-                                                'Congress: ${thisMember.roles.first.congress}',
-                                                style: new TextStyle(
+                                            ],
+                                          ),
+                                          Text(
+                                            '${thisMember.roles.first.chamber} - ${thisMember.roles.first.title}',
+                                            style: TextStyle(
+                                                color:
+                                                    memberContainerTextColor,
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.bold),
+                                          ),
+                                          Text(
+                                            'Congress: ${thisMember.roles.first.congress}',
+                                            style: TextStyle(
+                                                color:
+                                                    memberContainerTextColor,
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'State: ',
+                                                style: TextStyle(
                                                     color:
                                                         memberContainerTextColor,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              thisMember.roles.first.state ==
+                                                      null
+                                                  ? const Text(
+                                                      'No State Information')
+                                                  : Text(
+                                                      thisMember
+                                                          .roles.first.state,
+                                                      style: TextStyle(
+                                                          color:
+                                                              memberContainerTextColor,
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .normal),
+                                                    ),
+                                              thisMember.roles.first
+                                                          .chamber ==
+                                                      'Senate'
+                                                  ? const Text('')
+                                                  : Row(
+                                                      children: [
+                                                        Text(
+                                                          ', Dist: ',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  memberContainerTextColor,
+                                                              fontSize: 12.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        thisMember.roles.first
+                                                                    .district ==
+                                                                null
+                                                            ? const Text(
+                                                                'No District Information')
+                                                            : Text(
+                                                                thisMember
+                                                                    .roles
+                                                                    .first
+                                                                    .district,
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        memberContainerTextColor,
+                                                                    fontSize:
+                                                                        12.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                      ],
+                                                    ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Start Date: ',
+                                                style: TextStyle(
+                                                    color:
+                                                        memberContainerTextColor,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                              ),
+                                              thisMember.roles.first
+                                                          .startDate ==
+                                                      null
+                                                  ? const Text('No Information')
+                                                  : Text(
+                                                      formatter.format(
+                                                          thisMember
+                                                              .roles
+                                                              .first
+                                                              .startDate),
+                                                      style: TextStyle(
+                                                          color:
+                                                              memberContainerTextColor,
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .normal),
+                                                    ),
+                                            ],
+                                          ),
+                                          // new SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'End Date: ',
+                                                style: TextStyle(
+                                                    color:
+                                                        memberContainerTextColor,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                              ),
+                                              thisMember.roles.first
+                                                          .endDate ==
+                                                      null
+                                                  ? const Text('No Information')
+                                                  : Text(
+                                                      formatter.format(
+                                                          thisMember.roles
+                                                              .first.endDate),
+                                                      style: TextStyle(
+                                                          color:
+                                                              memberContainerTextColor,
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .normal),
+                                                    ),
+                                            ],
+                                          ),
+                                          // new SizedBox(height: 8),
+                                          thisMember.roles.first
+                                                      .nextElection ==
+                                                  null
+                                              ? const SizedBox.shrink()
+                                              : Row(
+                                                  children: [
+                                                    Text(
+                                                      'Next Election: ',
+                                                      style: TextStyle(
+                                                          color:
+                                                              memberContainerTextColor,
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .normal),
+                                                    ),
+                                                    Text(
+                                                      thisMember.roles.first
+                                                          .nextElection,
+                                                      style: TextStyle(
+                                                          color:
+                                                              memberContainerTextColor,
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .normal),
+                                                    ),
+                                                  ],
+                                                ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: SizedBox(
+                                height: 25,
+                                child: Row(
+                                  children: <Widget>[
+                                    thisMember.roles.first.phone == null
+                                        ? const SizedBox.shrink()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2.5),
+                                              child: ElevatedButton.icon(
+                                                  icon: Icon(Icons.phone,
+                                                      color:
+                                                          darkThemeTextColor,
+                                                      size: 15),
+                                                  label: Text('Call',
+                                                      style: TextStyle(
+                                                          color:
+                                                              darkThemeTextColor)),
+                                                  onPressed: () async =>
+                                                      await launchUrl(Uri.parse(
+                                                          'tel://${thisMember.roles.first.phone}')),
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty.all<Color>(
+                                                              Theme.of(
+                                                                      context)
+                                                                  .primaryColorDark))),
+                                            ),
+                                          ),
+                                    thisMember.twitterAccount == null
+                                        ? const SizedBox.shrink()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2.5),
+                                              child: ElevatedButton.icon(
+                                                  icon: Icon(Icons.launch,
+                                                      color:
+                                                          darkThemeTextColor,
+                                                      size: 15),
+                                                  label: Text('Twitter',
+                                                      style: TextStyle(
+                                                          color:
+                                                              darkThemeTextColor)),
+                                                  onPressed: () async =>
+                                                      await Functions.linkLaunch(
+                                                          context,
+                                                          'https://twitter.com/${thisMember.twitterAccount}',
+                                                          userDatabase,
+                                                          userIsPremium,
+                                                          appBarTitle:
+                                                              '@${thisMember.twitterAccount}'),
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark))),
+                                            ),
+                                          ),
+                                    thisMember.url == null
+                                        // || thisMember.url.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2.5),
+                                              child: ElevatedButton.icon(
+                                                  icon: Icon(Icons.web,
+                                                      color:
+                                                          darkThemeTextColor,
+                                                      size: 15),
+                                                  label: Text('Website',
+                                                      style: TextStyle(
+                                                          color:
+                                                              darkThemeTextColor)),
+                                                  onPressed: () async =>
+                                                      await Functions.linkLaunch(
+                                                          context,
+                                                          thisMember.url,
+                                                          userDatabase,
+                                                          userIsPremium,
+                                                          appBarTitle:
+                                                              '${thisMember.firstName} ${thisMember.lastName}'),
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark))),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: SizedBox(
+                                height: 25,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2.5),
+                                        child: ElevatedButton.icon(
+                                          icon: FaIcon(
+                                              FontAwesomeIcons.planeDeparture,
+                                              size: 12,
+                                              color: userIsPremium ||
+                                                      userIsLegacy
+                                                  ? darkThemeTextColor
+                                                  : null),
+                                          label: Text('Funded Travel',
+                                              style: TextStyle(
+                                                  color: userIsPremium ||
+                                                          userIsLegacy
+                                                      ? darkThemeTextColor
+                                                      : null)),
+                                          onPressed: () async =>
+                                              !userIsPremium && !userIsLegacy
+                                                  ? Functions
+                                                      .requestInAppPurchase(
+                                                          context,
+                                                          userIsPremium,
+                                                          whatToShow:
+                                                              'upgrades')
+                                                  : memberPrivateTravel
+                                                          .isEmpty
+                                                      ? null
+                                                      : setState(() {
+                                                          showPrivateTravel =
+                                                              !showPrivateTravel;
+                                                          showOfficeExpenses =
+                                                              false;
+                                                          showTradeActivity =
+                                                              false;
+                                                        }),
+                                          style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty
+                                                  .all((!userIsPremium &&
+                                                              !userIsLegacy) ||
+                                                          memberPrivateTravel
+                                                              .isEmpty
+                                                      ? Theme.of(context)
+                                                          .disabledColor
+                                                      : Theme.of(context)
+                                                          .primaryColorDark)),
+                                        ),
+                                      ),
+                                    ),
+                                    thisMember.roles.first.chamber
+                                                .toLowerCase() ==
+                                            'senate'
+                                        ? const SizedBox.shrink()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2.5),
+                                              child: ElevatedButton.icon(
+                                                icon: FaIcon(
+                                                    FontAwesomeIcons
+                                                        .moneyCheckDollar,
+                                                    size: 12,
+                                                    color: (userIsPremium ||
+                                                                userIsLegacy) &&
+                                                            memberOfficeExpenses
+                                                                .isNotEmpty
+                                                        ? darkThemeTextColor
+                                                        : null),
+                                                label: Text(
+                                                    (!userIsPremium &&
+                                                                !userIsLegacy) ||
+                                                            memberOfficeExpenses
+                                                                .isEmpty
+                                                        ? 'Office Expenses'
+                                                        : '${formatCurrency.format(memberOfficeExpensesTotal)} (Q$memberOfficeExpensesQuarter)',
+                                                    style: TextStyle(
+                                                        color: (userIsPremium ||
+                                                                    userIsLegacy) &&
+                                                                memberOfficeExpenses
+                                                                    .isNotEmpty
+                                                            ? darkThemeTextColor
+                                                            : null)),
+                                                onPressed: () async =>
+                                                    !userIsPremium &&
+                                                            !userIsLegacy
+                                                        ? Functions
+                                                            .requestInAppPurchase(
+                                                                context,
+                                                                userIsPremium,
+                                                                whatToShow:
+                                                                    'upgrades')
+                                                        : memberOfficeExpenses
+                                                                .isEmpty
+                                                            ? null
+                                                            : setState(() {
+                                                                showOfficeExpenses =
+                                                                    !showOfficeExpenses;
+                                                                showPrivateTravel =
+                                                                    false;
+                                                                showTradeActivity =
+                                                                    false;
+                                                              }),
+                                                style: ButtonStyle(
+                                                    backgroundColor: MaterialStateProperty
+                                                        .all((!userIsPremium &&
+                                                                    !userIsLegacy) ||
+                                                                memberOfficeExpenses
+                                                                    .isEmpty
+                                                            ? Theme.of(
+                                                                    context)
+                                                                .disabledColor
+                                                            : Theme.of(
+                                                                    context)
+                                                                .primaryColorDark)),
+                                              ),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: SizedBox(
+                                height: 25,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2.5),
+                                        child: ElevatedButton.icon(
+                                          icon: FaIcon(
+                                              FontAwesomeIcons.chartLine,
+                                              size: 12,
+                                              color: userIsPremium
+                                                  ? darkThemeTextColor
+                                                  : null),
+                                          label: Text(
+                                              'Recent Market Trade Activity (Reported)',
+                                              style: TextStyle(
+                                                  color: userIsPremium
+                                                      ? darkThemeTextColor
+                                                      : null)),
+                                          onPressed: () async =>
+                                              !userIsPremium
+                                                  ? Functions
+                                                      .requestInAppPurchase(
+                                                          context,
+                                                          userIsPremium,
+                                                          whatToShow:
+                                                              'upgrades')
+                                                  : thisHouseMemberStockTrades
+                                                              .isEmpty &&
+                                                          thisSenateMemberStockTrades
+                                                              .isEmpty
+                                                      ? null
+                                                      : setState(() {
+                                                          showPrivateTravel =
+                                                              false;
+                                                          showOfficeExpenses =
+                                                              false;
+                                                          showTradeActivity =
+                                                              !showTradeActivity;
+                                                        }),
+                                          style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty
+                                                  .all(!userIsPremium ||
+                                                          (thisHouseMemberStockTrades
+                                                                  .isEmpty &&
+                                                              thisSenateMemberStockTrades
+                                                                  .isEmpty)
+                                                      ? Theme.of(context)
+                                                          .disabledColor
+                                                      : Theme.of(context)
+                                                          .primaryColorDark)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            !showPrivateTravel
+                                ? const SizedBox.shrink()
+                                : Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        2.5, 0, 2.5, 2.5),
+                                    child: Container(
+                                      height: dataWindowHeight,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .primaryColorDark
+                                              .withOpacity(0.15),
+                                          border: Border.all(
+                                              width: 2,
+                                              color: Theme.of(context)
+                                                  .primaryColorDark),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                      child: Scrollbar(
+                                        // trackVisibility: true,
+                                        // thumbVisibility: true,
+                                        thickness: 5,
+                                        radius: const Radius.circular(5),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets
+                                                                  .fromLTRB(
+                                                              15, 0, 15, 0),
+                                                      child: Text(
+                                                          'Privately Funded Travel',
+                                                          style: Styles
+                                                              .googleStyle
+                                                              .copyWith(
+                                                                  fontSize:
+                                                                      24.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal)),
+                                                    )
+                                                  ] +
+                                                  [
+                                                    const Divider(),
+                                                  ] +
+                                                  memberPrivateTravel
+                                                      .map(
+                                                        (thisTrip) => Stack(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          children: [
+                                                            ListTile(
+                                                              dense: true,
+                                                              title: Text(
+                                                                thisTrip.traveler
+                                                                    .toUpperCase(),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        14.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              subtitle:
+                                                                  Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    'Destination: ${thisTrip.destination}\nSponsor: ${thisTrip.sponsor}\nDeparture Date: ${dateWithDayAndYearFormatter.format(thisTrip.departureDate)}\nReturn Date: ${dateWithDayAndYearFormatter.format(thisTrip.returnDate)}',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            IconButton(
+                                                                icon: const FaIcon(
+                                                                  FontAwesomeIcons
+                                                                      .solidFileLines,
+                                                                  size: 13,
+                                                                ),
+                                                                onPressed: () => Functions.linkLaunch(
+                                                                    context,
+                                                                    thisTrip
+                                                                        .pdfUrl,
+                                                                    userDatabase,
+                                                                    userIsPremium,
+                                                                    appBarTitle:
+                                                                        'Privately Funded Travel',
+                                                                    source:
+                                                                        'travel',
+                                                                    isPdf:
+                                                                        true))
+                                                          ],
+                                                        ),
+                                                      )
+                                                      .toList()),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            !showOfficeExpenses
+                                ? const SizedBox.shrink()
+                                : Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        2.5, 0, 2.5, 2.5),
+                                    child: Container(
+                                      height: dataWindowHeight,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .primaryColorDark
+                                              .withOpacity(0.15),
+                                          border: Border.all(
+                                              width: 2,
+                                              color: Theme.of(context)
+                                                  .primaryColorDark),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                      child: Scrollbar(
+                                        // trackVisibility: true,
+                                        // thumbVisibility: true,
+                                        thickness: 5,
+                                        radius: const Radius.circular(5),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets
+                                                                  .fromLTRB(
+                                                              15, 0, 15, 0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                              'Total Office Expenses ${formatCurrency.format(memberOfficeExpensesTotal)}',
+                                                              style: Styles
+                                                                  .googleStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          24.0,
+                                                                      fontWeight:
+                                                                          FontWeight.normal)),
+                                                          Text(
+                                                              'Q$memberOfficeExpensesQuarter $memberOfficeExpensesYear',
+                                                              style: Styles
+                                                                  .regularStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      fontWeight:
+                                                                          FontWeight.bold)),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ] +
+                                                  [const Divider()] +
+                                                  memberOfficeExpenses
+                                                      .map(
+                                                        (thisExpense) =>
+                                                            Stack(
+                                                          alignment: Alignment
+                                                              .bottomRight,
+                                                          children: [
+                                                            ListTile(
+                                                              dense: true,
+                                                              title: Text(
+                                                                thisExpense.category,
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        14.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              subtitle:
+                                                                  Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    'Amount: ${formatCurrency.format(thisExpense.amount)}\nYTD: ${formatCurrency.format(thisExpense.yearToDate)}\nChange From Prev Qtr: ${formatCurrency.format(thisExpense.changeFromPreviousQuarter)}',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              // trailing: FaIcon(
+                                                              //     FontAwesomeIcons
+                                                              //         .solidFileLines,
+                                                              //     size: 13),
+                                                              // onTap: () => Functions
+                                                              //     .linkLaunch(
+                                                              //         context,
+                                                              //         _thisTrip
+                                                              //             .pdfUrl,
+                                                              //         '${_thisTrip.filingType.name} FILING',
+                                                              //         source:
+                                                              //             'travel',
+                                                              //         isPdf: true),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                      .toList()),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            !showTradeActivity
+                                ? const SizedBox.shrink()
+                                : Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        2.5, 0, 2.5, 2.5),
+                                    child: Container(
+                                      height: dataWindowHeight,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .primaryColorDark
+                                              .withOpacity(0.15),
+                                          border: Border.all(
+                                              width: 2,
+                                              color: Theme.of(context)
+                                                  .primaryColorDark),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                      child: Scrollbar(
+                                        // trackVisibility: true,
+                                        // thumbVisibility: true,
+                                        thickness: 5,
+                                        radius: const Radius.circular(5),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(15, 0, 15, 0),
+                                                  child: Text(
+                                                      'Recently Reported Market Trade Activity',
+                                                      style: Styles
+                                                          .googleStyle
+                                                          .copyWith(
+                                                              fontSize: 24.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal)),
+                                                ),
+                                                const Divider(),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(15, 0, 15, 0),
+                                                  child: Column(
+                                                    children: isHouseMember
+                                                        ? thisHouseMemberStockTrades
+                                                            .map((e) =>
+                                                                !isHouseMember
+                                                                    ? const SizedBox
+                                                                        .shrink()
+                                                                    : Stack(
+                                                                        alignment:
+                                                                            Alignment.bottomRight,
+                                                                        children: [
+                                                                          ListTile(
+                                                                            dense: true,
+                                                                            contentPadding: const EdgeInsets.all(0),
+                                                                            title: Container(
+                                                                              padding: const EdgeInsets.all(3),
+                                                                              decoration: BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    '\$${e.ticker == '--' ? 'N/A' : e.ticker}',
+                                                                                    style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                                                                                  ),
+                                                                                  // Spacer(),
+                                                                                  Text('E: ${dateWithDayAndYearFormatter.format(e.transactionDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
+                                                                                  Text('D: ${dateWithDayAndYearFormatter.format(e.disclosureDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            subtitle: Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Text('${e.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nTrade Type: ${e.type.replaceFirst('_', ' ').toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
+                                                                                !e.capGainsOver200Usd ? const SizedBox.shrink() : Text('Capital gains reported', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                          IconButton(
+                                                                              icon: const FaIcon(
+                                                                                FontAwesomeIcons.solidFileLines,
+                                                                                size: 13,
+                                                                              ),
+                                                                              onPressed: () => Functions.linkLaunch(context, e.ptrLink, userDatabase, userIsPremium, appBarTitle: e.representative, source: 'stock_trade', isPdf: true))
+                                                                        ],
+                                                                      ))
+                                                            .toList()
+                                                        : thisSenateMemberStockTrades
+                                                            .map((e) =>
+                                                                isHouseMember
+                                                                    ? const SizedBox
+                                                                        .shrink()
+                                                                    : ListTile(
+                                                                        dense:
+                                                                            true,
+                                                                        contentPadding:
+                                                                            const EdgeInsets.all(0),
+                                                                        title:
+                                                                            Container(
+                                                                          padding:
+                                                                              const EdgeInsets.all(3),
+                                                                          decoration:
+                                                                              BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                            children: [
+                                                                              Text(
+                                                                                e.ticker == '--' ? 'N/A' : e.ticker,
+                                                                                style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                              // Spacer(),
+                                                                              Text('E: ${dateWithDayAndYearFormatter.format(e.transactionDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
+                                                                              Text('D: ${dateWithDayAndYearFormatter.format(e.disclosureDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        subtitle:
+                                                                            Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text('${e.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAsset Type: ${e.assetType}\nTrade Type: ${e.type.toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}\nAmount: ${e.amount}\nComments: ${e.comment == null || e.comment == '--' ? 'None' : e.comment}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
+                                                                            // Text(e.assetDescription.contains('scanned PDF') ? 'PDF Link: ${e.ptrLink}' : '', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal))
+                                                                          ],
+                                                                        ),
+                                                                        trailing: !e.assetDescription.toLowerCase().contains('scanned PDF')
+                                                                            ? const SizedBox.shrink()
+                                                                            : const FaIcon(FontAwesomeIcons.solidFileLines, size: 13),
+                                                                        onTap: () => Functions.linkLaunch(
+                                                                            context,
+                                                                            e.ptrLink,
+                                                                            userDatabase,
+                                                                            userIsPremium,
+                                                                            appBarTitle: 'Senate Trade',
+                                                                            source: 'stock_trade',
+                                                                            isPdf: false),
+                                                                      ))
+                                                            .toList(),
+                                                  ),
+                                                ),
+                                              ]),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.only(top: 10, left: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  const Text(
+                                    'Latest Vote: ',
+                                    style: TextStyle(
+                                        // color: Colors.blue[900],
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Container(
+                                    child: thisMember.mostRecentVote ==
+                                                null ||
+                                            thisMember.mostRecentVote == ''
+                                        ? const Text('No Vote Information')
+                                        : Text(
+                                            formatter.format(DateTime.parse(
+                                                thisMember.mostRecentVote)),
+                                            style: const TextStyle(
+                                                // color: Colors.blue[900],
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, left: 10.0),
+                                    child: const Text(
+                                      'Votes: ',
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember.roles.first
+                                              .votesWithPartyPct ==
+                                          null
+                                      ? Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: const Text(
+                                              'Total: No Information'))
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Total: ${thisMember.roles.first.totalVotes.toString()}',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember.roles.first
+                                              .votesWithPartyPct ==
+                                          null
+                                      ? Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child:
+                                              const Text('Missed: No Information'))
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Missed: ${thisMember.roles.first.missedVotes.toString()} (${thisMember.roles.first.missedVotesPct}%)',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember.roles.first
+                                              .votesWithPartyPct ==
+                                          null
+                                      ? Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child:
+                                              const Text('Present: No Information'))
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Present: ${thisMember.roles.first.totalPresent.toString()} (${thisMember.roles.first.totalPresent}%)',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember.roles.first
+                                              .votesWithPartyPct ==
+                                          null
+                                      ? Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: const Text(
+                                              'With Party: No Information'))
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'With Party: ${thisMember.roles.first
+                                                    .votesWithPartyPct}%',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember.roles.first
+                                              .votesAgainstPartyPct ==
+                                          null
+                                      ? Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: const Text(
+                                              'Against Party: No Information'))
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Against Party: ${thisMember.roles.first
+                                                    .votesAgainstPartyPct}%',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, left: 10.0),
+                                    child: const Text(
+                                      'Bills',
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child:
+                                      thisMember.roles.first.billsSponsored ==
+                                              null
+                                          ? const Text('Sponsored: No Information')
+                                          : Container(
+                                              margin: const EdgeInsets.only(
+                                                  top: 1, left: 10.0),
+                                              child: Text(
+                                                'Sponsored: ${thisMember.roles.first
+                                                        .billsSponsored}',
+                                                style: const TextStyle(
                                                     fontSize: 14.0,
                                                     fontWeight:
                                                         FontWeight.normal),
                                               ),
                                             ),
-                                            new SizedBox(height: 8),
-                                            new Row(
-                                              children: [
-                                                new Text(
-                                                  'State: ',
-                                                  style: new TextStyle(
-                                                      color:
-                                                          memberContainerTextColor,
-                                                      fontSize: 12.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                thisMember.roles.first.state ==
-                                                        null
-                                                    ? new Text(
-                                                        'No State Information')
-                                                    : new Text(
-                                                        thisMember
-                                                            .roles.first.state,
-                                                        style: new TextStyle(
-                                                            color:
-                                                                memberContainerTextColor,
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                      ),
-                                                thisMember.roles.first
-                                                            .chamber ==
-                                                        'Senate'
-                                                    ? new Text('')
-                                                    : new Row(
-                                                        children: [
-                                                          new Text(
-                                                            ', Dist: ',
-                                                            style: new TextStyle(
-                                                                color:
-                                                                    memberContainerTextColor,
-                                                                fontSize: 12.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          thisMember.roles.first
-                                                                      .district ==
-                                                                  null
-                                                              ? new Text(
-                                                                  'No District Information')
-                                                              : new Text(
-                                                                  thisMember
-                                                                      .roles
-                                                                      .first
-                                                                      .district,
-                                                                  style: new TextStyle(
-                                                                      color:
-                                                                          memberContainerTextColor,
-                                                                      fontSize:
-                                                                          12.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                                ),
-                                                        ],
-                                                      ),
-                                              ],
-                                            ),
-                                            new SizedBox(height: 8),
-                                            new Row(
-                                              children: [
-                                                new Text(
-                                                  'Start Date: ',
-                                                  style: new TextStyle(
-                                                      color:
-                                                          memberContainerTextColor,
-                                                      fontSize: 12.0,
-                                                      fontWeight:
-                                                          FontWeight.normal),
-                                                ),
-                                                thisMember.roles.first
-                                                            .startDate ==
-                                                        null
-                                                    ? new Text('No Information')
-                                                    : new Text(
-                                                        formatter.format(
-                                                            thisMember
-                                                                .roles
-                                                                .first
-                                                                .startDate),
-                                                        style: new TextStyle(
-                                                            color:
-                                                                memberContainerTextColor,
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                      ),
-                                              ],
-                                            ),
-                                            // new SizedBox(height: 8),
-                                            new Row(
-                                              children: [
-                                                new Text(
-                                                  'End Date: ',
-                                                  style: new TextStyle(
-                                                      color:
-                                                          memberContainerTextColor,
-                                                      fontSize: 12.0,
-                                                      fontWeight:
-                                                          FontWeight.normal),
-                                                ),
-                                                thisMember.roles.first
-                                                            .endDate ==
-                                                        null
-                                                    ? new Text('No Information')
-                                                    : new Text(
-                                                        formatter.format(
-                                                            thisMember.roles
-                                                                .first.endDate),
-                                                        style: new TextStyle(
-                                                            color:
-                                                                memberContainerTextColor,
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                      ),
-                                              ],
-                                            ),
-                                            // new SizedBox(height: 8),
-                                            thisMember.roles.first
-                                                        .nextElection ==
-                                                    null
-                                                ? new SizedBox.shrink()
-                                                : new Row(
-                                                    children: [
-                                                      new Text(
-                                                        'Next Election: ',
-                                                        style: new TextStyle(
-                                                            color:
-                                                                memberContainerTextColor,
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                      ),
-                                                      new Text(
-                                                        thisMember.roles.first
-                                                            .nextElection,
-                                                        style: new TextStyle(
-                                                            color:
-                                                                memberContainerTextColor,
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                      ),
-                                                    ],
-                                                  ),
-                                          ],
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: thisMember
+                                              .roles.first.billsCosponsored ==
+                                          null
+                                      ? const Text('Co-Sponsored: No Information')
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Co-Sponsored: ${thisMember.roles.first
+                                                    .billsCosponsored}',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight:
+                                                    FontWeight.normal),
+                                          ),
                                         ),
-                                      )
-                                    ],
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, left: 10.0),
+                                    child: const Text(
+                                      'Committees: ',
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: new SizedBox(
-                                  height: 25,
-                                  child: new Row(
-                                    children: <Widget>[
-                                      thisMember.roles.first.phone == null
-                                          ? new SizedBox.shrink()
-                                          : new Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 2.5),
-                                                child: new ElevatedButton.icon(
-                                                    icon: Icon(Icons.phone,
-                                                        color:
-                                                            darkThemeTextColor,
-                                                        size: 15),
-                                                    label: Text('Call',
-                                                        style: TextStyle(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                    onPressed: () async =>
-                                                        await launchUrl(Uri.parse(
-                                                            'tel://${thisMember.roles.first.phone}')),
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty.all<Color>(
-                                                                Theme.of(
-                                                                        context)
-                                                                    .primaryColorDark))),
-                                              ),
-                                            ),
-                                      thisMember.twitterAccount == null
-                                          ? new SizedBox.shrink()
-                                          : new Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 2.5),
-                                                child: new ElevatedButton.icon(
-                                                    icon: Icon(Icons.launch,
-                                                        color:
-                                                            darkThemeTextColor,
-                                                        size: 15),
-                                                    label: Text('Twitter',
-                                                        style: TextStyle(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                    onPressed: () async =>
-                                                        await Functions.linkLaunch(
-                                                            context,
-                                                            'https://twitter.com/${thisMember.twitterAccount}',
-                                                            userDatabase,
-                                                            userIsPremium,
-                                                            appBarTitle:
-                                                                '@${thisMember.twitterAccount}'),
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark))),
-                                              ),
-                                            ),
-                                      thisMember.url == null
-                                          // || thisMember.url.isEmpty
-                                          ? new SizedBox.shrink()
-                                          : new Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 2.5),
-                                                child: new ElevatedButton.icon(
-                                                    icon: Icon(Icons.web,
-                                                        color:
-                                                            darkThemeTextColor,
-                                                        size: 15),
-                                                    label: Text('Website',
-                                                        style: TextStyle(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                    onPressed: () async =>
-                                                        await Functions.linkLaunch(
-                                                            context,
-                                                            thisMember.url,
-                                                            userDatabase,
-                                                            userIsPremium,
-                                                            appBarTitle:
-                                                                '${thisMember.firstName} ${thisMember.lastName}'),
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark))),
-                                              ),
-                                            ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: new SizedBox(
-                                  height: 25,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 2.5),
-                                          child: new ElevatedButton.icon(
-                                            icon: FaIcon(
-                                                FontAwesomeIcons.planeDeparture,
-                                                size: 12,
-                                                color: userIsPremium ||
-                                                        userIsLegacy
-                                                    ? darkThemeTextColor
-                                                    : null),
-                                            label: Text('Funded Travel',
-                                                style: TextStyle(
-                                                    color: userIsPremium ||
-                                                            userIsLegacy
-                                                        ? darkThemeTextColor
-                                                        : null)),
-                                            onPressed: () async =>
-                                                !userIsPremium && !userIsLegacy
-                                                    ? Functions
-                                                        .requestInAppPurchase(
-                                                            context,
-                                                            userIsPremium,
-                                                            whatToShow:
-                                                                'upgrades')
-                                                    : memberPrivateTravel
-                                                            .isEmpty
-                                                        ? null
-                                                        : setState(() {
-                                                            showPrivateTravel =
-                                                                !showPrivateTravel;
-                                                            showOfficeExpenses =
-                                                                false;
-                                                            showTradeActivity =
-                                                                false;
-                                                          }),
-                                            style: ButtonStyle(
-                                                backgroundColor: MaterialStateProperty
-                                                    .all((!userIsPremium &&
-                                                                !userIsLegacy) ||
-                                                            memberPrivateTravel
-                                                                .isEmpty
-                                                        ? Theme.of(context)
-                                                            .disabledColor
-                                                        : Theme.of(context)
-                                                            .primaryColorDark)),
-                                          ),
-                                        ),
-                                      ),
-                                      thisMember.roles.first.chamber
-                                                  .toLowerCase() ==
-                                              'senate'
-                                          ? SizedBox.shrink()
-                                          : Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 2.5),
-                                                child: new ElevatedButton.icon(
-                                                  icon: FaIcon(
-                                                      FontAwesomeIcons
-                                                          .moneyCheckDollar,
-                                                      size: 12,
-                                                      color: (userIsPremium ||
-                                                                  userIsLegacy) &&
-                                                              memberOfficeExpenses
-                                                                  .isNotEmpty
-                                                          ? darkThemeTextColor
-                                                          : null),
-                                                  label: Text(
-                                                      (!userIsPremium &&
-                                                                  !userIsLegacy) ||
-                                                              memberOfficeExpenses
-                                                                  .isEmpty
-                                                          ? 'Office Expenses'
-                                                          : '${formatCurrency.format(memberOfficeExpensesTotal)} (Q$memberOfficeExpensesQuarter)',
-                                                      style: TextStyle(
-                                                          color: (userIsPremium ||
-                                                                      userIsLegacy) &&
-                                                                  memberOfficeExpenses
-                                                                      .isNotEmpty
-                                                              ? darkThemeTextColor
-                                                              : null)),
-                                                  onPressed: () async =>
-                                                      !userIsPremium &&
-                                                              !userIsLegacy
-                                                          ? Functions
-                                                              .requestInAppPurchase(
-                                                                  context,
-                                                                  userIsPremium,
-                                                                  whatToShow:
-                                                                      'upgrades')
-                                                          : memberOfficeExpenses
-                                                                  .isEmpty
-                                                              ? null
-                                                              : setState(() {
-                                                                  showOfficeExpenses =
-                                                                      !showOfficeExpenses;
-                                                                  showPrivateTravel =
-                                                                      false;
-                                                                  showTradeActivity =
-                                                                      false;
-                                                                }),
-                                                  style: ButtonStyle(
-                                                      backgroundColor: MaterialStateProperty
-                                                          .all((!userIsPremium &&
-                                                                      !userIsLegacy) ||
-                                                                  memberOfficeExpenses
-                                                                      .isEmpty
-                                                              ? Theme.of(
-                                                                      context)
-                                                                  .disabledColor
-                                                              : Theme.of(
-                                                                      context)
-                                                                  .primaryColorDark)),
-                                                ),
-                                              ),
-                                            ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: new SizedBox(
-                                  height: 25,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 2.5),
-                                          child: new ElevatedButton.icon(
-                                            icon: FaIcon(
-                                                FontAwesomeIcons.chartLine,
-                                                size: 12,
-                                                color: userIsPremium
-                                                    ? darkThemeTextColor
-                                                    : null),
-                                            label: Text(
-                                                'Recent Market Trade Activity (Reported)',
-                                                style: TextStyle(
-                                                    color: userIsPremium
-                                                        ? darkThemeTextColor
-                                                        : null)),
-                                            onPressed: () async =>
-                                                !userIsPremium
-                                                    ? Functions
-                                                        .requestInAppPurchase(
-                                                            context,
-                                                            userIsPremium,
-                                                            whatToShow:
-                                                                'upgrades')
-                                                    : thisHouseMemberStockTrades
-                                                                .isEmpty &&
-                                                            thisSenateMemberStockTrades
-                                                                .isEmpty
-                                                        ? null
-                                                        : setState(() {
-                                                            showPrivateTravel =
-                                                                false;
-                                                            showOfficeExpenses =
-                                                                false;
-                                                            showTradeActivity =
-                                                                !showTradeActivity;
-                                                          }),
-                                            style: ButtonStyle(
-                                                backgroundColor: MaterialStateProperty
-                                                    .all(!userIsPremium ||
-                                                            (thisHouseMemberStockTrades
-                                                                    .isEmpty &&
-                                                                thisSenateMemberStockTrades
-                                                                    .isEmpty)
-                                                        ? Theme.of(context)
-                                                            .disabledColor
-                                                        : Theme.of(context)
-                                                            .primaryColorDark)),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              !showPrivateTravel
-                                  ? SizedBox.shrink()
-                                  : Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          2.5, 0, 2.5, 2.5),
-                                      child: Container(
-                                        height: dataWindowHeight,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .primaryColorDark
-                                                .withOpacity(0.15),
-                                            border: Border.all(
-                                                width: 2,
-                                                color: Theme.of(context)
-                                                    .primaryColorDark),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        child: Scrollbar(
-                                          // trackVisibility: true,
-                                          // thumbVisibility: true,
-                                          thickness: 5,
-                                          radius: Radius.circular(5),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                15, 0, 15, 0),
-                                                        child: Text(
-                                                            'Privately Funded Travel',
-                                                            style: Styles
-                                                                .googleStyle
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        24.0,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal)),
-                                                      )
-                                                    ] +
-                                                    [
-                                                      Divider(),
-                                                    ] +
-                                                    memberPrivateTravel
-                                                        .map(
-                                                          (_thisTrip) => Stack(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            children: [
-                                                              ListTile(
-                                                                dense: true,
-                                                                title: Text(
-                                                                  '${_thisTrip.traveler}'
-                                                                      .toUpperCase(),
-                                                                  style: new TextStyle(
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                                subtitle:
-                                                                    Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Destination: ${_thisTrip.destination}\nSponsor: ${_thisTrip.sponsor}\nDeparture Date: ${dateWithDayAndYearFormatter.format(_thisTrip.departureDate)}\nReturn Date: ${dateWithDayAndYearFormatter.format(_thisTrip.returnDate)}',
-                                                                      style: new TextStyle(
-                                                                          fontSize:
-                                                                              14.0,
-                                                                          fontWeight:
-                                                                              FontWeight.normal),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              IconButton(
-                                                                  icon: FaIcon(
-                                                                    FontAwesomeIcons
-                                                                        .solidFileLines,
-                                                                    size: 13,
-                                                                  ),
-                                                                  onPressed: () => Functions.linkLaunch(
-                                                                      context,
-                                                                      _thisTrip
-                                                                          .pdfUrl,
-                                                                      userDatabase,
-                                                                      userIsPremium,
-                                                                      appBarTitle:
-                                                                          'Privately Funded Travel',
-                                                                      source:
-                                                                          'travel',
-                                                                      isPdf:
-                                                                          true))
-                                                            ],
-                                                          ),
-                                                        )
-                                                        .toList()),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              !showOfficeExpenses
-                                  ? SizedBox.shrink()
-                                  : Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          2.5, 0, 2.5, 2.5),
-                                      child: Container(
-                                        height: dataWindowHeight,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .primaryColorDark
-                                                .withOpacity(0.15),
-                                            border: Border.all(
-                                                width: 2,
-                                                color: Theme.of(context)
-                                                    .primaryColorDark),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        child: Scrollbar(
-                                          // trackVisibility: true,
-                                          // thumbVisibility: true,
-                                          thickness: 5,
-                                          radius: Radius.circular(5),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                15, 0, 15, 0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                                'Total Office Expenses ${formatCurrency.format(memberOfficeExpensesTotal)}',
-                                                                style: Styles
-                                                                    .googleStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            24.0,
-                                                                        fontWeight:
-                                                                            FontWeight.normal)),
-                                                            Text(
-                                                                'Q$memberOfficeExpensesQuarter $memberOfficeExpensesYear',
-                                                                style: Styles
-                                                                    .regularStyle
-                                                                    .copyWith(
-                                                                        fontSize:
-                                                                            14.0,
-                                                                        fontWeight:
-                                                                            FontWeight.bold)),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ] +
-                                                    [Divider()] +
-                                                    memberOfficeExpenses
-                                                        .map(
-                                                          (_thisExpense) =>
-                                                              Stack(
-                                                            alignment: Alignment
-                                                                .bottomRight,
-                                                            children: [
-                                                              ListTile(
-                                                                dense: true,
-                                                                title: Text(
-                                                                  '${_thisExpense.category}',
-                                                                  style: new TextStyle(
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                                subtitle:
-                                                                    Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Amount: ${formatCurrency.format(_thisExpense.amount)}\nYTD: ${formatCurrency.format(_thisExpense.yearToDate)}\nChange From Prev Qtr: ${formatCurrency.format(_thisExpense.changeFromPreviousQuarter)}',
-                                                                      style: new TextStyle(
-                                                                          fontSize:
-                                                                              14.0,
-                                                                          fontWeight:
-                                                                              FontWeight.normal),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                // trailing: FaIcon(
-                                                                //     FontAwesomeIcons
-                                                                //         .solidFileLines,
-                                                                //     size: 13),
-                                                                // onTap: () => Functions
-                                                                //     .linkLaunch(
-                                                                //         context,
-                                                                //         _thisTrip
-                                                                //             .pdfUrl,
-                                                                //         '${_thisTrip.filingType.name} FILING',
-                                                                //         source:
-                                                                //             'travel',
-                                                                //         isPdf: true),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                        .toList()),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              !showTradeActivity
-                                  ? SizedBox.shrink()
-                                  : Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          2.5, 0, 2.5, 2.5),
-                                      child: Container(
-                                        height: dataWindowHeight,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .primaryColorDark
-                                                .withOpacity(0.15),
-                                            border: Border.all(
-                                                width: 2,
-                                                color: Theme.of(context)
-                                                    .primaryColorDark),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        child: Scrollbar(
-                                          // trackVisibility: true,
-                                          // thumbVisibility: true,
-                                          thickness: 5,
-                                          radius: Radius.circular(5),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(15, 0, 15, 0),
-                                                    child: Text(
-                                                        'Recently Reported Market Trade Activity',
-                                                        style: Styles
-                                                            .googleStyle
-                                                            .copyWith(
-                                                                fontSize: 24.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal)),
-                                                  ),
-                                                  Divider(),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(15, 0, 15, 0),
-                                                    child: Column(
-                                                      children: isHouseMember
-                                                          ? thisHouseMemberStockTrades
-                                                              .map((e) =>
-                                                                  !isHouseMember
-                                                                      ? SizedBox
-                                                                          .shrink()
-                                                                      : Stack(
-                                                                          alignment:
-                                                                              Alignment.bottomRight,
-                                                                          children: [
-                                                                            ListTile(
-                                                                              dense: true,
-                                                                              contentPadding: const EdgeInsets.all(0),
-                                                                              title: Container(
-                                                                                padding: const EdgeInsets.all(3),
-                                                                                decoration: BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
-                                                                                child: Row(
-                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      '\$${e.ticker == '--' ? 'N/A' : e.ticker}',
-                                                                                      style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                                                                                    ),
-                                                                                    // Spacer(),
-                                                                                    Text('E: ${dateWithDayAndYearFormatter.format(e.transactionDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
-                                                                                    Text('D: ${dateWithDayAndYearFormatter.format(e.disclosureDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              subtitle: Column(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Text('${e.assetDescription.replaceAll(RegExp(r'\<(.*)\>'), '')}\nTrade Type: ${e.type.replaceFirst('_', ' ').toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
-                                                                                  !e.capGainsOver200Usd ? SizedBox.shrink() : Text('Capital gains reported', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                            IconButton(
-                                                                                icon: FaIcon(
-                                                                                  FontAwesomeIcons.solidFileLines,
-                                                                                  size: 13,
-                                                                                ),
-                                                                                onPressed: () => Functions.linkLaunch(context, e.ptrLink, userDatabase, userIsPremium, appBarTitle: '${e.representative}', source: 'stock_trade', isPdf: true))
-                                                                          ],
-                                                                        ))
-                                                              .toList()
-                                                          : thisSenateMemberStockTrades
-                                                              .map((e) =>
-                                                                  isHouseMember
-                                                                      ? SizedBox
-                                                                          .shrink()
-                                                                      : ListTile(
-                                                                          dense:
-                                                                              true,
-                                                                          contentPadding:
-                                                                              const EdgeInsets.all(0),
-                                                                          title:
-                                                                              Container(
-                                                                            padding:
-                                                                                const EdgeInsets.all(3),
-                                                                            decoration:
-                                                                                BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
-                                                                            child:
-                                                                                Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                              children: [
-                                                                                Text(
-                                                                                  e.ticker == '--' ? 'N/A' : e.ticker,
-                                                                                  style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                                                                                ),
-                                                                                // Spacer(),
-                                                                                Text('E: ${dateWithDayAndYearFormatter.format(e.transactionDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
-                                                                                Text('D: ${dateWithDayAndYearFormatter.format(e.disclosureDate)}', style: Styles.regularStyle.copyWith(fontSize: 12, fontWeight: FontWeight.normal)),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          subtitle:
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Text('${e.assetDescription.replaceAll(RegExp(r'\<(.*)\>'), '')}\nAsset Type: ${e.assetType}\nTrade Type: ${e.type.toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}\nAmount: ${e.amount}\nComments: ${e.comment == null || e.comment == '--' ? 'None' : e.comment}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
-                                                                              // Text(e.assetDescription.contains('scanned PDF') ? 'PDF Link: ${e.ptrLink}' : '', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal))
-                                                                            ],
-                                                                          ),
-                                                                          trailing: !e.assetDescription.toLowerCase().contains('scanned PDF')
-                                                                              ? SizedBox.shrink()
-                                                                              : FaIcon(FontAwesomeIcons.solidFileLines, size: 13),
-                                                                          onTap: () => Functions.linkLaunch(
-                                                                              context,
-                                                                              e.ptrLink,
-                                                                              userDatabase,
-                                                                              userIsPremium,
-                                                                              appBarTitle: 'Senate Trade',
-                                                                              source: 'stock_trade',
-                                                                              isPdf: false),
-                                                                        ))
-                                                              .toList(),
-                                                    ),
-                                                  ),
-                                                ]),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              Container(
-                                margin:
-                                    new EdgeInsets.only(top: 10, left: 10.0),
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    new Container(
-                                      child: new Text(
-                                        'Latest Vote: ',
-                                        style: new TextStyle(
-                                            // color: Colors.blue[900],
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    new Container(
-                                      child: thisMember.mostRecentVote ==
-                                                  null ||
-                                              thisMember.mostRecentVote == ''
-                                          ? new Text('No Vote Information')
-                                          : new Text(
-                                              formatter.format(DateTime.parse(
-                                                  thisMember.mostRecentVote)),
-                                              style: new TextStyle(
-                                                  // color: Colors.blue[900],
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 10, left: 10.0),
-                                      child: new Text(
-                                        'Votes: ',
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember.roles.first
-                                                .votesWithPartyPct ==
-                                            null
-                                        ? Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                                'Total: No Information'))
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'Total: ${thisMember.roles.first.totalVotes.toString()}',
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember.roles.first
-                                                .votesWithPartyPct ==
-                                            null
-                                        ? Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child:
-                                                Text('Missed: No Information'))
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'Missed: ${thisMember.roles.first.missedVotes.toString()} (${thisMember.roles.first.missedVotesPct}%)',
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember.roles.first
-                                                .votesWithPartyPct ==
-                                            null
-                                        ? Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child:
-                                                Text('Present: No Information'))
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'Present: ${thisMember.roles.first.totalPresent.toString()} (${thisMember.roles.first.totalPresent}%)',
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember.roles.first
-                                                .votesWithPartyPct ==
-                                            null
-                                        ? Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: Text(
-                                                'With Party: No Information'))
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'With Party: ' +
-                                                  thisMember.roles.first
-                                                      .votesWithPartyPct
-                                                      .toString() +
-                                                  '%',
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember.roles.first
-                                                .votesAgainstPartyPct ==
-                                            null
-                                        ? Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: Text(
-                                                'Against Party: No Information'))
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'Against Party: ' +
-                                                  thisMember.roles.first
-                                                      .votesAgainstPartyPct
-                                                      .toString() +
-                                                  '%',
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 10, left: 10.0),
-                                      child: new Text(
-                                        'Bills',
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child:
-                                        thisMember.roles.first.billsSponsored ==
-                                                null
-                                            ? Text('Sponsored: No Information')
-                                            : new Container(
-                                                margin: new EdgeInsets.only(
-                                                    top: 1, left: 10.0),
-                                                child: new Text(
-                                                  'Sponsored: ' +
-                                                      thisMember.roles.first
-                                                          .billsSponsored
-                                                          .toString(),
-                                                  style: new TextStyle(
-                                                      fontSize: 14.0,
-                                                      fontWeight:
-                                                          FontWeight.normal),
-                                                ),
-                                              ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: thisMember
-                                                .roles.first.billsCosponsored ==
-                                            null
-                                        ? Text('Co-Sponsored: No Information')
-                                        : new Container(
-                                            margin: new EdgeInsets.only(
-                                                top: 1, left: 10.0),
-                                            child: new Text(
-                                              'Co-Sponsored: ' +
-                                                  thisMember.roles.first
-                                                      .billsCosponsored
-                                                      .toString(),
-                                              style: new TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              new Row(
+                              ],
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.only(top: 1, left: 10.0),
+                              alignment: Alignment.topLeft,
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 10, left: 10.0),
-                                      child: new Text(
-                                        'Committees: ',
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
+                                children: [
+                                  thisMember.roles.first.committees.isEmpty
+                                      ? const Text('- No Committees Listed')
+                                      : ListView.builder(
+                                          primary: false,
+                                          shrinkWrap: true,
+                                          itemCount: thisMember
+                                              .roles.first.committees.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Text('- ${thisMember.roles.first
+                                                    .committees[index].name}');
+                                          },
+                                        ),
                                 ],
                               ),
-                              new Container(
-                                padding:
-                                    new EdgeInsets.only(top: 1, left: 10.0),
-                                alignment: Alignment.topLeft,
-                                child: new Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    thisMember.roles.first.committees.length ==
-                                            0
-                                        ? new Text('- No Committees Listed')
-                                        : new ListView.builder(
-                                            primary: false,
-                                            shrinkWrap: true,
-                                            itemCount: thisMember
-                                                .roles.first.committees.length,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return new Text('- ' +
-                                                  thisMember.roles.first
-                                                      .committees[index].name
-                                                      .toString());
-                                            },
-                                          ),
-                                  ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, left: 10.0),
+                                    child: const Text(
+                                      'Sub-Committees: ',
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              new Row(
+                              ],
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.only(top: 1, left: 10.0),
+                              alignment: Alignment.topLeft,
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 10, left: 10.0),
-                                      child: new Text(
-                                        'Sub-Committees: ',
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  thisMember.roles.first.subcommittees.isEmpty
+                                      ? const Text('- No Sub-Committees Listed')
+                                      : ListView.builder(
+                                          primary: false,
+                                          shrinkWrap: true,
+                                          itemCount: thisMember.roles.first
+                                              .subcommittees.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Text(
+                                              '- ${thisMember
+                                                      .roles
+                                                      .first
+                                                      .subcommittees[index]
+                                                      .name}',
+                                            );
+                                          },
+                                        ),
                                 ],
                               ),
-                              new Container(
-                                padding:
-                                    new EdgeInsets.only(top: 1, left: 10.0),
-                                alignment: Alignment.topLeft,
-                                child: new Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    thisMember.roles.first.subcommittees
-                                                .length ==
-                                            0
-                                        ? new Text('- No Sub-Committees Listed')
-                                        : new ListView.builder(
-                                            primary: false,
-                                            shrinkWrap: true,
-                                            itemCount: thisMember.roles.first
-                                                .subcommittees.length,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return new Text(
-                                                '- ' +
-                                                    thisMember
-                                                        .roles
-                                                        .first
-                                                        .subcommittees[index]
-                                                        .name
-                                                        .toString(),
-                                              );
-                                            },
-                                          ),
-                                  ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 10, left: 10.0),
+                                    child: const Text(
+                                      'Office Address',
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 10, left: 10.0),
-                                      child: new Text(
-                                        'Office Address',
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 1, left: 10.0),
+                                    child: Text(
+                                      thisMember.roles.first.office ?? 'Office: No Information',
+                                      style: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.normal),
                                     ),
                                   ),
-                                ],
-                              ),
-                              new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: Container(
-                                      margin: new EdgeInsets.only(
-                                          top: 1, left: 10.0),
-                                      child: new Text(
-                                        thisMember.roles.first.office == null
-                                            ? 'Office: No Information'
-                                            : thisMember.roles.first.office,
-                                        style: new TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.normal),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 5),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                          ],
                         ),
                       ),
                     ],
@@ -1733,7 +1707,7 @@ class _MemberDetailState extends State<MemberDetail> {
             mainAxisSize: MainAxisSize.min,
             children: [
               !showBannerAd || userIsPremium
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : bannerAdContainer,
               SharedWidgets.createdByContainer(
                   context, userIsPremium, userDatabase),

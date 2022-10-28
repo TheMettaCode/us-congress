@@ -84,7 +84,7 @@ class HomePageState extends State<HomePage> {
   // int thisPromotion = 0;
   // List<Widget> listOfPromotions = [];
   List<GithubNotifications> githubNotificationsList = [];
-  String thisGithubNotification = '';
+  GithubNotifications thisGithubNotification;
   int headerImageCounter = 0;
   bool randomImageActivated = false;
 
@@ -376,27 +376,27 @@ class HomePageState extends State<HomePage> {
         '*****\nCREDITS: ${userDatabase.get('credits')}\nPERMANENT CREDITS: ${userDatabase.get('permCredits')}\nPURCHASED CREDITS: ${userDatabase.get('purchCredits')} *****');
 
     /// GITHUB NOTIFICATIONS LIST
-    List<GithubNotifications> _githubNotificationsList = [];
-    String _thisGithubNotification = '';
+    List<GithubNotifications> tempGithubNotificationsList = [];
+    GithubNotifications tempGithubNotification;
     try {
-      _githubNotificationsList = githubDataFromJson(userDatabase.get('githubData')).notifications;
-      _thisGithubNotification =
-          _githubNotificationsList[random.nextInt(_githubNotificationsList.length)].message;
+      tempGithubNotificationsList = githubDataFromJson(userDatabase.get('githubData')).notifications;
+      tempGithubNotification =
+      tempGithubNotificationsList[random.nextInt(tempGithubNotificationsList.length)];
       logger.d(
-          '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${_githubNotificationsList.map((e) => e.title)}');
+          '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
     } catch (e) {
       logger.w(
           '^^^^^ ERROR RETRIEVING GITHUB NOTIFICATIONS LIST DATA FROM DBASE (MAIN.DART): $e ^^^^^');
     }
 
     logger.d(
-        '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${_githubNotificationsList.map((e) => e.title)}');
+        '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
     setState(() {
       devUpgraded = userDatabase.get('devUpgraded');
       freeTrialUsed = userDatabase.get('freeTrialUsed');
       newEcwidProducts = userDatabase.get('newEcwidProducts');
-      githubNotificationsList = _githubNotificationsList;
-      thisGithubNotification = _thisGithubNotification;
+      githubNotificationsList = tempGithubNotificationsList;
+      thisGithubNotification = tempGithubNotification;
     });
 
     /// YOUTUBE VIDEOS LIST
@@ -1130,7 +1130,8 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
                 body: appLoading
-                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                    ? AnimatedWidgets.circularProgressWatchtower(
+                        context, userDatabase, userIsPremium,
                         isFullScreen: true,
                         isHomePage: true,
                         thisGithubNotification: thisGithubNotification,
@@ -2444,7 +2445,8 @@ class HomePageState extends State<HomePage> {
                     : MediaQuery.of(context).size.width,
                 height: 75,
                 child: houseFloorLoading || houseFloorActions == null || houseFloorActions.isEmpty
-                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                    ? AnimatedWidgets.circularProgressWatchtower(
+                        context, userDatabase, userIsPremium,
                         widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
                     : BounceInRight(
                         from: 75,
@@ -2588,7 +2590,8 @@ class HomePageState extends State<HomePage> {
                 child: senateFloorLoading ||
                         senateFloorActions == null ||
                         senateFloorActions.isEmpty
-                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                    ? AnimatedWidgets.circularProgressWatchtower(
+                        context, userDatabase, userIsPremium,
                         widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
                     : BounceInRight(
                         from: 75,
@@ -2794,7 +2797,7 @@ class HomePageState extends State<HomePage> {
                                   enableDrag: true,
                                   context: context,
                                   builder: (context) {
-                                    return SharedWidgets.recentVotesList(context, userDatabase,
+                                    return SharedWidgets.recentVotesList(context, userDatabase, userIsPremium,
                                         voteList, houseStockWatchList, senateStockWatchList);
                                   }).then((_) => !userIsPremium &&
                                       interstitialAd != null &&

@@ -17,7 +17,7 @@ class AdMobLibrary {
       final BannerAd myBanner = BannerAd(
         adUnitId: defaultBannerId,
         size: AdSize.banner,
-        request: AdRequest(
+        request: const AdRequest(
           nonPersonalizedAds: false,
           keywords: adMobKeyWords,
         ),
@@ -80,10 +80,11 @@ class AdMobLibrary {
           userDatabase.get('credits') + userDatabase.get('permCredits');
       double chanceToShow = 0;
 
-      if (totalEarnedCredits <= adChanceToShowThreshold)
+      if (totalEarnedCredits <= adChanceToShowThreshold) {
         chanceToShow = 1 - (totalEarnedCredits / adChanceToShowThreshold);
-      else
+      } else {
         chanceToShow = 0;
+      }
 
       bool willShow = random.nextDouble() < chanceToShow;
 
@@ -112,11 +113,13 @@ class AdMobLibrary {
 
         interstitialAd.show();
         // return null;
-      } else
+      } else {
         logger.d(
             '***** INTERSTITIAL AD DATA IS NULL: AND MAY RELOAD DURING APP REFRESH');
-    } else
+      }
+    } else {
       logger.d('USER IS UPGRADED TO PREMIUM STATUS!');
+    }
   }
 
   // void rewardedInterstitialAdShow(RewardedInterstitialAd interstitialAd) {
@@ -219,9 +222,10 @@ class AdMobLibrary {
               isPermanent: true, creditsToAdd: 50);
         },
       );
-      return null;
-    } else
+      return;
+    } else {
       logger.d('***** AD DATA IS NULL: AND MAY RELOAD DURING APP REFRESH');
+    }
     // } else
     //   logger.d('USER IS UPGRADED TO PREMIUM STATUS!');
   }

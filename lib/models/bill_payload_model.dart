@@ -20,16 +20,16 @@ class Bills {
   final List<Result> results;
 
   factory Bills.fromJson(Map<String, dynamic> json) => Bills(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
+        status: json["status"],
+        copyright: json["copyright"],
         results: json["results"] == null
             ? null
             : List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
+        "status": status,
+        "copyright": copyright,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -124,33 +124,31 @@ class Result {
   final List<dynamic> votes;
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        billId: json["bill_id"] == null ? null : json["bill_id"],
-        billSlug: json["bill_slug"] == null ? null : json["bill_slug"],
-        congress: json["congress"] == null ? null : json["congress"],
-        bill: json["bill"] == null ? null : json["bill"],
-        billType: json["bill_type"] == null ? null : json["bill_type"],
-        number: json["number"] == null ? null : json["number"],
-        billUri: json["bill_uri"] == null ? null : json["bill_uri"],
-        title: json["title"] == null ? null : json["title"],
-        shortTitle: json["short_title"] == null ? null : json["short_title"],
+        billId: json["bill_id"],
+        billSlug: json["bill_slug"],
+        congress: json["congress"],
+        bill: json["bill"],
+        billType: json["bill_type"],
+        number: json["number"],
+        billUri: json["bill_uri"],
+        title: json["title"],
+        shortTitle: json["short_title"],
         sponsorTitle:
-            json["sponsor_title"] == null ? null : json["sponsor_title"],
-        sponsor: json["sponsor"] == null ? null : json["sponsor"],
-        sponsorId: json["sponsor_id"] == null ? null : json["sponsor_id"],
-        sponsorUri: json["sponsor_uri"] == null ? null : json["sponsor_uri"],
+            json["sponsor_title"],
+        sponsor: json["sponsor"],
+        sponsorId: json["sponsor_id"],
+        sponsorUri: json["sponsor_uri"],
         sponsorParty:
-            json["sponsor_party"] == null ? null : json["sponsor_party"],
+            json["sponsor_party"],
         sponsorState:
-            json["sponsor_state"] == null ? null : json["sponsor_state"],
+            json["sponsor_state"],
         gpoPdfUri: json["gpo_pdf_uri"],
-        congressdotgovUrl: json["congressdotgov_url"] == null
-            ? null
-            : json["congressdotgov_url"],
-        govtrackUrl: json["govtrack_url"] == null ? null : json["govtrack_url"],
+        congressdotgovUrl: json["congressdotgov_url"],
+        govtrackUrl: json["govtrack_url"],
         introducedDate: json["introduced_date"] == null
             ? null
             : DateTime.parse(json["introduced_date"]),
-        active: json["active"] == null ? null : json["active"],
+        active: json["active"],
         lastVote: json["last_vote"],
         housePassage: json["house_passage"] == null
             ? null
@@ -160,16 +158,14 @@ class Result {
             : DateTime.parse(json["senate_passage"]),
         enacted: json["enacted"],
         vetoed: json["vetoed"],
-        cosponsors: json["cosponsors"] == null ? null : json["cosponsors"],
+        cosponsors: json["cosponsors"],
         cosponsorsByParty: json["cosponsors_by_party"] == null
             ? null
             : CosponsorsByParty.fromJson(json["cosponsors_by_party"]),
-        withdrawnCosponsors: json["withdrawn_cosponsors"] == null
-            ? null
-            : json["withdrawn_cosponsors"],
+        withdrawnCosponsors: json["withdrawn_cosponsors"],
         primarySubject:
-            json["primary_subject"] == null ? null : json["primary_subject"],
-        committees: json["committees"] == null ? null : json["committees"],
+            json["primary_subject"],
+        committees: json["committees"],
         committeeCodes: json["committee_codes"] == null
             ? null
             : List<String>.from(json["committee_codes"].map((x) => x)),
@@ -179,18 +175,16 @@ class Result {
         latestMajorActionDate: json["latest_major_action_date"] == null
             ? null
             : DateTime.parse(json["latest_major_action_date"]),
-        latestMajorAction: json["latest_major_action"] == null
-            ? null
-            : json["latest_major_action"],
+        latestMajorAction: json["latest_major_action"],
         housePassageVote: json["house_passage_vote"] == null
             ? null
             : DateTime.parse(json["house_passage_vote"]),
         senatePassageVote: json["senate_passage_vote"] == null
             ? null
             : DateTime.parse(json["senate_passage_vote"]),
-        summary: json["summary"] == null ? null : json["summary"],
+        summary: json["summary"],
         summaryShort:
-            json["summary_short"] == null ? null : json["summary_short"],
+            json["summary_short"],
         versions: json["versions"] == null
             ? null
             : List<Version>.from(
@@ -204,29 +198,29 @@ class Result {
       );
 
   Map<String, dynamic> toJson() => {
-        "bill_id": billId == null ? 'noBillId' : billId,
-        "bill_slug": billSlug == null ? null : billSlug,
-        "congress": congress == null ? null : congress,
-        "bill": bill == null ? null : bill,
-        "bill_type": billType == null ? null : billType,
-        "number": number == null ? null : number,
-        "bill_uri": billUri == null ? null : billUri,
-        "title": title == null ? null : title,
-        "short_title": shortTitle == null ? null : shortTitle,
-        "sponsor_title": sponsorTitle == null ? null : sponsorTitle,
-        "sponsor": sponsor == null ? null : sponsor,
-        "sponsor_id": sponsorId == null ? null : sponsorId,
-        "sponsor_uri": sponsorUri == null ? null : sponsorUri,
-        "sponsor_party": sponsorParty == null ? null : sponsorParty,
-        "sponsor_state": sponsorState == null ? null : sponsorState,
+        "bill_id": billId ?? 'noBillId',
+        "bill_slug": billSlug,
+        "congress": congress,
+        "bill": bill,
+        "bill_type": billType,
+        "number": number,
+        "bill_uri": billUri,
+        "title": title,
+        "short_title": shortTitle,
+        "sponsor_title": sponsorTitle,
+        "sponsor": sponsor,
+        "sponsor_id": sponsorId,
+        "sponsor_uri": sponsorUri,
+        "sponsor_party": sponsorParty,
+        "sponsor_state": sponsorState,
         "gpo_pdf_uri": gpoPdfUri,
         "congressdotgov_url":
-            congressdotgovUrl == null ? null : congressdotgovUrl,
-        "govtrack_url": govtrackUrl == null ? null : govtrackUrl,
+            congressdotgovUrl,
+        "govtrack_url": govtrackUrl,
         "introduced_date": introducedDate == null
             ? null
             : "${introducedDate.year.toString().padLeft(4, '0')}-${introducedDate.month.toString().padLeft(2, '0')}-${introducedDate.day.toString().padLeft(2, '0')}",
-        "active": active == null ? null : active,
+        "active": active,
         "last_vote": lastVote,
         "house_passage": housePassage == null
             ? null
@@ -234,13 +228,13 @@ class Result {
         "senate_passage": senatePassage,
         "enacted": enacted,
         "vetoed": vetoed,
-        "cosponsors": cosponsors == null ? null : cosponsors,
+        "cosponsors": cosponsors,
         "cosponsors_by_party":
             cosponsorsByParty == null ? null : cosponsorsByParty.toJson(),
         "withdrawn_cosponsors":
-            withdrawnCosponsors == null ? null : withdrawnCosponsors,
-        "primary_subject": primarySubject == null ? null : primarySubject,
-        "committees": committees == null ? null : committees,
+            withdrawnCosponsors,
+        "primary_subject": primarySubject,
+        "committees": committees,
         "committee_codes": committeeCodes == null
             ? null
             : List<dynamic>.from(committeeCodes.map((x) => x)),
@@ -251,13 +245,13 @@ class Result {
             ? null
             : "${latestMajorActionDate.year.toString().padLeft(4, '0')}-${latestMajorActionDate.month.toString().padLeft(2, '0')}-${latestMajorActionDate.day.toString().padLeft(2, '0')}",
         "latest_major_action":
-            latestMajorAction == null ? null : latestMajorAction,
+            latestMajorAction,
         "house_passage_vote": housePassageVote == null
             ? null
             : "${housePassageVote.year.toString().padLeft(4, '0')}-${housePassageVote.month.toString().padLeft(2, '0')}-${housePassageVote.day.toString().padLeft(2, '0')}",
         "senate_passage_vote": senatePassageVote,
-        "summary": summary == null ? null : summary,
-        "summary_short": summaryShort == null ? null : summaryShort,
+        "summary": summary,
+        "summary_short": summaryShort,
         "versions": versions == null
             ? null
             : List<dynamic>.from(versions.map((x) => x.toJson())),
@@ -284,7 +278,7 @@ class Action {
   final String description;
 
   factory Action.fromJson(Map<String, dynamic> json) => Action(
-        id: json["id"] == null ? null : json["id"],
+        id: json["id"],
         chamber:
             json["chamber"] == null ? null : chamberValues.map[json["chamber"]],
         actionType: json["action_type"] == null
@@ -292,18 +286,18 @@ class Action {
             : actionTypeValues.map[json["action_type"]],
         datetime:
             json["datetime"] == null ? null : DateTime.parse(json["datetime"]),
-        description: json["description"] == null ? null : json["description"],
+        description: json["description"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "id": id,
         "chamber": chamber == null ? null : chamberValues.reverse[chamber],
         "action_type":
             actionType == null ? null : actionTypeValues.reverse[actionType],
         "datetime": datetime == null
             ? null
             : "${datetime.year.toString().padLeft(4, '0')}-${datetime.month.toString().padLeft(2, '0')}-${datetime.day.toString().padLeft(2, '0')}",
-        "description": description == null ? null : description,
+        "description": description,
       };
 }
 
@@ -328,13 +322,13 @@ class CosponsorsByParty {
 
   factory CosponsorsByParty.fromJson(Map<String, dynamic> json) =>
       CosponsorsByParty(
-        r: json["R"] == null ? null : json["R"],
-        d: json["D"] == null ? null : json["D"],
+        r: json["R"],
+        d: json["D"],
       );
 
   Map<String, dynamic> toJson() => {
-        "R": r == null ? null : r,
-        "D": d == null ? null : d,
+        "R": r,
+        "D": d,
       };
 }
 
@@ -352,20 +346,18 @@ class Version {
   final String congressdotgovUrl;
 
   factory Version.fromJson(Map<String, dynamic> json) => Version(
-        status: json["status"] == null ? null : json["status"],
-        title: json["title"] == null ? null : json["title"],
-        url: json["url"] == null ? null : json["url"],
-        congressdotgovUrl: json["congressdotgov_url"] == null
-            ? null
-            : json["congressdotgov_url"],
+        status: json["status"],
+        title: json["title"],
+        url: json["url"],
+        congressdotgovUrl: json["congressdotgov_url"],
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "title": title == null ? null : title,
-        "url": url == null ? null : url,
+        "status": status,
+        "title": title,
+        "url": url,
         "congressdotgov_url":
-            congressdotgovUrl == null ? null : congressdotgovUrl,
+            congressdotgovUrl,
       };
 }
 
@@ -376,9 +368,7 @@ class EnumValues<T> {
   EnumValues(this.map);
 
   Map<T, String> get reverse {
-    if (reverseMap == null) {
-      reverseMap = map.map((k, v) => new MapEntry(v, k));
-    }
+    reverseMap ??= map.map((k, v) => MapEntry(v, k));
     return reverseMap;
   }
 }

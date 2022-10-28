@@ -37,10 +37,10 @@ class CongressStockWatchApi {
 
       if (_currentHouseStockWatchList.isEmpty ||
           DateTime.parse(userDatabase.get('lastHouseStockWatchListRefresh'))
-              .isBefore(DateTime.now().subtract(Duration(hours: 3)))) {
+              .isBefore(DateTime.now().subtract(const Duration(hours: 3)))) {
         logger.d('***** Retrieving House Stock Watch Data... *****');
 
-        final String houseStockWatchUrl =
+        const String houseStockWatchUrl =
             'https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json';
 
         final response = await http.get(Uri.parse(houseStockWatchUrl));
@@ -53,7 +53,7 @@ class CongressStockWatchApi {
           List<ChamberMember> membersList = [];
           ChamberMember thisMember;
 
-          if (houseStockWatchList.length > 0) {
+          if (houseStockWatchList.isNotEmpty) {
             logger.d(houseStockWatchList.map((e) => e.transactionDate));
 
             _finalHouseStockWatchList = houseStockWatchList;
@@ -63,7 +63,7 @@ class CongressStockWatchApi {
 
             _finalHouseStockWatchList.removeWhere((element) =>
                 element.transactionDate.isAfter(DateTime.now()) ||
-                element.transactionDate.isBefore(DateTime.now().subtract(Duration(days: 365))));
+                element.transactionDate.isBefore(DateTime.now().subtract(const Duration(days: 365))));
 
             if (_currentHouseStockWatchList.isEmpty ||
                 _finalHouseStockWatchList.first.representative !=
@@ -96,7 +96,7 @@ class CongressStockWatchApi {
                 final String subject =
                     'MARKET TRADE REPORT FOR ${_finalHouseStockWatchList.first.representative}';
                 final String messageBody =
-                    'HOUSE TRADE REPORT: ${thisMember == null ? _finalHouseStockWatchList.first.representative : '\@${thisMember.twitterAccount}'} ${_finalHouseStockWatchList.first.type.toUpperCase().replaceFirst('_', ' ')} of ${_finalHouseStockWatchList.first.ticker == 'N/A' || _finalHouseStockWatchList.first.ticker == '--' || _finalHouseStockWatchList.first.ticker == null ? '' : '\$${_finalHouseStockWatchList.first.ticker}'} ${_finalHouseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
+                    'HOUSE TRADE REPORT: ${thisMember == null ? _finalHouseStockWatchList.first.representative : '@${thisMember.twitterAccount}'} ${_finalHouseStockWatchList.first.type.toUpperCase().replaceFirst('_', ' ')} of ${_finalHouseStockWatchList.first.ticker == 'N/A' || _finalHouseStockWatchList.first.ticker == '--' || _finalHouseStockWatchList.first.ticker == null ? '' : '\$${_finalHouseStockWatchList.first.ticker}'} ${_finalHouseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
 
                 List<String> capitolBabbleNotificationsList =
                     List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
@@ -106,8 +106,9 @@ class CongressStockWatchApi {
               }
             }
 
-            if (_currentHouseStockWatchList.isEmpty)
+            if (_currentHouseStockWatchList.isEmpty) {
               _currentHouseStockWatchList = _finalHouseStockWatchList;
+            }
 
             try {
               logger.i('***** SAVING NEW HOUSE STOCK DATA TO DBASE *****');
@@ -119,12 +120,12 @@ class CongressStockWatchApi {
 
             try {
               List<String> houseStockMarketActivityList = [];
-              _finalHouseStockWatchList.forEach((item) {
+              for (var item in _finalHouseStockWatchList) {
                 if (item.ticker != null && item.ticker != '--' && item.ticker != 'N/A') {
                   houseStockMarketActivityList.add(
                       '${item.ticker}<|:|>${item.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}_${item.type.replaceFirst('_', ' ')}_${item.amount}_${item.representative}_${item.transactionDate}_${item.disclosureDate}_house_${item.owner}');
                 }
-              });
+              }
               userDatabase.put('houseStockMarketActivityList', houseStockMarketActivityList);
             } catch (e) {
               logger
@@ -230,10 +231,10 @@ class CongressStockWatchApi {
 
       if (_currentSenateStockWatchList.isEmpty ||
           DateTime.parse(userDatabase.get('lastSenateStockWatchListRefresh'))
-              .isBefore(DateTime.now().subtract(Duration(hours: 4)))) {
+              .isBefore(DateTime.now().subtract(const Duration(hours: 4)))) {
         logger.d('***** Retrieving Senate Stock Watch Data... *****');
 
-        final String senateStockWatchUrl =
+        const String senateStockWatchUrl =
             'https://senate-stock-watcher-data.s3-us-west-2.amazonaws.com/aggregate/all_transactions.json';
 
         final response = await http.get(Uri.parse(senateStockWatchUrl));
@@ -246,7 +247,7 @@ class CongressStockWatchApi {
           List<ChamberMember> membersList = [];
           ChamberMember thisMember;
 
-          if (senateStockWatchList.length > 0) {
+          if (senateStockWatchList.isNotEmpty) {
             logger.d(senateStockWatchList.map((e) => e.transactionDate));
 
             _finalSenateStockWatchList = senateStockWatchList;
@@ -256,7 +257,7 @@ class CongressStockWatchApi {
 
             _finalSenateStockWatchList.removeWhere((element) =>
                 element.transactionDate.isAfter(DateTime.now()) ||
-                element.transactionDate.isBefore(DateTime.now().subtract(Duration(days: 365))));
+                element.transactionDate.isBefore(DateTime.now().subtract(const Duration(days: 365))));
 
             if (_currentSenateStockWatchList.isEmpty ||
                 _finalSenateStockWatchList.first.senator !=
@@ -289,7 +290,7 @@ class CongressStockWatchApi {
                 final String subject =
                     'MARKET TRADE REPORT FOR SEN. ${_finalSenateStockWatchList.first.senator}';
                 final String messageBody =
-                    'SENATE TRADE REPORT: ${thisMember == null ? 'Sen. ${_finalSenateStockWatchList.first.senator}' : '\@${thisMember.twitterAccount}'} ${_finalSenateStockWatchList.first.type} of ${_finalSenateStockWatchList.first.ticker == 'N/A' || _finalSenateStockWatchList.first.ticker == null || _finalSenateStockWatchList.first.ticker == '--' ? '' : '\$${_finalSenateStockWatchList.first.ticker}'} ${_finalSenateStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
+                    'SENATE TRADE REPORT: ${thisMember == null ? 'Sen. ${_finalSenateStockWatchList.first.senator}' : '@${thisMember.twitterAccount}'} ${_finalSenateStockWatchList.first.type} of ${_finalSenateStockWatchList.first.ticker == 'N/A' || _finalSenateStockWatchList.first.ticker == null || _finalSenateStockWatchList.first.ticker == '--' ? '' : '\$${_finalSenateStockWatchList.first.ticker}'} ${_finalSenateStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
 
                 List<String> capitolBabbleNotificationsList =
                     List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
@@ -299,8 +300,9 @@ class CongressStockWatchApi {
               }
             }
 
-            if (_currentSenateStockWatchList.isEmpty)
+            if (_currentSenateStockWatchList.isEmpty) {
               _currentSenateStockWatchList = _finalSenateStockWatchList;
+            }
 
             try {
               logger.i('***** SAVING NEW SENATE STOCK DATA TO DBASE *****');
@@ -313,12 +315,12 @@ class CongressStockWatchApi {
 
             try {
               List<String> senateStockMarketActivityList = [];
-              _finalSenateStockWatchList.forEach((item) {
+              for (var item in _finalSenateStockWatchList) {
                 if (item.ticker != null && item.ticker != '--' && item.ticker != 'N/A') {
                   senateStockMarketActivityList.add(
                       '${item.ticker}<|:|>${item.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}_${item.type}_${item.amount}_Sen. ${item.senator}_${item.transactionDate}_${item.disclosureDate}_senate_${item.owner}');
                 }
-              });
+              }
               userDatabase.put('senateStockMarketActivityList', senateStockMarketActivityList);
             } catch (e) {
               logger.w(
@@ -448,7 +450,7 @@ class CongressStockWatchApi {
       /// ADD MEMBER IDS TO ALL STOCK MARKET TRADES
       List<String> _newMarketTradesList = [];
 
-      _allStockMarketActivityList.forEach((trade) {
+      for (var trade in _allStockMarketActivityList) {
         String thisTradeMemberName = trade.split('_')[3];
         String _thisTradeFirstName = thisTradeMemberName.split(' ')[1];
 
@@ -476,17 +478,17 @@ class CongressStockWatchApi {
           _newMarketTradesList.add('${trade}_noId');
           // logger.i('MEMBER IS NULL');
         }
-      });
+      }
 
       _newMarketTradesList.retainWhere((element) => DateTime.parse(element.split('_')[4])
-          .isAfter(DateTime.now().subtract(Duration(days: 365))));
+          .isAfter(DateTime.now().subtract(const Duration(days: 365))));
 
       _newMarketTradesList.sort(
           (a, b) => DateTime.parse(a.split('_')[4]).compareTo(DateTime.parse(b.split('_')[4])));
 
       List<MarketActivity> _finalMarketActivityList = [];
 
-      _newMarketTradesList.forEach((trade) {
+      for (var trade in _newMarketTradesList) {
         String tickerInfo = trade.split('_')[0];
         String tickerName = tickerInfo.split('<|:|>')[0];
         String tickerDescription = tickerInfo.split('<|:|>')[1];
@@ -516,7 +518,7 @@ class CongressStockWatchApi {
             memberId: memberId);
 
         _finalMarketActivityList.add(_thisTrade);
-      });
+      }
 
       try {
         userDatabase.put('marketActivityOverview', marketActivityToJson(_finalMarketActivityList));

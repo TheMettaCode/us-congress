@@ -1398,7 +1398,7 @@ class SharedWidgets {
     );
   }
 
-  static Widget recentVotesList(BuildContext context, Box userDatabase, List<Vote> recentVotes,
+  static Widget recentVotesList(BuildContext context, Box userDatabase, bool userIsPremium, List<Vote> recentVotes,
       List<HouseStockWatch> houseStockWatchList, List<SenateStockWatch> senateStockWatchList) {
     logger.d('***** ALL VOTES: ${recentVotes.map((e) => e.bill.billId)} *****');
     List<RcPosition> positions = [];
@@ -1606,7 +1606,7 @@ class SharedWidgets {
                                                   context: context,
                                                   builder: (context) => SingleChildScrollView(
                                                     child: getVoteTile(
-                                                        userDatabase,
+                                                        userDatabase, userIsPremium,
                                                         thisRecentVote,
                                                         positionsAvailable,
                                                         houseStockWatchList,
@@ -1662,7 +1662,7 @@ class SharedWidgets {
   }
 
   /// VOTE TILE
-  static Widget getVoteTile(Box userDatabase, Vote thisVote, bool rollCallAvailable,
+  static Widget getVoteTile(Box userDatabase, bool userIsPremium, Vote thisVote, bool rollCallAvailable,
       List<HouseStockWatch> houseStockWatchList, List<SenateStockWatch> senateStockWatchList) {
     bool darkTheme = userDatabase.get('darkTheme');
     bool validUri = Uri.parse(thisVote.bill.apiUri).isAbsolute;
@@ -1902,7 +1902,7 @@ class SharedWidgets {
                         child: OutlinedButton.icon(
                             icon: rollCallAvailable
                                 ? gettingPositions
-                                    ? AnimatedWidgets.circularProgressWatchtower(context,
+                                    ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                                         widthAndHeight: 10, strokeWidth: 2, isFullScreen: false)
                                     : Pulse(
                                         infinite: true,

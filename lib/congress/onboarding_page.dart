@@ -7,11 +7,13 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/main.dart';
 
 class OnBoardingPage extends StatefulWidget {
+  const OnBoardingPage({Key key}) : super(key: key);
+
   @override
-  _OnBoardingPageState createState() => _OnBoardingPageState();
+  OnBoardingPageState createState() => OnBoardingPageState();
 }
 
-class _OnBoardingPageState extends State<OnBoardingPage> {
+class OnBoardingPageState extends State<OnBoardingPage> {
   // final introKey = GlobalKey<IntroductionScreenState>();
 
   @override
@@ -29,7 +31,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   void _onIntroEnd(context) async {
     await userDatabase.put('onboarding', false);
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => MyApp()),
+      MaterialPageRoute(builder: (_) => const MyApp()),
     );
   }
 
@@ -57,7 +59,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   Widget build(BuildContext context) {
     const bodyStyle = TextStyle(fontSize: 19.0);
 
-    const pageDecoration = const PageDecoration(
+    const pageDecoration = PageDecoration(
       titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
       bodyTextStyle: bodyStyle,
       bodyPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
@@ -94,14 +96,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           // title: "US Congress",
           titleWidget: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                new Text('US Congress',
+                Text('US Congress',
                     style: GoogleFonts.bangers(
                         fontSize: 30, color: Theme.of(context).primaryColor)),
-                new SizedBox(height: 5),
-                new Text(
+                const SizedBox(height: 5),
+                const Text(
                     'Keep watch over US Congressional member activities. Including bills, voting and lobbying.',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -113,7 +115,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ),
           // body:
           //     "Instead of having to buy an entire share, invest any amount yo am Nunc id euismod lectus, nou want.",
-          bodyWidget: new Container(
+          bodyWidget: Container(
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(
@@ -133,14 +135,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           // title: "US Congress",
           titleWidget: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                new Text('Stay Informed',
+                Text('Stay Informed',
                     style: GoogleFonts.bangers(
                         fontSize: 30, color: Theme.of(context).primaryColor)),
-                new SizedBox(height: 5),
-                new Text(
+                const SizedBox(height: 5),
+                const Text(
                     'Activate alerts from the Senate and House chambers floor while in session as well as specific congressional members, bills and lobby events.',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -152,7 +154,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ),
           // body:
           //     "Instead of having to buy an entire share, invest any amount yo am Nunc id euismod lectus, nou want.",
-          bodyWidget: new Container(
+          bodyWidget: Container(
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(
@@ -172,14 +174,14 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           // title: "US Congress",
           titleWidget: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                new Text('Follow The Market',
+                Text('Follow The Market',
                     style: GoogleFonts.bangers(
                         fontSize: 30, color: Theme.of(context).primaryColor)),
-                new SizedBox(height: 5),
-                new Text(
+                const SizedBox(height: 5),
+                const Text(
                     'Keep up to date on commodity and stock market trades executed by congressional members.',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -191,7 +193,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           ),
           // body:
           //     "Instead of having to buy an entire share, invest any amount yo am Nunc id euismod lectus, nou want.",
-          bodyWidget: new Container(
+          bodyWidget: Container(
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(

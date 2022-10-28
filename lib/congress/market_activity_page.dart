@@ -21,14 +21,14 @@ class MarketActivityPage extends StatefulWidget {
   final List<HouseStockWatch> houseStockWatchList;
   final List<SenateStockWatch> senateStockWatchList;
   final List<MarketActivity> marketActivityOverviewList;
-  MarketActivityPage(this.membersList, this.houseStockWatchList,
-      this.senateStockWatchList, this.marketActivityOverviewList);
+  const MarketActivityPage(this.membersList, this.houseStockWatchList,
+      this.senateStockWatchList, this.marketActivityOverviewList, {Key key}) : super(key: key);
 
   @override
-  _MarketActivityPageState createState() => _MarketActivityPageState();
+  MarketActivityPageState createState() => MarketActivityPageState();
 }
 
-class _MarketActivityPageState extends State<MarketActivityPage> {
+class MarketActivityPageState extends State<MarketActivityPage> {
   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
   bool _loading = false;
   bool darkTheme = false;
@@ -98,7 +98,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
       _loading = false;
     });
     tradeCalendarScrollController.animateTo(0,
-        duration: Duration(seconds: 30), curve: Curves.linear);
+        duration: const Duration(seconds: 30), curve: Curves.linear);
   }
 
   Future<void> setInitialValues() async {
@@ -206,7 +206,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
             .isAfter(DateTime.now().subtract(Duration(days: numDays))))
         .toList();
 
-    _marketActivityOverviewList.forEach((trade) {
+    for (var trade in _marketActivityOverviewList) {
       String thisTradeTickerName = trade.tickerName;
       String thisTradeTickerDescription = trade.tickerDescription;
       // String thisTradeTradeType = trade.tradeType;
@@ -312,8 +312,9 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
               thisTradeMemberName.toLowerCase())
           .forEach((ticker) {
         String _thisTicker = ticker.tickerName.toUpperCase();
-        if (!_thisMemberTickers.contains(_thisTicker.toUpperCase()))
+        if (!_thisMemberTickers.contains(_thisTicker.toUpperCase())) {
           _thisMemberTickers.add(_thisTicker.toUpperCase());
+        }
       });
 
       if (_thisMemberBuyCount + _thisMemberSellCount > _maxMemberTrades) {
@@ -331,19 +332,21 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
             _thisMemberTickers.length,
             _thisMember));
       }
-    });
+    }
 
     /// TALLY ALL MEMBER DATA
     _memberTradeData.sort(
         (a, b) => b.memberTotalTradeCount.compareTo(a.memberTotalTradeCount));
 
-    if (_memberTradeData.length > numMembersRetain)
+    if (_memberTradeData.length > numMembersRetain) {
       _memberTradeData.removeRange(numMembersRetain, _memberTradeData.length);
+    }
 
     /// TALLY ALL TICKER DATA
     _tickerData.sort((a, b) => b.totalCount.compareTo(a.totalCount));
-    if (_tickerData.length > numMembersRetain)
+    if (_tickerData.length > numMembersRetain) {
       _tickerData.removeRange(numMembersRetain, _tickerData.length);
+    }
 
     /// TALLY ALL DOLLAR RANGE DATA
     _dollarData.retainWhere((element) => element.dollarRange.contains('\$'));
@@ -377,13 +380,13 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
   Future<List<CalendarData>> buildCalendarData(
       List<MarketActivity> allTrades, int daysOfData) async {
     List<CalendarData> _calendarData = [];
-    DateTime _endOfRange = DateTime.now().subtract(Duration(days: 1));
+    DateTime _endOfRange = DateTime.now().subtract(const Duration(days: 1));
     DateTime _startOfRange = _endOfRange.subtract(Duration(days: daysOfData));
     int _maxDayTradeCount = maxDayTradeCount;
 
     for (var i = _endOfRange;
         i.isAfter(_startOfRange);
-        i = i.subtract(Duration(days: 1))) {
+        i = i.subtract(const Duration(days: 1))) {
       // logger.i('THIS DATE: ${dateWithDayFormatter.format(i)}');
       List<MarketActivity> _thisTradeDateList = allTrades
           .where((element) =>
@@ -392,8 +395,9 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
               i.year == element.tradeExecutionDate.year)
           .toList();
 
-      if (_thisTradeDateList.length > maxDayTradeCount)
+      if (_thisTradeDateList.length > maxDayTradeCount) {
         _maxDayTradeCount = _thisTradeDateList.length;
+      }
 
       DateTime _date = i;
 
@@ -430,7 +434,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
             userIsPremium = userDatabase.get('userIsPremium');
             userIsLegacy = !userDatabase.get('userIsPremium') &&
                     List.from(userDatabase.get('userIdList')).any((element) =>
-                        element.toString().startsWith('$oldUserIdPrefix'))
+                        element.toString().startsWith(oldUserIdPrefix))
                 ? true
                 : false;
             appRated = userDatabase.get('appRated');
@@ -442,13 +446,13 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
             return SafeArea(
                 child: Scaffold(
               appBar: AppBar(
-                title: Text('Stock Activity Overview'),
+                title: const Text('Stock Activity Overview'),
                 backgroundColor: darkTheme
                     ? Theme.of(context).primaryColorDark
                     : stockWatchColor,
               ),
               body: _loading
-                  ? AnimatedWidgets.circularProgressWatchtower(context,
+                  ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                       isMarket: true, isFullScreen: true)
                   : Padding(
                       padding: const EdgeInsets.all(0),
@@ -490,7 +494,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                               Expanded(
                                 child: Scrollbar(
                                   child: ListView(
-                                    physics: BouncingScrollPhysics(),
+                                    physics: const BouncingScrollPhysics(),
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Stack(
@@ -569,7 +573,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                         reverse: true,
                                                                         controller: tradeCalendarScrollController,
                                                                         scrollDirection: Axis.horizontal,
-                                                                        physics: BouncingScrollPhysics(),
+                                                                        physics: const BouncingScrollPhysics(),
                                                                         shrinkWrap: true,
                                                                         itemCount: calendarData.length,
                                                                         itemBuilder: (context, index) {
@@ -590,7 +594,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                 InkWell(
                                                                               onTap: () {
                                                                                 // debugPrint('${_thisDay.trades.map((e) => e)}');
-                                                                                if (_thisDay.trades.isNotEmpty)
+                                                                                if (_thisDay.trades.isNotEmpty) {
                                                                                   showModalBottomSheet(
                                                                                       backgroundColor: Colors.transparent,
                                                                                       context: context,
@@ -598,6 +602,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                       builder: (context) {
                                                                                         return SharedWidgets.marketDailyTradesCalendar(context, _thisDay, allMembersList, userDatabase, userIsPremium, allHouseStockWatchList, allSenateStockWatchList);
                                                                                       });
+                                                                                }
                                                                               },
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 1),
@@ -659,7 +664,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                   ],
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: orientation ==
                                                         Orientation.landscape
                                                     ? MediaQuery.of(context)
@@ -671,7 +676,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                         .width,
                                                 child: Card(
                                                   child: tickerData.isEmpty
-                                                      ? SizedBox.shrink()
+                                                      ? const SizedBox.shrink()
                                                       : Column(
                                                           children: [
                                                                 Padding(
@@ -703,7 +708,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                         child:
                                                                             BounceInRight(
                                                                           duration:
-                                                                              Duration(milliseconds: 500),
+                                                                              const Duration(milliseconds: 500),
                                                                           child:
                                                                               InkWell(
                                                                             onTap:
@@ -722,7 +727,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
 
                                                                               debugPrint('${_thisTicker.tickerName} TICKER MEMBERS: ${_tickerMembersList.length}');
 
-                                                                              if (_tickerMembersList.isNotEmpty)
+                                                                              if (_tickerMembersList.isNotEmpty) {
                                                                                 showModalBottomSheet(
                                                                                     backgroundColor: Colors.transparent,
                                                                                     context: context,
@@ -730,6 +735,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                     builder: (context) {
                                                                                       return SharedWidgets.marketActivityTicker(context, _thisTicker.tickerName, _thisTicker.tickerDescription, _tickerMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
                                                                                     });
+                                                                              }
                                                                             },
                                                                             child:
                                                                                 Container(
@@ -747,12 +753,12 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      '${_thisTicker.tickerName}',
+                                                                                      _thisTicker.tickerName,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
-                                                                                    Spacer(),
+                                                                                    const Spacer(),
                                                                                     AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.tickerName.toLowerCase() == _thisTicker.tickerName.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
-                                                                                    SizedBox(width: 5),
+                                                                                    const SizedBox(width: 5),
                                                                                     Text(
                                                                                       '${thisMarketActivityOverviewList.where((element) => element.tickerName.toLowerCase() == _thisTicker.tickerName.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${_thisTicker.tickerPurchaseCount} ▲ | ${_thisTicker.tickerSaleCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
@@ -766,9 +772,9 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                       ))
                                                                   .toList() +
                                                               [
-                                                                Padding(
+                                                                const Padding(
                                                                   padding:
-                                                                      const EdgeInsets
+                                                                      EdgeInsets
                                                                           .all(0),
                                                                   child: SizedBox(
                                                                       height:
@@ -778,7 +784,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                         ),
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: orientation ==
                                                         Orientation.landscape
                                                     ? MediaQuery.of(context)
@@ -790,7 +796,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                         .width,
                                                 child: Card(
                                                   child: memberTradeData.isEmpty
-                                                      ? SizedBox.shrink()
+                                                      ? const SizedBox.shrink()
                                                       : Column(
                                                           children: [
                                                                 Padding(
@@ -824,7 +830,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                         child:
                                                                             BounceInRight(
                                                                           duration:
-                                                                              Duration(milliseconds: 750),
+                                                                              const Duration(milliseconds: 750),
                                                                           child:
                                                                               InkWell(
                                                                             onTap:
@@ -879,12 +885,12 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      '${_thisMember.memberName}',
+                                                                                      _thisMember.memberName,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
-                                                                                    Spacer(),
+                                                                                    const Spacer(),
                                                                                     AnimatedWidgets.flashingEye(context, _thisMember.member.id != null && _thisMember.member.id.toLowerCase() != 'noid' && subscriptionAlertsList.any((item) => item.toLowerCase().contains(_thisMember.member.id.toLowerCase())), false, size: 8, sameColorBright: true),
-                                                                                    SizedBox(width: 5),
+                                                                                    const SizedBox(width: 5),
                                                                                     Text(
                                                                                       '${_thisMember.memberTickerCount} STX | ${_thisMember.memberBuyCount} ▲ | ${_thisMember.memberSellCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
@@ -898,9 +904,9 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                       ))
                                                                   .toList() +
                                                               [
-                                                                Padding(
+                                                                const Padding(
                                                                   padding:
-                                                                      const EdgeInsets
+                                                                      EdgeInsets
                                                                           .all(0),
                                                                   child: SizedBox(
                                                                       height:
@@ -910,7 +916,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                         ),
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 width: orientation ==
                                                         Orientation.landscape
                                                     ? MediaQuery.of(context)
@@ -922,7 +928,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                         .width,
                                                 child: Card(
                                                   child: dollarData.isEmpty
-                                                      ? SizedBox.shrink()
+                                                      ? const SizedBox.shrink()
                                                       : Column(
                                                           children: [
                                                                 Padding(
@@ -954,7 +960,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                         child:
                                                                             BounceInRight(
                                                                           duration:
-                                                                              Duration(milliseconds: 1000),
+                                                                              const Duration(milliseconds: 1000),
                                                                           child:
                                                                               InkWell(
                                                                             onTap:
@@ -973,7 +979,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
 
                                                                               debugPrint('${_thisDollarRange.dollarRange} DOLLAR RANGE MEMBERS: ${_dollarRangeMembersList.length}');
 
-                                                                              if (_dollarRangeMembersList.isNotEmpty)
+                                                                              if (_dollarRangeMembersList.isNotEmpty) {
                                                                                 showModalBottomSheet(
                                                                                     backgroundColor: Colors.transparent,
                                                                                     context: context,
@@ -981,6 +987,7 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                     builder: (context) {
                                                                                       return SharedWidgets.marketActivityDollarRange(context, _thisDollarRange.dollarRange, _dollarRangeMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
                                                                                     });
+                                                                              }
                                                                             },
                                                                             child:
                                                                                 Container(
@@ -998,12 +1005,12 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      '${_thisDollarRange.dollarRange}',
+                                                                                      _thisDollarRange.dollarRange,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
-                                                                                    Spacer(),
+                                                                                    const Spacer(),
                                                                                     AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.dollarAmount.toLowerCase() == _thisDollarRange.dollarRange.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
-                                                                                    SizedBox(width: 5),
+                                                                                    const SizedBox(width: 5),
                                                                                     Text(
                                                                                       '${thisMarketActivityOverviewList.where((element) => element.dollarAmount.toLowerCase() == _thisDollarRange.dollarRange.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${_thisDollarRange.rangeBuyCount} ▲ | ${_thisDollarRange.rangeSellCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
@@ -1017,9 +1024,9 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                                                       ))
                                                                   .toList() +
                                                               [
-                                                                Padding(
+                                                                const Padding(
                                                                   padding:
-                                                                      const EdgeInsets
+                                                                      EdgeInsets
                                                                           .all(0),
                                                                   child: SizedBox(
                                                                       height:
@@ -1034,10 +1041,10 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                           _dataLoading
                                               ? AnimatedWidgets
                                                   .circularProgressWatchtower(
-                                                      context,
+                                                      context, userDatabase, userIsPremium,
                                                       isMarket: true,
                                                       isFullScreen: true)
-                                              : SizedBox.shrink()
+                                              : const SizedBox.shrink()
                                         ],
                                       ),
                                     ],
@@ -1072,9 +1079,18 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                               setState(() => _dataLoading = true);
                               await processChartData(30);
                             },
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(daysOfData != 30
+                                        ? darkTheme
+                                            ? Theme.of(context).primaryColor
+                                            : null // Theme.of(context).disabledColor
+                                        : darkTheme
+                                            ? Theme.of(context).primaryColorDark
+                                            : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context,
+                                    context, userDatabase, userIsPremium,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
@@ -1087,17 +1103,8 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                             ? Theme.of(context).disabledColor
                                             : darkThemeTextColor),
                                   ),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(daysOfData != 30
-                                        ? darkTheme
-                                            ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
-                                        : darkTheme
-                                            ? Theme.of(context).primaryColorDark
-                                            : stockWatchColor)),
                           )),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Expanded(
                               child: OutlinedButton(
                             onPressed: () async {
@@ -1108,9 +1115,18 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                   // _allSenateStockWatchList,
                                   60);
                             },
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(daysOfData != 60
+                                        ? darkTheme
+                                            ? Theme.of(context).primaryColor
+                                            : null // Theme.of(context).disabledColor
+                                        : darkTheme
+                                            ? Theme.of(context).primaryColorDark
+                                            : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context,
+                                    context, userDatabase, userIsPremium,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
@@ -1123,17 +1139,8 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                             ? Theme.of(context).disabledColor
                                             : darkThemeTextColor),
                                   ),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(daysOfData != 60
-                                        ? darkTheme
-                                            ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
-                                        : darkTheme
-                                            ? Theme.of(context).primaryColorDark
-                                            : stockWatchColor)),
                           )),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Expanded(
                               child: OutlinedButton(
                             onPressed: () async {
@@ -1141,9 +1148,18 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                               setState(() => _dataLoading = true);
                               await processChartData(90);
                             },
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(daysOfData != 90
+                                        ? darkTheme
+                                            ? Theme.of(context).primaryColor
+                                            : null // Theme.of(context).disabledColor
+                                        : darkTheme
+                                            ? Theme.of(context).primaryColorDark
+                                            : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context,
+                                    context, userDatabase, userIsPremium,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
@@ -1156,15 +1172,6 @@ class _MarketActivityPageState extends State<MarketActivityPage> {
                                             ? Theme.of(context).disabledColor
                                             : darkThemeTextColor),
                                   ),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(daysOfData != 90
-                                        ? darkTheme
-                                            ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
-                                        : darkTheme
-                                            ? Theme.of(context).primaryColorDark
-                                            : stockWatchColor)),
                           )),
                         ],
                       ))),
