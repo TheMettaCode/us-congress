@@ -316,7 +316,7 @@ class AnimatedWidgets {
                         ],
                       )),
                 ),
-                isHomePage && thisGithubNotification.title.isNotEmpty
+                isHomePage && thisGithubNotification.message.isNotEmpty
                     ? InkWell(
                         onTap: () => thisGithubNotification.url.isEmpty
                             ? null
@@ -325,7 +325,7 @@ class AnimatedWidgets {
                         child: SlideInUp(
                           child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              child: Text(thisGithubNotification.title,
+                              child: Text(thisGithubNotification.message,
                                   textAlign: TextAlign.center,
                                   style: Styles.regularStyle
                                       .copyWith(fontSize: 20 /*, color: darkThemeTextColor*/))),
