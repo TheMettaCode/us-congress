@@ -36,8 +36,8 @@ import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_st
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_api.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
-import 'package:us_congress_vote_tracker/services/github/github-promo-message-api.dart';
-import 'package:us_congress_vote_tracker/services/github/github-promo-message-model.dart';
+import 'package:us_congress_vote_tracker/services/github/usc-app-data-api.dart';
+import 'package:us_congress_vote_tracker/services/github/usc-app-data-model.dart';
 import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
@@ -379,7 +379,7 @@ class HomePageState extends State<HomePage> {
     String _thisGithubNotification = '';
     try {
       _githubNotificationsList =
-          githubMessagesFromJson(userDatabase.get('githubNotifications')).notifications;
+          githubDataFromJson(userDatabase.get('githubNotifications')).notifications;
       _thisGithubNotification =
           _githubNotificationsList[random.nextInt(_githubNotificationsList.length)].message;
       logger.d(

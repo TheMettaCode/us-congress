@@ -34,7 +34,7 @@ import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../services/github/github-promo-message-model.dart';
+import '../services/github/usc-app-data-model.dart';
 
 class Messages {
   static Future<void> showMessage(
@@ -2566,11 +2566,13 @@ class Functions {
   }
 
   static Future<String> addHashTags(String sentence) async {
-    // Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+    Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+    List<String> hashtags = userDatabase.get('hashtags');
     debugPrint('^^^^^ ORIGINAL SENTENCE: $sentence');
     String newSentence = sentence;
 
-    List<String> allWordsToHash = wordsToHash + statesMap.values.toList();
+    // List<String> allWordsToHash = wordsToHash + statesMap.values.toList();
+    List<String> allWordsToHash = hashtags + statesMap.values.toList();
 
     for (var word in allWordsToHash) {
       RegExp match = RegExp('\\b$word\\b', caseSensitive: false);

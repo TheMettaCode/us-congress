@@ -2,45 +2,40 @@
 //
 //     final githubMessages = githubMessagesFromJson(jsonString);
 
-
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
-GithubMessages githubMessagesFromJson(String str) => GithubMessages.fromJson(json.decode(str));
+GithubData githubDataFromJson(String str) => GithubData.fromJson(json.decode(str));
 
-String githubMessagesToJson(GithubMessages data) => json.encode(data.toJson());
+String githubDataToJson(GithubData data) => json.encode(data.toJson());
 
-class GithubMessages {
-  GithubMessages({
+class GithubData {
+  GithubData({
     @required this.app,
-    // @required this.updated,
     @required this.status,
     @required this.notifications,
+    @required this.hashtags,
   });
 
   final String app;
-  // final DateTime updated;
   final String status;
   final List<GithubNotifications> notifications;
+  final List<String> hashtags;
 
-  factory GithubMessages.fromJson(Map<String, dynamic> json) => GithubMessages(
+  factory GithubData.fromJson(Map<String, dynamic> json) => GithubData(
         app: json["app"] ?? 'us-congress',
-        // updated: json["updated"] == null ? DateTime.now() : DateTime.parse(json["updated"]),
         status: json["status"] ?? "ERR",
-        notifications: json["notifications"] == null
-            ? []
-            : List<GithubNotifications>.from(
-                json["notifications"].map((x) => GithubNotifications.fromJson(x))),
+        notifications: List<GithubNotifications>.from(
+                json["notifications"].map((x) => GithubNotifications.fromJson(x))) ??
+            [],
+        hashtags: List<String>.from(json['hashtags']) ?? [],
       );
 
   Map<String, dynamic> toJson() => {
         "app": app,
-        // "updated": updated == null
-        //     ? null
-        //     : "${updated.year.toString().padLeft(4, '0')}-${updated.month.toString().padLeft(2, '0')}-${updated.day.toString().padLeft(2, '0')}",
         "status": status ?? "ERR",
-        "notifications":
-            notifications == null ? null : List<dynamic>.from(notifications.map((x) => x.toJson())),
+        "notifications": List<dynamic>.from(notifications.map((x) => x.toJson())),
+        "hashtags": hashtags ?? [],
       };
 }
 
@@ -101,11 +96,4 @@ class GithubNotifications {
         "support-option": supportOption ?? false,
         "additional-data": additionalData ?? "",
       };
-
-  @override
-  String toString() {
-    // TODO: implement toString
-    "$startDate $expirationDate $title $message $priority $userLevels $url $icon $supportOption $additionalData)";
-    return super.toString();
-  }
 }

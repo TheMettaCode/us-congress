@@ -36,7 +36,7 @@ import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 
-import '../services/github/github-promo-message-model.dart';
+import '../services/github/usc-app-data-model.dart';
 
 class SharedWidgets {
   static Widget createdByContainer(BuildContext context, bool userIsPremium, Box userDatabase) {
@@ -919,8 +919,8 @@ class SharedWidgets {
                                                       ? Icons.star
                                                       : notification.icon == 'store'
                                                           ? Icons.store
-                                                          : notification.icon == 'credit-card'
-                                                              ? Icons.credit_card
+                                                          : notification.icon == 'coins'
+                                                              ? FontAwesomeIcons.coins
                                                               : notification.icon == 'trending-up'
                                                                   ? Icons.trending_up
                                                                   : notification.icon ==
@@ -950,7 +950,9 @@ class SharedWidgets {
                                           ? const SizedBox.shrink()
                                           : notification.additionalData == 'share'
                                               ? const Icon(Icons.share, size: 16)
-                                              : const Icon(Icons.launch, size: 16),
+                                              : notification.additionalData == 'credits'
+                                          ? const Icon(Icons.touch_app, size: 16)
+                                          : const Icon(Icons.launch, size: 16),
                                       onTap: () => notification.additionalData == 'credits'
                                           ? Functions.requestInAppPurchase(context, userIsPremium,
                                               whatToShow: notification.additionalData)

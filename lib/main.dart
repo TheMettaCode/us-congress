@@ -20,7 +20,7 @@ import 'package:us_congress_vote_tracker/models/order_detail.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/congress_stock_watch_api.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
-import 'package:us_congress_vote_tracker/services/github/github-promo-message-api.dart';
+import 'package:us_congress_vote_tracker/services/github/usc-app-data-api.dart';
 import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';

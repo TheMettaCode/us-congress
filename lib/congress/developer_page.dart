@@ -11,7 +11,7 @@ import 'package:us_congress_vote_tracker/models/news_article_model.dart';
 import 'package:us_congress_vote_tracker/models/order_detail.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../services/github/github-promo-message-model.dart';
+import '../services/github/usc-app-data-model.dart';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({Key key, this.title}) : super(key: key);
@@ -52,7 +52,7 @@ class DeveloperPageState extends State<DeveloperPage> {
         _newsArticles[random.nextInt(_newsArticles.length)];
 
     List<GithubNotifications> _githubNotifications =
-        githubMessagesFromJson(userDatabase.get('githubNotifications'))
+        githubDataFromJson(userDatabase.get('githubNotifications'))
             .notifications;
     GithubNotifications _thisGithubNotification =
         _githubNotifications[random.nextInt(_githubNotifications.length)];
