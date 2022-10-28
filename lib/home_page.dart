@@ -288,7 +288,8 @@ class HomePageState extends State<HomePage> {
 
         /// REVERSE SLIDER ANIMATION
         if (_videoListController.offset >= (youTubePlaylist.length.toDouble() - 1) * 150) {
-          _videoListController.animateTo(0, duration: const Duration(seconds: 30), curve: Curves.linear);
+          _videoListController.animateTo(0,
+              duration: const Duration(seconds: 30), curve: Curves.linear);
         } else if (_videoListController.offset <= 30) {
           _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
               duration: const Duration(seconds: 30), curve: Curves.linear);
@@ -378,8 +379,7 @@ class HomePageState extends State<HomePage> {
     List<GithubNotifications> _githubNotificationsList = [];
     String _thisGithubNotification = '';
     try {
-      _githubNotificationsList =
-          githubDataFromJson(userDatabase.get('githubData')).notifications;
+      _githubNotificationsList = githubDataFromJson(userDatabase.get('githubData')).notifications;
       _thisGithubNotification =
           _githubNotificationsList[random.nextInt(_githubNotificationsList.length)].message;
       logger.d(
@@ -1207,8 +1207,7 @@ class HomePageState extends State<HomePage> {
                                           ),
                                         )
                                       : const SizedBox.shrink(),
-                                  orientation == Orientation.landscape ||
-                                          youTubePlaylist.isEmpty
+                                  orientation == Orientation.landscape || youTubePlaylist.isEmpty
                                       ? const SizedBox.shrink()
                                       : Stack(
                                           alignment: Alignment.centerLeft,
@@ -1268,7 +1267,9 @@ class HomePageState extends State<HomePage> {
                                       children: [
                                         userInfo(memberSubs, billSubs, lobbySubs, otherSubs,
                                             subscriptionAlertsList),
-                                        newsArticleSlider(newsArticlesList),
+                                        newsArticlesList.isEmpty
+                                            ? const SizedBox.shrink()
+                                            : newsArticleSlider(newsArticlesList),
                                         houseFloorActions.isEmpty && senateFloorActions.isEmpty
                                             ? const SizedBox.shrink()
                                             : floorActions(orientation),
@@ -1421,15 +1422,14 @@ class HomePageState extends State<HomePage> {
                                   } else if (source == 'userId') {
                                     List<String> currentUserIdList =
                                         List.from(userDatabase.get('userIdList'));
-                                    if (!currentUserIdList.any((element) =>
-                                        element.startsWith('$newUserIdPrefix$data'))) {
+                                    if (!currentUserIdList.any(
+                                        (element) => element.startsWith('$newUserIdPrefix$data'))) {
                                       currentUserIdList
                                           .add('$newUserIdPrefix$data<|:|>${DateTime.now()}');
-                                    } else if (currentUserIdList.any((element) =>
-                                        element.startsWith('$newUserIdPrefix$data'))) {
+                                    } else if (currentUserIdList.any(
+                                        (element) => element.startsWith('$newUserIdPrefix$data'))) {
                                       int existingUserNameIndex = currentUserIdList.indexWhere(
-                                          (element) =>
-                                              element.startsWith('$newUserIdPrefix$data'));
+                                          (element) => element.startsWith('$newUserIdPrefix$data'));
 
                                       String existingUserName =
                                           currentUserIdList.removeAt(existingUserNameIndex);
@@ -1661,8 +1661,8 @@ class HomePageState extends State<HomePage> {
         ? Container(
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
-              borderRadius:
-                  const BorderRadius.only(topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(5), topRight: Radius.circular(5)),
             ),
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width.toDouble(),
@@ -1672,8 +1672,8 @@ class HomePageState extends State<HomePage> {
         : Container(
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
-              borderRadius:
-                  const BorderRadius.only(topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(5), topRight: Radius.circular(5)),
             ),
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width.toDouble(),
@@ -2347,8 +2347,7 @@ class HomePageState extends State<HomePage> {
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      Text(
-                                                          houseStockWatchList.first.representative,
+                                                      Text(houseStockWatchList.first.representative,
                                                           maxLines: 1,
                                                           overflow: TextOverflow.ellipsis,
                                                           style: Styles.regularStyle.copyWith(
@@ -2444,9 +2443,7 @@ class HomePageState extends State<HomePage> {
                     ? MediaQuery.of(context).size.width * 0.58333
                     : MediaQuery.of(context).size.width,
                 height: 75,
-                child: houseFloorLoading ||
-                        houseFloorActions == null ||
-                        houseFloorActions.isEmpty
+                child: houseFloorLoading || houseFloorActions == null || houseFloorActions.isEmpty
                     ? AnimatedWidgets.circularProgressWatchtower(context,
                         widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
                     : BounceInRight(
@@ -2540,7 +2537,10 @@ class HomePageState extends State<HomePage> {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      dateWithTimeFormatter.format(houseFloorActions[index].timestamp.toLocal()),
+                                                      dateWithTimeFormatter.format(
+                                                          houseFloorActions[index]
+                                                              .timestamp
+                                                              .toLocal()),
                                                       style: const TextStyle(
                                                         fontSize: 11,
                                                         fontWeight: FontWeight.bold,
@@ -2690,7 +2690,10 @@ class HomePageState extends State<HomePage> {
                                                           MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
-                                                          dateWithTimeFormatter.format(senateFloorActions[index].timestamp.toLocal()),
+                                                          dateWithTimeFormatter.format(
+                                                              senateFloorActions[index]
+                                                                  .timestamp
+                                                                  .toLocal()),
                                                           style: const TextStyle(
                                                             fontSize: 11,
                                                             fontWeight: FontWeight.bold,
@@ -2881,8 +2884,10 @@ class HomePageState extends State<HomePage> {
                               backgroundColor: democratColor,
                             ),
                           )
-                        : const FaIcon(FontAwesomeIcons.peopleGroup, size: 13, color: Color(0xffffffff)),
-                    label: const Text('Representatives', style: TextStyle(color: Color(0xffffffff))),
+                        : const FaIcon(FontAwesomeIcons.peopleGroup,
+                            size: 13, color: Color(0xffffffff)),
+                    label:
+                        const Text('Representatives', style: TextStyle(color: Color(0xffffffff))),
                     style: ButtonStyle(
                         enableFeedback: true,
                         backgroundColor: darkTheme
@@ -3010,12 +3015,10 @@ class HomePageState extends State<HomePage> {
                                   ),
                             label: Text('Funded Travel',
                                 style: TextStyle(
-                                  color:
-                                      userIsPremium || userIsLegacy ? darkThemeTextColor : null,
+                                  color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
                                 )),
                             onPressed: !userIsPremium && !userIsLegacy
-                                ? () async => Functions.requestInAppPurchase(
-                                    context, userIsPremium,
+                                ? () async => Functions.requestInAppPurchase(context, userIsPremium,
                                     whatToShow: 'upgrades')
                                 : privatelyFundedTripsList.isEmpty
                                     ? null
@@ -3080,68 +3083,68 @@ class HomePageState extends State<HomePage> {
                                     !statesMap.keys.contains(Map<String, dynamic>.from(
                                         userDatabase.get('representativesLocation'))['state']))
                             ? Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(
-                                              Theme.of(context).primaryColorDark)),
-                                      label: Text('Enter Zip',
-                                          style: TextStyle(color: darkThemeTextColor)),
-                                      icon: FaIcon(FontAwesomeIcons.solidCompass,
-                                          size: 13, color: darkThemeTextColor),
-                                      onPressed: () async =>
-                                          await Functions.requestUsageInfo(context)),
-                                ),
-                              ],
-                            )
-                            : Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(
-                                              Theme.of(context).primaryColorDark)),
-                                      label: Text('Enter Zip',
-                                          style: TextStyle(color: darkThemeTextColor)),
-                                      icon: Icon(Icons.location_pin,
-                                          size: 15, color: darkThemeTextColor),
-                                      onPressed: () {
-                                        return homePageTextInput(context, orientation,
-                                            'zipCode', 'Enter your 5 digit U.S. Zip Code');
-                                      }),
-                                ),
-                                Row(
-                                  children: [
-                                    const SizedBox(width: 5),
-                                    ElevatedButton.icon(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ElevatedButton.icon(
                                         style: ButtonStyle(
                                             backgroundColor: MaterialStateProperty.all<Color>(
                                                 Theme.of(context).primaryColorDark)),
-                                        label: Text(
-                                            'Use ${Map<String, dynamic>.from(userDatabase.get('currentAddress'))['zip']}',
+                                        label: Text('Enter Zip',
                                             style: TextStyle(color: darkThemeTextColor)),
-                                        icon: Icon(Icons.location_searching,
+                                        icon: FaIcon(FontAwesomeIcons.solidCompass,
+                                            size: 13, color: darkThemeTextColor),
+                                        onPressed: () async =>
+                                            await Functions.requestUsageInfo(context)),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty.all<Color>(
+                                                Theme.of(context).primaryColorDark)),
+                                        label: Text('Enter Zip',
+                                            style: TextStyle(color: darkThemeTextColor)),
+                                        icon: Icon(Icons.location_pin,
                                             size: 15, color: darkThemeTextColor),
-                                        onPressed: () async {
-                                          String zip = Map<String, dynamic>.from(
-                                              userDatabase.get('currentAddress'))['zip'];
-                                          logger.d(
-                                              '***** DBase update to $zip will happen here. *****');
-                                          await Functions.getUserCongress(context,
-                                                  houseMembersList + senateMembersList, zip)
-                                              .then((value) {
-                                            setState(() => userCongressList = value);
-                                          });
-                                          Functions.processCredits(true,
-                                              isPurchased: false, isPermanent: false);
+                                        onPressed: () {
+                                          return homePageTextInput(context, orientation, 'zipCode',
+                                              'Enter your 5 digit U.S. Zip Code');
                                         }),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const SizedBox(width: 5),
+                                      ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty.all<Color>(
+                                                  Theme.of(context).primaryColorDark)),
+                                          label: Text(
+                                              'Use ${Map<String, dynamic>.from(userDatabase.get('currentAddress'))['zip']}',
+                                              style: TextStyle(color: darkThemeTextColor)),
+                                          icon: Icon(Icons.location_searching,
+                                              size: 15, color: darkThemeTextColor),
+                                          onPressed: () async {
+                                            String zip = Map<String, dynamic>.from(
+                                                userDatabase.get('currentAddress'))['zip'];
+                                            logger.d(
+                                                '***** DBase update to $zip will happen here. *****');
+                                            await Functions.getUserCongress(context,
+                                                    houseMembersList + senateMembersList, zip)
+                                                .then((value) {
+                                              setState(() => userCongressList = value);
+                                            });
+                                            Functions.processCredits(true,
+                                                isPurchased: false, isPermanent: false);
+                                          }),
+                                    ],
+                                  ),
+                                ],
+                              ),
                       ),
                     )
                   ],
@@ -3249,7 +3252,8 @@ class HomePageState extends State<HomePage> {
                                             const SizedBox(width: 5),
                                             Text(
                                                 '${official.shortTitle} ${official.firstName} ${official.lastName} ${official.suffix ?? ''}',
-                                                style: const TextStyle(fontWeight: FontWeight.bold)),
+                                                style:
+                                                    const TextStyle(fontWeight: FontWeight.bold)),
                                             AnimatedWidgets.flashingEye(
                                                 context,
                                                 subscriptionAlertsList.any((element) => element

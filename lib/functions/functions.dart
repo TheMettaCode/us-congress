@@ -9,6 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -1177,16 +1178,115 @@ class Functions {
         ChamberMember thisMember;
 
         if (newsArticles.isNotEmpty) {
-          finalNewsArticlesList = newsArticles;
+          // finalNewsArticlesList = newsArticles;
+          // List<NewsArticle> rawNewsArticlesList = [];
+          // List<String> publisherSlug = rawNewsArticlesList.map((e) => e.slug).toList();
+
+          for (NewsArticle article in newsArticles) {
+            switch (article.slug) {
+              case "politico":
+                {
+                  try {
+                    if (DateFormat('yyyy/MM/dd')
+                        .parse(article.date.trim())
+                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                      finalNewsArticlesList.add(article);
+                    }
+                    debugPrint("^^^ ARTICLE ${article.title} ADDED");
+                    // finalNewsArticlesList.removeWhere((element) => DateFormat('yyyy/MM/dd')
+                    //     .parse(element.date.trim())
+                    //     .isBefore(DateTime.now().subtract(const Duration(days: 14))));
+                  } catch (e) {
+                    debugPrint("^^^ ERROR PARSING POLITICO DATE FORMAT FOR ${article.date}: $e");
+                  }
+                }
+                break;
+
+              case "usatoday":
+                {
+                  try {
+                    if (DateFormat('yyyy/MM/dd')
+                        .parse(article.date.trim())
+                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                      finalNewsArticlesList.add(article);
+                    }
+                    debugPrint("^^^ ARTICLE ${article.title} ADDED");
+                    // finalNewsArticlesList.removeWhere((element) => DateFormat('yyyy/MM/dd')
+                    //     .parse(element.date.trim())
+                    //     .isBefore(DateTime.now().subtract(const Duration(days: 14))));
+                  } catch (e) {
+                    debugPrint("^^^ ERROR PARSING USA TODAY DATE FORMAT FOR ${article.date}: $e");
+                  }
+                }
+                break;
+
+              case "nytimes":
+                {
+                  try {
+                    if (DateFormat('yyyy/MM/dd')
+                        .parse(article.date.trim())
+                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                      finalNewsArticlesList.add(article);
+                    }
+                    debugPrint("^^^ ARTICLE ${article.title} ADDED");
+                    // finalNewsArticlesList.removeWhere((element) => DateFormat('yyyy/MM/dd')
+                    //     .parse(element.date.trim())
+                    //     .isBefore(DateTime.now().subtract(const Duration(days: 14))));
+                  } catch (e) {
+                    debugPrint("^^^ ERROR PARSING NY TIMES DATE FORMAT FOR ${article.date}: $e");
+                  }
+                }
+                break;
+
+              case "propublica":
+                {
+                  try {
+                    if (DateFormat('MMM dd')
+                        .parse(article.date.replaceAll('.', '').trim())
+                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                      finalNewsArticlesList.add(article);
+                    }
+                    debugPrint("^^^ ARTICLE ${article.title} ADDED");
+                    // finalNewsArticlesList.removeWhere((element) => DateFormat('MMM dd')
+                    //     .parse(element.date.replaceAll('.', '').trim())
+                    //     .isBefore(DateTime.now().subtract(const Duration(days: 14))));
+                  } catch (e) {
+                    debugPrint("^^^ ERROR PARSING PROPUBLICA DATE FORMAT FOR ${article.date}: $e");
+                  }
+                }
+                break;
+
+              case "apnews":
+                {
+                  try {
+                    if (DateFormat('MMMM dd, yyyy')
+                        .parse(article.date.trim())
+                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                      finalNewsArticlesList.add(article);
+                    }
+                    debugPrint("^^^ ARTICLE ${article.title} ADDED");
+                    // finalNewsArticlesList.removeWhere((element) => DateFormat('MMMM dd, yyyy')
+                    //     .parse(element.date.trim())
+                    //     .isBefore(DateTime.now().subtract(const Duration(days: 14))));
+                  } catch (e) {
+                    debugPrint("^^^ ERROR PARSING AP NEWS DATE FORMAT FOR ${article.date}: $e");
+                  }
+                }
+                break;
+
+              default:
+                {
+                  debugPrint("^^^^^ NO ACTION TAKEN FOR SLUG ${article.slug}");
+                }
+            }
+          }
 
           // if (_finalNewsArticlesList.length > 30) {
           //   _finalNewsArticlesList.removeRange(
           //       30, _finalNewsArticlesList.length);
           // }
 
-          finalNewsArticlesList.sort((a, b) => a.index.compareTo(b.index));
-
-          // _finalNewsArticleList.removeWhere((element) =>
+          // finalNewsArticlesList.removeWhere((element) =>
           //     element.date.isAfter(DateTime.now()) ||
           //     element.title == '' ||
           //     element.title == null);
@@ -1218,6 +1318,7 @@ class Functions {
           //     _subscribedMemberArticles + _notSubscribedMemberArticles;
 
           if (finalNewsArticlesList.isNotEmpty) {
+            finalNewsArticlesList.sort((a, b) => a.index.compareTo(b.index));
             if (currentNewsArticlesList.isEmpty ||
                     !currentNewsArticlesList
                         .any((element) => element.title == finalNewsArticlesList.first.title)
@@ -1331,8 +1432,7 @@ class Functions {
             currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
       }
     } else {
-      logger
-          .d('***** CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
+      logger.d('***** CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
       finalNewsArticlesList = currentNewsArticlesList;
       logger.d('***** ARTICLES NOT UPDATED: LIST IS CURRENT *****');
       return finalNewsArticlesList;
@@ -1392,8 +1492,8 @@ class Functions {
           List<StatementsResults> subscribedMemberStatements = [];
           List<StatementsResults> notSubscribedMemberStatements = [];
           for (var statement in finalStatementsList) {
-            if (List.from(userDatabase.get('subscriptionAlertsList')).any(
-                (item) => item.toString().toLowerCase().contains(statement.memberId.toLowerCase()))) {
+            if (List.from(userDatabase.get('subscriptionAlertsList')).any((item) =>
+                item.toString().toLowerCase().contains(statement.memberId.toLowerCase()))) {
               subscribedMemberStatements.add(statement);
             } else {
               notSubscribedMemberStatements.add(statement);
@@ -1474,14 +1574,18 @@ class Functions {
                 'Public Statement',
                 '🧑🏽‍💼 Congressional Statements',
                 memberWatched
-                    ? thisMember == null ? '' : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
+                    ? thisMember == null
+                        ? ''
+                        : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
                     : thisStatement.title,
                 statements.results);
           } else if (thisMember != null && ModalRoute.of(context).isCurrent) {
             Messages.showMessage(
                 context: context,
                 message: memberWatched
-                    ? thisMember == null ? '' : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
+                    ? thisMember == null
+                        ? ''
+                        : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
                     : thisStatement.title,
                 networkImageUrl:
                     '${PropublicaApi().memberImageRootUrl}${thisStatement.memberId.toLowerCase()}.jpg',
@@ -1500,12 +1604,10 @@ class Functions {
       } else {
         logger.w('***** API ERROR: LOADING STATEMENTS FROM DBASE: ${response.statusCode} *****');
 
-        return finalStatementsList =
-            currentStatementsList.isNotEmpty ? currentStatementsList : [];
+        return finalStatementsList = currentStatementsList.isNotEmpty ? currentStatementsList : [];
       }
     } else {
-      logger
-          .d('***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
+      logger.d('***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
       finalStatementsList = currentStatementsList;
       logger.d('***** STATEMENTS NOT UPDATED: LIST IS CURRENT *****');
       return finalStatementsList;
@@ -2180,8 +2282,7 @@ class Functions {
           debugPrint('NEW 1ST SENATE FLOOR ACTION: ${finalSenateFloorActions.first.description}');
 
           if (currentSenateFloorActions.isEmpty ||
-              finalSenateFloorActions.first.actionId !=
-                  currentSenateFloorActions.first.actionId) {
+              finalSenateFloorActions.first.actionId != currentSenateFloorActions.first.actionId) {
             userDatabase.put('newSenateFloor', true);
 
             if (userIsDev) {
@@ -2418,20 +2519,18 @@ class Functions {
       if (listToSearch.isNotEmpty && subscribedItems.isNotEmpty) {
         logger.d('***** SUBSCRIBER CHECK FUNCTION RUNNING HERE... *****');
         for (var item in subscribedItems) {
-            logger.d('***** CHECKING LIST ${listToSearch.values} FOR ${item.split('_')[1]} *****');
-            if (listToSearch.values.any((val) => val
-                .toString()
-                .toLowerCase()
-                .contains(item.toString().split('_')[1].toLowerCase()))) {
-              logger.d(
-                  '***** SUB CHECK SUCCESS! ${listToSearch.values} CONTAINS ${item.split('_')[1]} *****');
-              subscribed = true;
-            } else {
-              logger.d(
-                  '***** SUB CHECK FAILED! ${listToSearch.values} DOES NOT CONTAIN ${item.split('_')[1]} *****');
-              subscribed = false;
-            }
+          logger.d('***** CHECKING LIST ${listToSearch.values} FOR ${item.split('_')[1]} *****');
+          if (listToSearch.values.any((val) =>
+              val.toString().toLowerCase().contains(item.toString().split('_')[1].toLowerCase()))) {
+            logger.d(
+                '***** SUB CHECK SUCCESS! ${listToSearch.values} CONTAINS ${item.split('_')[1]} *****');
+            subscribed = true;
+          } else {
+            logger.d(
+                '***** SUB CHECK FAILED! ${listToSearch.values} DOES NOT CONTAIN ${item.split('_')[1]} *****');
+            subscribed = false;
           }
+        }
         return subscribed;
       } else {
         logger.d('***** USER IS NOT SUBSCRIBED TO ANY ITEMS. CONTINUING... *****');
@@ -2536,8 +2635,7 @@ class Functions {
       int congress, String chamber, int sessionNumber, int rollCallNumber) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
-    final url =
-        'congress/v1/$congress/$chamber/sessions/$sessionNumber/votes/$rollCallNumber.json';
+    final url = 'congress/v1/$congress/$chamber/sessions/$sessionNumber/votes/$rollCallNumber.json';
     final headers = PropublicaApi().apiHeaders;
     final authority = PropublicaApi().authority;
     final response = await http.get(Uri.https(authority, url), headers: headers);
