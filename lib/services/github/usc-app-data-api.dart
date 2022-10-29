@@ -10,7 +10,7 @@ import '../github/usc-app-data-model.dart';
 class GithubApi {
   static Future<List<GithubNotifications>> getPromoMessages([BuildContext context]) async {
     Box userDatabase = Hive.box(appDatabase);
-
+    bool appRated = userDatabase.get('appRated');
     List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
     bool userIsPremium = userLevels[1];
@@ -90,14 +90,18 @@ class GithubApi {
           //   debugPrint('^^^^^ ${_newNotifications.length} NEW NOTIFICATIONS ADDED');
           // }
 
-          // if (_newGithubNotifications.isNotEmpty) {
           /// PRUNE AND SORT NOTIFICATIONS
           newGithubNotifications.sort((a, b) =>
               a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
+
           newGithubNotifications.retainWhere((element) =>
               element.startDate.isBefore(now) &&
               (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
               element.userLevels.contains(githubApiUserLevel));
+
+          if (appRated) {
+            newGithubNotifications.removeWhere((element) => element.additionalData == 'rating');
+          }
 
           /// SET 'NEW NOTIFICATIONS RETRIEVED' FLAG TO TRUE
           if (newGithubNotifications.isNotEmpty &&

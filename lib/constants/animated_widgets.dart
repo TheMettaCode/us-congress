@@ -324,11 +324,15 @@ class AnimatedWidgets {
                                 context, thisGithubNotification.url, userDatabase, userIsPremium),
                         child: SlideInUp(
                           child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              child: Text(thisGithubNotification.message,
-                                  textAlign: TextAlign.center,
-                                  style: Styles.regularStyle
-                                      .copyWith(fontSize: 20 /*, color: darkThemeTextColor*/))),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: Text(
+                              thisGithubNotification.message,
+                              textAlign: TextAlign.center,
+                              style: Styles.regularStyle.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/),
+                            ),
+                          ),
                         ),
                       )
                     : const SizedBox.shrink()
