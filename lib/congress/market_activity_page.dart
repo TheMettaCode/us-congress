@@ -351,11 +351,11 @@ class MarketActivityPageState extends State<MarketActivityPage> {
     /// TALLY ALL DOLLAR RANGE DATA
     _dollarData.retainWhere((element) => element.dollarRange.contains('\$'));
     _dollarData.sort((a, b) => int.parse(a.dollarRange
-            .split(' - ')[0]
+            .split('-')[0].trim()
             .replaceFirst('\$', '')
             .replaceAll(',', ''))
         .compareTo(int.parse(b.dollarRange
-            .split(' - ')[0]
+            .split('-')[0].trim()
             .replaceFirst('\$', '')
             .replaceAll(',', ''))));
 
