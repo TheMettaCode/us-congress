@@ -29,6 +29,7 @@ import 'constants/constants.dart';
 
 // [Android-only] This "Headless Task" is run when the Android app
 // is terminated with enableHeadless: true
+@pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   // pragma('vm:entry-point');
   String taskId = task.taskId;
@@ -259,7 +260,7 @@ class MyAppState extends State<MyApp> {
             title: "US Congress",
             theme: userDatabase.get('darkTheme') ? darkThemeData : defaultThemeData,
             home: userDatabase.get('onboarding') == true
-                ? OnBoardingPage()
+                ? const OnBoardingPage()
                 : Scaffold(
                     endDrawer: OrientationBuilder(builder: (context, orientation) {
                       return SafeArea(
@@ -332,7 +333,7 @@ class MyAppState extends State<MyApp> {
                                                                     context,
                                                                     MaterialPageRoute(
                                                                       builder: (context) =>
-                                                                          DeveloperPage(),
+                                                                          const DeveloperPage(),
                                                                     ))),
                                                           )
                                                         : const SizedBox.shrink(),
@@ -524,7 +525,7 @@ class MyAppState extends State<MyApp> {
                                                                   .colorScheme
                                                                   .primary,
                                                             ),
-                                                            Icon(
+                                                            const Icon(
                                                               Icons.star_border_purple500_rounded,
                                                               size: 12,
                                                               color: altHighlightColor,
@@ -577,7 +578,7 @@ class MyAppState extends State<MyApp> {
                                             child: ListTile(
                                               enabled: true,
                                               dense: true,
-                                              leading: FaIcon(FontAwesomeIcons.bug,
+                                              leading: const FaIcon(FontAwesomeIcons.bug,
                                                   size: 12, color: darkThemeTextColor),
                                               title: Text(
                                                   commentSent
@@ -592,7 +593,7 @@ class MyAppState extends State<MyApp> {
                                                   style: Styles.regularStyle.copyWith(
                                                       color: darkThemeTextColor, fontSize: 12)),
                                               trailing: isCommenting
-                                                  ? Icon(Icons.close, color: darkThemeTextColor)
+                                                  ? const Icon(Icons.close, color: darkThemeTextColor)
                                                   : const SizedBox.shrink(),
                                               onTap: () {
                                                 setState(() {
@@ -615,7 +616,7 @@ class MyAppState extends State<MyApp> {
                                         child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: Icon(FontAwesomeIcons.share,
+                                          leading: const Icon(FontAwesomeIcons.share,
                                               size: 15, color: darkThemeTextColor),
                                           title: Text('Share The App',
                                               style: Styles.regularStyle
@@ -637,7 +638,7 @@ class MyAppState extends State<MyApp> {
                                               child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: Icon(FontAwesomeIcons.star,
+                                                leading: const Icon(FontAwesomeIcons.star,
                                                     size: 15, color: darkThemeTextColor),
                                                 title: Text('Rate The App',
                                                     style: Styles.regularStyle
@@ -667,7 +668,7 @@ class MyAppState extends State<MyApp> {
                                               child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: Icon(FontAwesomeIcons.store,
+                                                leading: const Icon(FontAwesomeIcons.store,
                                                     size: 15, color: darkThemeTextColor),
                                                 title: Text('Shop Merchandise',
                                                     style: Styles.regularStyle
@@ -726,7 +727,7 @@ class MyAppState extends State<MyApp> {
                                   child: ListTile(
                                     enabled: true,
                                     enableFeedback: true,
-                                    leading: FaIcon(FontAwesomeIcons.gear,
+                                    leading: const FaIcon(FontAwesomeIcons.gear,
                                         size: 13, color: darkThemeTextColor),
                                     title: Text('Settings',
                                         style: Styles.regularStyle
@@ -736,7 +737,7 @@ class MyAppState extends State<MyApp> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => Settings(),
+                                            builder: (context) => const Settings(),
                                           ));
                                     },
                                   ),
@@ -748,7 +749,7 @@ class MyAppState extends State<MyApp> {
                                         child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: Icon(Icons.developer_board,
+                                          leading: const Icon(Icons.developer_board,
                                               size: 15, color: darkThemeTextColor),
                                           title: Text('Developer Page',
                                               style: Styles.regularStyle
@@ -758,7 +759,7 @@ class MyAppState extends State<MyApp> {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => DeveloperPage(),
+                                                  builder: (context) => const DeveloperPage(),
                                                 ));
                                           },
                                         ),
@@ -805,8 +806,8 @@ class MyAppState extends State<MyApp> {
                         hintText: 'Your email',
                         hintStyle:
                             Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
-                        counterStyle: TextStyle(color: darkThemeTextColor)),
-                    style: TextStyle(color: darkThemeTextColor),
+                        counterStyle: const TextStyle(color: darkThemeTextColor)),
+                    style: const TextStyle(color: darkThemeTextColor),
                     validator: (val) =>
                         // _val.isEmpty ||
                         //         !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -834,8 +835,8 @@ class MyAppState extends State<MyApp> {
                         hintText: 'Your comment',
                         hintStyle:
                             Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
-                        counterStyle: TextStyle(color: darkThemeTextColor)),
-                    style: TextStyle(color: darkThemeTextColor),
+                        counterStyle: const TextStyle(color: darkThemeTextColor)),
+                    style: const TextStyle(color: darkThemeTextColor),
                     validator: (val) =>
                         val.isEmpty || val.length < 10 ? 'Not enough information' : null,
                     onChanged: (comment) {
@@ -870,7 +871,7 @@ class MyAppState extends State<MyApp> {
                               icon: commentSending
                                   ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                                       widthAndHeight: 11, strokeWidth: 1, isFullScreen: false)
-                                  : Icon(Icons.send, size: 10, color: darkThemeTextColor),
+                                  : const Icon(Icons.send, size: 10, color: darkThemeTextColor),
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
                                   setState(() => commentSending = true);
@@ -918,7 +919,7 @@ class MyAppState extends State<MyApp> {
                                   });
                                 }
                               },
-                              label: Text('Send', style: TextStyle(color: darkThemeTextColor))),
+                              label: const Text('Send', style: TextStyle(color: darkThemeTextColor))),
                         ],
                       ),
                     ),
