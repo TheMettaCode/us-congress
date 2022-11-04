@@ -101,10 +101,4 @@ class Order {
         "customer_phone": customerPhone ?? 'No Phone Number',
         "customer_shipping_address": customerShippingAddress
       };
-
-  @override
-  String toString() {
-    // TODO: implement toString
-    return super.toString();
-  }
 }

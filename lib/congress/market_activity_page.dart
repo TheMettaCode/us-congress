@@ -179,36 +179,36 @@ class MarketActivityPageState extends State<MarketActivityPage> {
       maxTickerTrades = minTrades;
       maxRangeTrades = minTrades;
     });
-    List<HouseStockWatch> _houseList = [];
-    List<SenateStockWatch> _senateList = [];
-    List<TickerData> _tickerData = [];
-    List<String> _allTrades = [];
+    List<HouseStockWatch> localHouseList = [];
+    List<SenateStockWatch> localSenateList = [];
+    List<TickerData> localTickerData = [];
+    List<String> localAllTrades = [];
     // List<String> _houseTickers = [];
     // List<String> _senateTickers = [];
-    List<DollarData> _dollarData = [];
-    List<MemberTradeData> _memberTradeData = [];
-    List<MarketActivity> _marketActivityOverviewList = [];
+    List<DollarData> localDollarData = [];
+    List<MemberTradeData> localMemberTradeData = [];
+    List<MarketActivity> localMarketActivityOverviewList = [];
     // List<CalendarData> _calendarData = [];
-    int _maxTickerTrades = 0;
-    int _maxMemberTrades = 0;
-    int _maxRangeTrades = 0;
+    int localMaxTickerTrades = 0;
+    int localMaxMemberTrades = 0;
+    int localMaxRangeTrades = 0;
 
-    _houseList = allHouseStockWatchList
+    localHouseList = allHouseStockWatchList
         .where((element) => element.transactionDate
             .isAfter(DateTime.now().subtract(Duration(days: numDays))))
         .toList();
 
-    _senateList = allSenateStockWatchList
+    localSenateList = allSenateStockWatchList
         .where((element) => element.transactionDate
             .isAfter(DateTime.now().subtract(Duration(days: numDays))))
         .toList();
 
-    _marketActivityOverviewList = allMarketActivityOverviewList
+    localMarketActivityOverviewList = allMarketActivityOverviewList
         .where((element) => element.tradeExecutionDate
             .isAfter(DateTime.now().subtract(Duration(days: numDays))))
         .toList();
 
-    for (var trade in _marketActivityOverviewList) {
+    for (var trade in localMarketActivityOverviewList) {
       String thisTradeTickerName = trade.tickerName;
       String thisTradeTickerDescription = trade.tickerDescription;
       // String thisTradeTradeType = trade.tradeType;
@@ -222,137 +222,142 @@ class MarketActivityPageState extends State<MarketActivityPage> {
       // String thisTradeOwner = trade.tradeOwner;
       String thisTradeMemberId = trade.memberId;
 
-      ChamberMember _thisMember;
+      ChamberMember localThisMember;
 
       try {
-        _thisMember = allMembersList.firstWhere(
+        localThisMember = allMembersList.firstWhere(
             (m) => m.id.toLowerCase() == thisTradeMemberId.toLowerCase());
       } catch (e) {
-        _thisMember = null;
+        localThisMember = null;
       }
 
       /// BUILD TICKER BUY/SALE DATA
-      int _purchaseCount = _marketActivityOverviewList
+      int localPurchaseCount = localMarketActivityOverviewList
           .where((element) =>
               element.tickerName.toLowerCase() ==
                   thisTradeTickerName.toLowerCase() &&
               element.tradeType.toLowerCase().contains('purchase'))
           .length;
-      int _saleCount = _marketActivityOverviewList
+      int localSaleCount = localMarketActivityOverviewList
           .where((element) =>
               element.tickerName.toLowerCase() ==
                   thisTradeTickerName.toLowerCase() &&
               element.tradeType.toLowerCase().contains('sale'))
           .length;
 
-      if (_purchaseCount + _saleCount > _maxTickerTrades) {
-        _maxTickerTrades = _purchaseCount + _saleCount;
+      if (localPurchaseCount + localSaleCount > localMaxTickerTrades) {
+        localMaxTickerTrades = localPurchaseCount + localSaleCount;
       }
 
-      if (_thisMember != null &&
-          !_tickerData
+      if (localThisMember != null &&
+          !localTickerData
               .any((element) => element.tickerName == thisTradeTickerName)) {
-        _tickerData.add(TickerData(
+        localTickerData.add(TickerData(
           thisTradeTickerName,
           thisTradeTickerDescription,
-          _purchaseCount,
-          _saleCount,
-          _purchaseCount + _saleCount,
+          localPurchaseCount,
+          localSaleCount,
+          localPurchaseCount + localSaleCount,
         ));
       }
 
       /// BUILD DOLLAR RANGE DATA
-      int _rangeBuyCount = _marketActivityOverviewList
+      int localRangeBuyCount = localMarketActivityOverviewList
           .where((element) =>
               element.dollarAmount.toLowerCase() ==
                   thisTradeDollarAmount.toLowerCase() &&
               element.tradeType.toLowerCase().contains('purchase'))
           .length;
 
-      int _rangeSellCount = _marketActivityOverviewList
+      int localRangeSellCount = localMarketActivityOverviewList
           .where((element) =>
               element.dollarAmount.toLowerCase() ==
                   thisTradeDollarAmount.toLowerCase() &&
               element.tradeType.toLowerCase().contains('sale'))
           .length;
 
-      if (_rangeBuyCount + _rangeSellCount > _maxRangeTrades) {
-        _maxRangeTrades = _rangeBuyCount + _rangeSellCount;
-        debugPrint('^^^^^ MAX RANGE TRADES FOR THIS PERIOD: $_maxRangeTrades');
+      if (localRangeBuyCount + localRangeSellCount > localMaxRangeTrades) {
+        localMaxRangeTrades = localRangeBuyCount + localRangeSellCount;
+        debugPrint(
+            '^^^^^ MAX RANGE TRADES FOR THIS PERIOD: $localMaxRangeTrades');
       }
 
-      if (_thisMember != null &&
-          !_dollarData
+      if (localThisMember != null &&
+          !localDollarData
               .any((element) => element.dollarRange == thisTradeDollarAmount)) {
-        _dollarData.add(DollarData(
+        localDollarData.add(DollarData(
           thisTradeDollarAmount,
-          _rangeBuyCount,
-          _rangeSellCount,
+          localRangeBuyCount,
+          localRangeSellCount,
         ));
       }
 
       /// BUILD MEMBER TRADES DATA
-      int _thisMemberBuyCount = _marketActivityOverviewList
+      int localThisMemberBuyCount = localMarketActivityOverviewList
           .where((element) =>
               element.memberFullName.toLowerCase() ==
                   thisTradeMemberName.toLowerCase() &&
               element.tradeType.toLowerCase().contains('purchase'))
           .length;
 
-      int _thisMemberSellCount = _marketActivityOverviewList
+      int localThisMemberSellCount = localMarketActivityOverviewList
           .where((element) =>
               element.memberFullName.toLowerCase() ==
                   thisTradeMemberName.toLowerCase() &&
               element.tradeType.toLowerCase().contains('sale'))
           .length;
 
-      List<String> _thisMemberTickers = [];
+      List<String> localThisMemberTickers = [];
 
-      _marketActivityOverviewList
+      localMarketActivityOverviewList
           .where((item) =>
               item.memberFullName.toLowerCase() ==
               thisTradeMemberName.toLowerCase())
           .forEach((ticker) {
-        String _thisTicker = ticker.tickerName.toUpperCase();
-        if (!_thisMemberTickers.contains(_thisTicker.toUpperCase())) {
-          _thisMemberTickers.add(_thisTicker.toUpperCase());
+        String localThisTicker = ticker.tickerName.toUpperCase();
+        if (!localThisMemberTickers.contains(localThisTicker.toUpperCase())) {
+          localThisMemberTickers.add(localThisTicker.toUpperCase());
         }
       });
 
-      if (_thisMemberBuyCount + _thisMemberSellCount > _maxMemberTrades) {
-        _maxMemberTrades = _thisMemberBuyCount + _thisMemberSellCount;
+      if (localThisMemberBuyCount + localThisMemberSellCount >
+          localMaxMemberTrades) {
+        localMaxMemberTrades =
+            localThisMemberBuyCount + localThisMemberSellCount;
       }
 
-      if (_thisMember != null &&
-          !_memberTradeData
+      if (localThisMember != null &&
+          !localMemberTradeData
               .any((element) => element.memberName == thisTradeMemberName)) {
-        _memberTradeData.add(MemberTradeData(
+        localMemberTradeData.add(MemberTradeData(
             thisTradeMemberName,
-            _thisMemberBuyCount,
-            _thisMemberSellCount,
-            _thisMemberBuyCount + _thisMemberSellCount,
-            _thisMemberTickers.length,
-            _thisMember));
+            localThisMemberBuyCount,
+            localThisMemberSellCount,
+            localThisMemberBuyCount + localThisMemberSellCount,
+            localThisMemberTickers.length,
+            localThisMember));
       }
     }
 
     /// TALLY ALL MEMBER DATA
-    _memberTradeData.sort(
+    localMemberTradeData.sort(
         (a, b) => b.memberTotalTradeCount.compareTo(a.memberTotalTradeCount));
 
-    if (_memberTradeData.length > numMembersRetain) {
-      _memberTradeData.removeRange(numMembersRetain, _memberTradeData.length);
+    if (localMemberTradeData.length > numMembersRetain) {
+      localMemberTradeData.removeRange(
+          numMembersRetain, localMemberTradeData.length);
     }
 
     /// TALLY ALL TICKER DATA
-    _tickerData.sort((a, b) => b.totalCount.compareTo(a.totalCount));
-    if (_tickerData.length > numMembersRetain) {
-      _tickerData.removeRange(numMembersRetain, _tickerData.length);
+    localTickerData.sort((a, b) => b.totalCount.compareTo(a.totalCount));
+    if (localTickerData.length > numMembersRetain) {
+      localTickerData.removeRange(numMembersRetain, localTickerData.length);
     }
 
     /// TALLY ALL DOLLAR RANGE DATA
-    _dollarData.retainWhere((element) => element.dollarRange.contains('\$'));
-    _dollarData.sort((a, b) => int.parse(a.dollarRange
+    localDollarData
+        .retainWhere((element) => element.dollarRange.contains('\$'));
+    localDollarData.sort((a, b) => int.parse(a.dollarRange
             .split('-')[0]
             .trim()
             .replaceFirst('\$', '')
@@ -364,68 +369,70 @@ class MarketActivityPageState extends State<MarketActivityPage> {
             .replaceAll(',', ''))));
 
     setState(() {
-      tickerData = _tickerData;
-      allTrades = _allTrades;
-      thisMarketActivityOverviewList = _marketActivityOverviewList;
-      dollarData = _dollarData;
-      memberTradeData = _memberTradeData;
-      thisHouseStockWatchList = _houseList;
-      thisSenateStockWatchList = _senateList;
+      tickerData = localTickerData;
+      allTrades = localAllTrades;
+      thisMarketActivityOverviewList = localMarketActivityOverviewList;
+      dollarData = localDollarData;
+      memberTradeData = localMemberTradeData;
+      thisHouseStockWatchList = localHouseList;
+      thisSenateStockWatchList = localSenateList;
       maxMemberTrades =
-          _maxMemberTrades > minTrades ? _maxMemberTrades : minTrades;
+          localMaxMemberTrades > minTrades ? localMaxMemberTrades : minTrades;
       maxTickerTrades =
-          _maxTickerTrades > minTrades ? _maxMemberTrades : minTrades;
+          localMaxTickerTrades > minTrades ? localMaxMemberTrades : minTrades;
       maxRangeTrades =
-          _maxRangeTrades > minTrades ? _maxRangeTrades : minTrades;
+          localMaxRangeTrades > minTrades ? localMaxRangeTrades : minTrades;
       _dataLoading = false;
     });
   }
 
   Future<List<CalendarData>> buildCalendarData(
       List<MarketActivity> allTrades, int daysOfData) async {
-    List<CalendarData> _calendarData = [];
-    DateTime _endOfRange = DateTime.now().subtract(const Duration(days: 1));
-    DateTime _startOfRange = _endOfRange.subtract(Duration(days: daysOfData));
-    int _maxDayTradeCount = maxDayTradeCount;
+    List<CalendarData> localCalendarData = [];
+    DateTime localEndOfRange = DateTime.now().subtract(const Duration(days: 1));
+    DateTime localStartOfRange =
+        localEndOfRange.subtract(Duration(days: daysOfData));
+    int localMaxDayTradeCount = maxDayTradeCount;
 
-    for (var i = _endOfRange;
-        i.isAfter(_startOfRange);
+    for (var i = localEndOfRange;
+        i.isAfter(localStartOfRange);
         i = i.subtract(const Duration(days: 1))) {
       // logger.i('THIS DATE: ${dateWithDayFormatter.format(i)}');
-      List<MarketActivity> _thisTradeDateList = allTrades
+      List<MarketActivity> localThisTradeDateList = allTrades
           .where((element) =>
               i.month == element.tradeExecutionDate.month &&
               i.day == element.tradeExecutionDate.day &&
               i.year == element.tradeExecutionDate.year)
           .toList();
 
-      if (_thisTradeDateList.length > maxDayTradeCount) {
-        _maxDayTradeCount = _thisTradeDateList.length;
+      if (localThisTradeDateList.length > maxDayTradeCount) {
+        localMaxDayTradeCount = localThisTradeDateList.length;
       }
 
-      DateTime _date = i;
+      DateTime localDate = i;
 
-      List<String> _tickers =
-          _thisTradeDateList.map((e) => e.tickerName.toUpperCase()).toList();
+      List<String> localTickers = localThisTradeDateList
+          .map((e) => e.tickerName.toUpperCase())
+          .toList();
 
-      List<String> _memberIds =
-          _thisTradeDateList.map((e) => e.memberId).toList();
+      List<String> localMemberIds =
+          localThisTradeDateList.map((e) => e.memberId).toList();
 
-      _calendarData.add(CalendarData(
-        _date,
-        _tickers,
-        _memberIds,
-        _thisTradeDateList,
+      localCalendarData.add(CalendarData(
+        localDate,
+        localTickers,
+        localMemberIds,
+        localThisTradeDateList,
       ));
 
-      _calendarData.removeWhere((element) =>
+      localCalendarData.removeWhere((element) =>
           dateWithDayFormatter.format(element.date).contains('Sat') ||
           dateWithDayFormatter.format(element.date).contains('Sun'));
     }
 
-    setState(() => maxDayTradeCount = _maxDayTradeCount);
+    setState(() => maxDayTradeCount = localMaxDayTradeCount);
 
-    return _calendarData;
+    return localCalendarData;
   }
 
   @override
@@ -583,14 +590,14 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                         itemCount: calendarData.length,
                                                                         itemBuilder: (context, index) {
                                                                           CalendarData
-                                                                              _thisDay =
+                                                                              localThisDay =
                                                                               calendarData[index];
                                                                           String
-                                                                              _thisDate =
+                                                                              localThisDate =
                                                                               dateWithDayFormatter.format(calendarData[index].date);
                                                                           double
-                                                                              _thisBarHeightPercent =
-                                                                              (_thisDay.trades.length / dailyTradeBarHeight);
+                                                                              localThisBarHeightPercent =
+                                                                              (localThisDay.trades.length / dailyTradeBarHeight);
 
                                                                           return BounceInDown(
                                                                             duration:
@@ -599,13 +606,13 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                 InkWell(
                                                                               onTap: () {
                                                                                 // debugPrint('${_thisDay.trades.map((e) => e)}');
-                                                                                if (_thisDay.trades.isNotEmpty) {
+                                                                                if (localThisDay.trades.isNotEmpty) {
                                                                                   showModalBottomSheet(
                                                                                       backgroundColor: Colors.transparent,
                                                                                       context: context,
                                                                                       enableDrag: true,
                                                                                       builder: (context) {
-                                                                                        return SharedWidgets.marketDailyTradesCalendar(context, _thisDay, allMembersList, userDatabase, userIsPremium, allHouseStockWatchList, allSenateStockWatchList);
+                                                                                        return SharedWidgets.marketDailyTradesCalendar(context, localThisDay, allMembersList, userDatabase, userIsPremium, allHouseStockWatchList, allSenateStockWatchList);
                                                                                       });
                                                                                 }
                                                                               },
@@ -623,10 +630,10 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                           gradient: LinearGradient(
                                                                                             begin: Alignment.bottomCenter,
                                                                                             end: Alignment.topCenter,
-                                                                                            colors: List.generate((_thisBarHeightPercent * 100).toInt() * 10, (_) => darkTheme ? Colors.purple : stockWatchColor) +
+                                                                                            colors: List.generate((localThisBarHeightPercent * 100).toInt() * 10, (_) => darkTheme ? Colors.purple : stockWatchColor) +
                                                                                                 List.generate(
-                                                                                                  (dailyTradeBarHeight - (dailyTradeBarHeight * _thisBarHeightPercent)).toInt() * 10,
-                                                                                                  (_) => _thisDate.contains('Mon')
+                                                                                                  (dailyTradeBarHeight - (dailyTradeBarHeight * localThisBarHeightPercent)).toInt() * 10,
+                                                                                                  (_) => localThisDate.contains('Mon')
                                                                                                       ? darkTheme
                                                                                                           ? Theme.of(context).primaryColorDark.withOpacity(0.4)
                                                                                                           : stockWatchColor.withOpacity(0.15)
@@ -636,11 +643,11 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                         ),
                                                                                         child: Column(
                                                                                           children: [
-                                                                                            AnimatedWidgets.flashingEye(context, _thisDay.memberIds.any((id) => subscriptionAlertsList.toString().toLowerCase().contains(id.toLowerCase())), false, size: 6, sameColorBright: false),
+                                                                                            AnimatedWidgets.flashingEye(context, localThisDay.memberIds.any((id) => subscriptionAlertsList.toString().toLowerCase().contains(id.toLowerCase())), false, size: 6, sameColorBright: false),
                                                                                             RotatedBox(
                                                                                                 quarterTurns: 3,
                                                                                                 child: Text(
-                                                                                                  _thisDate.toUpperCase(),
+                                                                                                  localThisDate.toUpperCase(),
                                                                                                   textAlign: TextAlign.end,
                                                                                                   style: Styles.regularStyle.copyWith(
                                                                                                       fontWeight: FontWeight.bold,
@@ -650,9 +657,9 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                           ],
                                                                                         )),
                                                                                     Positioned(
-                                                                                      bottom: (dailyTradeBarHeight * _thisBarHeightPercent).toDouble() - 4.75,
+                                                                                      bottom: (dailyTradeBarHeight * localThisBarHeightPercent).toDouble() - 4.75,
                                                                                       // left: 1,
-                                                                                      child: CircleAvatar(radius: 9, backgroundColor: darkTheme ? Theme.of(context).primaryColorDark : stockWatchColor, child: Text(_thisDay.tickers.length.toString(), style: Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 8, fontWeight: FontWeight.bold))),
+                                                                                      child: CircleAvatar(radius: 9, backgroundColor: darkTheme ? Theme.of(context).primaryColorDark : stockWatchColor, child: Text(localThisDay.tickers.length.toString(), style: Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 8, fontWeight: FontWeight.bold))),
                                                                                     )
                                                                                   ],
                                                                                 ),
@@ -703,7 +710,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                 )
                                                               ] +
                                                               tickerData
-                                                                  .map((_thisTicker) =>
+                                                                  .map((localThisTicker) =>
                                                                       Padding(
                                                                         padding: const EdgeInsets.symmetric(
                                                                             horizontal:
@@ -718,27 +725,27 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                               InkWell(
                                                                             onTap:
                                                                                 () {
-                                                                              List<String> _memberIds = [];
+                                                                              List<String> localMemberIds = [];
 
-                                                                              thisMarketActivityOverviewList.where((element) => element.tickerName.toLowerCase() == _thisTicker.tickerName.toLowerCase() && element.memberId.toLowerCase() != 'noid').forEach((item) {
-                                                                                _memberIds.add(item.memberId.toLowerCase());
+                                                                              thisMarketActivityOverviewList.where((element) => element.tickerName.toLowerCase() == localThisTicker.tickerName.toLowerCase() && element.memberId.toLowerCase() != 'noid').forEach((item) {
+                                                                                localMemberIds.add(item.memberId.toLowerCase());
                                                                               });
 
-                                                                              List<ChamberMember> _tickerMembersList = [];
+                                                                              List<ChamberMember> localTickerMembersList = [];
 
-                                                                              _memberIds.toSet().forEach((memberId) {
-                                                                                _tickerMembersList.add(allMembersList.firstWhere((element) => element.id.toLowerCase() == memberId.toLowerCase()));
+                                                                              localMemberIds.toSet().forEach((memberId) {
+                                                                                localTickerMembersList.add(allMembersList.firstWhere((element) => element.id.toLowerCase() == memberId.toLowerCase()));
                                                                               });
 
-                                                                              debugPrint('${_thisTicker.tickerName} TICKER MEMBERS: ${_tickerMembersList.length}');
+                                                                              debugPrint('${localThisTicker.tickerName} TICKER MEMBERS: ${localTickerMembersList.length}');
 
-                                                                              if (_tickerMembersList.isNotEmpty) {
+                                                                              if (localTickerMembersList.isNotEmpty) {
                                                                                 showModalBottomSheet(
                                                                                     backgroundColor: Colors.transparent,
                                                                                     context: context,
                                                                                     enableDrag: true,
                                                                                     builder: (context) {
-                                                                                      return SharedWidgets.marketActivityTicker(context, _thisTicker.tickerName, _thisTicker.tickerDescription, _tickerMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
+                                                                                      return SharedWidgets.marketActivityTicker(context, localThisTicker.tickerName, localThisTicker.tickerDescription, localTickerMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
                                                                                     });
                                                                               }
                                                                             },
@@ -750,7 +757,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(_thisTicker.tickerPurchaseCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(_thisTicker.tickerSaleCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxTickerTrades - (_thisTicker.tickerPurchaseCount + _thisTicker.tickerSaleCount)) + (maxTickerTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisTicker.tickerPurchaseCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisTicker.tickerSaleCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxTickerTrades - (localThisTicker.tickerPurchaseCount + localThisTicker.tickerSaleCount)) + (maxTickerTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -758,14 +765,14 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      _thisTicker.tickerName,
+                                                                                      localThisTicker.tickerName,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
                                                                                     const Spacer(),
-                                                                                    AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.tickerName.toLowerCase() == _thisTicker.tickerName.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
+                                                                                    AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.tickerName.toLowerCase() == localThisTicker.tickerName.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
                                                                                     const SizedBox(width: 5),
                                                                                     Text(
-                                                                                      '${thisMarketActivityOverviewList.where((element) => element.tickerName.toLowerCase() == _thisTicker.tickerName.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${_thisTicker.tickerPurchaseCount} ▲ | ${_thisTicker.tickerSaleCount} ▼',
+                                                                                      '${thisMarketActivityOverviewList.where((element) => element.tickerName.toLowerCase() == localThisTicker.tickerName.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${localThisTicker.tickerPurchaseCount} ▲ | ${localThisTicker.tickerSaleCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
                                                                                     )
                                                                                   ],
@@ -826,7 +833,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                               memberTradeData
                                                                   // .take(
                                                                   //     memberTradesToRetain)
-                                                                  .map((_thisMember) =>
+                                                                  .map((localThisMember) =>
                                                                       Padding(
                                                                         padding: const EdgeInsets.symmetric(
                                                                             horizontal:
@@ -842,27 +849,27 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                             onTap:
                                                                                 () async {
                                                                               if (thisHouseStockWatchList.isNotEmpty && thisSenateStockWatchList.isNotEmpty) {
-                                                                                List<HouseStockWatch> _thisRepresentativeList = [];
-                                                                                List<SenateStockWatch> _thisSenatorList = [];
-                                                                                String _thisChamber = _thisMember.member.shortTitle.toLowerCase().startsWith('r') || _thisMember.member.shortTitle.toLowerCase().startsWith('h') ? 'house' : 'senate';
+                                                                                List<HouseStockWatch> localThisRepresentativeList = [];
+                                                                                List<SenateStockWatch> localThisSenatorList = [];
+                                                                                String localThisChamber = localThisMember.member.shortTitle.toLowerCase().startsWith('r') || localThisMember.member.shortTitle.toLowerCase().startsWith('h') ? 'house' : 'senate';
 
-                                                                                debugPrint('^^^^^ CHAMBER IS: $_thisChamber');
+                                                                                debugPrint('^^^^^ CHAMBER IS: $localThisChamber');
 
-                                                                                if (_thisChamber == 'house') {
+                                                                                if (localThisChamber == 'house') {
                                                                                   try {
-                                                                                    _thisRepresentativeList = thisHouseStockWatchList.where((element) => element.representative.toLowerCase().split(' ')[1][0] == _thisMember.member.firstName.toLowerCase()[0] && element.representative.toLowerCase().contains(_thisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
-                                                                                    debugPrint('^^^^^ HOUSE STOCK LIST: ${_thisRepresentativeList.length}');
+                                                                                    localThisRepresentativeList = thisHouseStockWatchList.where((element) => element.representative.toLowerCase().split(' ')[1][0] == localThisMember.member.firstName.toLowerCase()[0] && element.representative.toLowerCase().contains(localThisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
+                                                                                    debugPrint('^^^^^ HOUSE STOCK LIST: ${localThisRepresentativeList.length}');
                                                                                   } catch (e) {
                                                                                     debugPrint('^^^^^ HOUSE STOCK LIST ERROR $e');
-                                                                                    _thisRepresentativeList = [];
+                                                                                    localThisRepresentativeList = [];
                                                                                   }
-                                                                                } else if (_thisChamber == 'senate') {
+                                                                                } else if (localThisChamber == 'senate') {
                                                                                   try {
-                                                                                    _thisSenatorList = thisSenateStockWatchList.where((element) => element.senator.toLowerCase().split(' ')[0][0] == _thisMember.member.firstName.toLowerCase()[0] && element.senator.toLowerCase().contains(_thisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
-                                                                                    debugPrint('^^^^^ SENATE STOCK LIST: ${_thisSenatorList.length}');
+                                                                                    localThisSenatorList = thisSenateStockWatchList.where((element) => element.senator.toLowerCase().split(' ')[0][0] == localThisMember.member.firstName.toLowerCase()[0] && element.senator.toLowerCase().contains(localThisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
+                                                                                    debugPrint('^^^^^ SENATE STOCK LIST: ${localThisSenatorList.length}');
                                                                                   } catch (e) {
                                                                                     debugPrint('^^^^^ SENATE STOCK LIST ERROR $e');
-                                                                                    _thisSenatorList = [];
+                                                                                    localThisSenatorList = [];
                                                                                   }
                                                                                 }
 
@@ -871,7 +878,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                     context: context,
                                                                                     enableDrag: true,
                                                                                     builder: (context) {
-                                                                                      return SharedWidgets.marketActivityMember(context, _thisChamber, _thisMember.member, daysOfData, userDatabase, userIsPremium, userIsLegacy, _thisRepresentativeList, _thisSenatorList);
+                                                                                      return SharedWidgets.marketActivityMember(context, localThisChamber, localThisMember.member, daysOfData, userDatabase, userIsPremium, userIsLegacy, localThisRepresentativeList, localThisSenatorList);
                                                                                     });
                                                                               }
                                                                             },
@@ -883,7 +890,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(_thisMember.memberBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(_thisMember.memberSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxMemberTrades - (_thisMember.memberBuyCount + _thisMember.memberSellCount)) + (maxMemberTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisMember.memberBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisMember.memberSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxMemberTrades - (localThisMember.memberBuyCount + localThisMember.memberSellCount)) + (maxMemberTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -891,14 +898,14 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      _thisMember.memberName,
+                                                                                      localThisMember.memberName,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
                                                                                     const Spacer(),
-                                                                                    AnimatedWidgets.flashingEye(context, _thisMember.member.id != null && _thisMember.member.id.toLowerCase() != 'noid' && subscriptionAlertsList.any((item) => item.toLowerCase().contains(_thisMember.member.id.toLowerCase())), false, size: 8, sameColorBright: true),
+                                                                                    AnimatedWidgets.flashingEye(context, localThisMember.member.id != null && localThisMember.member.id.toLowerCase() != 'noid' && subscriptionAlertsList.any((item) => item.toLowerCase().contains(localThisMember.member.id.toLowerCase())), false, size: 8, sameColorBright: true),
                                                                                     const SizedBox(width: 5),
                                                                                     Text(
-                                                                                      '${_thisMember.memberTickerCount} STX | ${_thisMember.memberBuyCount} ▲ | ${_thisMember.memberSellCount} ▼',
+                                                                                      '${localThisMember.memberTickerCount} STX | ${localThisMember.memberBuyCount} ▲ | ${localThisMember.memberSellCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
                                                                                     )
                                                                                   ],
@@ -957,7 +964,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                 )
                                                               ] +
                                                               dollarData
-                                                                  .map((_thisDollarRange) =>
+                                                                  .map((localThisDollarRange) =>
                                                                       Padding(
                                                                         padding: const EdgeInsets.symmetric(
                                                                             horizontal:
@@ -972,27 +979,27 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                               InkWell(
                                                                             onTap:
                                                                                 () {
-                                                                              List<String> _memberIds = [];
+                                                                              List<String> localMemberIds = [];
 
-                                                                              thisMarketActivityOverviewList.where((element) => element.dollarAmount.toLowerCase() == _thisDollarRange.dollarRange.toLowerCase() && element.memberId.toLowerCase() != 'noid').forEach((item) {
-                                                                                _memberIds.add(item.memberId.toLowerCase());
+                                                                              thisMarketActivityOverviewList.where((element) => element.dollarAmount.toLowerCase() == localThisDollarRange.dollarRange.toLowerCase() && element.memberId.toLowerCase() != 'noid').forEach((item) {
+                                                                                localMemberIds.add(item.memberId.toLowerCase());
                                                                               });
 
-                                                                              List<ChamberMember> _dollarRangeMembersList = [];
+                                                                              List<ChamberMember> localDollarRangeMembersList = [];
 
-                                                                              _memberIds.toSet().forEach((memberId) {
-                                                                                _dollarRangeMembersList.add(allMembersList.firstWhere((element) => element.id.toLowerCase() == memberId.toLowerCase()));
+                                                                              localMemberIds.toSet().forEach((memberId) {
+                                                                                localDollarRangeMembersList.add(allMembersList.firstWhere((element) => element.id.toLowerCase() == memberId.toLowerCase()));
                                                                               });
 
-                                                                              debugPrint('${_thisDollarRange.dollarRange} DOLLAR RANGE MEMBERS: ${_dollarRangeMembersList.length}');
+                                                                              debugPrint('${localThisDollarRange.dollarRange} DOLLAR RANGE MEMBERS: ${localDollarRangeMembersList.length}');
 
-                                                                              if (_dollarRangeMembersList.isNotEmpty) {
+                                                                              if (localDollarRangeMembersList.isNotEmpty) {
                                                                                 showModalBottomSheet(
                                                                                     backgroundColor: Colors.transparent,
                                                                                     context: context,
                                                                                     enableDrag: true,
                                                                                     builder: (context) {
-                                                                                      return SharedWidgets.marketActivityDollarRange(context, _thisDollarRange.dollarRange, _dollarRangeMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
+                                                                                      return SharedWidgets.marketActivityDollarRange(context, localThisDollarRange.dollarRange, localDollarRangeMembersList.toSet().toList(), daysOfData, userDatabase, userIsPremium, userIsLegacy, allHouseStockWatchList, allSenateStockWatchList);
                                                                                     });
                                                                               }
                                                                             },
@@ -1004,7 +1011,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(_thisDollarRange.rangeBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(_thisDollarRange.rangeSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxRangeTrades - (_thisDollarRange.rangeBuyCount + _thisDollarRange.rangeSellCount)) + (maxRangeTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisDollarRange.rangeBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisDollarRange.rangeSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxRangeTrades - (localThisDollarRange.rangeBuyCount + localThisDollarRange.rangeSellCount)) + (maxRangeTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -1012,14 +1019,14 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                   children: [
                                                                                     Text(
-                                                                                      _thisDollarRange.dollarRange,
+                                                                                      localThisDollarRange.dollarRange,
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 13, color: darkThemeTextColor),
                                                                                     ),
                                                                                     const Spacer(),
-                                                                                    AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.dollarAmount.toLowerCase() == _thisDollarRange.dollarRange.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
+                                                                                    AnimatedWidgets.flashingEye(context, thisMarketActivityOverviewList.any((element) => element.dollarAmount.toLowerCase() == localThisDollarRange.dollarRange.toLowerCase() && subscriptionAlertsList.any((item) => item.toLowerCase().contains(element.memberId.toLowerCase()))), false, size: 8, sameColorBright: true),
                                                                                     const SizedBox(width: 5),
                                                                                     Text(
-                                                                                      '${thisMarketActivityOverviewList.where((element) => element.dollarAmount.toLowerCase() == _thisDollarRange.dollarRange.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${_thisDollarRange.rangeBuyCount} ▲ | ${_thisDollarRange.rangeSellCount} ▼',
+                                                                                      '${thisMarketActivityOverviewList.where((element) => element.dollarAmount.toLowerCase() == localThisDollarRange.dollarRange.toLowerCase() && element.memberId.toLowerCase() != 'noid').map((e) => e.memberId).toSet().length} 🧑🏽‍💼 | ${localThisDollarRange.rangeBuyCount} ▲ | ${localThisDollarRange.rangeSellCount} ▼',
                                                                                       style: Styles.regularStyle.copyWith(fontSize: 11, color: darkThemeTextColor),
                                                                                     )
                                                                                   ],

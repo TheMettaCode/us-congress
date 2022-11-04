@@ -1435,8 +1435,9 @@ class Functions {
               }
             }
 
-            if (currentNewsArticlesList.isEmpty)
+            if (currentNewsArticlesList.isEmpty) {
               currentNewsArticlesList = finalNewsArticlesList;
+            }
 
             try {
               logger.d('***** SAVING NEW ARTICLES TO DBASE *****');
@@ -1629,8 +1630,9 @@ class Functions {
               }
             }
 
-            if (currentStatementsList.isEmpty)
+            if (currentStatementsList.isEmpty) {
               currentStatementsList = finalStatementsList;
+            }
 
             try {
               logger.d('***** SAVING NEW STATEMENTS TO DBASE *****');
@@ -1778,8 +1780,9 @@ class Functions {
             }
           }
 
-          if (currentUpdatedBillsList.isEmpty)
+          if (currentUpdatedBillsList.isEmpty) {
             currentUpdatedBillsList = finalUpdatedBillsList;
+          }
 
           try {
             logger.d('***** SAVING NEW BILLS TO DBASE *****');
@@ -2784,8 +2787,9 @@ class Functions {
 
         if (finalUserCongress['kind'] ==
             'civicinfo#representativeInfoResponse') {
-          if (currentUserCongress.isEmpty)
+          if (currentUserCongress.isEmpty) {
             currentUserCongress = finalUserCongress;
+          }
 
           try {
             logger.d('***** SAVING NEW USER CONGRESS TO DBASE *****');

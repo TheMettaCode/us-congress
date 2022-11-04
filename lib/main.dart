@@ -213,9 +213,9 @@ class MyAppState extends State<MyApp> {
       setState(() {
         _events.insert(0, DateTime.now());
       });
-      print("^^^^ Background Fetch Task ID: $taskId");
+      logger.d("^^^^ Background Fetch Task ID: $taskId");
       if (taskId == "flutter_background_fetch") {
-        print("Background Fetch - app running");
+        logger.d("Background Fetch - app running");
       }
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
       // for taking too long in the background.
@@ -223,10 +223,10 @@ class MyAppState extends State<MyApp> {
     }, (String taskId) async {
       // <-- Task timeout handler.
       // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-      print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
+      logger.d("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
     });
-    print('[BackgroundFetch] configure success: $status');
+    logger.d('[BackgroundFetch] configure success: $status');
     // setState(() {
     //   _status = status;
     // });
