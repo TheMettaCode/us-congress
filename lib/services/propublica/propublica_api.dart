@@ -98,13 +98,13 @@ class PropublicaApi {
       String lobbyId) async {
     logger.d('^^^^^ FETCHING LOBBY DATA... ^^^^^');
 
-    SpecificLobbyResult _thisSpecificLobbyEvent;
+    SpecificLobbyResult localThisSpecificLobbyEvent;
 
-    final _url = 'congress/v1/lobbying/$lobbyId.json';
-    final _headers = PropublicaApi().apiHeaders;
+    final localUrl = 'congress/v1/lobbying/$lobbyId.json';
+    final localHeaders = PropublicaApi().apiHeaders;
     final authority = PropublicaApi().authority;
     final response =
-        await http.get(Uri.https(authority, _url), headers: _headers);
+        await http.get(Uri.https(authority, localUrl), headers: localHeaders);
 
     logger.d(
         '^^^^^ LOBBY DATA RESPONSE STATUS CODE: ${response.statusCode} ^^^^^');
@@ -116,9 +116,9 @@ class PropublicaApi {
       if (specificLobbyingEvent.status == 'OK') {
         logger.d(
             '^^^^^ LOBBY DATA RESPONSE STATUS: ${specificLobbyingEvent.status} ^^^^^');
-        _thisSpecificLobbyEvent = specificLobbyingEvent.results.first;
+        localThisSpecificLobbyEvent = specificLobbyingEvent.results.first;
 
-        return _thisSpecificLobbyEvent;
+        return localThisSpecificLobbyEvent;
       } else {
         logger.w(
             'ERROR: API RETURNED STATUS CODE ${specificLobbyingEvent.status}');
@@ -193,11 +193,11 @@ class PropublicaApi {
       {bool userIsPremium = false, bool userIsLegacy = false}) async {
     logger.d('[Begin] Private Funded Travel By Member Retrieval');
 
-    final _url = 'congress/v1/members/$memberId/private-trips.json';
-    final _headers = PropublicaApi().apiHeaders;
+    final localUrl = 'congress/v1/members/$memberId/private-trips.json';
+    final localHeaders = PropublicaApi().apiHeaders;
     final authority = PropublicaApi().authority;
     final response =
-        await http.get(Uri.https(authority, _url), headers: _headers);
+        await http.get(Uri.https(authority, localUrl), headers: localHeaders);
     logger.d(
         '***** PRIVATE TRIPS BY MEMBER API RESPONSE CODE: ${response.statusCode} *****');
 

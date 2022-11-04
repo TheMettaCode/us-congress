@@ -91,16 +91,14 @@ class Order {
         "user_name": userName,
         "product_id": productId,
         "product_name": productName,
-        "product_options":
-            productOptions == null ? 'No Product Options' : productOptions,
+        "product_options": productOptions ?? 'No Product Options',
         "product_price": productPrice,
         "product_image_url": productImageUrl,
         "product_description": productDescription,
         "customer_id": customerId,
         "customer_name": customerName,
         "customer_email": customerEmail,
-        "customer_phone":
-            customerPhone == null ? 'No Phone Number' : customerPhone,
+        "customer_phone": customerPhone ?? 'No Phone Number',
         "customer_shipping_address": customerShippingAddress
       };
 

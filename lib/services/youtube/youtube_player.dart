@@ -18,7 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class Youtube {
-  Widget videoPlayer(BuildContext context, List<PlaylistItem> _playlist,
+  Widget videoPlayer(BuildContext context, List<PlaylistItem> localPlaylist,
       PlaylistItem thisVideo, List<bool> userLevels) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
 
@@ -27,9 +27,9 @@ class Youtube {
     bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
     // ytWeb.YoutubePlayerController _webController;
-    YoutubePlayerController _controller;
+    YoutubePlayerController localController;
     // ignore: unused_local_variable
-    bool _isPlayerReady = false;
+    bool localIsPlayerReady = false;
     bool darkTheme = userDatabase.get('darkTheme');
     bool isCapitolBabble =
         thisVideo.snippet.videoOwnerChannelTitle == 'Capitol Babble';
@@ -60,16 +60,16 @@ class Youtube {
     //     aspectRatio: 16 / 9,
     //   );
     // } else {
-      _controller = YoutubePlayerController(
-        initialVideoId: thisVideo.snippet.resourceId.videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
-          mute: false,
-          loop: false,
-          controlsVisibleAtStart: false,
-          enableCaption: true,
-        ),
-      );
+    localController = YoutubePlayerController(
+      initialVideoId: thisVideo.snippet.resourceId.videoId,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        loop: false,
+        controlsVisibleAtStart: false,
+        enableCaption: true,
+      ),
+    );
     // }
 
     ////////////////////////////////////////////////
@@ -223,7 +223,7 @@ class Youtube {
                 ? capitolBabbleDark
                 : Theme.of(context).primaryColor.withOpacity(0.15),
             child: YoutubePlayer(
-              controller: _controller,
+              controller: localController,
               showVideoProgressIndicator: true,
               aspectRatio: 16 / 9,
               progressIndicatorColor: Theme.of(context).primaryColor,
@@ -240,7 +240,7 @@ class Youtube {
                       handleColor: Theme.of(context).primaryColor,
                       bufferedColor: Theme.of(context).primaryColorLight),
               onReady: () {
-                _isPlayerReady = true;
+                localIsPlayerReady = true;
                 // _controller.addListener(listener);
               },
               onEnded: (youtubeMetaData) => Navigator.maybePop(context),
@@ -283,8 +283,8 @@ class Youtube {
 
   Widget youTubeVideoTile(
       BuildContext context,
-      List<PlaylistItem> _playlist,
-      PlaylistItem _thisVideo,
+      List<PlaylistItem> localPlaylist,
+      PlaylistItem localThisVideo,
       int index,
       Orientation orientation,
       InterstitialAd interstitialAd,
@@ -292,7 +292,7 @@ class Youtube {
       List<bool> userLevels) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     bool technicalDifficulties =
-        _thisVideo.snippet.description.contains('technical difficulties')
+        localThisVideo.snippet.description.contains('technical difficulties')
             ? true
             : false;
     String technicalDifficultiesText =
@@ -300,7 +300,7 @@ class Youtube {
 
     // bool darkTheme = userDatabase.get('darkTheme');
     bool isCapitolBabble =
-        _thisVideo.snippet.videoOwnerChannelTitle == 'Capitol Babble';
+        localThisVideo.snippet.videoOwnerChannelTitle == 'Capitol Babble';
     Color capitolBabbleDark = const Color.fromARGB(255, 77, 0, 70);
     // Color capitolBabbleMainColor = Colors.purple;
 
@@ -335,8 +335,8 @@ class Youtube {
                   context: context,
                   builder: (context) {
                     return BounceInUp(
-                        child: videoPlayer(
-                            context, _playlist, _thisVideo, userLevels));
+                        child: videoPlayer(context, localPlaylist,
+                            localThisVideo, userLevels));
                   },
                 ).then((_) async {
                   userDatabase.put('newVideos', false);
@@ -397,14 +397,14 @@ class Youtube {
                     child: AspectRatio(
                         aspectRatio: 16 / 9,
                         child: FadeInImage(
-                          image: _thisVideo.snippet.thumbnails.thumbnailsDefault
-                                          .url ==
+                          image: localThisVideo.snippet.thumbnails
+                                          .thumbnailsDefault.url ==
                                       null ||
-                                  _thisVideo.snippet.thumbnails
+                                  localThisVideo.snippet.thumbnails
                                       .thumbnailsDefault.url.isEmpty
                               ? AssetImage(
                                   "assets/congress_pic_${random.nextInt(4)}.png")
-                              : NetworkImage(_thisVideo
+                              : NetworkImage(localThisVideo
                                   .snippet.thumbnails.thumbnailsDefault.url),
                           placeholder: AssetImage(
                               "assets/congress_pic_${random.nextInt(4)}.png"),
@@ -447,7 +447,7 @@ class Youtube {
                             Text(
                               technicalDifficulties
                                   ? technicalDifficultiesText
-                                  : _thisVideo.snippet.title
+                                  : localThisVideo.snippet.title
                                       .replaceAll('&amp;', '&')
                                       .replaceAll("&quot;", "\"")
                                       .replaceAll("&#39;", "'"),
@@ -473,11 +473,12 @@ class Youtube {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            const FaIcon(FontAwesomeIcons.youtube,
+                                            const FaIcon(
+                                                FontAwesomeIcons.youtube,
                                                 size: 10,
                                                 color: darkThemeTextColor),
                                             Text(
-                                                ' ${_thisVideo.snippet.videoOwnerChannelTitle}',
+                                                ' ${localThisVideo.snippet.videoOwnerChannelTitle}',
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: Styles.regularStyle
@@ -510,7 +511,7 @@ class Youtube {
                                 Text(
                                   technicalDifficulties
                                       ? technicalDifficultiesText
-                                      : _thisVideo.snippet.title
+                                      : localThisVideo.snippet.title
                                           .replaceAll('&amp;', '&')
                                           .replaceAll("&quot;", "\"")
                                           .replaceAll("&#39;", "'"),
@@ -537,11 +538,12 @@ class Youtube {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                const FaIcon(FontAwesomeIcons.youtube,
+                                                const FaIcon(
+                                                    FontAwesomeIcons.youtube,
                                                     size: 10,
                                                     color: darkThemeTextColor),
                                                 Text(
-                                                    ' ${_thisVideo.snippet.videoOwnerChannelTitle}',
+                                                    ' ${localThisVideo.snippet.videoOwnerChannelTitle}',
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -586,20 +588,20 @@ class Youtube {
     // bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
 
-    List<PlaylistItem> _currentPlaylistItems = [];
+    List<PlaylistItem> localCurrentPlaylistItems = [];
 
     try {
-      _currentPlaylistItems =
+      localCurrentPlaylistItems =
           youTubePlaylistFromJson(userDatabase.get('youTubePlaylist')).items;
     } catch (e) {
       logger.d('^^^^^ ERROR DURING YOUTUBE LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('youTubePlaylist', {});
-      _currentPlaylistItems = [];
+      localCurrentPlaylistItems = [];
     }
 
-    List<PlaylistItem> _finalPlaylistItems = [];
+    List<PlaylistItem> localFinalPlaylistItems = [];
 
-    if (_currentPlaylistItems.isEmpty ||
+    if (localCurrentPlaylistItems.isEmpty ||
         DateTime.parse(userDatabase.get('lastRefresh').toString()).isBefore(
             DateTime.now().subtract(context == null
                 ? const Duration(hours: 1)
@@ -617,35 +619,42 @@ class Youtube {
             youTubePlaylistFromJson(response.body);
 
         if (youTubePlaylistResponse.items.isNotEmpty) {
-          _finalPlaylistItems = youTubePlaylistResponse.items;
+          localFinalPlaylistItems = youTubePlaylistResponse.items;
 
-          _finalPlaylistItems.removeWhere((video) =>
+          localFinalPlaylistItems.removeWhere((video) =>
               video.snippet.title.toLowerCase().contains('private') ||
               video.snippet.title.toLowerCase().contains('deleted') ||
               video.snippet.publishedAt
                   .isBefore(DateTime.now().subtract(const Duration(days: 7))));
 
-          if (_currentPlaylistItems.isEmpty ||
-              _finalPlaylistItems.first.id != _currentPlaylistItems.first.id) {
+          if (localCurrentPlaylistItems.isEmpty ||
+              localFinalPlaylistItems.first.id !=
+                  localCurrentPlaylistItems.first.id) {
             userDatabase.put('newVideos', true);
 
             if (userIsDev) {
               final String messageBody =
-                  _finalPlaylistItems.first.snippet.title.length > 175 ? _finalPlaylistItems.first.snippet.title.replaceRange(175, null, '...') : _finalPlaylistItems.first.snippet.title;
+                  localFinalPlaylistItems.first.snippet.title.length > 175
+                      ? localFinalPlaylistItems.first.snippet.title
+                          .replaceRange(175, null, '...')
+                      : localFinalPlaylistItems.first.snippet.title;
               final String subject =
-                  _finalPlaylistItems.first.snippet.title.length > 200 ? _finalPlaylistItems.first.snippet.title.replaceRange(200, null, '...') : _finalPlaylistItems.first.snippet.title;
+                  localFinalPlaylistItems.first.snippet.title.length > 200
+                      ? localFinalPlaylistItems.first.snippet.title
+                          .replaceRange(200, null, '...')
+                      : localFinalPlaylistItems.first.snippet.title;
 
               List<String> capitolBabbleNotificationsList = List<String>.from(
                   userDatabase.get('capitolBabbleNotificationsList'));
               capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>https://www.youtube.com/watch?v=${_finalPlaylistItems.first.snippet.resourceId.videoId}');
+                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>https://www.youtube.com/watch?v=${localFinalPlaylistItems.first.snippet.resourceId.videoId}');
               userDatabase.put('capitolBabbleNotificationsList',
                   capitolBabbleNotificationsList);
             }
           }
 
-          if (_currentPlaylistItems.isEmpty) {
-            _currentPlaylistItems = _finalPlaylistItems;
+          if (localCurrentPlaylistItems.isEmpty) {
+            localCurrentPlaylistItems = localFinalPlaylistItems;
           }
 
           try {
@@ -660,7 +669,8 @@ class Youtube {
         }
 
         if (userDatabase.get('videoAlerts') &&
-            _currentPlaylistItems.first.id != _finalPlaylistItems.first.id) {
+            localCurrentPlaylistItems.first.id !=
+                localFinalPlaylistItems.first.id) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 12,
@@ -668,36 +678,36 @@ class Youtube {
                 'Congressional Videos',
                 'New congressional videos',
                 'New videos',
-                '📺 ${_finalPlaylistItems.first.snippet.videoOwnerChannelTitle}',
-                _finalPlaylistItems.first.snippet.title,
+                '📺 ${localFinalPlaylistItems.first.snippet.videoOwnerChannelTitle}',
+                localFinalPlaylistItems.first.snippet.title,
                 youTubePlaylistResponse);
           } else if (ModalRoute.of(context).isCurrent) {
             Messages.showMessage(
               context: context,
               message: 'New videos added',
-              networkImageUrl: _finalPlaylistItems
+              networkImageUrl: localFinalPlaylistItems
                   .first.snippet.thumbnails.thumbnailsDefault.url,
               isAlert: false,
               removeCurrent: false,
             );
           }
         }
-        return _finalPlaylistItems;
+        return localFinalPlaylistItems;
       } else {
         logger.d(
             '***** API ERROR: LOADING VIDEOS FROM DBASE: ${response.statusCode} *****');
 
-        return _finalPlaylistItems = _currentPlaylistItems.isNotEmpty
-            ? _currentPlaylistItems
+        return localFinalPlaylistItems = localCurrentPlaylistItems.isNotEmpty
+            ? localCurrentPlaylistItems
             : youTubePlaylistPlaceholder;
       }
     } else {
       logger.d(
-          '***** CURRENT PLAYLIST ITEMS: ${_currentPlaylistItems.map((e) => e.snippet.title)} *****');
-      _finalPlaylistItems = _currentPlaylistItems;
+          '***** CURRENT PLAYLIST ITEMS: ${localCurrentPlaylistItems.map((e) => e.snippet.title)} *****');
+      localFinalPlaylistItems = localCurrentPlaylistItems;
       logger.d('***** VIDEOS NOT UPDATED: LIST IS CURRENT *****');
       userDatabase.put('newVideos', false);
-      return _finalPlaylistItems;
+      return localFinalPlaylistItems;
     }
   }
 }

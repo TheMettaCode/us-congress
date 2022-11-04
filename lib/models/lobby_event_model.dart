@@ -22,16 +22,16 @@ class LobbyEvent {
   final List<Result> results;
 
   factory LobbyEvent.fromJson(Map<String, dynamic> json) => LobbyEvent(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
+        status: json["status"],
+        copyright: json["copyright"],
         results: json["results"] == null
             ? null
             : List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
+        "status": status,
+        "copyright": copyright,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -50,8 +50,8 @@ class Result {
   final List<LobbyingRepresentation> lobbyingRepresentations;
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        numResults: json["num_results"] == null ? null : json["num_results"],
-        offset: json["offset"] == null ? null : json["offset"],
+        numResults: json["num_results"],
+        offset: json["offset"],
         lobbyingRepresentations: json["lobbying_representations"] == null
             ? null
             : List<LobbyingRepresentation>.from(json["lobbying_representations"]
@@ -59,8 +59,8 @@ class Result {
       );
 
   Map<String, dynamic> toJson() => {
-        "num_results": numResults == null ? null : numResults,
-        "offset": offset == null ? null : offset,
+        "num_results": numResults,
+        "offset": offset,
         "lobbying_representations": lobbyingRepresentations == null
             ? null
             : List<dynamic>.from(
@@ -109,19 +109,18 @@ class LobbyingRepresentation {
         lobbyingRegistrant: json["lobbying_registrant"] == null
             ? null
             : Lobbying.fromJson(json["lobbying_registrant"]),
-        inhouse: json["inhouse"] == null ? null : json["inhouse"],
-        signedDate: json["signed_date"] == null ? null : json["signed_date"],
-        effectiveDate:
-            json["effective_date"] == null ? null : json["effective_date"],
-        xmlFilename: json["xml_filename"] == null ? null : json["xml_filename"],
-        id: json["id"] == null ? null : json["id"],
+        inhouse: json["inhouse"],
+        signedDate: json["signed_date"],
+        effectiveDate: json["effective_date"],
+        xmlFilename: json["xml_filename"],
+        id: json["id"],
         specificIssues: json["specific_issues"] == null
             ? null
             : List<String>.from(json["specific_issues"].map((x) => x)),
-        reportType: json["report_type"] == null ? null : json["report_type"],
-        reportYear: json["report_year"] == null ? null : json["report_year"],
-        senateId: json["senate_id"] == null ? null : json["senate_id"],
-        houseId: json["house_id"] == null ? null : json["house_id"],
+        reportType: json["report_type"],
+        reportYear: json["report_year"],
+        senateId: json["senate_id"],
+        houseId: json["house_id"],
         latestFiling: json["latest_filing"] == null
             ? null
             : LatestFiling.fromJson(json["latest_filing"]),
@@ -136,18 +135,18 @@ class LobbyingRepresentation {
             lobbyingClient == null ? null : lobbyingClient.toJson(),
         "lobbying_registrant":
             lobbyingRegistrant == null ? null : lobbyingRegistrant.toJson(),
-        "inhouse": inhouse == null ? null : inhouse,
-        "signed_date": signedDate == null ? null : signedDate,
-        "effective_date": effectiveDate == null ? null : effectiveDate,
-        "xml_filename": xmlFilename == null ? null : xmlFilename,
-        "id": id == null ? null : id,
+        "inhouse": inhouse,
+        "signed_date": signedDate,
+        "effective_date": effectiveDate,
+        "xml_filename": xmlFilename,
+        "id": id,
         "specific_issues": specificIssues == null
             ? null
             : List<dynamic>.from(specificIssues.map((x) => x)),
-        "report_type": reportType == null ? null : reportType,
-        "report_year": reportYear == null ? null : reportYear,
-        "senate_id": senateId == null ? null : senateId,
-        "house_id": houseId == null ? null : houseId,
+        "report_type": reportType,
+        "report_year": reportYear,
+        "senate_id": senateId,
+        "house_id": houseId,
         "latest_filing": latestFiling == null ? null : latestFiling.toJson(),
         "lobbyists": lobbyists == null
             ? null
@@ -172,21 +171,21 @@ class LatestFiling {
         filingDate: json["filing_date"] == null
             ? null
             : DateTime.parse(json["filing_date"]),
-        reportYear: json["report_year"] == null ? null : json["report_year"],
+        reportYear: json["report_year"],
         reportType: json["report_type"] == null
             ? null
             : reportTypeValues.map[json["report_type"]],
-        pdfUrl: json["pdf_url"] == null ? null : json["pdf_url"],
+        pdfUrl: json["pdf_url"],
       );
 
   Map<String, dynamic> toJson() => {
         "filing_date": filingDate == null
             ? null
             : "${filingDate.year.toString().padLeft(4, '0')}-${filingDate.month.toString().padLeft(2, '0')}-${filingDate.day.toString().padLeft(2, '0')}",
-        "report_year": reportYear == null ? null : reportYear,
+        "report_year": reportYear,
         "report_type":
             reportType == null ? null : reportTypeValues.reverse[reportType],
-        "pdf_url": pdfUrl == null ? null : pdfUrl,
+        "pdf_url": pdfUrl,
       };
 }
 
@@ -205,16 +204,13 @@ class Lobbying {
   final String generalDescription;
 
   factory Lobbying.fromJson(Map<String, dynamic> json) => Lobbying(
-        name: json["name"] == null ? null : json["name"],
-        generalDescription: json["general_description"] == null
-            ? null
-            : json["general_description"],
+        name: json["name"],
+        generalDescription: json["general_description"],
       );
 
   Map<String, dynamic> toJson() => {
-        "name": name == null ? null : name,
-        "general_description":
-            generalDescription == null ? null : generalDescription,
+        "name": name,
+        "general_description": generalDescription,
       };
 }
 
@@ -228,14 +224,13 @@ class Lobbyist {
   final String coveredPosition;
 
   factory Lobbyist.fromJson(Map<String, dynamic> json) => Lobbyist(
-        name: json["name"] == null ? null : json["name"],
-        coveredPosition:
-            json["covered_position"] == null ? null : json["covered_position"],
+        name: json["name"],
+        coveredPosition: json["covered_position"],
       );
 
   Map<String, dynamic> toJson() => {
-        "name": name == null ? null : name,
-        "covered_position": coveredPosition == null ? null : coveredPosition,
+        "name": name,
+        "covered_position": coveredPosition,
       };
 }
 
@@ -246,9 +241,7 @@ class EnumValues<T> {
   EnumValues(this.map);
 
   Map<T, String> get reverse {
-    if (reverseMap == null) {
-      reverseMap = map.map((k, v) => new MapEntry(v, k));
-    }
+    reverseMap ??= map.map((k, v) => MapEntry(v, k));
     return reverseMap;
   }
 }

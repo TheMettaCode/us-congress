@@ -29,11 +29,11 @@ class TotalOfficeExpenses {
 
   factory TotalOfficeExpenses.fromJson(Map<String, dynamic> json) =>
       TotalOfficeExpenses(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
-        category: json["category"] == null ? null : json["category"],
-        numResults: json["num_results"] == null ? null : json["num_results"],
-        offset: json["offset"] == null ? null : json["offset"],
+        status: json["status"],
+        copyright: json["copyright"],
+        category: json["category"],
+        numResults: json["num_results"],
+        offset: json["offset"],
         results: json["results"] == null
             ? null
             : List<TotalExpensesResult>.from(
@@ -41,11 +41,11 @@ class TotalOfficeExpenses {
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
-        "category": category == null ? null : category,
-        "num_results": numResults == null ? null : numResults,
-        "offset": offset == null ? null : offset,
+        "status": status,
+        "copyright": copyright,
+        "category": category,
+        "num_results": numResults,
+        "offset": offset,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -75,11 +75,11 @@ class TotalExpensesResult {
 
   factory TotalExpensesResult.fromJson(Map<String, dynamic> json) =>
       TotalExpensesResult(
-        year: json["year"] == null ? null : json["year"],
-        quarter: json["quarter"] == null ? null : json["quarter"],
-        memberId: json["member_id"] == null ? null : json["member_id"],
-        name: json["name"] == null ? null : json["name"],
-        memberUri: json["member_uri"] == null ? null : json["member_uri"],
+        year: json["year"],
+        quarter: json["quarter"],
+        memberId: json["member_id"],
+        name: json["name"],
+        memberUri: json["member_uri"],
         amount: json["amount"] == null ? null : json["amount"].toDouble(),
         yearToDate: json["year_to_date"] == null
             ? null
@@ -90,15 +90,13 @@ class TotalExpensesResult {
       );
 
   Map<String, dynamic> toJson() => {
-        "year": year == null ? null : year,
-        "quarter": quarter == null ? null : quarter,
-        "member_id": memberId == null ? null : memberId,
-        "name": name == null ? null : name,
-        "member_uri": memberUri == null ? null : memberUri,
-        "amount": amount == null ? null : amount,
-        "year_to_date": yearToDate == null ? null : yearToDate,
-        "change_from_previous_quarter": changeFromPreviousQuarter == null
-            ? null
-            : changeFromPreviousQuarter,
+        "year": year,
+        "quarter": quarter,
+        "member_id": memberId,
+        "name": name,
+        "member_uri": memberUri,
+        "amount": amount,
+        "year_to_date": yearToDate,
+        "change_from_previous_quarter": changeFromPreviousQuarter,
       };
 }

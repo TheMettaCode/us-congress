@@ -22,7 +22,9 @@ class MarketActivityPage extends StatefulWidget {
   final List<SenateStockWatch> senateStockWatchList;
   final List<MarketActivity> marketActivityOverviewList;
   const MarketActivityPage(this.membersList, this.houseStockWatchList,
-      this.senateStockWatchList, this.marketActivityOverviewList, {Key key}) : super(key: key);
+      this.senateStockWatchList, this.marketActivityOverviewList,
+      {Key key})
+      : super(key: key);
 
   @override
   MarketActivityPageState createState() => MarketActivityPageState();
@@ -351,11 +353,13 @@ class MarketActivityPageState extends State<MarketActivityPage> {
     /// TALLY ALL DOLLAR RANGE DATA
     _dollarData.retainWhere((element) => element.dollarRange.contains('\$'));
     _dollarData.sort((a, b) => int.parse(a.dollarRange
-            .split('-')[0].trim()
+            .split('-')[0]
+            .trim()
             .replaceFirst('\$', '')
             .replaceAll(',', ''))
         .compareTo(int.parse(b.dollarRange
-            .split('-')[0].trim()
+            .split('-')[0]
+            .trim()
             .replaceFirst('\$', '')
             .replaceAll(',', ''))));
 
@@ -452,7 +456,8 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                     : stockWatchColor,
               ),
               body: _loading
-                  ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+                  ? AnimatedWidgets.circularProgressWatchtower(
+                      context, userDatabase, userIsPremium,
                       isMarket: true, isFullScreen: true)
                   : Padding(
                       padding: const EdgeInsets.all(0),
@@ -775,7 +780,8 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                 const Padding(
                                                                   padding:
                                                                       EdgeInsets
-                                                                          .all(0),
+                                                                          .all(
+                                                                              0),
                                                                   child: SizedBox(
                                                                       height:
                                                                           5),
@@ -907,7 +913,8 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                 const Padding(
                                                                   padding:
                                                                       EdgeInsets
-                                                                          .all(0),
+                                                                          .all(
+                                                                              0),
                                                                   child: SizedBox(
                                                                       height:
                                                                           5),
@@ -1027,7 +1034,8 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                 const Padding(
                                                                   padding:
                                                                       EdgeInsets
-                                                                          .all(0),
+                                                                          .all(
+                                                                              0),
                                                                   child: SizedBox(
                                                                       height:
                                                                           5),
@@ -1041,7 +1049,9 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                           _dataLoading
                                               ? AnimatedWidgets
                                                   .circularProgressWatchtower(
-                                                      context, userDatabase, userIsPremium,
+                                                      context,
+                                                      userDatabase,
+                                                      userIsPremium,
                                                       isMarket: true,
                                                       isFullScreen: true)
                                               : const SizedBox.shrink()

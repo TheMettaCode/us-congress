@@ -20,8 +20,8 @@ class Members {
   final List<MemberResult> results;
 
   factory Members.fromJson(Map<String, dynamic> json) => Members(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
+        status: json["status"],
+        copyright: json["copyright"],
         results: json["results"] == null
             ? null
             : List<MemberResult>.from(
@@ -29,8 +29,8 @@ class Members {
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
+        "status": status,
+        "copyright": copyright,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -95,72 +95,66 @@ class MemberResult {
   final List<Role> roles;
 
   factory MemberResult.fromJson(Map<String, dynamic> json) => MemberResult(
-        id: json["id"] == null ? null : json["id"],
-        memberId: json["member_id"] == null ? null : json["member_id"],
-        firstName: json["first_name"] == null ? null : json["first_name"],
-        middleName: json["middle_name"] == null ? null : json["middle_name"],
-        lastName: json["last_name"] == null ? null : json["last_name"],
+        id: json["id"],
+        memberId: json["member_id"],
+        firstName: json["first_name"],
+        middleName: json["middle_name"],
+        lastName: json["last_name"],
         suffix: json["suffix"],
         dateOfBirth: json["date_of_birth"] == null
             ? null
             : DateTime.parse(json["date_of_birth"]),
-        gender: json["gender"] == null ? null : json["gender"],
-        url: json["url"] == null ? null : json["url"],
-        timesTopicsUrl:
-            json["times_topics_url"] == null ? null : json["times_topics_url"],
-        timesTag: json["times_tag"] == null ? null : json["times_tag"],
-        govtrackId: json["govtrack_id"] == null ? null : json["govtrack_id"],
-        cspanId: json["cspan_id"] == null ? null : json["cspan_id"],
-        votesmartId: json["votesmart_id"] == null ? null : json["votesmart_id"],
-        icpsrId: json["icpsr_id"] == null ? null : json["icpsr_id"],
-        twitterAccount:
-            json["twitter_account"] == null ? null : json["twitter_account"],
-        facebookAccount:
-            json["facebook_account"] == null ? null : json["facebook_account"],
+        gender: json["gender"],
+        url: json["url"],
+        timesTopicsUrl: json["times_topics_url"],
+        timesTag: json["times_tag"],
+        govtrackId: json["govtrack_id"],
+        cspanId: json["cspan_id"],
+        votesmartId: json["votesmart_id"],
+        icpsrId: json["icpsr_id"],
+        twitterAccount: json["twitter_account"],
+        facebookAccount: json["facebook_account"],
         youtubeAccount: json["youtube_account"],
-        crpId: json["crp_id"] == null ? null : json["crp_id"],
-        googleEntityId:
-            json["google_entity_id"] == null ? null : json["google_entity_id"],
+        crpId: json["crp_id"],
+        googleEntityId: json["google_entity_id"],
         rssUrl: json["rss_url"],
-        inOffice: json["in_office"] == null ? null : json["in_office"],
-        currentParty:
-            json["current_party"] == null ? null : json["current_party"],
-        mostRecentVote:
-            json["most_recent_vote"] == null ? null : json["most_recent_vote"],
-        lastUpdated: json["last_updated"] == null ? null : json["last_updated"],
+        inOffice: json["in_office"],
+        currentParty: json["current_party"],
+        mostRecentVote: json["most_recent_vote"],
+        lastUpdated: json["last_updated"],
         roles: json["roles"] == null
             ? null
             : List<Role>.from(json["roles"].map((x) => Role.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "member_id": memberId == null ? null : memberId,
-        "first_name": firstName == null ? null : firstName,
-        "middle_name": middleName == null ? null : middleName,
-        "last_name": lastName == null ? null : lastName,
+        "id": id,
+        "member_id": memberId,
+        "first_name": firstName,
+        "middle_name": middleName,
+        "last_name": lastName,
         "suffix": suffix,
         "date_of_birth": dateOfBirth == null
             ? null
             : "${dateOfBirth.year.toString().padLeft(4, '0')}-${dateOfBirth.month.toString().padLeft(2, '0')}-${dateOfBirth.day.toString().padLeft(2, '0')}",
-        "gender": gender == null ? null : gender,
-        "url": url == null ? null : url,
-        "times_topics_url": timesTopicsUrl == null ? null : timesTopicsUrl,
-        "times_tag": timesTag == null ? null : timesTag,
-        "govtrack_id": govtrackId == null ? null : govtrackId,
-        "cspan_id": cspanId == null ? null : cspanId,
-        "votesmart_id": votesmartId == null ? null : votesmartId,
-        "icpsr_id": icpsrId == null ? null : icpsrId,
-        "twitter_account": twitterAccount == null ? null : twitterAccount,
-        "facebook_account": facebookAccount == null ? null : facebookAccount,
+        "gender": gender,
+        "url": url,
+        "times_topics_url": timesTopicsUrl,
+        "times_tag": timesTag,
+        "govtrack_id": govtrackId,
+        "cspan_id": cspanId,
+        "votesmart_id": votesmartId,
+        "icpsr_id": icpsrId,
+        "twitter_account": twitterAccount,
+        "facebook_account": facebookAccount,
         "youtube_account": youtubeAccount,
-        "crp_id": crpId == null ? null : crpId,
-        "google_entity_id": googleEntityId == null ? null : googleEntityId,
+        "crp_id": crpId,
+        "google_entity_id": googleEntityId,
         "rss_url": rssUrl,
-        "in_office": inOffice == null ? null : inOffice,
-        "current_party": currentParty == null ? null : currentParty,
-        "most_recent_vote": mostRecentVote == null ? null : mostRecentVote,
-        "last_updated": lastUpdated == null ? null : lastUpdated,
+        "in_office": inOffice,
+        "current_party": currentParty,
+        "most_recent_vote": mostRecentVote,
+        "last_updated": lastUpdated,
         "roles": roles == null
             ? null
             : List<dynamic>.from(roles.map((x) => x.toJson())),
@@ -243,46 +237,40 @@ class Role {
   final List<Committee> subcommittees;
 
   factory Role.fromJson(Map<String, dynamic> json) => Role(
-        congress: json["congress"] == null ? null : json["congress"],
-        chamber: json["chamber"] == null ? null : json["chamber"],
-        title: json["title"] == null ? null : json["title"],
-        shortTitle: json["short_title"] == null ? null : json["short_title"],
-        state: json["state"] == null ? null : json["state"],
-        party: json["party"] == null ? null : json["party"],
+        congress: json["congress"],
+        chamber: json["chamber"],
+        title: json["title"],
+        shortTitle: json["short_title"],
+        state: json["state"],
+        party: json["party"],
         leadershipRole: json["leadership_role"],
-        fecCandidateId:
-            json["fec_candidate_id"] == null ? null : json["fec_candidate_id"],
-        seniority: json["seniority"] == null ? null : json["seniority"],
-        district: json["district"] == null ? null : json["district"],
-        atLarge: json["at_large"] == null ? null : json["at_large"],
-        ocdId: json["ocd_id"] == null ? null : json["ocd_id"],
+        fecCandidateId: json["fec_candidate_id"],
+        seniority: json["seniority"],
+        district: json["district"],
+        atLarge: json["at_large"],
+        ocdId: json["ocd_id"],
         startDate: json["start_date"] == null
             ? null
             : DateTime.parse(json["start_date"]),
         endDate:
             json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
-        office: json["office"] == null ? null : json["office"],
-        phone: json["phone"] == null ? null : json["phone"],
+        office: json["office"],
+        phone: json["phone"],
         fax: json["fax"],
         contactForm: json["contact_form"],
-        cookPvi: json["cook_pvi"] == null ? null : json["cook_pvi"],
+        cookPvi: json["cook_pvi"],
         dwNominate:
             json["dw_nominate"] == null ? null : json["dw_nominate"].toDouble(),
         idealPoint: json["ideal_point"],
-        nextElection:
-            json["next_election"] == null ? null : json["next_election"],
-        totalVotes: json["total_votes"] == null ? null : json["total_votes"],
-        missedVotes: json["missed_votes"] == null ? null : json["missed_votes"],
-        totalPresent:
-            json["total_present"] == null ? null : json["total_present"],
-        senateClass: json["senate_class"] == null ? null : json["senate_class"],
-        stateRank: json["state_rank"] == null ? null : json["state_rank"],
-        lisId: json["lis_id"] == null ? null : json["lis_id"],
-        billsSponsored:
-            json["bills_sponsored"] == null ? null : json["bills_sponsored"],
-        billsCosponsored: json["bills_cosponsored"] == null
-            ? null
-            : json["bills_cosponsored"],
+        nextElection: json["next_election"],
+        totalVotes: json["total_votes"],
+        missedVotes: json["missed_votes"],
+        totalPresent: json["total_present"],
+        senateClass: json["senate_class"],
+        stateRank: json["state_rank"],
+        lisId: json["lis_id"],
+        billsSponsored: json["bills_sponsored"],
+        billsCosponsored: json["bills_cosponsored"],
         missedVotesPct: json["missed_votes_pct"] == null
             ? null
             : json["missed_votes_pct"].toDouble(),
@@ -303,45 +291,43 @@ class Role {
       );
 
   Map<String, dynamic> toJson() => {
-        "congress": congress == null ? null : congress,
-        "chamber": chamber == null ? null : chamber,
-        "title": title == null ? null : title,
-        "short_title": shortTitle == null ? null : shortTitle,
-        "state": state == null ? null : state,
-        "party": party == null ? null : party,
+        "congress": congress,
+        "chamber": chamber,
+        "title": title,
+        "short_title": shortTitle,
+        "state": state,
+        "party": party,
         "leadership_role": leadershipRole,
-        "fec_candidate_id": fecCandidateId == null ? null : fecCandidateId,
-        "seniority": seniority == null ? null : seniority,
-        "district": district == null ? null : district,
-        "at_large": atLarge == null ? null : atLarge,
-        "ocd_id": ocdId == null ? null : ocdId,
+        "fec_candidate_id": fecCandidateId,
+        "seniority": seniority,
+        "district": district,
+        "at_large": atLarge,
+        "ocd_id": ocdId,
         "start_date": startDate == null
             ? null
             : "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
         "end_date": endDate == null
             ? null
             : "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
-        "office": office == null ? null : office,
-        "phone": phone == null ? null : phone,
+        "office": office,
+        "phone": phone,
         "fax": fax,
         "contact_form": contactForm,
-        "cook_pvi": cookPvi == null ? null : cookPvi,
-        "dw_nominate": dwNominate == null ? null : dwNominate,
+        "cook_pvi": cookPvi,
+        "dw_nominate": dwNominate,
         "ideal_point": idealPoint,
-        "next_election": nextElection == null ? null : nextElection,
-        "total_votes": totalVotes == null ? null : totalVotes,
-        "missed_votes": missedVotes == null ? null : missedVotes,
-        "total_present": totalPresent == null ? null : totalPresent,
-        "senate_class": senateClass == null ? null : senateClass,
-        "state_rank": stateRank == null ? null : stateRank,
-        "lis_id": lisId == null ? null : lisId,
-        "bills_sponsored": billsSponsored == null ? null : billsSponsored,
-        "bills_cosponsored": billsCosponsored == null ? null : billsCosponsored,
-        "missed_votes_pct": missedVotesPct == null ? null : missedVotesPct,
-        "votes_with_party_pct":
-            votesWithPartyPct == null ? null : votesWithPartyPct,
-        "votes_against_party_pct":
-            votesAgainstPartyPct == null ? null : votesAgainstPartyPct,
+        "next_election": nextElection,
+        "total_votes": totalVotes,
+        "missed_votes": missedVotes,
+        "total_present": totalPresent,
+        "senate_class": senateClass,
+        "state_rank": stateRank,
+        "lis_id": lisId,
+        "bills_sponsored": billsSponsored,
+        "bills_cosponsored": billsCosponsored,
+        "missed_votes_pct": missedVotesPct,
+        "votes_with_party_pct": votesWithPartyPct,
+        "votes_against_party_pct": votesAgainstPartyPct,
         "committees": committees == null
             ? null
             : List<dynamic>.from(committees.map((x) => x.toJson())),
@@ -375,13 +361,12 @@ class Committee {
   final ParentCommitteeId parentCommitteeId;
 
   factory Committee.fromJson(Map<String, dynamic> json) => Committee(
-        name: json["name"] == null ? null : json["name"],
-        code: json["code"] == null ? null : json["code"],
-        apiUri: json["api_uri"] == null ? null : json["api_uri"],
+        name: json["name"],
+        code: json["code"],
+        apiUri: json["api_uri"],
         side: json["side"] == null ? null : sideValues.map[json["side"]],
         title: json["title"] == null ? null : titleValues.map[json["title"]],
-        rankInParty:
-            json["rank_in_party"] == null ? null : json["rank_in_party"],
+        rankInParty: json["rank_in_party"],
         // beginDate: json["begin_date"] == null ? null : DateTime.parse(json["begin_date"]),
         // endDate: json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
         parentCommitteeId: json["parent_committee_id"] == null
@@ -390,12 +375,12 @@ class Committee {
       );
 
   Map<String, dynamic> toJson() => {
-        "name": name == null ? null : name,
-        "code": code == null ? null : code,
-        "api_uri": apiUri == null ? null : apiUri,
+        "name": name,
+        "code": code,
+        "api_uri": apiUri,
         "side": side == null ? null : sideValues.reverse[side],
         "title": title == null ? null : titleValues.reverse[title],
-        "rank_in_party": rankInParty == null ? null : rankInParty,
+        "rank_in_party": rankInParty,
         // "begin_date": beginDate == null ? null : "${beginDate.year.toString().padLeft(4, '0')}-${beginDate.month.toString().padLeft(2, '0')}-${beginDate.day.toString().padLeft(2, '0')}",
         // "end_date": endDate == null ? null : "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
         "parent_committee_id": parentCommitteeId == null

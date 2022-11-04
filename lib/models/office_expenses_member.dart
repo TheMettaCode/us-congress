@@ -35,14 +35,14 @@ class MemberOfficeExpenses {
 
   factory MemberOfficeExpenses.fromJson(Map<String, dynamic> json) =>
       MemberOfficeExpenses(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
-        memberId: json["member_id"] == null ? null : json["member_id"],
-        name: json["name"] == null ? null : json["name"],
-        memberUri: json["member_uri"] == null ? null : json["member_uri"],
-        year: json["year"] == null ? null : json["year"],
-        quarter: json["quarter"] == null ? null : json["quarter"],
-        numResults: json["num_results"] == null ? null : json["num_results"],
+        status: json["status"],
+        copyright: json["copyright"],
+        memberId: json["member_id"],
+        name: json["name"],
+        memberUri: json["member_uri"],
+        year: json["year"],
+        quarter: json["quarter"],
+        numResults: json["num_results"],
         results: json["results"] == null
             ? null
             : List<MemberExpensesResult>.from(
@@ -50,14 +50,14 @@ class MemberOfficeExpenses {
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
-        "member_id": memberId == null ? null : memberId,
-        "name": name == null ? null : name,
-        "member_uri": memberUri == null ? null : memberUri,
-        "year": year == null ? null : year,
-        "quarter": quarter == null ? null : quarter,
-        "num_results": numResults == null ? null : numResults,
+        "status": status,
+        "copyright": copyright,
+        "member_id": memberId,
+        "name": name,
+        "member_uri": memberUri,
+        "year": year,
+        "quarter": quarter,
+        "num_results": numResults,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -81,9 +81,8 @@ class MemberExpensesResult {
 
   factory MemberExpensesResult.fromJson(Map<String, dynamic> json) =>
       MemberExpensesResult(
-        category: json["category"] == null ? null : json["category"],
-        categorySlug:
-            json["category_slug"] == null ? null : json["category_slug"],
+        category: json["category"],
+        categorySlug: json["category_slug"],
         amount: json["amount"] == null ? null : json["amount"].toDouble(),
         yearToDate: json["year_to_date"] == null
             ? null
@@ -94,12 +93,10 @@ class MemberExpensesResult {
       );
 
   Map<String, dynamic> toJson() => {
-        "category": category == null ? null : category,
-        "category_slug": categorySlug == null ? null : categorySlug,
-        "amount": amount == null ? null : amount,
-        "year_to_date": yearToDate == null ? null : yearToDate,
-        "change_from_previous_quarter": changeFromPreviousQuarter == null
-            ? null
-            : changeFromPreviousQuarter,
+        "category": category,
+        "category_slug": categorySlug,
+        "amount": amount,
+        "year_to_date": yearToDate,
+        "change_from_previous_quarter": changeFromPreviousQuarter,
       };
 }

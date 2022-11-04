@@ -42,8 +42,7 @@ class HouseStockWatch {
 
   factory HouseStockWatch.fromJson(Map<String, dynamic> json) =>
       HouseStockWatch(
-        disclosureYear:
-            json["disclosure_year"] == null ? null : json["disclosure_year"],
+        disclosureYear: json["disclosure_year"],
         disclosureDate: json["disclosure_date"] == null
             ? null
             : DateTime.parse(
@@ -51,39 +50,33 @@ class HouseStockWatch {
         transactionDate: json["transaction_date"] == null
             ? null
             : DateTime.parse(json["transaction_date"]),
-        owner: json["owner"] == null ? null : json["owner"],
-        ticker: json["ticker"] == null ? null : json["ticker"],
-        assetDescription: json["asset_description"] == null
-            ? null
-            : json["asset_description"],
-        type: json["type"] == null ? null : json["type"],
-        amount: json["amount"] == null ? null : json["amount"],
-        representative:
-            json["representative"] == null ? null : json["representative"],
-        district: json["district"] == null ? null : json["district"],
-        ptrLink: json["ptr_link"] == null ? null : json["ptr_link"],
-        capGainsOver200Usd: json["cap_gains_over_200_usd"] == null
-            ? null
-            : json["cap_gains_over_200_usd"],
+        owner: json["owner"],
+        ticker: json["ticker"],
+        assetDescription: json["asset_description"],
+        type: json["type"],
+        amount: json["amount"],
+        representative: json["representative"],
+        district: json["district"],
+        ptrLink: json["ptr_link"],
+        capGainsOver200Usd: json["cap_gains_over_200_usd"],
       );
 
   Map<String, dynamic> toJson() => {
-        "disclosure_year": disclosureYear == null ? null : disclosureYear,
+        "disclosure_year": disclosureYear,
         "disclosure_date": disclosureDate == null
             ? null
             : "${disclosureDate.month.toString().padLeft(2, '0')}/${disclosureDate.day.toString().padLeft(2, '0')}/${disclosureDate.year.toString().padLeft(4, '0')}",
         "transaction_date": transactionDate == null
             ? null
             : "${transactionDate.year.toString().padLeft(4, '0')}-${transactionDate.month.toString().padLeft(2, '0')}-${transactionDate.day.toString().padLeft(2, '0')}",
-        "owner": owner == null ? null : owner,
-        "ticker": ticker == null ? null : ticker,
-        "asset_description": assetDescription == null ? null : assetDescription,
-        "type": type == null ? null : type,
-        "amount": amount == null ? null : amount,
-        "representative": representative == null ? null : representative,
-        "district": district == null ? null : district,
-        "ptr_link": ptrLink == null ? null : ptrLink,
-        "cap_gains_over_200_usd":
-            capGainsOver200Usd == null ? null : capGainsOver200Usd,
+        "owner": owner,
+        "ticker": ticker,
+        "asset_description": assetDescription,
+        "type": type,
+        "amount": amount,
+        "representative": representative,
+        "district": district,
+        "ptr_link": ptrLink,
+        "cap_gains_over_200_usd": capGainsOver200Usd,
       };
 }

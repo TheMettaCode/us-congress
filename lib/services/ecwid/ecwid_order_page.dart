@@ -15,7 +15,8 @@ import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class EcwidOrderPage extends StatefulWidget {
-  const EcwidOrderPage({Key key, this.title, this.productId, this.product, this.creditsToBuy})
+  const EcwidOrderPage(
+      {Key key, this.title, this.productId, this.product, this.creditsToBuy})
       : super(key: key);
   final String title;
   final EcwidStoreItem product;
@@ -62,7 +63,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
 
     /// ECWID STORE PRODUCTS LIST
     try {
-      setState(() => ecwidStoreItems = ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
+      setState(() => ecwidStoreItems =
+          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
     } catch (e) {
       logger.w(
           '^^^^^ ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
@@ -71,7 +73,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
     /// PRODUCT ORDERS LIST
     try {
       setState(() => productOrdersList =
-          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders);
+          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList'))
+              .orders);
     } catch (e) {
       logger.w(
           '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
@@ -91,12 +94,14 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
       newEcwidProducts = userDatabase.get('newEcwidProducts');
 
       initialUserId = List<String>.from(userDatabase.get('userIdList'))
-          .firstWhere((element) => element.split('<|:|>')[0].toLowerCase() == 'newuser');
+          .firstWhere((element) =>
+              element.split('<|:|>')[0].toLowerCase() == 'newuser');
       lastUserId = List<String>.from(userDatabase.get('userIdList')).last;
       orderId = 'EPO${random.nextInt(999999)}';
       orderIdExtended =
           'EPO${random.nextInt(999999)}-${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}-${initialUserId.split('<|:|>')[1]}';
-      currentUserAddress = Map<String, dynamic>.from(userDatabase.get('currentAddress'));
+      currentUserAddress =
+          Map<String, dynamic>.from(userDatabase.get('currentAddress'));
     });
   }
 
@@ -112,9 +117,10 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
         isExpanded: true,
         value: optionChoiceList[i].choice,
         hint: Text('${optionChoiceList[i].option.toUpperCase()} *'),
-        validator: (value) => value == null || value.isEmpty ? '$option is required' : null,
-        decoration:
-            InputDecoration(errorStyle: TextStyle(color: darkTheme ? altHighlightColor : null)),
+        validator: (value) =>
+            value == null || value.isEmpty ? '$option is required' : null,
+        decoration: InputDecoration(
+            errorStyle: TextStyle(color: darkTheme ? altHighlightColor : null)),
         items: thisOption.choices
             .map((e) => e.text)
             .toList()
@@ -128,16 +134,19 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
         onChanged: (String choice) {
           if (choice != null) {
             List<OptionChoice> list = optionChoiceList;
-            debugPrint('CURRENT OPTION-CHOICE LIST: ${list.map((e) => e.toString())}');
+            debugPrint(
+                'CURRENT OPTION-CHOICE LIST: ${list.map((e) => e.toString())}');
             list.removeAt(i);
             list.insert(i, OptionChoice(option, choice));
             setState(() => optionChoiceList = list);
-            debugPrint('UPDATED OPTION-CHOICE LIST: ${optionChoiceList.map((e) => e.toString())}');
+            debugPrint(
+                'UPDATED OPTION-CHOICE LIST: ${optionChoiceList.map((e) => e.toString())}');
           }
         },
       ));
     }
-    debugPrint('FINAL OPTION-CHOICE LIST: ${optionChoiceList.map((e) => e.toString())}');
+    debugPrint(
+        'FINAL OPTION-CHOICE LIST: ${optionChoiceList.map((e) => e.toString())}');
   }
 
   static final _ecwidFormKey = GlobalKey<FormState>();
@@ -174,7 +183,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
 
   String orderId = '';
   String orderIdExtended = '';
-  final String orderDate = dateWithTimeAndSecondsFormatter.format(DateTime.now());
+  final String orderDate =
+      dateWithTimeAndSecondsFormatter.format(DateTime.now());
 
   String _email = '';
   String _firstName = '';
@@ -218,7 +228,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
               title: Text(pageTitle),
             ),
             body: _loading || product == null
-                ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+                ? AnimatedWidgets.circularProgressWatchtower(
+                    context, userDatabase, userIsPremium,
                     isFullScreen: true)
                 : SafeArea(
                     child: Container(
@@ -229,10 +240,12 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                               image: AssetImage(backgroundImage),
                               repeat: ImageRepeat.repeat,
                               colorFilter: ColorFilter.mode(
-                                  Theme.of(context).colorScheme.background, BlendMode.color)),
+                                  Theme.of(context).colorScheme.background,
+                                  BlendMode.color)),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
                           child: BounceInUp(
                             child: ListView(
                               shrinkWrap: true,
@@ -241,8 +254,9 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                 Text(
                                   'Order: $orderId'.toUpperCase(),
                                   textAlign: TextAlign.center,
-                                  style: Styles.regularStyle
-                                      .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: Styles.regularStyle.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 10),
                                 InteractiveViewer(
@@ -252,8 +266,10 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                     // duration: Duration(milliseconds: 250),
                                     // delay: Duration(milliseconds: 1000),
                                     child: Container(
-                                      color:
-                                          Theme.of(context).colorScheme.background.withOpacity(0.5),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background
+                                          .withOpacity(0.5),
                                       alignment: Alignment.center,
                                       height: 200,
                                       width: MediaQuery.of(context).size.width,
@@ -265,7 +281,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                           ),
                                           fit: BoxFit.cover,
                                           onError: (error, stackTrace) =>
-                                              const AssetImage('assets/intro_background.png'),
+                                              const AssetImage(
+                                                  'assets/intro_background.png'),
                                           // colorFilter: ColorFilter.mode(
                                           //     Theme.of(context)
                                           //         .colorScheme
@@ -282,7 +299,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                           ),
                                           fit: BoxFit.contain,
                                           onError: (error, stackTrace) =>
-                                              const AssetImage('assets/intro_background.png'),
+                                              const AssetImage(
+                                                  'assets/intro_background.png'),
                                         ),
                                       ),
                                       // child: BackdropFilter(
@@ -295,9 +313,11 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         product.name.toUpperCase(),
@@ -305,13 +325,15 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                         textAlign: TextAlign.center,
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
-                                        style: Styles.regularStyle
-                                            .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: Styles.regularStyle.copyWith(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         'Price: $creditsToBuy Credits',
-                                        style: Styles.regularStyle
-                                            .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: Styles.regularStyle.copyWith(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         'Credits Available: $totalCredits',
@@ -321,7 +343,9 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                             color: !canBuy
                                                 ? darkTheme
                                                     ? null
-                                                    : Theme.of(context).colorScheme.error
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .error
                                                 : darkTheme
                                                     ? alertIndicatorColorBrightGreen
                                                     : alertIndicatorColorDarkGreen),
@@ -331,55 +355,79 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                 ),
                                 Card(
                                   elevation: 0,
-                                  color: Theme.of(context).colorScheme.background.withOpacity(0.75),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .background
+                                      .withOpacity(0.75),
                                   child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        10, 0, 10, 20),
                                     child: Form(
                                       key: _ecwidFormKey,
                                       child: Scrollbar(
                                         child: ListView(
                                           shrinkWrap: true,
-                                          physics: const BouncingScrollPhysics(),
+                                          physics:
+                                              const BouncingScrollPhysics(),
                                           children: [
                                             dropdownButtonList.isEmpty
                                                 ? const SizedBox.shrink()
-                                                : ListBody(children: dropdownButtonList),
+                                                : ListBody(
+                                                    children:
+                                                        dropdownButtonList),
                                             TextFormField(
-                                              keyboardType: TextInputType.emailAddress,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
                                               validator: (val) =>
-                                                  EmailValidator.validate(val) ? null : "Email",
+                                                  EmailValidator.validate(val)
+                                                      ? null
+                                                      : "Email",
                                               decoration: InputDecoration(
-                                                  hintText: 'Email *'.toUpperCase(),
+                                                  hintText:
+                                                      'Email *'.toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _email = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) =>
+                                                  setState(() => _email = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
-                                              validator: (val) =>
-                                                  val == null || val.length < 2 || val.length > 20
-                                                      ? 'Must be 2 to 20 characters'
-                                                      : null,
+                                              validator: (val) => val == null ||
+                                                      val.length < 2 ||
+                                                      val.length > 20
+                                                  ? 'Must be 2 to 20 characters'
+                                                  : null,
                                               decoration: InputDecoration(
-                                                hintText: 'First Name *'.toUpperCase(),
+                                                hintText: 'First Name *'
+                                                    .toUpperCase(),
                                                 errorStyle: TextStyle(
-                                                    color: darkTheme ? altHighlightColor : null),
+                                                    color: darkTheme
+                                                        ? altHighlightColor
+                                                        : null),
                                               ),
-                                              onChanged: (val) => setState(() => _firstName = val),
+                                              onChanged: (val) => setState(
+                                                  () => _firstName = val),
                                             ),
                                             // SizedBox(width: 10),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
-                                              validator: (val) =>
-                                                  val == null || val.length < 5 || val.length > 20
-                                                      ? 'Must be 5 to 20 characters'
-                                                      : null,
+                                              validator: (val) => val == null ||
+                                                      val.length < 5 ||
+                                                      val.length > 20
+                                                  ? 'Must be 5 to 20 characters'
+                                                  : null,
                                               decoration: InputDecoration(
-                                                hintText: 'Last Name *'.toUpperCase(),
+                                                hintText:
+                                                    'Last Name *'.toUpperCase(),
                                                 errorStyle: TextStyle(
-                                                    color: darkTheme ? altHighlightColor : null),
+                                                    color: darkTheme
+                                                        ? altHighlightColor
+                                                        : null),
                                               ),
-                                              onChanged: (val) => setState(() => _lastName = val),
+                                              onChanged: (val) => setState(
+                                                  () => _lastName = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.phone,
@@ -390,23 +438,32 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                               //         ? '10 digits without dashes'
                                               //         : null,
                                               decoration: InputDecoration(
-                                                  hintText: 'Phone number'.toUpperCase(),
+                                                  hintText: 'Phone number'
+                                                      .toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _phone = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) =>
+                                                  setState(() => _phone = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
-                                              validator: (val) => val == null || val.isEmpty
+                                              validator: (val) => val == null ||
+                                                      val.isEmpty
                                                   ? 'Address'
                                                   // : val.length < 5 || val.length > 20
                                                   //     ? 'User must be 5 to 20 characters'
                                                   : null,
                                               decoration: InputDecoration(
-                                                  hintText: 'Street Address *'.toUpperCase(),
+                                                  hintText: 'Street Address *'
+                                                      .toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _address1 = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) => setState(
+                                                  () => _address1 = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
@@ -416,53 +473,78 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                               //         ? 'User must be 5 to 20 characters'
                                               //         : null,
                                               decoration: InputDecoration(
-                                                  hintText: 'Apt., P.O. Box, etc.'.toUpperCase(),
+                                                  hintText:
+                                                      'Apt., P.O. Box, etc.'
+                                                          .toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _address2 = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) => setState(
+                                                  () => _address2 = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
-                                              validator: (val) => val == null || val.isEmpty
+                                              validator: (val) => val == null ||
+                                                      val.isEmpty
                                                   ? 'City'
                                                   // : val.length < 5 || val.length > 20
                                                   //     ? 'User must be 5 to 20 characters'
                                                   : null,
                                               decoration: InputDecoration(
-                                                  hintText: 'City *'.toUpperCase(),
+                                                  hintText:
+                                                      'City *'.toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _city = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) =>
+                                                  setState(() => _city = val),
                                             ),
                                             TextFormField(
                                               keyboardType: TextInputType.text,
-                                              validator: (val) => val == null || val.isEmpty
+                                              validator: (val) => val == null ||
+                                                      val.isEmpty
                                                   ? 'State Abbr.'
                                                   : val.length < 2 ||
                                                           val.length > 2 ||
                                                           !statesMap.keys.any((abbr) =>
-                                                              abbr.toString().toLowerCase() ==
-                                                              _state.toLowerCase())
+                                                              abbr
+                                                                  .toString()
+                                                                  .toLowerCase() ==
+                                                              _state
+                                                                  .toLowerCase())
                                                       ? 'State Abbr. must be 2 character US Territory code'
                                                       : null,
                                               decoration: InputDecoration(
-                                                  hintText: 'State Abbr. *'.toUpperCase(),
+                                                  hintText: 'State Abbr. *'
+                                                      .toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _state = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) =>
+                                                  setState(() => _state = val),
                                             ),
                                             TextFormField(
-                                              keyboardType: TextInputType.number,
-                                              validator: (val) => val == null || val.isEmpty
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              validator: (val) => val == null ||
+                                                      val.isEmpty
                                                   ? '5 Digit Zip'
-                                                  : val.length < 5 || val.length > 5
+                                                  : val.length < 5 ||
+                                                          val.length > 5
                                                       ? 'Zip must be a 5 digit code'
                                                       : null,
                                               decoration: InputDecoration(
-                                                  hintText: '5 Digit Zip *'.toUpperCase(),
+                                                  hintText: '5 Digit Zip *'
+                                                      .toUpperCase(),
                                                   errorStyle: TextStyle(
-                                                      color: darkTheme ? altHighlightColor : null)),
-                                              onChanged: (val) => setState(() => _zip = val),
+                                                      color: darkTheme
+                                                          ? altHighlightColor
+                                                          : null)),
+                                              onChanged: (val) =>
+                                                  setState(() => _zip = val),
                                             ),
                                           ],
                                         ),
@@ -491,7 +573,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                         )),
                   ),
             bottomNavigationBar: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: SizedBox(
                   height: 25,
                   child: Row(
@@ -499,8 +582,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                       Expanded(
                         child: OutlinedButton(
                           style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.transparent)),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.transparent)),
                           onPressed: () => Navigator.pop(context),
                           child: const Text('Maybe Later'),
                         ),
@@ -509,8 +592,9 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                       Expanded(
                         child: OutlinedButton(
                             style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(
-                                    Theme.of(context).primaryColorDark)),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Theme.of(context).primaryColorDark)),
                             onPressed: () async {
                               if (_ecwidFormKey.currentState.validate()) {
                                 await showDialog(
@@ -520,19 +604,22 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                     setState(() => _fullAddress =
                                         "$_address1\n$_address2\n$_city, $_state $_zip");
                                     return AlertDialog(
-                                      title: const Text('Confirm Order Details'),
+                                      title:
+                                          const Text('Confirm Order Details'),
                                       content: SingleChildScrollView(
                                         child: ListBody(
                                           children: <Widget>[
                                             const Text(
                                                 'Please confirm your name and delivery address. Incorrect information will delay delivery of your order.\n'),
-                                            Text('Order: $orderId\nPrice: $creditsToBuy Credits\n'
-                                                .toUpperCase()),
+                                            Text(
+                                                'Order: $orderId\nPrice: $creditsToBuy Credits\n'
+                                                    .toUpperCase()),
                                             Text(
                                                 'Product: ${product.name} ${optionChoiceList.isEmpty ? '' : '\nOptions: ${optionChoiceList.map((e) => e.toString())}'}\n'
                                                     .toUpperCase()),
-                                            Text('Ship To: $_firstName $_lastName\n$_fullAddress'
-                                                .toUpperCase()),
+                                            Text(
+                                                'Ship To: $_firstName $_lastName\n$_fullAddress'
+                                                    .toUpperCase()),
                                           ],
                                         ),
                                       ),
@@ -546,7 +633,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                         OutlinedButton(
                                           child: const Text('Approve'),
                                           onPressed: () {
-                                            setState(() => addressConfirmed = true);
+                                            setState(
+                                                () => addressConfirmed = true);
                                             Navigator.of(context).pop();
                                           },
                                         ),
@@ -558,8 +646,10 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                 if (addressConfirmed) {
                                   try {
                                     /// DEDUCT REQUIRED CREDITS
-                                    debugPrint("PROCESSING CREDITS... (ecwid_order_page)");
-                                    Functions.processCredits(false, creditsToRemove: creditsToBuy);
+                                    debugPrint(
+                                        "PROCESSING CREDITS... (ecwid_order_page)");
+                                    Functions.processCredits(false,
+                                        creditsToRemove: creditsToBuy);
                                     // if (credits >= creditsToBuy) {
                                     //   int _newCredits = credits - creditsToBuy;
                                     //   userDatabase.put('credits', _newCredits);
@@ -573,77 +663,100 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                     // }
 
                                     /// UPDATE USER EMAILS
-                                    debugPrint("UPDATING USER EMAILS LIST... (ecwid_order_page)");
-                                    List<String> userEmailList =
-                                        List.from(userDatabase.get('userEmailList'));
+                                    debugPrint(
+                                        "UPDATING USER EMAILS LIST... (ecwid_order_page)");
+                                    List<String> userEmailList = List.from(
+                                        userDatabase.get('userEmailList'));
                                     if (!userEmailList.any((element) =>
-                                        element.toLowerCase() == _email.toLowerCase())) {
-                                      userEmailList.add('$_email<|:|>${DateTime.now()}');
+                                        element.toLowerCase() ==
+                                        _email.toLowerCase())) {
+                                      userEmailList
+                                          .add('$_email<|:|>${DateTime.now()}');
                                     }
 
-                                    debugPrint("UPDATING RECENT ORDERS LIST... (ecwid_order_page)");
+                                    debugPrint(
+                                        "UPDATING RECENT ORDERS LIST... (ecwid_order_page)");
                                     productOrdersList.insert(
                                         0,
                                         Order(
                                             orderDate: DateTime.now(),
                                             orderId: orderId,
                                             orderIdExtended: orderIdExtended,
-                                            userName: lastUserId.split('<|:|>')[0],
-                                            userId: initialUserId.split('<|:|>')[1],
+                                            userName:
+                                                lastUserId.split('<|:|>')[0],
+                                            userId:
+                                                initialUserId.split('<|:|>')[1],
                                             productId: product.id.toString(),
                                             productName: product.name,
-                                            productOptions:
-                                                optionChoiceList.map((e) => e).toList().isEmpty
-                                                    ? 'No Options'
-                                                    : optionChoiceList
-                                                        .map((e) => e.toString())
-                                                        .toString()
-                                                        .toUpperCase(),
-                                            productDescription: product.description,
-                                            productPrice: '$creditsToBuy Credits',
+                                            productOptions: optionChoiceList
+                                                    .map((e) => e)
+                                                    .toList()
+                                                    .isEmpty
+                                                ? 'No Options'
+                                                : optionChoiceList
+                                                    .map((e) => e.toString())
+                                                    .toString()
+                                                    .toUpperCase(),
+                                            productDescription:
+                                                product.description,
+                                            productPrice:
+                                                '$creditsToBuy Credits',
                                             productImageUrl: product.imageUrl,
-                                            customerName: '$_firstName $_lastName',
-                                            customerId: initialUserId.split('<|:|>')[1],
+                                            customerName:
+                                                '$_firstName $_lastName',
+                                            customerId:
+                                                initialUserId.split('<|:|>')[1],
                                             customerPhone: _phone,
-                                            customerShippingAddress: _fullAddress,
+                                            customerShippingAddress:
+                                                _fullAddress,
                                             customerEmail: _email));
 
                                     userDatabase.put(
                                         'ecwidProductOrdersList',
-                                        orderDetailListToJson(
-                                            OrderDetailList(orders: productOrdersList)));
+                                        orderDetailListToJson(OrderDetailList(
+                                            orders: productOrdersList)));
 
                                     debugPrint(
                                         "ADDING 100 TEMPORARY REWARD CREDITS... (ecwid_order_page)");
-                                    await Functions.processCredits(true, creditsToAdd: 100);
+                                    await Functions.processCredits(true,
+                                        creditsToAdd: 100);
 
-                                    debugPrint("SENDING EMAILS... (ecwid_order_page)");
+                                    debugPrint(
+                                        "SENDING EMAILS... (ecwid_order_page)");
 
                                     /// SEND EMAIL, POPUP & NOTIFICATION
-                                    await EmailjsApi.sendEcwidOrderWithCreditsEmail(
-                                      '${product.name} - $orderId'.toUpperCase(),
+                                    await EmailjsApi
+                                        .sendEcwidOrderWithCreditsEmail(
+                                      '${product.name} - $orderId'
+                                          .toUpperCase(),
                                       '[Address Confirmed] $_firstName $_lastName has just ordered ${product.name}'
                                           .toUpperCase(),
                                       _email,
                                       '$_firstName $_lastName'.toUpperCase(),
                                       customerPhone: _phone.toUpperCase(),
-                                      customerAddress: _fullAddress.toUpperCase(),
+                                      customerAddress:
+                                          _fullAddress.toUpperCase(),
                                       orderId: orderId.toUpperCase(),
-                                      orderIdExtended: orderIdExtended.toUpperCase(),
+                                      orderIdExtended:
+                                          orderIdExtended.toUpperCase(),
                                       orderDate: orderDate.toUpperCase(),
-                                      creditsUsed: creditsToBuy.toString().toUpperCase(),
+                                      creditsUsed:
+                                          creditsToBuy.toString().toUpperCase(),
                                       productName: product.name.toUpperCase(),
-                                      productOptions:
-                                          optionChoiceList.map((e) => e).toList().isEmpty
-                                              ? 'No Options'
-                                              : optionChoiceList
-                                                  .map((e) => e.toString())
-                                                  .toString()
-                                                  .toUpperCase(),
+                                      productOptions: optionChoiceList
+                                              .map((e) => e)
+                                              .toList()
+                                              .isEmpty
+                                          ? 'No Options'
+                                          : optionChoiceList
+                                              .map((e) => e.toString())
+                                              .toString()
+                                              .toUpperCase(),
                                       productImageUrl: product.imageUrl,
                                       otherProductInfo:
                                           'Printful ID: ${product.id} - Ecwid SKU: ${product.sku}',
-                                      allProductInfo: product.toJson().toString(),
+                                      allProductInfo:
+                                          product.toJson().toString(),
                                       appUserId: initialUserId.toUpperCase(),
                                       appUserStatus: userIsDev
                                           ? 'Developer'
@@ -658,7 +771,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                           .toUpperCase(),
                                     );
 
-                                    debugPrint("INITIATING POP-UP TOAST... (ecwid_order_page)");
+                                    debugPrint(
+                                        "INITIATING POP-UP TOAST... (ecwid_order_page)");
                                     Messages.showMessage(
                                         context: context,
                                         message:
@@ -666,10 +780,12 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                         networkImageUrl: product.imageUrl,
                                         isAlert: false);
 
-                                    debugPrint("POPPING 1ST CONTEXT... (ecwid_order_page)");
+                                    debugPrint(
+                                        "POPPING 1ST CONTEXT... (ecwid_order_page)");
                                     Navigator.pop(context);
 
-                                    debugPrint("SENDING IN-APP NOTIFICATION... (ecwid_order_page)");
+                                    debugPrint(
+                                        "SENDING IN-APP NOTIFICATION... (ecwid_order_page)");
                                     Messages.sendNotification(
                                         context: context,
                                         source: 'ecwid',
@@ -682,7 +798,8 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                     // debugPrint(
                                     //     "POPPING 2ND CONTEXT... (ecwid_order_page)");
                                     // Navigator.maybePop(context);
-                                    debugPrint("PROCESSING COMPLETE (ecwid_order_page)");
+                                    debugPrint(
+                                        "PROCESSING COMPLETE (ecwid_order_page)");
                                   } catch (e) {
                                     debugPrint(
                                         "ERROR DURING PRODUCT PURCHASE PROCESS (ecwid_order_page): $e");
@@ -692,7 +809,7 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                 logger.d('***** Data is invalid *****');
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               'Buy Now',
                               style: TextStyle(color: darkThemeTextColor),
                             )),

@@ -68,13 +68,13 @@ class EmailjsApi {
     if (userIsDev &&
         capitolBabbleNotificationsList.isNotEmpty &&
         ((isPeakCapitolBabblePostHours &&
-                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
-                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes)))) ||
-            (capitolBabbleNotificationsList.any((element) =>
-                    element.split('<|:|>')[3].toLowerCase() == 'high') &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
                     DateTime.now().subtract(
-                        const Duration(minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
+                        const Duration(minutes: capitolBabbleDelayMinutes)))) ||
+            (capitolBabbleNotificationsList.any((element) => element.split('<|:|>')[3].toLowerCase() == 'high') &&
+                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
+                    DateTime.now().subtract(const Duration(
+                        minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
             (capitolBabbleNotificationsList.any((element) =>
                     element.split('<|:|>')[3].toLowerCase() == 'medium') &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
@@ -91,25 +91,25 @@ class EmailjsApi {
       final templateId = dotenv.env['CBTEMPLATEID'];
       final publicKey = dotenv.env['MCPUBLICKEY'];
 
-      String _nextBabble = capitolBabbleNotificationsList.first;
+      String localNextBabble = capitolBabbleNotificationsList.first;
       // DateTime _nextBabbleDateTime =
       //     DateTime.parse(_nextBabble.split('<|:|>')[0]);
-      String _nextBabbleSubject = _nextBabble.split('<|:|>')[1];
-      String _nextBabbleBody = _nextBabble.split('<|:|>')[2];
+      String localNextBabbleSubject = localNextBabble.split('<|:|>')[1];
+      String localNextBabbleBody = localNextBabble.split('<|:|>')[2];
       // String _nextBabblePriority = _nextBabble.split('<|:|>')[3];
-      String _nextBabbleUrl = '';
-      if (_nextBabble.split('<|:|>').length > 4) {
-        _nextBabbleUrl = _nextBabble.split('<|:|>')[4];
+      String localNextBabbleUrl = '';
+      if (localNextBabble.split('<|:|>').length > 4) {
+        localNextBabbleUrl = localNextBabble.split('<|:|>')[4];
       }
 
-      String _rawMessage = subject.isNotEmpty && messageBody.isNotEmpty
+      String localRawMessage = subject.isNotEmpty && messageBody.isNotEmpty
           ? messageBody
-          : _nextBabbleBody;
-      debugPrint('SENDING EMAIL TO CAPITOL BABBLE SOCIALS: $_rawMessage');
+          : localNextBabbleBody;
+      debugPrint('SENDING EMAIL TO CAPITOL BABBLE SOCIALS: $localRawMessage');
 
-      String _finalMessage = '';
-      await Functions.addHashTags(_rawMessage)
-          .then((str) => _finalMessage = '$str $_nextBabbleUrl');
+      String localFinalMessage = '';
+      await Functions.addHashTags(localRawMessage)
+          .then((str) => localFinalMessage = '$str $localNextBabbleUrl');
 
       try {
         final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
@@ -124,9 +124,9 @@ class EmailjsApi {
               'user_id': publicKey,
               'template_params': {
                 'subject': subject.isNotEmpty && messageBody.isNotEmpty
-                    ? '$subject#capitolbabble'
-                    : '$_nextBabbleSubject#capitolbabble',
-                'message': _finalMessage,
+                    ? '$subject #capitolbabble'
+                    : '$localNextBabbleSubject #capitolbabble',
+                'message': localFinalMessage,
               }
             }));
         debugPrint(response.statusCode.toString());

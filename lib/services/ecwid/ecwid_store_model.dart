@@ -22,10 +22,10 @@ class EcwidStore {
   final List<EcwidStoreItem> items;
 
   factory EcwidStore.fromJson(Map<String, dynamic> json) => EcwidStore(
-        total: json["total"] == null ? null : json["total"],
-        count: json["count"] == null ? null : json["count"],
-        offset: json["offset"] == null ? null : json["offset"],
-        limit: json["limit"] == null ? null : json["limit"],
+        total: json["total"],
+        count: json["count"],
+        offset: json["offset"],
+        limit: json["limit"],
         items: json["items"] == null
             ? null
             : List<EcwidStoreItem>.from(
@@ -33,10 +33,10 @@ class EcwidStore {
       );
 
   Map<String, dynamic> toJson() => {
-        "total": total == null ? null : total,
-        "count": count == null ? null : count,
-        "offset": offset == null ? null : offset,
-        "limit": limit == null ? null : limit,
+        "total": total,
+        "count": count,
+        "offset": offset,
+        "limit": limit,
         "items": items == null
             ? null
             : List<dynamic>.from(items.map((x) => x.toJson())),
@@ -161,13 +161,12 @@ class EcwidStoreItem {
   final int showOnFrontpage;
 
   factory EcwidStoreItem.fromJson(Map<String, dynamic> json) => EcwidStoreItem(
-        id: json["id"] == null ? null : json["id"],
-        sku: json["sku"] == null ? null : json["sku"],
-        thumbnailUrl:
-            json["thumbnailUrl"] == null ? null : json["thumbnailUrl"],
-        unlimited: json["unlimited"] == null ? null : json["unlimited"],
-        inStock: json["inStock"] == null ? null : json["inStock"],
-        name: json["name"] == null ? null : json["name"],
+        id: json["id"],
+        sku: json["sku"],
+        thumbnailUrl: json["thumbnailUrl"],
+        unlimited: json["unlimited"],
+        inStock: json["inStock"],
+        name: json["name"],
         price: json["price"] == null ? null : json["price"].toDouble(),
         priceInProductList: json["priceInProductList"] == null
             ? null
@@ -175,75 +174,45 @@ class EcwidStoreItem {
         defaultDisplayedPrice: json["defaultDisplayedPrice"] == null
             ? null
             : json["defaultDisplayedPrice"].toDouble(),
-        defaultDisplayedPriceFormatted:
-            json["defaultDisplayedPriceFormatted"] == null
-                ? null
-                : json["defaultDisplayedPriceFormatted"],
+        defaultDisplayedPriceFormatted: json["defaultDisplayedPriceFormatted"],
         tax: json["tax"] == null ? null : Tax.fromJson(json["tax"]),
-        compareToPrice:
-            json["compareToPrice"] == null ? null : json["compareToPrice"],
-        compareToPriceFormatted: json["compareToPriceFormatted"] == null
-            ? null
-            : json["compareToPriceFormatted"],
-        compareToPriceDiscount: json["compareToPriceDiscount"] == null
-            ? null
-            : json["compareToPriceDiscount"],
+        compareToPrice: json["compareToPrice"],
+        compareToPriceFormatted: json["compareToPriceFormatted"],
+        compareToPriceDiscount: json["compareToPriceDiscount"],
         compareToPriceDiscountFormatted:
-            json["compareToPriceDiscountFormatted"] == null
-                ? null
-                : json["compareToPriceDiscountFormatted"],
-        compareToPriceDiscountPercent:
-            json["compareToPriceDiscountPercent"] == null
-                ? null
-                : json["compareToPriceDiscountPercent"],
+            json["compareToPriceDiscountFormatted"],
+        compareToPriceDiscountPercent: json["compareToPriceDiscountPercent"],
         compareToPriceDiscountPercentFormatted:
-            json["compareToPriceDiscountPercentFormatted"] == null
-                ? null
-                : json["compareToPriceDiscountPercentFormatted"],
-        isShippingRequired: json["isShippingRequired"] == null
-            ? null
-            : json["isShippingRequired"],
+            json["compareToPriceDiscountPercentFormatted"],
+        isShippingRequired: json["isShippingRequired"],
         weight: json["weight"] == null ? null : json["weight"].toDouble(),
-        url: json["url"] == null ? null : json["url"],
-        created: json["created"] == null ? null : json["created"],
-        updated: json["updated"] == null ? null : json["updated"],
-        createTimestamp:
-            json["createTimestamp"] == null ? null : json["createTimestamp"],
-        updateTimestamp:
-            json["updateTimestamp"] == null ? null : json["updateTimestamp"],
-        productClassId:
-            json["productClassId"] == null ? null : json["productClassId"],
-        enabled: json["enabled"] == null ? null : json["enabled"],
+        url: json["url"],
+        created: json["created"],
+        updated: json["updated"],
+        createTimestamp: json["createTimestamp"],
+        updateTimestamp: json["updateTimestamp"],
+        productClassId: json["productClassId"],
+        enabled: json["enabled"],
         options: json["options"] == null
             ? null
             : List<Option>.from(json["options"].map((x) => Option.fromJson(x))),
-        fixedShippingRateOnly: json["fixedShippingRateOnly"] == null
-            ? null
-            : json["fixedShippingRateOnly"],
-        fixedShippingRate: json["fixedShippingRate"] == null
-            ? null
-            : json["fixedShippingRate"],
+        fixedShippingRateOnly: json["fixedShippingRateOnly"],
+        fixedShippingRate: json["fixedShippingRate"],
         shipping: json["shipping"] == null
             ? null
             : Shipping.fromJson(json["shipping"]),
-        defaultCombinationId: json["defaultCombinationId"] == null
-            ? null
-            : json["defaultCombinationId"],
-        imageUrl: json["imageUrl"] == null ? null : json["imageUrl"],
-        smallThumbnailUrl: json["smallThumbnailUrl"] == null
-            ? null
-            : json["smallThumbnailUrl"],
-        hdThumbnailUrl:
-            json["hdThumbnailUrl"] == null ? null : json["hdThumbnailUrl"],
-        originalImageUrl:
-            json["originalImageUrl"] == null ? null : json["originalImageUrl"],
+        defaultCombinationId: json["defaultCombinationId"],
+        imageUrl: json["imageUrl"],
+        smallThumbnailUrl: json["smallThumbnailUrl"],
+        hdThumbnailUrl: json["hdThumbnailUrl"],
+        originalImageUrl: json["originalImageUrl"],
         originalImage: json["originalImage"] == null
             ? null
             : OriginalImage.fromJson(json["originalImage"]),
         borderInfo: json["borderInfo"] == null
             ? null
             : BorderInfo.fromJson(json["borderInfo"]),
-        description: json["description"] == null ? null : json["description"],
+        description: json["description"],
         galleryImages: json["galleryImages"] == null
             ? null
             : List<GalleryImage>.from(
@@ -256,12 +225,9 @@ class EcwidStoreItem {
             ? null
             : List<Category>.from(
                 json["categories"].map((x) => Category.fromJson(x))),
-        defaultCategoryId: json["defaultCategoryId"] == null
-            ? null
-            : json["defaultCategoryId"],
-        seoTitle: json["seoTitle"] == null ? null : json["seoTitle"],
-        seoDescription:
-            json["seoDescription"] == null ? null : json["seoDescription"],
+        defaultCategoryId: json["defaultCategoryId"],
+        seoTitle: json["seoTitle"],
+        seoDescription: json["seoDescription"],
         favorites: json["favorites"] == null
             ? null
             : Favorites.fromJson(json["favorites"]),
@@ -274,82 +240,57 @@ class EcwidStoreItem {
         combinations: json["combinations"] == null
             ? null
             : List<dynamic>.from(json["combinations"].map((x) => x)),
-        volume: json["volume"] == null ? null : json["volume"],
-        isSampleProduct:
-            json["isSampleProduct"] == null ? null : json["isSampleProduct"],
-        googleItemCondition: json["googleItemCondition"] == null
-            ? null
-            : json["googleItemCondition"],
-        isGiftCard: json["isGiftCard"] == null ? null : json["isGiftCard"],
-        discountsAllowed:
-            json["discountsAllowed"] == null ? null : json["discountsAllowed"],
-        nameYourPriceEnabled: json["nameYourPriceEnabled"] == null
-            ? null
-            : json["nameYourPriceEnabled"],
-        showOnFrontpage:
-            json["showOnFrontpage"] == null ? 1000 : json["showOnFrontpage"],
+        volume: json["volume"],
+        isSampleProduct: json["isSampleProduct"],
+        googleItemCondition: json["googleItemCondition"],
+        isGiftCard: json["isGiftCard"],
+        discountsAllowed: json["discountsAllowed"],
+        nameYourPriceEnabled: json["nameYourPriceEnabled"],
+        showOnFrontpage: json["showOnFrontpage"] ?? 1000,
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "sku": sku == null ? null : sku,
-        "thumbnailUrl": thumbnailUrl == null ? null : thumbnailUrl,
-        "unlimited": unlimited == null ? null : unlimited,
-        "inStock": inStock == null ? null : inStock,
-        "name": name == null ? null : name,
-        "price": price == null ? null : price,
-        "priceInProductList":
-            priceInProductList == null ? null : priceInProductList,
-        "defaultDisplayedPrice":
-            defaultDisplayedPrice == null ? null : defaultDisplayedPrice,
-        "defaultDisplayedPriceFormatted": defaultDisplayedPriceFormatted == null
-            ? null
-            : defaultDisplayedPriceFormatted,
+        "id": id,
+        "sku": sku,
+        "thumbnailUrl": thumbnailUrl,
+        "unlimited": unlimited,
+        "inStock": inStock,
+        "name": name,
+        "price": price,
+        "priceInProductList": priceInProductList,
+        "defaultDisplayedPrice": defaultDisplayedPrice,
+        "defaultDisplayedPriceFormatted": defaultDisplayedPriceFormatted,
         "tax": tax == null ? null : tax.toJson(),
-        "compareToPrice": compareToPrice == null ? null : compareToPrice,
-        "compareToPriceFormatted":
-            compareToPriceFormatted == null ? null : compareToPriceFormatted,
-        "compareToPriceDiscount":
-            compareToPriceDiscount == null ? null : compareToPriceDiscount,
-        "compareToPriceDiscountFormatted":
-            compareToPriceDiscountFormatted == null
-                ? null
-                : compareToPriceDiscountFormatted,
-        "compareToPriceDiscountPercent": compareToPriceDiscountPercent == null
-            ? null
-            : compareToPriceDiscountPercent,
+        "compareToPrice": compareToPrice,
+        "compareToPriceFormatted": compareToPriceFormatted,
+        "compareToPriceDiscount": compareToPriceDiscount,
+        "compareToPriceDiscountFormatted": compareToPriceDiscountFormatted,
+        "compareToPriceDiscountPercent": compareToPriceDiscountPercent,
         "compareToPriceDiscountPercentFormatted":
-            compareToPriceDiscountPercentFormatted == null
-                ? null
-                : compareToPriceDiscountPercentFormatted,
-        "isShippingRequired":
-            isShippingRequired == null ? null : isShippingRequired,
-        "weight": weight == null ? null : weight,
-        "url": url == null ? null : url,
-        "created": created == null ? null : created,
-        "updated": updated == null ? null : updated,
-        "createTimestamp": createTimestamp == null ? null : createTimestamp,
-        "updateTimestamp": updateTimestamp == null ? null : updateTimestamp,
-        "productClassId": productClassId == null ? null : productClassId,
-        "enabled": enabled == null ? null : enabled,
+            compareToPriceDiscountPercentFormatted,
+        "isShippingRequired": isShippingRequired,
+        "weight": weight,
+        "url": url,
+        "created": created,
+        "updated": updated,
+        "createTimestamp": createTimestamp,
+        "updateTimestamp": updateTimestamp,
+        "productClassId": productClassId,
+        "enabled": enabled,
         "options": options == null
             ? null
             : List<dynamic>.from(options.map((x) => x.toJson())),
-        "fixedShippingRateOnly":
-            fixedShippingRateOnly == null ? null : fixedShippingRateOnly,
-        "fixedShippingRate":
-            fixedShippingRate == null ? null : fixedShippingRate,
+        "fixedShippingRateOnly": fixedShippingRateOnly,
+        "fixedShippingRate": fixedShippingRate,
         "shipping": shipping == null ? null : shipping.toJson(),
-        "defaultCombinationId":
-            defaultCombinationId == null ? null : defaultCombinationId,
-        "imageUrl": imageUrl == null ? null : imageUrl,
-        "smallThumbnailUrl":
-            smallThumbnailUrl == null ? null : smallThumbnailUrl,
-        "hdThumbnailUrl": hdThumbnailUrl == null ? null : hdThumbnailUrl,
-        "originalImageUrl": originalImageUrl == null ? null : originalImageUrl,
+        "defaultCombinationId": defaultCombinationId,
+        "imageUrl": imageUrl,
+        "smallThumbnailUrl": smallThumbnailUrl,
+        "hdThumbnailUrl": hdThumbnailUrl,
+        "originalImageUrl": originalImageUrl,
         "originalImage": originalImage == null ? null : originalImage.toJson(),
         "borderInfo": borderInfo == null ? null : borderInfo.toJson(),
-        "description": description == null ? null : description,
+        "description": description,
         "galleryImages": galleryImages == null
             ? null
             : List<dynamic>.from(galleryImages.map((x) => x.toJson())),
@@ -360,10 +301,9 @@ class EcwidStoreItem {
         "categories": categories == null
             ? null
             : List<dynamic>.from(categories.map((x) => x.toJson())),
-        "defaultCategoryId":
-            defaultCategoryId == null ? null : defaultCategoryId,
-        "seoTitle": seoTitle == null ? null : seoTitle,
-        "seoDescription": seoDescription == null ? null : seoDescription,
+        "defaultCategoryId": defaultCategoryId,
+        "seoTitle": seoTitle,
+        "seoDescription": seoDescription,
         "favorites": favorites == null ? null : favorites.toJson(),
         "attributes": attributes == null
             ? null
@@ -373,15 +313,13 @@ class EcwidStoreItem {
         "combinations": combinations == null
             ? null
             : List<dynamic>.from(combinations.map((x) => x)),
-        "volume": volume == null ? null : volume,
-        "isSampleProduct": isSampleProduct == null ? null : isSampleProduct,
-        "googleItemCondition":
-            googleItemCondition == null ? null : googleItemCondition,
-        "isGiftCard": isGiftCard == null ? null : isGiftCard,
-        "discountsAllowed": discountsAllowed == null ? null : discountsAllowed,
-        "nameYourPriceEnabled":
-            nameYourPriceEnabled == null ? null : nameYourPriceEnabled,
-        "showOnFrontpage": showOnFrontpage == null ? 1000 : showOnFrontpage,
+        "volume": volume,
+        "isSampleProduct": isSampleProduct,
+        "googleItemCondition": googleItemCondition,
+        "isGiftCard": isGiftCard,
+        "discountsAllowed": discountsAllowed,
+        "nameYourPriceEnabled": nameYourPriceEnabled,
+        "showOnFrontpage": showOnFrontpage ?? 1000,
       };
 }
 
@@ -398,13 +336,13 @@ class BorderInfo {
         dominatingColor: json["dominatingColor"] == null
             ? null
             : DominatingColor.fromJson(json["dominatingColor"]),
-        homogeneity: json["homogeneity"] == null ? null : json["homogeneity"],
+        homogeneity: json["homogeneity"],
       );
 
   Map<String, dynamic> toJson() => {
         "dominatingColor":
             dominatingColor == null ? null : dominatingColor.toJson(),
-        "homogeneity": homogeneity == null ? null : homogeneity,
+        "homogeneity": homogeneity,
       };
 }
 
@@ -423,17 +361,17 @@ class DominatingColor {
 
   factory DominatingColor.fromJson(Map<String, dynamic> json) =>
       DominatingColor(
-        red: json["red"] == null ? null : json["red"],
-        green: json["green"] == null ? null : json["green"],
-        blue: json["blue"] == null ? null : json["blue"],
-        alpha: json["alpha"] == null ? null : json["alpha"],
+        red: json["red"],
+        green: json["green"],
+        blue: json["blue"],
+        alpha: json["alpha"],
       );
 
   Map<String, dynamic> toJson() => {
-        "red": red == null ? null : red,
-        "green": green == null ? null : green,
-        "blue": blue == null ? null : blue,
-        "alpha": alpha == null ? null : alpha,
+        "red": red,
+        "green": green,
+        "blue": blue,
+        "alpha": alpha,
       };
 }
 
@@ -447,13 +385,13 @@ class Category {
   final bool enabled;
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
-        id: json["id"] == null ? null : json["id"],
-        enabled: json["enabled"] == null ? null : json["enabled"],
+        id: json["id"],
+        enabled: json["enabled"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "enabled": enabled == null ? null : enabled,
+        "id": id,
+        "enabled": enabled,
       };
 }
 
@@ -467,14 +405,13 @@ class Favorites {
   final String displayedCount;
 
   factory Favorites.fromJson(Map<String, dynamic> json) => Favorites(
-        count: json["count"] == null ? null : json["count"],
-        displayedCount:
-            json["displayedCount"] == null ? null : json["displayedCount"],
+        count: json["count"],
+        displayedCount: json["displayedCount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "count": count == null ? null : count,
-        "displayedCount": displayedCount == null ? null : displayedCount,
+        "count": count,
+        "displayedCount": displayedCount,
       };
 }
 
@@ -508,40 +445,34 @@ class GalleryImage {
   final BorderInfo borderInfo;
 
   factory GalleryImage.fromJson(Map<String, dynamic> json) => GalleryImage(
-        id: json["id"] == null ? null : json["id"],
-        url: json["url"] == null ? null : json["url"],
-        thumbnail: json["thumbnail"] == null ? null : json["thumbnail"],
-        originalImageUrl:
-            json["originalImageUrl"] == null ? null : json["originalImageUrl"],
-        imageUrl: json["imageUrl"] == null ? null : json["imageUrl"],
-        hdThumbnailUrl:
-            json["hdThumbnailUrl"] == null ? null : json["hdThumbnailUrl"],
-        thumbnailUrl:
-            json["thumbnailUrl"] == null ? null : json["thumbnailUrl"],
-        smallThumbnailUrl: json["smallThumbnailUrl"] == null
-            ? null
-            : json["smallThumbnailUrl"],
-        width: json["width"] == null ? null : json["width"],
-        height: json["height"] == null ? null : json["height"],
-        orderBy: json["orderBy"] == null ? null : json["orderBy"],
+        id: json["id"],
+        url: json["url"],
+        thumbnail: json["thumbnail"],
+        originalImageUrl: json["originalImageUrl"],
+        imageUrl: json["imageUrl"],
+        hdThumbnailUrl: json["hdThumbnailUrl"],
+        thumbnailUrl: json["thumbnailUrl"],
+        smallThumbnailUrl: json["smallThumbnailUrl"],
+        width: json["width"],
+        height: json["height"],
+        orderBy: json["orderBy"],
         borderInfo: json["borderInfo"] == null
             ? null
             : BorderInfo.fromJson(json["borderInfo"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "url": url == null ? null : url,
-        "thumbnail": thumbnail == null ? null : thumbnail,
-        "originalImageUrl": originalImageUrl == null ? null : originalImageUrl,
-        "imageUrl": imageUrl == null ? null : imageUrl,
-        "hdThumbnailUrl": hdThumbnailUrl == null ? null : hdThumbnailUrl,
-        "thumbnailUrl": thumbnailUrl == null ? null : thumbnailUrl,
-        "smallThumbnailUrl":
-            smallThumbnailUrl == null ? null : smallThumbnailUrl,
-        "width": width == null ? null : width,
-        "height": height == null ? null : height,
-        "orderBy": orderBy == null ? null : orderBy,
+        "id": id,
+        "url": url,
+        "thumbnail": thumbnail,
+        "originalImageUrl": originalImageUrl,
+        "imageUrl": imageUrl,
+        "hdThumbnailUrl": hdThumbnailUrl,
+        "thumbnailUrl": thumbnailUrl,
+        "smallThumbnailUrl": smallThumbnailUrl,
+        "width": width,
+        "height": height,
+        "orderBy": orderBy,
         "borderInfo": borderInfo == null ? null : borderInfo.toJson(),
       };
 }
@@ -589,30 +520,25 @@ class ProductImage {
   final String imageOriginalUrl;
 
   factory ProductImage.fromJson(Map<String, dynamic> json) => ProductImage(
-        id: json["id"] == null ? null : json["id"],
-        isMain: json["isMain"] == null ? null : json["isMain"],
-        orderBy: json["orderBy"] == null ? null : json["orderBy"],
-        image160PxUrl:
-            json["image160pxUrl"] == null ? null : json["image160pxUrl"],
-        image400PxUrl:
-            json["image400pxUrl"] == null ? null : json["image400pxUrl"],
-        image800PxUrl:
-            json["image800pxUrl"] == null ? null : json["image800pxUrl"],
-        image1500PxUrl:
-            json["image1500pxUrl"] == null ? null : json["image1500pxUrl"],
-        imageOriginalUrl:
-            json["imageOriginalUrl"] == null ? null : json["imageOriginalUrl"],
+        id: json["id"],
+        isMain: json["isMain"],
+        orderBy: json["orderBy"],
+        image160PxUrl: json["image160pxUrl"],
+        image400PxUrl: json["image400pxUrl"],
+        image800PxUrl: json["image800pxUrl"],
+        image1500PxUrl: json["image1500pxUrl"],
+        imageOriginalUrl: json["imageOriginalUrl"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "isMain": isMain == null ? null : isMain,
-        "orderBy": orderBy == null ? null : orderBy,
-        "image160pxUrl": image160PxUrl == null ? null : image160PxUrl,
-        "image400pxUrl": image400PxUrl == null ? null : image400PxUrl,
-        "image800pxUrl": image800PxUrl == null ? null : image800PxUrl,
-        "image1500pxUrl": image1500PxUrl == null ? null : image1500PxUrl,
-        "imageOriginalUrl": imageOriginalUrl == null ? null : imageOriginalUrl,
+        "id": id,
+        "isMain": isMain,
+        "orderBy": orderBy,
+        "image160pxUrl": image160PxUrl,
+        "image400pxUrl": image400PxUrl,
+        "image800pxUrl": image800PxUrl,
+        "image1500pxUrl": image1500PxUrl,
+        "imageOriginalUrl": imageOriginalUrl,
       };
 }
 
@@ -634,29 +560,28 @@ class Option {
   final bool required;
 
   factory Option.fromJson(Map<String, dynamic> json) => Option(
-        type: json["type"] == null ? null : json["type"],
-        name: json["name"] == null ? null : json["name"],
+        type: json["type"],
+        name: json["name"],
         nameTranslated: json["nameTranslated"] == null
             ? null
             : Translated.fromJson(json["nameTranslated"]),
         choices: json["choices"] == null
             ? null
             : List<Choice>.from(json["choices"].map((x) => Choice.fromJson(x))),
-        defaultChoice:
-            json["defaultChoice"] == null ? null : json["defaultChoice"],
-        required: json["required"] == null ? null : json["required"],
+        defaultChoice: json["defaultChoice"],
+        required: json["required"],
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type == null ? null : type,
-        "name": name == null ? null : name,
+        "type": type,
+        "name": name,
         "nameTranslated":
             nameTranslated == null ? null : nameTranslated.toJson(),
         "choices": choices == null
             ? null
             : List<dynamic>.from(choices.map((x) => x.toJson())),
-        "defaultChoice": defaultChoice == null ? null : defaultChoice,
-        "required": required == null ? null : required,
+        "defaultChoice": defaultChoice,
+        "required": required,
       };
 }
 
@@ -674,25 +599,22 @@ class Choice {
   final String priceModifierType;
 
   factory Choice.fromJson(Map<String, dynamic> json) => Choice(
-        text: json["text"] == null ? null : json["text"],
+        text: json["text"],
         textTranslated: json["textTranslated"] == null
             ? null
             : Translated.fromJson(json["textTranslated"]),
         priceModifier: json["priceModifier"] == null
             ? null
             : json["priceModifier"].toDouble(),
-        priceModifierType: json["priceModifierType"] == null
-            ? null
-            : json["priceModifierType"],
+        priceModifierType: json["priceModifierType"],
       );
 
   Map<String, dynamic> toJson() => {
-        "text": text == null ? null : text,
+        "text": text,
         "textTranslated":
             textTranslated == null ? null : textTranslated.toJson(),
-        "priceModifier": priceModifier == null ? null : priceModifier,
-        "priceModifierType":
-            priceModifierType == null ? null : priceModifierType,
+        "priceModifier": priceModifier,
+        "priceModifierType": priceModifierType,
       };
 }
 
@@ -704,11 +626,11 @@ class Translated {
   final String en;
 
   factory Translated.fromJson(Map<String, dynamic> json) => Translated(
-        en: json["en"] == null ? null : json["en"],
+        en: json["en"],
       );
 
   Map<String, dynamic> toJson() => {
-        "en": en == null ? null : en,
+        "en": en,
       };
 }
 
@@ -724,15 +646,15 @@ class OriginalImage {
   final int height;
 
   factory OriginalImage.fromJson(Map<String, dynamic> json) => OriginalImage(
-        url: json["url"] == null ? null : json["url"],
-        width: json["width"] == null ? null : json["width"],
-        height: json["height"] == null ? null : json["height"],
+        url: json["url"],
+        width: json["width"],
+        height: json["height"],
       );
 
   Map<String, dynamic> toJson() => {
-        "url": url == null ? null : url,
-        "width": width == null ? null : width,
-        "height": height == null ? null : height,
+        "url": url,
+        "width": width,
+        "height": height,
       };
 }
 
@@ -777,16 +699,15 @@ class RelatedCategory {
 
   factory RelatedCategory.fromJson(Map<String, dynamic> json) =>
       RelatedCategory(
-        enabled: json["enabled"] == null ? null : json["enabled"],
-        categoryId: json["categoryId"] == null ? null : json["categoryId"],
-        productCount:
-            json["productCount"] == null ? null : json["productCount"],
+        enabled: json["enabled"],
+        categoryId: json["categoryId"],
+        productCount: json["productCount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "enabled": enabled == null ? null : enabled,
-        "categoryId": categoryId == null ? null : categoryId,
-        "productCount": productCount == null ? null : productCount,
+        "enabled": enabled,
+        "categoryId": categoryId,
+        "productCount": productCount,
       };
 }
 
@@ -806,10 +727,9 @@ class Shipping {
   final List<dynamic> enabledMethods;
 
   factory Shipping.fromJson(Map<String, dynamic> json) => Shipping(
-        type: json["type"] == null ? null : json["type"],
-        methodMarkup:
-            json["methodMarkup"] == null ? null : json["methodMarkup"],
-        flatRate: json["flatRate"] == null ? null : json["flatRate"],
+        type: json["type"],
+        methodMarkup: json["methodMarkup"],
+        flatRate: json["flatRate"],
         disabledMethods: json["disabledMethods"] == null
             ? null
             : List<dynamic>.from(json["disabledMethods"].map((x) => x)),
@@ -819,9 +739,9 @@ class Shipping {
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type == null ? null : type,
-        "methodMarkup": methodMarkup == null ? null : methodMarkup,
-        "flatRate": flatRate == null ? null : flatRate,
+        "type": type,
+        "methodMarkup": methodMarkup,
+        "flatRate": flatRate,
         "disabledMethods": disabledMethods == null
             ? null
             : List<dynamic>.from(disabledMethods.map((x) => x)),
@@ -845,26 +765,20 @@ class Tax {
   final String taxClassCode;
 
   factory Tax.fromJson(Map<String, dynamic> json) => Tax(
-        taxable: json["taxable"] == null ? null : json["taxable"],
-        defaultLocationIncludedTaxRate:
-            json["defaultLocationIncludedTaxRate"] == null
-                ? null
-                : json["defaultLocationIncludedTaxRate"],
+        taxable: json["taxable"],
+        defaultLocationIncludedTaxRate: json["defaultLocationIncludedTaxRate"],
         enabledManualTaxes: json["enabledManualTaxes"] == null
             ? null
             : List<dynamic>.from(json["enabledManualTaxes"].map((x) => x)),
-        taxClassCode:
-            json["taxClassCode"] == null ? null : json["taxClassCode"],
+        taxClassCode: json["taxClassCode"],
       );
 
   Map<String, dynamic> toJson() => {
-        "taxable": taxable == null ? null : taxable,
-        "defaultLocationIncludedTaxRate": defaultLocationIncludedTaxRate == null
-            ? null
-            : defaultLocationIncludedTaxRate,
+        "taxable": taxable,
+        "defaultLocationIncludedTaxRate": defaultLocationIncludedTaxRate,
         "enabledManualTaxes": enabledManualTaxes == null
             ? null
             : List<dynamic>.from(enabledManualTaxes.map((x) => x)),
-        "taxClassCode": taxClassCode == null ? null : taxClassCode,
+        "taxClassCode": taxClassCode,
       };
 }

@@ -7,7 +7,7 @@ import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 
 import '../functions/functions.dart';
-import '../services/github/usc-app-data-model.dart';
+import '../services/github/usc_app_data_model.dart';
 
 class AnimatedWidgets {
   static Widget starryNight(
@@ -36,7 +36,8 @@ class AnimatedWidgets {
                   // delay: Duration(milliseconds: 1000),
                   duration: const Duration(milliseconds: 5000),
                   // spins: spins,
-                  child: Icon(Icons.auto_awesome_outlined, size: size / 1.5, color: Colors.white),
+                  child: Icon(Icons.auto_awesome_outlined,
+                      size: size / 1.5, color: Colors.white),
                 ),
               ),
               ZoomIn(
@@ -96,7 +97,8 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget flashingEye(BuildContext context, bool isActiveWhen, bool visibleWhenOff,
+  static Widget flashingEye(
+      BuildContext context, bool isActiveWhen, bool visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 15,
@@ -133,8 +135,8 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget flashingText(
-      BuildContext context, String textToFlash, bool isActiveWhen, bool visibleWhenOff,
+  static Widget flashingText(BuildContext context, String textToFlash,
+      bool isActiveWhen, bool visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
@@ -156,7 +158,8 @@ class AnimatedWidgets {
               padding: const EdgeInsets.only(left: 3.0),
               child: Text(textToFlash,
                   style: Styles.googleStyle.copyWith(
-                      shadows: removeShadow ? null : Styles.shadowStrokeTextGrey,
+                      shadows:
+                          removeShadow ? null : Styles.shadowStrokeTextGrey,
                       fontSize: size,
                       color: color)),
             ),
@@ -170,7 +173,8 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget spinningLocation(BuildContext context, bool isActive, visibleWhenOff,
+  static Widget spinningLocation(
+      BuildContext context, bool isActive, visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
@@ -202,11 +206,13 @@ class AnimatedWidgets {
                                 : alertIndicatorColorDarkGreen),
           )
         : visibleWhenOff
-            ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
+            ? FaIcon(FontAwesomeIcons.locationCrosshairs,
+                size: size, color: disabledColor)
             : const SizedBox.shrink();
   }
 
-  static Widget flashingInfo(BuildContext context, bool isActive, visibleWhenOff,
+  static Widget flashingInfo(
+      BuildContext context, bool isActive, visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
@@ -223,10 +229,12 @@ class AnimatedWidgets {
             infinite: infinite,
             // delay: Duration(milliseconds: 1000),
             duration: const Duration(seconds: 5),
-            child: FaIcon(FontAwesomeIcons.circleInfo, size: size, color: color),
+            child:
+                FaIcon(FontAwesomeIcons.circleInfo, size: size, color: color),
           )
         : visibleWhenOff
-            ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
+            ? FaIcon(FontAwesomeIcons.locationCrosshairs,
+                size: size, color: disabledColor)
             : const SizedBox.shrink();
   }
 
@@ -278,7 +286,8 @@ class AnimatedWidgets {
                             repeat: ImageRepeat.repeat,
                             // fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
-                                Theme.of(context).colorScheme.background, BlendMode.color)),
+                                Theme.of(context).colorScheme.background,
+                                BlendMode.color)),
                       ),
                     ),
                   ),
@@ -321,16 +330,21 @@ class AnimatedWidgets {
                         onTap: () => thisGithubNotification.url.isEmpty
                             ? null
                             : Functions.linkLaunch(
-                                context, thisGithubNotification.url, userDatabase, userIsPremium),
+                                context,
+                                thisGithubNotification.url,
+                                userDatabase,
+                                userIsPremium),
                         child: SlideInUp(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
                             child: Text(
                               thisGithubNotification.message,
                               textAlign: TextAlign.center,
                               style: Styles.regularStyle.copyWith(
                                   fontSize: 20,
-                                  fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/),
+                                  fontWeight: FontWeight
+                                      .bold /*, color: darkThemeTextColor*/),
                             ),
                           ),
                         ),

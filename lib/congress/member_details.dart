@@ -22,7 +22,9 @@ import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart
 
 class MemberDetail extends StatefulWidget {
   const MemberDetail(
-      this.memberId, this.memberHouseStockTrades, this.memberSenateStockTrades, {Key key}) : super(key: key);
+      this.memberId, this.memberHouseStockTrades, this.memberSenateStockTrades,
+      {Key key})
+      : super(key: key);
   final String memberId;
   final List<HouseStockWatch> memberHouseStockTrades;
   final List<SenateStockWatch> memberSenateStockTrades;
@@ -222,8 +224,7 @@ class MemberDetailState extends State<MemberDetail> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Member Details',
-            style: GoogleFonts.bangers(fontSize: 25)),
+        title: Text('Member Details', style: GoogleFonts.bangers(fontSize: 25)),
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       body: _isLoading || thisMember == null
@@ -257,7 +258,7 @@ class MemberDetailState extends State<MemberDetail> {
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
-                              CircularProgressIndicator(
+                              const CircularProgressIndicator(
                                 strokeWidth: 5,
                                 color: republicanColor,
                                 backgroundColor: democratColor,
@@ -328,9 +329,8 @@ class MemberDetailState extends State<MemberDetail> {
                                           child: ElevatedButton.icon(
                                             icon: AnimatedWidgets.flashingEye(
                                                 context,
-                                                List<String>.from(
-                                                        userDatabase.get(
-                                                            'subscriptionAlertsList'))
+                                                List<String>.from(userDatabase.get(
+                                                        'subscriptionAlertsList'))
                                                     .any((element) => element
                                                         .toLowerCase()
                                                         .startsWith(
@@ -373,8 +373,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                 //   userDatabase.put(
                                                 //       'memberAlerts', true);
 
-                                                await Functions
-                                                    .processCredits(true);
+                                                await Functions.processCredits(
+                                                    true);
                                               } else {
                                                 subscriptionAlertsList.removeWhere(
                                                     (element) => element
@@ -391,9 +391,9 @@ class MemberDetailState extends State<MemberDetail> {
                                             style: ButtonStyle(
                                                 backgroundColor:
                                                     MaterialStateProperty.all<
-                                                        Color>(Theme.of(
-                                                            context)
-                                                        .primaryColorDark)),
+                                                            Color>(
+                                                        Theme.of(context)
+                                                            .primaryColorDark)),
                                           ),
                                         )
                                       : const SizedBox.shrink(),
@@ -404,11 +404,9 @@ class MemberDetailState extends State<MemberDetail> {
                             Container(
                               color: userDatabase.get('darkTheme') == true
                                   ? memberContainerColor
-                                  : thisMember.currentParty.toLowerCase() ==
-                                          'd'
+                                  : thisMember.currentParty.toLowerCase() == 'd'
                                       ? democratColor
-                                      : thisMember.currentParty
-                                                  .toLowerCase() ==
+                                      : thisMember.currentParty.toLowerCase() ==
                                               'r'
                                           ? republicanColor
                                           : thisMember.currentParty
@@ -419,8 +417,7 @@ class MemberDetailState extends State<MemberDetail> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Padding(
@@ -437,16 +434,17 @@ class MemberDetailState extends State<MemberDetail> {
                                                     image: AssetImage(
                                                         'assets/congress_pic_${random.nextInt(4)}.png'),
                                                     fit: BoxFit.cover,
-                                                    colorFilter: ColorFilter.mode(
-                                                        userDatabase.get(
-                                                                'darkTheme')
-                                                            ? Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .primary
-                                                            : Colors
-                                                                .transparent,
-                                                        BlendMode.color))),
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                            userDatabase.get(
+                                                                    'darkTheme')
+                                                                ? Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .primary
+                                                                : Colors
+                                                                    .transparent,
+                                                            BlendMode.color))),
                                             foregroundDecoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(5),
@@ -459,8 +457,7 @@ class MemberDetailState extends State<MemberDetail> {
                                       ),
                                     ),
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 8.0),
+                                      padding: const EdgeInsets.only(left: 8.0),
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
@@ -490,20 +487,16 @@ class MemberDetailState extends State<MemberDetail> {
                                           Text(
                                             '${thisMember.roles.first.chamber} - ${thisMember.roles.first.title}',
                                             style: TextStyle(
-                                                color:
-                                                    memberContainerTextColor,
+                                                color: memberContainerTextColor,
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.bold),
+                                                fontWeight: FontWeight.bold),
                                           ),
                                           Text(
                                             'Congress: ${thisMember.roles.first.congress}',
                                             style: TextStyle(
-                                                color:
-                                                    memberContainerTextColor,
+                                                color: memberContainerTextColor,
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                           const SizedBox(height: 8),
                                           Row(
@@ -528,12 +521,10 @@ class MemberDetailState extends State<MemberDetail> {
                                                           color:
                                                               memberContainerTextColor,
                                                           fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .normal),
+                                                          fontWeight: FontWeight
+                                                              .normal),
                                                     ),
-                                              thisMember.roles.first
-                                                          .chamber ==
+                                              thisMember.roles.first.chamber ==
                                                       'Senate'
                                                   ? const Text('')
                                                   : Row(
@@ -589,17 +580,14 @@ class MemberDetailState extends State<MemberDetail> {
                                                   ? const Text('No Information')
                                                   : Text(
                                                       formatter.format(
-                                                          thisMember
-                                                              .roles
-                                                              .first
+                                                          thisMember.roles.first
                                                               .startDate),
                                                       style: TextStyle(
                                                           color:
                                                               memberContainerTextColor,
                                                           fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .normal),
+                                                          fontWeight: FontWeight
+                                                              .normal),
                                                     ),
                                             ],
                                           ),
@@ -615,27 +603,24 @@ class MemberDetailState extends State<MemberDetail> {
                                                     fontWeight:
                                                         FontWeight.normal),
                                               ),
-                                              thisMember.roles.first
-                                                          .endDate ==
+                                              thisMember.roles.first.endDate ==
                                                       null
                                                   ? const Text('No Information')
                                                   : Text(
                                                       formatter.format(
-                                                          thisMember.roles
-                                                              .first.endDate),
+                                                          thisMember.roles.first
+                                                              .endDate),
                                                       style: TextStyle(
                                                           color:
                                                               memberContainerTextColor,
                                                           fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .normal),
+                                                          fontWeight: FontWeight
+                                                              .normal),
                                                     ),
                                             ],
                                           ),
                                           // new SizedBox(height: 8),
-                                          thisMember.roles.first
-                                                      .nextElection ==
+                                          thisMember.roles.first.nextElection ==
                                                   null
                                               ? const SizedBox.shrink()
                                               : Row(
@@ -646,9 +631,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                           color:
                                                               memberContainerTextColor,
                                                           fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .normal),
+                                                          fontWeight: FontWeight
+                                                              .normal),
                                                     ),
                                                     Text(
                                                       thisMember.roles.first
@@ -657,9 +641,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                           color:
                                                               memberContainerTextColor,
                                                           fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .normal),
+                                                          fontWeight: FontWeight
+                                                              .normal),
                                                     ),
                                                   ],
                                                 ),
@@ -684,11 +667,10 @@ class MemberDetailState extends State<MemberDetail> {
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 2.5),
                                               child: ElevatedButton.icon(
-                                                  icon: Icon(Icons.phone,
-                                                      color:
-                                                          darkThemeTextColor,
+                                                  icon: const Icon(Icons.phone,
+                                                      color: darkThemeTextColor,
                                                       size: 15),
-                                                  label: Text('Call',
+                                                  label: const Text('Call',
                                                       style: TextStyle(
                                                           color:
                                                               darkThemeTextColor)),
@@ -698,8 +680,7 @@ class MemberDetailState extends State<MemberDetail> {
                                                   style: ButtonStyle(
                                                       backgroundColor:
                                                           MaterialStateProperty.all<Color>(
-                                                              Theme.of(
-                                                                      context)
+                                                              Theme.of(context)
                                                                   .primaryColorDark))),
                                             ),
                                           ),
@@ -711,11 +692,10 @@ class MemberDetailState extends State<MemberDetail> {
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 2.5),
                                               child: ElevatedButton.icon(
-                                                  icon: Icon(Icons.launch,
-                                                      color:
-                                                          darkThemeTextColor,
+                                                  icon: const Icon(Icons.launch,
+                                                      color: darkThemeTextColor,
                                                       size: 15),
-                                                  label: Text('Twitter',
+                                                  label: const Text('Twitter',
                                                       style: TextStyle(
                                                           color:
                                                               darkThemeTextColor)),
@@ -741,11 +721,10 @@ class MemberDetailState extends State<MemberDetail> {
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 2.5),
                                               child: ElevatedButton.icon(
-                                                  icon: Icon(Icons.web,
-                                                      color:
-                                                          darkThemeTextColor,
+                                                  icon: const Icon(Icons.web,
+                                                      color: darkThemeTextColor,
                                                       size: 15),
-                                                  label: Text('Website',
+                                                  label: const Text('Website',
                                                       style: TextStyle(
                                                           color:
                                                               darkThemeTextColor)),
@@ -780,10 +759,10 @@ class MemberDetailState extends State<MemberDetail> {
                                           icon: FaIcon(
                                               FontAwesomeIcons.planeDeparture,
                                               size: 12,
-                                              color: userIsPremium ||
-                                                      userIsLegacy
-                                                  ? darkThemeTextColor
-                                                  : null),
+                                              color:
+                                                  userIsPremium || userIsLegacy
+                                                      ? darkThemeTextColor
+                                                      : null),
                                           label: Text('Funded Travel',
                                               style: TextStyle(
                                                   color: userIsPremium ||
@@ -798,8 +777,7 @@ class MemberDetailState extends State<MemberDetail> {
                                                           userIsPremium,
                                                           whatToShow:
                                                               'upgrades')
-                                                  : memberPrivateTravel
-                                                          .isEmpty
+                                                  : memberPrivateTravel.isEmpty
                                                       ? null
                                                       : setState(() {
                                                           showPrivateTravel =
@@ -882,11 +860,9 @@ class MemberDetailState extends State<MemberDetail> {
                                                                     !userIsLegacy) ||
                                                                 memberOfficeExpenses
                                                                     .isEmpty
-                                                            ? Theme.of(
-                                                                    context)
+                                                            ? Theme.of(context)
                                                                 .disabledColor
-                                                            : Theme.of(
-                                                                    context)
+                                                            : Theme.of(context)
                                                                 .primaryColorDark)),
                                               ),
                                             ),
@@ -918,27 +894,22 @@ class MemberDetailState extends State<MemberDetail> {
                                                   color: userIsPremium
                                                       ? darkThemeTextColor
                                                       : null)),
-                                          onPressed: () async =>
-                                              !userIsPremium
-                                                  ? Functions
-                                                      .requestInAppPurchase(
-                                                          context,
-                                                          userIsPremium,
-                                                          whatToShow:
-                                                              'upgrades')
-                                                  : thisHouseMemberStockTrades
-                                                              .isEmpty &&
-                                                          thisSenateMemberStockTrades
-                                                              .isEmpty
-                                                      ? null
-                                                      : setState(() {
-                                                          showPrivateTravel =
-                                                              false;
-                                                          showOfficeExpenses =
-                                                              false;
-                                                          showTradeActivity =
-                                                              !showTradeActivity;
-                                                        }),
+                                          onPressed: () async => !userIsPremium
+                                              ? Functions.requestInAppPurchase(
+                                                  context, userIsPremium,
+                                                  whatToShow: 'upgrades')
+                                              : thisHouseMemberStockTrades
+                                                          .isEmpty &&
+                                                      thisSenateMemberStockTrades
+                                                          .isEmpty
+                                                  ? null
+                                                  : setState(() {
+                                                      showPrivateTravel = false;
+                                                      showOfficeExpenses =
+                                                          false;
+                                                      showTradeActivity =
+                                                          !showTradeActivity;
+                                                    }),
                                           style: ButtonStyle(
                                               backgroundColor: MaterialStateProperty
                                                   .all(!userIsPremium ||
@@ -987,10 +958,9 @@ class MemberDetailState extends State<MemberDetail> {
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets
-                                                                  .fromLTRB(
-                                                              15, 0, 15, 0),
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          15, 0, 15, 0),
                                                       child: Text(
                                                           'Privately Funded Travel',
                                                           style: Styles
@@ -1015,7 +985,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                             ListTile(
                                                               dense: true,
                                                               title: Text(
-                                                                thisTrip.traveler
+                                                                thisTrip
+                                                                    .traveler
                                                                     .toUpperCase(),
                                                                 style: const TextStyle(
                                                                     fontSize:
@@ -1024,8 +995,7 @@ class MemberDetailState extends State<MemberDetail> {
                                                                         FontWeight
                                                                             .bold),
                                                               ),
-                                                              subtitle:
-                                                                  Column(
+                                                              subtitle: Column(
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
                                                                         .start,
@@ -1042,7 +1012,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                               ),
                                                             ),
                                                             IconButton(
-                                                                icon: const FaIcon(
+                                                                icon:
+                                                                    const FaIcon(
                                                                   FontAwesomeIcons
                                                                       .solidFileLines,
                                                                   size: 13,
@@ -1097,10 +1068,9 @@ class MemberDetailState extends State<MemberDetail> {
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets
-                                                                  .fromLTRB(
-                                                              15, 0, 15, 0),
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          15, 0, 15, 0),
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -1114,7 +1084,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                                       fontSize:
                                                                           24.0,
                                                                       fontWeight:
-                                                                          FontWeight.normal)),
+                                                                          FontWeight
+                                                                              .normal)),
                                                           Text(
                                                               'Q$memberOfficeExpensesQuarter $memberOfficeExpensesYear',
                                                               style: Styles
@@ -1123,7 +1094,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                                       fontSize:
                                                                           14.0,
                                                                       fontWeight:
-                                                                          FontWeight.bold)),
+                                                                          FontWeight
+                                                                              .bold)),
                                                         ],
                                                       ),
                                                     )
@@ -1131,15 +1103,15 @@ class MemberDetailState extends State<MemberDetail> {
                                                   [const Divider()] +
                                                   memberOfficeExpenses
                                                       .map(
-                                                        (thisExpense) =>
-                                                            Stack(
+                                                        (thisExpense) => Stack(
                                                           alignment: Alignment
                                                               .bottomRight,
                                                           children: [
                                                             ListTile(
                                                               dense: true,
                                                               title: Text(
-                                                                thisExpense.category,
+                                                                thisExpense
+                                                                    .category,
                                                                 style: const TextStyle(
                                                                     fontSize:
                                                                         14.0,
@@ -1147,8 +1119,7 @@ class MemberDetailState extends State<MemberDetail> {
                                                                         FontWeight
                                                                             .bold),
                                                               ),
-                                                              subtitle:
-                                                                  Column(
+                                                              subtitle: Column(
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
                                                                         .start,
@@ -1215,12 +1186,12 @@ class MemberDetailState extends State<MemberDetail> {
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Padding(
-                                                  padding: const EdgeInsets
-                                                      .fromLTRB(15, 0, 15, 0),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          15, 0, 15, 0),
                                                   child: Text(
                                                       'Recently Reported Market Trade Activity',
-                                                      style: Styles
-                                                          .googleStyle
+                                                      style: Styles.googleStyle
                                                           .copyWith(
                                                               fontSize: 24.0,
                                                               fontWeight:
@@ -1229,8 +1200,9 @@ class MemberDetailState extends State<MemberDetail> {
                                                 ),
                                                 const Divider(),
                                                 Padding(
-                                                  padding: const EdgeInsets
-                                                      .fromLTRB(15, 0, 15, 0),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          15, 0, 15, 0),
                                                   child: Column(
                                                     children: isHouseMember
                                                         ? thisHouseMemberStockTrades
@@ -1243,9 +1215,12 @@ class MemberDetailState extends State<MemberDetail> {
                                                                             Alignment.bottomRight,
                                                                         children: [
                                                                           ListTile(
-                                                                            dense: true,
-                                                                            contentPadding: const EdgeInsets.all(0),
-                                                                            title: Container(
+                                                                            dense:
+                                                                                true,
+                                                                            contentPadding:
+                                                                                const EdgeInsets.all(0),
+                                                                            title:
+                                                                                Container(
                                                                               padding: const EdgeInsets.all(3),
                                                                               decoration: BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
                                                                               child: Row(
@@ -1261,7 +1236,8 @@ class MemberDetailState extends State<MemberDetail> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                            subtitle: Column(
+                                                                            subtitle:
+                                                                                Column(
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               children: [
                                                                                 Text('${e.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nTrade Type: ${e.type.replaceFirst('_', ' ').toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
@@ -1292,11 +1268,13 @@ class MemberDetailState extends State<MemberDetail> {
                                                                             Container(
                                                                           padding:
                                                                               const EdgeInsets.all(3),
-                                                                          decoration:
-                                                                              BoxDecoration(color: Theme.of(context).primaryColorDark.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
+                                                                          decoration: BoxDecoration(
+                                                                              color: Theme.of(context).primaryColorDark.withOpacity(0.25),
+                                                                              borderRadius: BorderRadius.circular(3)),
                                                                           child:
                                                                               Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.spaceBetween,
                                                                             children: [
                                                                               Text(
                                                                                 e.ticker == '--' ? 'N/A' : e.ticker,
@@ -1313,13 +1291,16 @@ class MemberDetailState extends State<MemberDetail> {
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Text('${e.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAsset Type: ${e.assetType}\nTrade Type: ${e.type.toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}\nAmount: ${e.amount}\nComments: ${e.comment == null || e.comment == '--' ? 'None' : e.comment}', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
+                                                                            Text('${e.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}\nAsset Type: ${e.assetType}\nTrade Type: ${e.type.toUpperCase()}\nOwner: ${e.owner == null || e.owner == '--' ? 'Not Provided' : e.owner.toUpperCase()}\nAmount: ${e.amount}\nComments: ${e.comment == null || e.comment == '--' ? 'None' : e.comment}',
+                                                                                style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal)),
                                                                             // Text(e.assetDescription.contains('scanned PDF') ? 'PDF Link: ${e.ptrLink}' : '', style: Styles.regularStyle.copyWith(fontSize: 14, fontWeight: FontWeight.normal))
                                                                           ],
                                                                         ),
                                                                         trailing: !e.assetDescription.toLowerCase().contains('scanned PDF')
-                                                                            ? const SizedBox.shrink()
-                                                                            : const FaIcon(FontAwesomeIcons.solidFileLines, size: 13),
+                                                                            ? const SizedBox
+                                                                                .shrink()
+                                                                            : const FaIcon(FontAwesomeIcons.solidFileLines,
+                                                                                size: 13),
                                                                         onTap: () => Functions.linkLaunch(
                                                                             context,
                                                                             e.ptrLink,
@@ -1352,8 +1333,7 @@ class MemberDetailState extends State<MemberDetail> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Container(
-                                    child: thisMember.mostRecentVote ==
-                                                null ||
+                                    child: thisMember.mostRecentVote == null ||
                                             thisMember.mostRecentVote == ''
                                         ? const Text('No Vote Information')
                                         : Text(
@@ -1362,8 +1342,7 @@ class MemberDetailState extends State<MemberDetail> {
                                             style: const TextStyle(
                                                 // color: Colors.blue[900],
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                   ),
                                 ],
@@ -1388,8 +1367,8 @@ class MemberDetailState extends State<MemberDetail> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: thisMember.roles.first
-                                              .votesWithPartyPct ==
+                                  child: thisMember
+                                              .roles.first.votesWithPartyPct ==
                                           null
                                       ? Container(
                                           margin: const EdgeInsets.only(
@@ -1403,8 +1382,7 @@ class MemberDetailState extends State<MemberDetail> {
                                             'Total: ${thisMember.roles.first.totalVotes.toString()}',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1413,14 +1391,14 @@ class MemberDetailState extends State<MemberDetail> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: thisMember.roles.first
-                                              .votesWithPartyPct ==
+                                  child: thisMember
+                                              .roles.first.votesWithPartyPct ==
                                           null
                                       ? Container(
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
-                                          child:
-                                              const Text('Missed: No Information'))
+                                          child: const Text(
+                                              'Missed: No Information'))
                                       : Container(
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
@@ -1428,8 +1406,7 @@ class MemberDetailState extends State<MemberDetail> {
                                             'Missed: ${thisMember.roles.first.missedVotes.toString()} (${thisMember.roles.first.missedVotesPct}%)',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1438,14 +1415,14 @@ class MemberDetailState extends State<MemberDetail> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: thisMember.roles.first
-                                              .votesWithPartyPct ==
+                                  child: thisMember
+                                              .roles.first.votesWithPartyPct ==
                                           null
                                       ? Container(
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
-                                          child:
-                                              const Text('Present: No Information'))
+                                          child: const Text(
+                                              'Present: No Information'))
                                       : Container(
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
@@ -1453,8 +1430,7 @@ class MemberDetailState extends State<MemberDetail> {
                                             'Present: ${thisMember.roles.first.totalPresent.toString()} (${thisMember.roles.first.totalPresent}%)',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1463,8 +1439,8 @@ class MemberDetailState extends State<MemberDetail> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: thisMember.roles.first
-                                              .votesWithPartyPct ==
+                                  child: thisMember
+                                              .roles.first.votesWithPartyPct ==
                                           null
                                       ? Container(
                                           margin: const EdgeInsets.only(
@@ -1475,12 +1451,10 @@ class MemberDetailState extends State<MemberDetail> {
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
                                           child: Text(
-                                            'With Party: ${thisMember.roles.first
-                                                    .votesWithPartyPct}%',
+                                            'With Party: ${thisMember.roles.first.votesWithPartyPct}%',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1501,12 +1475,10 @@ class MemberDetailState extends State<MemberDetail> {
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
                                           child: Text(
-                                            'Against Party: ${thisMember.roles.first
-                                                    .votesAgainstPartyPct}%',
+                                            'Against Party: ${thisMember.roles.first.votesAgainstPartyPct}%',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1531,22 +1503,20 @@ class MemberDetailState extends State<MemberDetail> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child:
-                                      thisMember.roles.first.billsSponsored ==
-                                              null
-                                          ? const Text('Sponsored: No Information')
-                                          : Container(
-                                              margin: const EdgeInsets.only(
-                                                  top: 1, left: 10.0),
-                                              child: Text(
-                                                'Sponsored: ${thisMember.roles.first
-                                                        .billsSponsored}',
-                                                style: const TextStyle(
-                                                    fontSize: 14.0,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                              ),
-                                            ),
+                                  child: thisMember
+                                              .roles.first.billsSponsored ==
+                                          null
+                                      ? const Text('Sponsored: No Information')
+                                      : Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 1, left: 10.0),
+                                          child: Text(
+                                            'Sponsored: ${thisMember.roles.first.billsSponsored}',
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                        ),
                                 ),
                               ],
                             ),
@@ -1556,17 +1526,16 @@ class MemberDetailState extends State<MemberDetail> {
                                   child: thisMember
                                               .roles.first.billsCosponsored ==
                                           null
-                                      ? const Text('Co-Sponsored: No Information')
+                                      ? const Text(
+                                          'Co-Sponsored: No Information')
                                       : Container(
                                           margin: const EdgeInsets.only(
                                               top: 1, left: 10.0),
                                           child: Text(
-                                            'Co-Sponsored: ${thisMember.roles.first
-                                                    .billsCosponsored}',
+                                            'Co-Sponsored: ${thisMember.roles.first.billsCosponsored}',
                                             style: const TextStyle(
                                                 fontSize: 14.0,
-                                                fontWeight:
-                                                    FontWeight.normal),
+                                                fontWeight: FontWeight.normal),
                                           ),
                                         ),
                                 ),
@@ -1605,8 +1574,8 @@ class MemberDetailState extends State<MemberDetail> {
                                               .roles.first.committees.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
-                                            return Text('- ${thisMember.roles.first
-                                                    .committees[index].name}');
+                                            return Text(
+                                                '- ${thisMember.roles.first.committees[index].name}');
                                           },
                                         ),
                                 ],
@@ -1642,16 +1611,12 @@ class MemberDetailState extends State<MemberDetail> {
                                       : ListView.builder(
                                           primary: false,
                                           shrinkWrap: true,
-                                          itemCount: thisMember.roles.first
-                                              .subcommittees.length,
+                                          itemCount: thisMember
+                                              .roles.first.subcommittees.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
                                             return Text(
-                                              '- ${thisMember
-                                                      .roles
-                                                      .first
-                                                      .subcommittees[index]
-                                                      .name}',
+                                              '- ${thisMember.roles.first.subcommittees[index].name}',
                                             );
                                           },
                                         ),
@@ -1681,7 +1646,8 @@ class MemberDetailState extends State<MemberDetail> {
                                     margin: const EdgeInsets.only(
                                         top: 1, left: 10.0),
                                     child: Text(
-                                      thisMember.roles.first.office ?? 'Office: No Information',
+                                      thisMember.roles.first.office ??
+                                          'Office: No Information',
                                       style: const TextStyle(
                                           fontSize: 14.0,
                                           fontWeight: FontWeight.normal),

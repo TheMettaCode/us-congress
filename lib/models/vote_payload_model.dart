@@ -20,15 +20,15 @@ class Payload {
   final Results results;
 
   factory Payload.fromJson(Map<String, dynamic> json) => Payload(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
+        status: json["status"],
+        copyright: json["copyright"],
         results:
             json["results"] == null ? null : Results.fromJson(json["results"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
+        "status": status,
+        "copyright": copyright,
         "results": results == null ? null : results.toJson(),
       };
 }
@@ -49,8 +49,8 @@ class Results {
   factory Results.fromJson(Map<String, dynamic> json) => Results(
         chamber:
             json["chamber"] == null ? null : chamberValues.map[json["chamber"]],
-        offset: json["offset"] == null ? null : json["offset"],
-        numResults: json["num_results"] == null ? null : json["num_results"],
+        offset: json["offset"],
+        numResults: json["num_results"],
         votes: json["votes"] == null
             ? null
             : List<Vote>.from(json["votes"].map((x) => Vote.fromJson(x))),
@@ -58,8 +58,8 @@ class Results {
 
   Map<String, dynamic> toJson() => {
         "chamber": chamber == null ? null : chamberValues.reverse[chamber],
-        "offset": offset == null ? null : offset,
-        "num_results": numResults == null ? null : numResults,
+        "offset": offset,
+        "num_results": numResults,
         "votes": votes == null
             ? null
             : List<dynamic>.from(votes.map((x) => x.toJson())),
@@ -114,30 +114,27 @@ class Vote {
   final Democratic total;
 
   factory Vote.fromJson(Map<String, dynamic> json) => Vote(
-        congress: json["congress"] == null ? 'No Data' : json["congress"],
+        congress: json["congress"] ?? 'No Data',
         chamber: json["chamber"] == null
             ? 'No Chamber'
             : chamberValues.map[json["chamber"]],
-        session: json["session"] == null ? 'No Session' : json["session"],
-        rollCall:
-            json["roll_call"] == null ? 'No Roll Call' : json["roll_call"],
-        source: json["source"] == null ? 'No Source' : json["source"],
-        url: json["url"] == null ? 'No URL' : json["url"],
-        voteUri: json["vote_uri"] == null ? 'No URI' : json["vote_uri"],
+        session: json["session"] ?? 'No Session',
+        rollCall: json["roll_call"] ?? 'No Roll Call',
+        source: json["source"] ?? 'No Source',
+        url: json["url"] ?? 'No URL',
+        voteUri: json["vote_uri"] ?? 'No URI',
         bill:
             json["bill"] == null ? 'No Bill Data' : Bill.fromJson(json["bill"]),
         amendment: json["amendment"] == null
             ? 'No Amendment Data'
             : Amendment.fromJson(json["amendment"]),
-        question: json["question"] == null ? 'No Question' : json["question"],
-        description: json["description"] == null
-            ? 'No Description'
-            : json["description"],
+        question: json["question"] ?? 'No Question',
+        description: json["description"] ?? 'No Description',
         voteType: json["vote_type"] == null
             ? 'No Type Data'
             : voteTypeValues.map[json["vote_type"]],
         date: json["date"] == null ? 'No Date' : DateTime.parse(json["date"]),
-        time: json["time"] == null ? 'No Time' : json["time"],
+        time: json["time"] ?? 'No Time',
         result: json["result"] == null
             ? 'No Results'
             : resultValues.map[json["result"]],
@@ -156,26 +153,26 @@ class Vote {
       );
 
   Map<String, dynamic> toJson() => {
-        "congress": congress == null ? 'No Data' : congress,
+        "congress": congress ?? 'No Data',
         "chamber":
             chamber == null ? 'No Chamber' : chamberValues.reverse[chamber],
-        "session": session == null ? 'No Session' : session,
-        "roll_call": rollCall == null ? 'No Roll Call' : rollCall,
-        "source": source == null ? 'No Source' : source,
-        "url": url == null ? 'No URL' : url,
-        "vote_uri": voteUri == null ? 'No URI' : voteUri,
+        "session": session ?? 'No Session',
+        "roll_call": rollCall ?? 'No Roll Call',
+        "source": source ?? 'No Source',
+        "url": url ?? 'No URL',
+        "vote_uri": voteUri ?? 'No URI',
         "bill": bill == null ? 'No Data' : bill.toJson(),
         "amendment":
             amendment == null ? 'No Amendment Data' : amendment.toJson(),
-        "question": question == null ? 'No Question' : question,
-        "description": description == null ? 'No Description' : description,
+        "question": question ?? 'No Question',
+        "description": description ?? 'No Description',
         "vote_type": voteType == null
             ? 'No Type Data'
             : voteTypeValues.reverse[voteType],
         "date": date == null
             ? 'No Date'
             : "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
-        "time": time == null ? 'No Time' : time,
+        "time": time ?? 'No Time',
         "result": result == null ? 'No Results' : resultValues.reverse[result],
         "democratic": democratic == null ? 'No Data' : democratic.toJson(),
         "republican": republican == null ? 'No Data' : republican.toJson(),
@@ -208,23 +205,19 @@ class Bill {
   final String latestAction;
 
   factory Bill.fromJson(Map<String, dynamic> json) => Bill(
-        number: json["number"] == null ? 'Not Available' : json["number"],
-        billId: json["bill_id"] == null ? 'noBillId' : json["bill_id"],
-        apiUri: json["api_uri"] == null ? 'No URI' : json["api_uri"],
-        title: json["title"] == null
-            ? 'No additional information available.'
-            : json["title"],
-        latestAction: json["latest_action"] == null
-            ? 'No recent actions listed'
-            : json["latest_action"],
+        number: json["number"] ?? 'Not Available',
+        billId: json["bill_id"] ?? 'noBillId',
+        apiUri: json["api_uri"] ?? 'No URI',
+        title: json["title"] ?? 'No additional information available.',
+        latestAction: json["latest_action"] ?? 'No recent actions listed',
       );
 
   Map<String, dynamic> toJson() => {
-        "number": number == null ? 'No Bill No.' : number,
-        "bill_id": billId == null ? 'noBillId' : billId,
-        "api_uri": apiUri == null ? 'No URI' : apiUri,
-        "title": title == null ? 'No Title' : title,
-        "latest_action": latestAction == null ? 'No Actions' : latestAction,
+        "number": number ?? 'No Bill No.',
+        "bill_id": billId ?? 'noBillId',
+        "api_uri": apiUri ?? 'No URI',
+        "title": title ?? 'No Title',
+        "latest_action": latestAction ?? 'No Actions',
       };
 }
 
@@ -244,20 +237,20 @@ class Democratic {
   final MajorityPosition majorityPosition;
 
   factory Democratic.fromJson(Map<String, dynamic> json) => Democratic(
-        yes: json["yes"] == null ? null : json["yes"],
-        no: json["no"] == null ? null : json["no"],
-        present: json["present"] == null ? null : json["present"],
-        notVoting: json["not_voting"] == null ? null : json["not_voting"],
+        yes: json["yes"],
+        no: json["no"],
+        present: json["present"],
+        notVoting: json["not_voting"],
         majorityPosition: json["majority_position"] == null
             ? null
             : majorityPositionValues.map[json["majority_position"]],
       );
 
   Map<String, dynamic> toJson() => {
-        "yes": yes == null ? null : yes,
-        "no": no == null ? null : no,
-        "present": present == null ? null : present,
-        "not_voting": notVoting == null ? null : notVoting,
+        "yes": yes,
+        "no": no,
+        "present": present,
+        "not_voting": notVoting,
         "majority_position": majorityPosition == null
             ? null
             : majorityPositionValues.reverse[majorityPosition],

@@ -21,15 +21,15 @@ class RollCall {
   final Results results;
 
   factory RollCall.fromJson(Map<String, dynamic> json) => RollCall(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
+        status: json["status"],
+        copyright: json["copyright"],
         results:
             json["results"] == null ? null : Results.fromJson(json["results"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
+        "status": status,
+        "copyright": copyright,
         "results": results == null ? null : results.toJson(),
       };
 }
@@ -124,26 +124,23 @@ class RcVote {
   final List<RcPosition> positions;
 
   factory RcVote.fromJson(Map<String, dynamic> json) => RcVote(
-        congress: json["congress"] == null ? null : json["congress"],
-        session: json["session"] == null ? null : json["session"],
-        chamber: json["chamber"] == null ? null : json["chamber"],
-        rollCall: json["roll_call"] == null ? null : json["roll_call"],
-        source: json["source"] == null ? null : json["source"],
-        url: json["url"] == null ? null : json["url"],
+        congress: json["congress"],
+        session: json["session"],
+        chamber: json["chamber"],
+        rollCall: json["roll_call"],
+        source: json["source"],
+        url: json["url"],
         bill: json["bill"] == null ? null : RcBill.fromJson(json["bill"]),
-        question: json["question"] == null ? null : json["question"],
-        description: json["description"] == null ? null : json["description"],
-        voteType: json["vote_type"] == null ? null : json["vote_type"],
+        question: json["question"],
+        description: json["description"],
+        voteType: json["vote_type"],
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
-        time: json["time"] == null ? null : json["time"],
-        result: json["result"] == null ? null : json["result"],
-        tieBreaker: json["tie_breaker"] == null ? null : json["tie_breaker"],
-        tieBreakerVote:
-            json["tie_breaker_vote"] == null ? null : json["tie_breaker_vote"],
-        documentNumber:
-            json["document_number"] == null ? null : json["document_number"],
-        documentTitle:
-            json["document_title"] == null ? null : json["document_title"],
+        time: json["time"],
+        result: json["result"],
+        tieBreaker: json["tie_breaker"],
+        tieBreakerVote: json["tie_breaker_vote"],
+        documentNumber: json["document_number"],
+        documentTitle: json["document_title"],
         democratic: json["democratic"] == null
             ? null
             : Democratic.fromJson(json["democratic"]),
@@ -162,25 +159,25 @@ class RcVote {
       );
 
   Map<String, dynamic> toJson() => {
-        "congress": congress == null ? null : congress,
-        "session": session == null ? null : session,
-        "chamber": chamber == null ? null : chamber,
-        "roll_call": rollCall == null ? null : rollCall,
-        "source": source == null ? null : source,
-        "url": url == null ? null : url,
+        "congress": congress,
+        "session": session,
+        "chamber": chamber,
+        "roll_call": rollCall,
+        "source": source,
+        "url": url,
         "bill": bill == null ? null : bill.toJson(),
-        "question": question == null ? null : question,
-        "description": description == null ? null : description,
-        "vote_type": voteType == null ? null : voteType,
+        "question": question,
+        "description": description,
+        "vote_type": voteType,
         "date": date == null
             ? null
             : "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
-        "time": time == null ? null : time,
-        "result": result == null ? null : result,
-        "tie_breaker": tieBreaker == null ? null : tieBreaker,
-        "tie_breaker_vote": tieBreakerVote == null ? null : tieBreakerVote,
-        "document_number": documentNumber == null ? null : documentNumber,
-        "document_title": documentTitle == null ? null : documentTitle,
+        "time": time,
+        "result": result,
+        "tie_breaker": tieBreaker,
+        "tie_breaker_vote": tieBreakerVote,
+        "document_number": documentNumber,
+        "document_title": documentTitle,
         "democratic": democratic == null ? null : democratic.toJson(),
         "republican": republican == null ? null : republican.toJson(),
         "independent": independent == null ? null : independent.toJson(),
@@ -207,20 +204,19 @@ class RcBill {
   final String latestAction;
 
   factory RcBill.fromJson(Map<String, dynamic> json) => RcBill(
-        billId: json["bill_id"] == null ? 'noBillId' : json["bill_id"],
-        number: json["number"] == null ? null : json["number"],
-        apiUri: json["api_uri"] == null ? null : json["api_uri"],
-        title: json["title"] == null ? null : json["title"],
-        latestAction:
-            json["latest_action"] == null ? null : json["latest_action"],
+        billId: json["bill_id"] ?? 'noBillId',
+        number: json["number"],
+        apiUri: json["api_uri"],
+        title: json["title"],
+        latestAction: json["latest_action"],
       );
 
   Map<String, dynamic> toJson() => {
-        "bill_id": billId == null ? 'noBillId' : billId,
-        "number": number == null ? null : number,
-        "api_uri": apiUri == null ? null : apiUri,
-        "title": title == null ? null : title,
-        "latest_action": latestAction == null ? null : latestAction,
+        "bill_id": billId ?? 'noBillId',
+        "number": number,
+        "api_uri": apiUri,
+        "title": title,
+        "latest_action": latestAction,
       };
 }
 
@@ -240,21 +236,19 @@ class Democratic {
   final String majorityPosition;
 
   factory Democratic.fromJson(Map<String, dynamic> json) => Democratic(
-        yes: json["yes"] == null ? null : json["yes"],
-        no: json["no"] == null ? null : json["no"],
-        present: json["present"] == null ? null : json["present"],
-        notVoting: json["not_voting"] == null ? null : json["not_voting"],
-        majorityPosition: json["majority_position"] == null
-            ? null
-            : json["majority_position"],
+        yes: json["yes"],
+        no: json["no"],
+        present: json["present"],
+        notVoting: json["not_voting"],
+        majorityPosition: json["majority_position"],
       );
 
   Map<String, dynamic> toJson() => {
-        "yes": yes == null ? null : yes,
-        "no": no == null ? null : no,
-        "present": present == null ? null : present,
-        "not_voting": notVoting == null ? null : notVoting,
-        "majority_position": majorityPosition == null ? null : majorityPosition,
+        "yes": yes,
+        "no": no,
+        "present": present,
+        "not_voting": notVoting,
+        "majority_position": majorityPosition,
       };
 }
 
@@ -276,22 +270,21 @@ class RcPosition {
   final double dwNominate;
 
   factory RcPosition.fromJson(Map<String, dynamic> json) => RcPosition(
-        memberId: json["member_id"] == null ? null : json["member_id"],
-        name: json["name"] == null ? null : json["name"],
-        party: json["party"] == null ? null : json["party"],
-        state: json["state"] == null ? null : json["state"],
-        votePosition:
-            json["vote_position"] == null ? null : json["vote_position"],
+        memberId: json["member_id"],
+        name: json["name"],
+        party: json["party"],
+        state: json["state"],
+        votePosition: json["vote_position"],
         dwNominate:
             json["dw_nominate"] == null ? null : json["dw_nominate"].toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
-        "member_id": memberId == null ? null : memberId,
-        "name": name == null ? null : name,
-        "party": party == null ? null : party,
-        "state": state == null ? null : state,
-        "vote_position": votePosition == null ? null : votePosition,
-        "dw_nominate": dwNominate == null ? null : dwNominate,
+        "member_id": memberId,
+        "name": name,
+        "party": party,
+        "state": state,
+        "vote_position": votePosition,
+        "dw_nominate": dwNominate,
       };
 }

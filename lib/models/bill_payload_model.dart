@@ -133,15 +133,12 @@ class Result {
         billUri: json["bill_uri"],
         title: json["title"],
         shortTitle: json["short_title"],
-        sponsorTitle:
-            json["sponsor_title"],
+        sponsorTitle: json["sponsor_title"],
         sponsor: json["sponsor"],
         sponsorId: json["sponsor_id"],
         sponsorUri: json["sponsor_uri"],
-        sponsorParty:
-            json["sponsor_party"],
-        sponsorState:
-            json["sponsor_state"],
+        sponsorParty: json["sponsor_party"],
+        sponsorState: json["sponsor_state"],
         gpoPdfUri: json["gpo_pdf_uri"],
         congressdotgovUrl: json["congressdotgov_url"],
         govtrackUrl: json["govtrack_url"],
@@ -163,8 +160,7 @@ class Result {
             ? null
             : CosponsorsByParty.fromJson(json["cosponsors_by_party"]),
         withdrawnCosponsors: json["withdrawn_cosponsors"],
-        primarySubject:
-            json["primary_subject"],
+        primarySubject: json["primary_subject"],
         committees: json["committees"],
         committeeCodes: json["committee_codes"] == null
             ? null
@@ -183,8 +179,7 @@ class Result {
             ? null
             : DateTime.parse(json["senate_passage_vote"]),
         summary: json["summary"],
-        summaryShort:
-            json["summary_short"],
+        summaryShort: json["summary_short"],
         versions: json["versions"] == null
             ? null
             : List<Version>.from(
@@ -214,8 +209,7 @@ class Result {
         "sponsor_party": sponsorParty,
         "sponsor_state": sponsorState,
         "gpo_pdf_uri": gpoPdfUri,
-        "congressdotgov_url":
-            congressdotgovUrl,
+        "congressdotgov_url": congressdotgovUrl,
         "govtrack_url": govtrackUrl,
         "introduced_date": introducedDate == null
             ? null
@@ -231,8 +225,7 @@ class Result {
         "cosponsors": cosponsors,
         "cosponsors_by_party":
             cosponsorsByParty == null ? null : cosponsorsByParty.toJson(),
-        "withdrawn_cosponsors":
-            withdrawnCosponsors,
+        "withdrawn_cosponsors": withdrawnCosponsors,
         "primary_subject": primarySubject,
         "committees": committees,
         "committee_codes": committeeCodes == null
@@ -244,8 +237,7 @@ class Result {
         "latest_major_action_date": latestMajorActionDate == null
             ? null
             : "${latestMajorActionDate.year.toString().padLeft(4, '0')}-${latestMajorActionDate.month.toString().padLeft(2, '0')}-${latestMajorActionDate.day.toString().padLeft(2, '0')}",
-        "latest_major_action":
-            latestMajorAction,
+        "latest_major_action": latestMajorAction,
         "house_passage_vote": housePassageVote == null
             ? null
             : "${housePassageVote.year.toString().padLeft(4, '0')}-${housePassageVote.month.toString().padLeft(2, '0')}-${housePassageVote.day.toString().padLeft(2, '0')}",
@@ -356,8 +348,7 @@ class Version {
         "status": status,
         "title": title,
         "url": url,
-        "congressdotgov_url":
-            congressdotgovUrl,
+        "congressdotgov_url": congressdotgovUrl,
       };
 }
 

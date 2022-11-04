@@ -19,7 +19,7 @@ class RcPurchaseApi {
 
     await Purchases.configure(PurchasesConfiguration(_apiKey
         // ,appUserId: appUserId.first.split('<|:|>')[1]
-    ));
+        ));
   }
 
   /// USED TO RETRIEVE CURRENT LIST OF PRODUCT OFFERINGS
@@ -35,7 +35,8 @@ class RcPurchaseApi {
   }
 
   /// USED TO RETRIEVE CURRENT LIST OF PRODUCTS
-  static Future<List<StoreProduct>> fetchProducts(List<String> productIds) async {
+  static Future<List<StoreProduct>> fetchProducts(
+      List<String> productIds) async {
     try {
       final products = await Purchases.getProducts(productIds);
 
@@ -63,11 +64,11 @@ class RcPurchaseApi {
           }
 
           /// RESTORE SUBSCRIPTIONS IF USER HAS RESUBSCRIBED
-          List<String> _backupSubscriptions =
+          List<String> localBackupSubscriptions =
               List.from(userDatabase.get('subscriptionAlertsListBackup'));
-          if (_backupSubscriptions.isNotEmpty) {
+          if (localBackupSubscriptions.isNotEmpty) {
             await userDatabase.put(
-                'subscriptionAlertsList', _backupSubscriptions);
+                'subscriptionAlertsList', localBackupSubscriptions);
             userDatabase.put('subscriptionAlertsListBackup', []);
 
             userDatabase.put('billAlerts', true);
@@ -82,12 +83,12 @@ class RcPurchaseApi {
           logger.d('USER IS SUBSCRIBED');
         } else {
           /// CLEAR AND BACKUP USER SUBSCRIPTIONS JUST IN CASE THE USER RESUBSCRIBES
-          List<String> _currentSubscriptions =
+          List<String> localCurrentSubscriptions =
               List.from(userDatabase.get('subscriptionAlertsList'));
 
-          if (_currentSubscriptions.isNotEmpty) {
+          if (localCurrentSubscriptions.isNotEmpty) {
             await userDatabase.put(
-                'subscriptionAlertsListBackup', _currentSubscriptions);
+                'subscriptionAlertsListBackup', localCurrentSubscriptions);
 
             userDatabase.put('subscriptionAlertsList', []);
             userDatabase.put('memberAlerts', false);
@@ -108,15 +109,15 @@ class RcPurchaseApi {
       }
     } else {
       /// RESTORE WATCH LIST IF USER HAS RESUBSCRIBED
-      List<String> _currentSubscriptions =
+      List<String> localCurrentSubscriptions =
           List.from(userDatabase.get('subscriptionAlertsList'));
-      List<String> _backupSubscriptions =
+      List<String> localBackupSubscriptions =
           List.from(userDatabase.get('subscriptionAlertsListBackup'));
 
-      if (_backupSubscriptions.isNotEmpty) {
-        _currentSubscriptions.addAll(_backupSubscriptions);
+      if (localBackupSubscriptions.isNotEmpty) {
+        localCurrentSubscriptions.addAll(localBackupSubscriptions);
 
-        userDatabase.put('subscriptionAlertsList', _currentSubscriptions);
+        userDatabase.put('subscriptionAlertsList', localCurrentSubscriptions);
         userDatabase.put('subscriptionAlertsListBackup', []);
 
         logger.d(
@@ -149,8 +150,9 @@ class RcPurchaseApi {
       CustomerInfo customerInfo = await Purchases.purchaseProduct(
           product.identifier,
           type: PurchaseType.inapp);
-      StoreTransaction thisTransaction = customerInfo.nonSubscriptionTransactions
-          .lastWhere((element) => element.productIdentifier == product.identifier);
+      StoreTransaction thisTransaction =
+          customerInfo.nonSubscriptionTransactions.lastWhere(
+              (element) => element.productIdentifier == product.identifier);
       bool purchaseVerified = DateTime.parse(thisTransaction.purchaseDate)
               .minute
               .compareTo(DateTime.now().minute) ==
@@ -227,8 +229,8 @@ class RcPurchaseApi {
       BuildContext context, Package packageToPurchase,
       {UpgradeInfo upgradeInfo}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    final Package _package = packageToPurchase;
-    logger.i(_package.packageType.name);
+    final Package localPackage = packageToPurchase;
+    logger.i(localPackage.packageType.name);
 
     try {
       CustomerInfo customerInfo =
@@ -299,8 +301,8 @@ class RcPurchaseApi {
   static Future<void> removePackage(
       BuildContext context, Package packageToRemove) async {
     // Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    final Package _package = packageToRemove;
-    logger.i(_package.packageType.name);
+    final Package localPackage = packageToRemove;
+    logger.i(localPackage.packageType.name);
 
     try {
       // PurchaserInfo purchaserInfo =

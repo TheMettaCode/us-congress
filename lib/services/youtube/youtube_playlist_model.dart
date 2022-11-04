@@ -28,10 +28,9 @@ class YouTubePlaylist {
 
   factory YouTubePlaylist.fromJson(Map<String, dynamic> json) =>
       YouTubePlaylist(
-        kind: json["kind"] == null ? null : json["kind"],
-        etag: json["etag"] == null ? null : json["etag"],
-        nextPageToken:
-            json["nextPageToken"] == null ? null : json["nextPageToken"],
+        kind: json["kind"],
+        etag: json["etag"],
+        nextPageToken: json["nextPageToken"],
         items: json["items"] == null
             ? null
             : List<PlaylistItem>.from(
@@ -42,13 +41,13 @@ class YouTubePlaylist {
       );
 
   Map<String, dynamic> toJson() => {
-        "kind": kind == null ? null : kind,
-        "etag": etag == null ? null : etag,
-        "nextPageToken": nextPageToken == null ? null : nextPageToken,
+        "kind": kind,
+        "etag": etag,
+        "nextPageToken": nextPageToken,
         "items": items == null
             ? null
             : List<dynamic>.from(items.map((x) => x.toJson())),
-        "pageInfo": pageInfo == null ? null : pageInfo.toJson(),
+        "pageInfo": pageInfo.toJson(),
       };
 }
 
@@ -66,18 +65,18 @@ class PlaylistItem {
   final Snippet snippet;
 
   factory PlaylistItem.fromJson(Map<String, dynamic> json) => PlaylistItem(
-        kind: json["kind"] == null ? null : json["kind"],
-        etag: json["etag"] == null ? null : json["etag"],
-        id: json["id"] == null ? null : json["id"],
+        kind: json["kind"],
+        etag: json["etag"],
+        id: json["id"],
         snippet:
             json["snippet"] == null ? null : Snippet.fromJson(json["snippet"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "kind": kind == null ? null : kind,
-        "etag": etag == null ? null : etag,
-        "id": id == null ? null : id,
-        "snippet": snippet == null ? null : snippet.toJson(),
+        "kind": kind,
+        "etag": etag,
+        "id": id,
+        "snippet": snippet.toJson(),
       };
 }
 
@@ -112,42 +111,34 @@ class Snippet {
         publishedAt: json["publishedAt"] == null
             ? null
             : DateTime.parse(json["publishedAt"]),
-        channelId: json["channelId"] == null ? null : json["channelId"],
-        title: json["title"] == null ? null : json["title"],
-        description: json["description"] == null ? null : json["description"],
+        channelId: json["channelId"],
+        title: json["title"],
+        description: json["description"],
         thumbnails: json["thumbnails"] == null
             ? null
             : Thumbnails.fromJson(json["thumbnails"]),
-        channelTitle:
-            json["channelTitle"] == null ? null : json["channelTitle"],
-        playlistId: json["playlistId"] == null ? null : json["playlistId"],
-        position: json["position"] == null ? null : json["position"],
+        channelTitle: json["channelTitle"],
+        playlistId: json["playlistId"],
+        position: json["position"],
         resourceId: json["resourceId"] == null
             ? null
             : ResourceId.fromJson(json["resourceId"]),
-        videoOwnerChannelTitle: json["videoOwnerChannelTitle"] == null
-            ? null
-            : json["videoOwnerChannelTitle"],
-        videoOwnerChannelId: json["videoOwnerChannelId"] == null
-            ? null
-            : json["videoOwnerChannelId"],
+        videoOwnerChannelTitle: json["videoOwnerChannelTitle"],
+        videoOwnerChannelId: json["videoOwnerChannelId"],
       );
 
   Map<String, dynamic> toJson() => {
-        "publishedAt":
-            publishedAt == null ? null : publishedAt.toIso8601String(),
-        "channelId": channelId == null ? null : channelId,
-        "title": title == null ? null : title,
-        "description": description == null ? null : description,
-        "thumbnails": thumbnails == null ? null : thumbnails.toJson(),
-        "channelTitle": channelTitle == null ? null : channelTitle,
-        "playlistId": playlistId == null ? null : playlistId,
-        "position": position == null ? null : position,
-        "resourceId": resourceId == null ? null : resourceId.toJson(),
-        "videoOwnerChannelTitle":
-            videoOwnerChannelTitle == null ? null : videoOwnerChannelTitle,
-        "videoOwnerChannelId":
-            videoOwnerChannelId == null ? null : videoOwnerChannelId,
+        "publishedAt": publishedAt.toIso8601String(),
+        "channelId": channelId,
+        "title": title,
+        "description": description,
+        "thumbnails": thumbnails.toJson(),
+        "channelTitle": channelTitle,
+        "playlistId": playlistId,
+        "position": position,
+        "resourceId": resourceId.toJson(),
+        "videoOwnerChannelTitle": videoOwnerChannelTitle,
+        "videoOwnerChannelId": videoOwnerChannelId,
       };
 }
 
@@ -161,13 +152,13 @@ class ResourceId {
   final String videoId;
 
   factory ResourceId.fromJson(Map<String, dynamic> json) => ResourceId(
-        kind: json["kind"] == null ? null : json["kind"],
-        videoId: json["videoId"] == null ? null : json["videoId"],
+        kind: json["kind"],
+        videoId: json["videoId"],
       );
 
   Map<String, dynamic> toJson() => {
-        "kind": kind == null ? null : kind,
-        "videoId": videoId == null ? null : videoId,
+        "kind": kind,
+        "videoId": videoId,
       };
 }
 
@@ -200,12 +191,11 @@ class Thumbnails {
       );
 
   Map<String, dynamic> toJson() => {
-        "default":
-            thumbnailsDefault == null ? null : thumbnailsDefault.toJson(),
-        "medium": medium == null ? null : medium.toJson(),
-        "high": high == null ? null : high.toJson(),
-        "standard": standard == null ? null : standard.toJson(),
-        "maxres": maxres == null ? null : maxres.toJson(),
+        "default": thumbnailsDefault.toJson(),
+        "medium": medium.toJson(),
+        "high": high.toJson(),
+        "standard": standard.toJson(),
+        "maxres": maxres.toJson(),
       };
 }
 
@@ -221,15 +211,15 @@ class Default {
   final int height;
 
   factory Default.fromJson(Map<String, dynamic> json) => Default(
-        url: json["url"] == null ? null : json["url"],
-        width: json["width"] == null ? null : json["width"],
-        height: json["height"] == null ? null : json["height"],
+        url: json["url"],
+        width: json["width"],
+        height: json["height"],
       );
 
   Map<String, dynamic> toJson() => {
-        "url": url == null ? null : url,
-        "width": width == null ? null : width,
-        "height": height == null ? null : height,
+        "url": url,
+        "width": width,
+        "height": height,
       };
 }
 
@@ -243,14 +233,12 @@ class PageInfo {
   final int resultsPerPage;
 
   factory PageInfo.fromJson(Map<String, dynamic> json) => PageInfo(
-        totalResults:
-            json["totalResults"] == null ? null : json["totalResults"],
-        resultsPerPage:
-            json["resultsPerPage"] == null ? null : json["resultsPerPage"],
+        totalResults: json["totalResults"],
+        resultsPerPage: json["resultsPerPage"],
       );
 
   Map<String, dynamic> toJson() => {
-        "totalResults": totalResults == null ? null : totalResults,
-        "resultsPerPage": resultsPerPage == null ? null : resultsPerPage,
+        "totalResults": totalResults,
+        "resultsPerPage": resultsPerPage,
       };
 }

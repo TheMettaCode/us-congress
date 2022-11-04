@@ -30,11 +30,11 @@ class PrivateFundedTrip {
 
   factory PrivateFundedTrip.fromJson(Map<String, dynamic> json) =>
       PrivateFundedTrip(
-        status: json["status"] == null ? null : json["status"],
-        copyright: json["copyright"] == null ? null : json["copyright"],
-        congress: json["congress"] == null ? null : json["congress"],
-        numResults: json["num_results"] == null ? null : json["num_results"],
-        offset: json["offset"] == null ? null : json["offset"],
+        status: json["status"],
+        copyright: json["copyright"],
+        congress: json["congress"],
+        numResults: json["num_results"],
+        offset: json["offset"],
         results: json["results"] == null
             ? null
             : List<PrivateTripResult>.from(
@@ -42,11 +42,11 @@ class PrivateFundedTrip {
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "copyright": copyright == null ? null : copyright,
-        "congress": congress == null ? null : congress,
-        "num_results": numResults == null ? null : numResults,
-        "offset": offset == null ? null : offset,
+        "status": status,
+        "copyright": copyright,
+        "congress": congress,
+        "num_results": numResults,
+        "offset": offset,
         "results": results == null
             ? null
             : List<dynamic>.from(results.map((x) => x.toJson())),
@@ -86,14 +86,14 @@ class PrivateTripResult {
 
   factory PrivateTripResult.fromJson(Map<String, dynamic> json) =>
       PrivateTripResult(
-        memberId: json["member_id"] == null ? null : json["member_id"],
-        apiUri: json["api_uri"] == null ? null : json["api_uri"],
-        displayName: json["display_name"] == null ? null : json["display_name"],
+        memberId: json["member_id"],
+        apiUri: json["api_uri"],
+        displayName: json["display_name"],
         filingType: json["filing_type"] == null
             ? null
             : filingTypeValues.map[json["filing_type"]],
-        traveler: json["traveler"] == null ? null : json["traveler"],
-        isMember: json["is_member"] == null ? null : json["is_member"],
+        traveler: json["traveler"],
+        isMember: json["is_member"],
         departureDate: json["departure_date"] == null
             ? null
             : DateTime.parse(json["departure_date"]),
@@ -102,20 +102,20 @@ class PrivateTripResult {
             : DateTime.parse(json["return_date"]),
         chamber:
             json["chamber"] == null ? null : chamberValues.map[json["chamber"]],
-        destination: json["destination"] == null ? null : json["destination"],
-        sponsor: json["sponsor"] == null ? null : json["sponsor"],
-        documentId: json["document_id"] == null ? null : json["document_id"],
-        pdfUrl: json["pdf_url"] == null ? null : json["pdf_url"],
+        destination: json["destination"],
+        sponsor: json["sponsor"],
+        documentId: json["document_id"],
+        pdfUrl: json["pdf_url"],
       );
 
   Map<String, dynamic> toJson() => {
-        "member_id": memberId == null ? null : memberId,
-        "api_uri": apiUri == null ? null : apiUri,
-        "display_name": displayName == null ? null : displayName,
+        "member_id": memberId,
+        "api_uri": apiUri,
+        "display_name": displayName,
         "filing_type":
             filingType == null ? null : filingTypeValues.reverse[filingType],
-        "traveler": traveler == null ? null : traveler,
-        "is_member": isMember == null ? null : isMember,
+        "traveler": traveler,
+        "is_member": isMember,
         "departure_date": departureDate == null
             ? null
             : "${departureDate.year.toString().padLeft(4, '0')}-${departureDate.month.toString().padLeft(2, '0')}-${departureDate.day.toString().padLeft(2, '0')}",
@@ -123,10 +123,10 @@ class PrivateTripResult {
             ? null
             : "${returnDate.year.toString().padLeft(4, '0')}-${returnDate.month.toString().padLeft(2, '0')}-${returnDate.day.toString().padLeft(2, '0')}",
         "chamber": chamber == null ? null : chamberValues.reverse[chamber],
-        "destination": destination == null ? null : destination,
-        "sponsor": sponsor == null ? null : sponsor,
-        "document_id": documentId == null ? null : documentId,
-        "pdf_url": pdfUrl == null ? null : pdfUrl,
+        "destination": destination,
+        "sponsor": sponsor,
+        "document_id": documentId,
+        "pdf_url": pdfUrl,
       };
 }
 
