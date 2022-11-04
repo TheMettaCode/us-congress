@@ -72,89 +72,6 @@ class Youtube {
     );
     // }
 
-    ////////////////////////////////////////////////
-    /// UNDER DEVELOPMENT               ////////////
-    /// FULL PLAYLIST HORIZONTAL SCROLL ////////////
-    ////////////////////////////////////////////////
-    ///
-    // return Container(
-    //   height: 350,
-    //   child: ListView.builder(
-    //       scrollDirection: Axis.vertical,
-    //       shrinkWrap: true,
-    //       itemCount: _playlist.length,
-    //       itemBuilder: (context, index) {
-    //         return ListView(shrinkWrap: true, children: <Widget>[
-    //           ListTile(
-    //             dense: true,
-    //             title: Text(
-    //               _playlist[index]
-    //                   .snippet
-    //                   .title
-    //                   .replaceAll('&amp;', '&')
-    //                   .replaceAll("&quot;", "\"")
-    //                   .replaceAll("&#39;", "'"),
-    //               style: Styles.googleStyle,
-    //             ),
-    //             subtitle: Row(
-    //               children: [
-    //                 Text('${thisVideo.snippet.videoOwnerChannelTitle}',
-    //                     style: Styles.regularStyle.copyWith(
-    //                         fontWeight: FontWeight.bold, fontSize: 11)),
-    //                 Text(
-    //                     ' | ${dateWithTimeFormatter.format(DateTime.parse(thisVideo.snippet.publishedAt.toString()).toLocal())}',
-    //                     style: Styles.regularStyle.copyWith(fontSize: 10))
-    //               ],
-    //             ),
-    //             trailing: IconButton(
-    //                 icon: Icon(Icons.close),
-    //                 onPressed: () => Navigator.pop(context)),
-    //           ),
-    //           AspectRatio(
-    //             aspectRatio: 16 / 9,
-    //             child: Container(
-    //               color: Theme.of(context).colorScheme.secondary,
-    //               child: kIsWeb
-    //                   ? ytWeb.YoutubePlayerIFrame(
-    //                       controller: _webController,
-    //                       aspectRatio: 16 / 9,
-    //                     )
-    //                   : YoutubePlayer(
-    //                       controller: _controller,
-    //                       showVideoProgressIndicator: true,
-    //                       aspectRatio: 16 / 9,
-    //                       progressIndicatorColor:
-    //                           Theme.of(context).primaryColor,
-    //                       progressColors: ProgressBarColors(
-    //                           backgroundColor:
-    //                               Theme.of(context).colorScheme.secondary,
-    //                           playedColor: Theme.of(context).primaryColor,
-    //                           handleColor: Theme.of(context).primaryColor,
-    //                           bufferedColor:
-    //                               Theme.of(context).primaryColorLight),
-    //                       onReady: () {
-    //                         _isPlayerReady = true;
-    //                         // _controller.addListener(listener);
-    //                       },
-    //                       // onEnded: (youtubeMetaData) {},
-    //                     ),
-    //             ),
-    //           ),
-    //           TextButton(
-    //             child: Padding(
-    //               padding: const EdgeInsets.all(10.0),
-    //               child: Text(
-    //                 'Advertise Here',
-    //                 style: Styles.googleStyle,
-    //               ),
-    //             ),
-    //             onPressed: () => Functions.linkLaunch(
-    //                 context, developerWebLink, developerWebLink),
-    //           ),
-    //         ]);
-    //       }),
-    // );
-
     return Container(
       color: isCapitolBabble
           ? capitolBabbleDark
@@ -602,10 +519,10 @@ class Youtube {
     List<PlaylistItem> localFinalPlaylistItems = [];
 
     if (localCurrentPlaylistItems.isEmpty ||
-        DateTime.parse(userDatabase.get('lastRefresh').toString()).isBefore(
-            DateTime.now().subtract(context == null
+        DateTime.parse(userDatabase.get('lastRefresh')).isBefore(DateTime.now()
+            .subtract(context == null
                 ? const Duration(hours: 1)
-                : const Duration(minutes: 25)))) {
+                : const Duration(minutes: 5)))) {
       debugPrint('***** GENERATING LIST OF YOUTUBE PLAYLIST ITEMS  *****');
       final response = await http.get(
         Uri.parse(
@@ -618,8 +535,28 @@ class Youtube {
         final YouTubePlaylist youTubePlaylistResponse =
             youTubePlaylistFromJson(response.body);
 
+        try {
+          debugPrint('***** SAVING NEW PLAYLIST TO DBASE *****');
+          userDatabase.put('youTubePlaylist',
+              youTubePlaylistToJson(youTubePlaylistResponse));
+        } catch (e) {
+          debugPrint(
+              '^^^^^ ERROR SAVING NEW VIDEOS TO DBASE (YOUTUBE FUNCTION): $e ^^^^^');
+          userDatabase.put('youTubePlaylist', {});
+        }
+
         if (youTubePlaylistResponse.items.isNotEmpty) {
           localFinalPlaylistItems = youTubePlaylistResponse.items;
+
+          // for (PlaylistItem item in localFinalPlaylistItems) {
+          //   if (!localCurrentPlaylistItems.contains(item)) {
+          //     debugPrint('MISSING YT Item: $item');
+          //   }
+          // }
+
+          bool playlistsAreEqual = listEquals<String>(
+              localFinalPlaylistItems.map((e) => e.id).toList(),
+              localCurrentPlaylistItems.map((e) => e.id).toList());
 
           localFinalPlaylistItems.removeWhere((video) =>
               video.snippet.title.toLowerCase().contains('private') ||
@@ -627,9 +564,13 @@ class Youtube {
               video.snippet.publishedAt
                   .isBefore(DateTime.now().subtract(const Duration(days: 7))));
 
+          debugPrint(
+              '^^^^^\nYT PLAYLISTS EQUAL? $playlistsAreEqual\nCURRENT YT PLAYLIST LENGTH: ${localFinalPlaylistItems.length}\nFINAL YT PLAYLIST LENGTH: ${localFinalPlaylistItems.length}');
+
           if (localCurrentPlaylistItems.isEmpty ||
-              localFinalPlaylistItems.first.id !=
-                  localCurrentPlaylistItems.first.id) {
+              // localFinalPlaylistItems.first.id !=
+              //     localCurrentPlaylistItems.first.id ||
+              !playlistsAreEqual) {
             userDatabase.put('newVideos', true);
 
             if (userIsDev) {
@@ -653,19 +594,7 @@ class Youtube {
             }
           }
 
-          if (localCurrentPlaylistItems.isEmpty) {
-            localCurrentPlaylistItems = localFinalPlaylistItems;
-          }
-
-          try {
-            logger.d('***** SAVING NEW PLAYLIST TO DBASE *****');
-            userDatabase.put('youTubePlaylist',
-                youTubePlaylistToJson(youTubePlaylistResponse));
-          } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING NEW VIDEOS TO DBASE (YOUTUBE FUNCTION): $e ^^^^^');
-            userDatabase.put('youTubePlaylist', {});
-          }
+          localCurrentPlaylistItems = localFinalPlaylistItems;
         }
 
         if (userDatabase.get('videoAlerts') &&

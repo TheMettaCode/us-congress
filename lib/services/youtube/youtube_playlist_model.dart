@@ -47,7 +47,7 @@ class YouTubePlaylist {
         "items": items == null
             ? null
             : List<dynamic>.from(items.map((x) => x.toJson())),
-        "pageInfo": pageInfo.toJson(),
+        "pageInfo": pageInfo == null ? null : pageInfo.toJson(),
       };
 }
 
@@ -76,7 +76,7 @@ class PlaylistItem {
         "kind": kind,
         "etag": etag,
         "id": id,
-        "snippet": snippet.toJson(),
+        "snippet": snippet == null ? null : snippet.toJson(),
       };
 }
 
@@ -132,11 +132,11 @@ class Snippet {
         "channelId": channelId,
         "title": title,
         "description": description,
-        "thumbnails": thumbnails.toJson(),
+        "thumbnails": thumbnails == null ? null : thumbnails.toJson(),
         "channelTitle": channelTitle,
         "playlistId": playlistId,
         "position": position,
-        "resourceId": resourceId.toJson(),
+        "resourceId": resourceId == null ? null : resourceId.toJson(),
         "videoOwnerChannelTitle": videoOwnerChannelTitle,
         "videoOwnerChannelId": videoOwnerChannelId,
       };
@@ -191,11 +191,12 @@ class Thumbnails {
       );
 
   Map<String, dynamic> toJson() => {
-        "default": thumbnailsDefault.toJson(),
-        "medium": medium.toJson(),
-        "high": high.toJson(),
-        "standard": standard.toJson(),
-        "maxres": maxres.toJson(),
+        "default":
+            thumbnailsDefault == null ? null : thumbnailsDefault.toJson(),
+        "medium": medium == null ? null : medium.toJson(),
+        "high": high == null ? null : high.toJson(),
+        "standard": standard == null ? null : standard.toJson(),
+        "maxres": maxres == null ? null : maxres.toJson(),
       };
 }
 

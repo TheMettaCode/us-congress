@@ -40,7 +40,7 @@ class GithubApi {
     try {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
       currentGithubNotifications = currentGithubData.notifications.toList();
-      currentGithubHashtags = currentGithubData.hashtags;
+      currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
       currentGithubNotifications = [];
@@ -60,15 +60,26 @@ class GithubApi {
           '***** GITHUB MSG API RESPONSE CODE: ${response.statusCode} *****');
       if (response.statusCode == 200) {
         GithubData githubData = githubDataFromJson(response.body);
+        userDatabase.put('githubData', githubDataToJson(githubData));
 
         /// CHECK FOR CURRENT AND NEW HASHTAG DATA EQUALITY & UPDATE LOCAL IF SO
         List<String> newGithubHashtags = githubData.hashtags;
+        // currentGithubHashtags.sort();
+        // newGithubHashtags.sort();
         bool hashtagListsAreEqual =
             listEquals(newGithubHashtags, currentGithubHashtags);
+        // for (String item in newGithubHashtags) {
+        //   if (!currentGithubHashtags.contains(item)) {
+        //     debugPrint('MISSING HASHTAG: $item');
+        //   }
+        // }
         debugPrint(
-            "^^^ NEW & CURRENT HASHTAG LISTS ARE EQUAL? $hashtagListsAreEqual");
+            "^^^ ${newGithubHashtags.length} NEW & ${currentGithubHashtags.length} CURRENT HASHTAG LISTS ARE EQUAL? $hashtagListsAreEqual");
         if (!hashtagListsAreEqual) {
-          debugPrint("^^^ HASHTAGS UPDATED: $newGithubHashtags");
+          debugPrint(
+              "^^^ CURRENT HASHTAGS LIST: ${currentGithubHashtags.first} ${currentGithubHashtags.last}");
+          debugPrint(
+              "^^^ NEW HASHTAGS UPDATED LIST: ${newGithubHashtags.first} ${newGithubHashtags.last}");
           userDatabase.put('hashtags', newGithubHashtags);
         }
 
@@ -81,7 +92,7 @@ class GithubApi {
 
         if (githubData.status == "OK" &&
             githubData.app == 'us-congress' &&
-            (!notificationListsAreEqual)) {
+            !notificationListsAreEqual) {
           debugPrint('***** NEW GITHUB DATA RETRIEVED');
           newGithubNotifications = githubData.notifications.toList();
 
@@ -121,7 +132,6 @@ class GithubApi {
           // }
 
           currentGithubNotifications = newGithubNotifications;
-          userDatabase.put('githubData', githubDataToJson(githubData));
 
           if (newGithubNotifications.isNotEmpty &&
               (newUserLevelMessagesRetrieved ||

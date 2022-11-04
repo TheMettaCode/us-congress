@@ -5,7 +5,8 @@
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
-GithubData githubDataFromJson(String str) => GithubData.fromJson(json.decode(str));
+GithubData githubDataFromJson(String str) =>
+    GithubData.fromJson(json.decode(str));
 
 String githubDataToJson(GithubData data) => json.encode(data.toJson());
 
@@ -25,8 +26,8 @@ class GithubData {
   factory GithubData.fromJson(Map<String, dynamic> json) => GithubData(
         app: json["app"] ?? 'us-congress',
         status: json["status"] ?? "ERR",
-        notifications: List<GithubNotifications>.from(
-                json["notifications"].map((x) => GithubNotifications.fromJson(x))) ??
+        notifications: List<GithubNotifications>.from(json["notifications"]
+                .map((x) => GithubNotifications.fromJson(x))) ??
             [],
         hashtags: List<String>.from(json['hashtags']) ?? [],
       );
@@ -34,7 +35,8 @@ class GithubData {
   Map<String, dynamic> toJson() => {
         "app": app,
         "status": status ?? "ERR",
-        "notifications": List<dynamic>.from(notifications.map((x) => x.toJson())),
+        "notifications":
+            List<dynamic>.from(notifications.map((x) => x.toJson())),
         "hashtags": hashtags ?? [],
       };
 }
@@ -64,13 +66,15 @@ class GithubNotifications {
   final bool supportOption;
   final String additionalData;
 
-  factory GithubNotifications.fromJson(Map<String, dynamic> json) => GithubNotifications(
+  factory GithubNotifications.fromJson(Map<String, dynamic> json) =>
+      GithubNotifications(
         startDate: json["start-date"] == null || json["start-date"] == ""
             ? DateTime.now()
             : DateTime.parse(json["start-date"]),
-        expirationDate: json["expiration-date"] == null || json["expiration-date"] == ""
-            ? DateTime.now().add(const Duration(days: 1))
-            : DateTime.parse(json["expiration-date"]),
+        expirationDate:
+            json["expiration-date"] == null || json["expiration-date"] == ""
+                ? DateTime.now().add(const Duration(days: 1))
+                : DateTime.parse(json["expiration-date"]),
         title: json["title"] ?? "",
         message: json["message"] ?? "",
         priority: json["priority"],
@@ -82,15 +86,18 @@ class GithubNotifications {
       );
 
   Map<String, dynamic> toJson() => {
-        "start-date":
-            startDate == null ? DateTime.now().toIso8601String() : startDate.toIso8601String(),
+        "start-date": startDate == null
+            ? DateTime.now().toIso8601String()
+            : startDate.toIso8601String(),
         "expiration-date": expirationDate == null
             ? DateTime.now().toIso8601String()
             : expirationDate.toIso8601String(),
         "title": title ?? "",
         "message": message ?? "",
         "priority": priority ?? 10,
-        "user-levels": userLevels == null ? null : List<dynamic>.from(userLevels.map((x) => x)),
+        "user-levels": userLevels == null
+            ? null
+            : List<dynamic>.from(userLevels.map((x) => x)),
         "url": url ?? "",
         "icon": icon ?? "handshake",
         "support-option": supportOption ?? false,
