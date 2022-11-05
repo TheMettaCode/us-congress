@@ -26,6 +26,7 @@ import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dar
 import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
 import 'package:us_congress_vote_tracker/congress/onboarding_page.dart';
 import 'constants/constants.dart';
+import 'functions/rapidapi_functions.dart';
 
 // [Android-only] This "Headless Task" is run when the Android app
 // is terminated with enableHeadless: true
@@ -52,7 +53,9 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   debugPrint('***** OPENING DATA BOX (Background Fetch) *****');
   await Functions.initializeBox();
   await Functions.processCredits(false, creditsToRemove: 15);
-  await Functions.fetchNewsArticles();
+  await RapidApiFunctions.fetchNewsArticles();
+  // await RapidApiFunctions.getFloorActions(isHouseChamber: true);
+  // await RapidApiFunctions.getFloorActions(isHouseChamber: false);
   await Functions.fetchStatements();
   await Functions.houseFloor();
   await Functions.senateFloor();
@@ -146,6 +149,8 @@ class MyAppState extends State<MyApp> {
       await Functions.getPosition();
       await Functions.getDeviceInfo();
       await Functions.getPackageInfo();
+      await RapidApiFunctions.getFloorActions(isHouseChamber: true);
+      await RapidApiFunctions.getFloorActions(isHouseChamber: false);
     });
     super.initState();
     initBackgroundFetchPlatformState();

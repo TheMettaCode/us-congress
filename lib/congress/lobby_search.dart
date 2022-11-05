@@ -7,7 +7,7 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:us_congress_vote_tracker/models/lobby_search_model.dart';
-import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
+import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
 
 import '../functions/functions.dart';
 

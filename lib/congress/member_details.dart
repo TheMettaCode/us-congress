@@ -18,7 +18,8 @@ import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
 import 'package:us_congress_vote_tracker/models/members_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
+
+import '../functions/propublica_api_functions.dart';
 
 class MemberDetail extends StatefulWidget {
   const MemberDetail(

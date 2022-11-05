@@ -8,7 +8,7 @@ import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_sto
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/market_activity_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
 import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
-import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
+import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
 
 class CongressStockWatchApi {
   static Future<List<HouseStockWatch>> fetchHouseStockDisclosures({

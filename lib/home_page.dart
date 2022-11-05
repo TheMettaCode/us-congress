@@ -39,12 +39,13 @@ import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
 import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
-import 'package:us_congress_vote_tracker/services/propublica/propublica_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'constants/constants.dart';
+import 'functions/propublica_api_functions.dart';
+import 'functions/rapidapi_functions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key, this.title}) : super(key: key);
@@ -702,7 +703,7 @@ class HomePageState extends State<HomePage> {
           .then((value) => setState(() => youTubePlaylist = value));
 
       setState(() => appLoadingText = 'Retrieving latest news...');
-      await Functions.fetchNewsArticles(context: context).then((value) {
+      await RapidApiFunctions.fetchNewsArticles(context: context).then((value) {
         value.shuffle();
         setState(() => newsArticlesList = value);
       });
@@ -785,6 +786,7 @@ class HomePageState extends State<HomePage> {
 
       setState(
           () => appLoadingText = 'Checking for new house floor actions...');
+
       await Functions.houseFloor(context: context).then((value) => setState(() {
             houseFloorActions = value;
             houseFloorLoading = false;
@@ -792,6 +794,7 @@ class HomePageState extends State<HomePage> {
 
       setState(
           () => appLoadingText = 'Checking for new senate floor actions...');
+
       await Functions.senateFloor(context: context).then((value) {
         if (userDatabase.get('congress') != int.parse(value.first.congress)) {
           setState(() => congress = int.parse(value.first.congress));
