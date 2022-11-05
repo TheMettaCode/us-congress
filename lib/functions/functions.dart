@@ -61,10 +61,7 @@ class Messages {
               padding: const EdgeInsets.all(10.0),
               decoration: BoxDecoration(
                   border: Border.all(
-                      color: darkTheme
-                          ? alertIndicatorColorBrightGreen
-                          : borderColor,
-                      width: 3),
+                      color: darkTheme ? alertIndicatorColorBrightGreen : borderColor, width: 3),
                   borderRadius: BorderRadius.circular(10),
                   color: isAlert
                       ? Theme.of(context).errorColor
@@ -79,8 +76,8 @@ class Messages {
                       ? Container(
                           width: 45,
                           height: 45,
-                          foregroundDecoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5)),
+                          foregroundDecoration:
+                              BoxDecoration(borderRadius: BorderRadius.circular(5)),
                           child: FadeInImage(
                               placeholder: AssetImage(assetImage),
                               image: NetworkImage(networkImageUrl),
@@ -90,8 +87,8 @@ class Messages {
                           ? Container(
                               width: 45,
                               height: 45,
-                              foregroundDecoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5)),
+                              foregroundDecoration:
+                                  BoxDecoration(borderRadius: BorderRadius.circular(5)),
                               child: FadeInImage(
                                   placeholder: AssetImage(assetImage),
                                   image: AssetImage(assetImageString),
@@ -100,8 +97,8 @@ class Messages {
                           : Container(
                               width: 45,
                               height: 45,
-                              foregroundDecoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5)),
+                              foregroundDecoration:
+                                  BoxDecoration(borderRadius: BorderRadius.circular(5)),
                               child: FadeInImage(
                                   placeholder: AssetImage(assetImage),
                                   image: AssetImage(assetImage),
@@ -145,12 +142,10 @@ class Messages {
       String message = 'Download it now in the Google Play Store!'}) async {
     if (shareApp) {
       Share.share(appShare, subject: appTitle).then((value) async =>
-          await Functions.processCredits(true,
-              isPermanent: true, creditsToAdd: 5));
+          await Functions.processCredits(true, isPermanent: true, creditsToAdd: 5));
     } else {
       Share.share(message, subject: subject).then((value) async =>
-          await Functions.processCredits(true,
-              isPermanent: false, creditsToAdd: 10));
+          await Functions.processCredits(true, isPermanent: false, creditsToAdd: 10));
     }
   }
 
@@ -271,12 +266,10 @@ class Messages {
 
 class Functions {
   static Future<void> initializeBox() async {
-    logger.d(
-        '***** OPENING ${appDatabase.toUpperCase()} DATA BOX (Initialization...) *****');
+    logger.d('***** OPENING ${appDatabase.toUpperCase()} DATA BOX (Initialization...) *****');
 
     if (Hive.isBoxOpen(appDatabase)) {
-      logger.d(
-          '***** ${appDatabase.toUpperCase()} DATA BOX IS ALREADY OPEN *****');
+      logger.d('***** ${appDatabase.toUpperCase()} DATA BOX IS ALREADY OPEN *****');
     } else {
       Directory directory = await getApplicationDocumentsDirectory();
       await Hive.initFlutter(directory.path);
@@ -315,11 +308,8 @@ class Functions {
     // ADD KEY IF MISSING FROM DATABASE
     for (var key in initialUserData.keys) {
       if (!userDatabase.keys.contains(key)) {
-        dynamic value = initialUserData.entries
-            .firstWhere((element) => element.key == key)
-            .value;
-        logger
-            .d('***** Missing DBase Key: Adding $key : $value to DBase *****');
+        dynamic value = initialUserData.entries.firstWhere((element) => element.key == key).value;
+        logger.d('***** Missing DBase Key: Adding $key : $value to DBase *****');
         userDatabase.put(key, value);
       }
     }
@@ -363,8 +353,7 @@ class Functions {
           logger.d('***** ${element.toString().split('_')[1]} IS GOOD...*****');
           scrubbed.add(element);
         } else {
-          logger.d(
-              '***** ${element.toString()} WAS OUTDATED, SCRUBBED FROM THE LIST *****');
+          logger.d('***** ${element.toString()} WAS OUTDATED, SCRUBBED FROM THE LIST *****');
         }
       }
 
@@ -381,8 +370,7 @@ class Functions {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     /// PROCESS FREE TRIAL TIME FRAME
-    final DateTime freeTrialStartDate =
-        DateTime.parse(userDatabase.get('freeTrialStartDate'));
+    final DateTime freeTrialStartDate = DateTime.parse(userDatabase.get('freeTrialStartDate'));
     final DateTime nowDate = DateTime.now();
     // final bool devUpgraded = userDatabase.get('devUpgraded');
     final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
@@ -390,17 +378,14 @@ class Functions {
 
     if (userIsPremium &&
         freeTrialUsed &&
-        freeTrialStartDate.isBefore(
-            nowDate.subtract(Duration(days: freeTrialPromoDurationDays)))) {
+        freeTrialStartDate.isBefore(nowDate.subtract(Duration(days: freeTrialPromoDurationDays)))) {
       debugPrint('^^^^^ USER FREE TRIAL HAS EXPIRED ^^^^^');
 
       /// CLEAR AND BACKUP USER SUBSCRIPTIONS JUST IN CASE THE USER RESUBSCRIBES
-      List<String> currentSubscriptions =
-          List.from(userDatabase.get('subscriptionAlertsList'));
+      List<String> currentSubscriptions = List.from(userDatabase.get('subscriptionAlertsList'));
 
       if (currentSubscriptions.isNotEmpty) {
-        await userDatabase.put(
-            'subscriptionAlertsListBackup', currentSubscriptions);
+        await userDatabase.put('subscriptionAlertsListBackup', currentSubscriptions);
         userDatabase.put('subscriptionAlertsList', []);
       }
 
@@ -434,12 +419,10 @@ class Functions {
           });
     } else if (!userIsPremium && freeTrialUsed) {
       /// CLEAR AND BACKUP USER SUBSCRIPTIONS JUST IN CASE THE USER RESUBSCRIBES
-      List<String> currentSubscriptions =
-          List.from(userDatabase.get('subscriptionAlertsList'));
+      List<String> currentSubscriptions = List.from(userDatabase.get('subscriptionAlertsList'));
 
       if (currentSubscriptions.isNotEmpty) {
-        await userDatabase.put(
-            'subscriptionAlertsListBackup', currentSubscriptions);
+        await userDatabase.put('subscriptionAlertsListBackup', currentSubscriptions);
         userDatabase.put('subscriptionAlertsList', []);
       }
 
@@ -533,10 +516,7 @@ class Functions {
     }
   }
 
-  static Future<void> checkRewards(
-      BuildContext context,
-      RewardedAd ad,
-      List<bool> userLevels,
+  static Future<void> checkRewards(BuildContext context, RewardedAd ad, List<bool> userLevels,
       List<GithubNotifications> githubNotificationsList) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     // bool userIsDev = userLevels[0];
@@ -556,8 +536,7 @@ class Functions {
             enableDrag: true,
             context: context,
             builder: (context) {
-              return SharedWidgets.ratingOptions(
-                  context, userDatabase, userIsPremium);
+              return SharedWidgets.ratingOptions(context, userDatabase, userIsPremium);
             });
       }
     } else if (currentAppOpens % 30 == 0) {
@@ -623,17 +602,11 @@ class Functions {
       userDatabase.put('credits', newCredits);
     } else if (currentPurchCredits - creditsToRemove < 0 &&
         currentPurchCredits + currentCredits - creditsToRemove < 0 &&
-        currentPurchCredits +
-                currentCredits +
-                currentPermCredits -
-                creditsToRemove >=
-            0) {
+        currentPurchCredits + currentCredits + currentPermCredits - creditsToRemove >= 0) {
       int newPurchCredits = 0;
       int newCredits = 0;
-      int newPermCredits = currentPurchCredits +
-          currentCredits +
-          currentPermCredits -
-          creditsToRemove;
+      int newPermCredits =
+          currentPurchCredits + currentCredits + currentPermCredits - creditsToRemove;
       userDatabase.put('purchCredits', newPurchCredits);
       userDatabase.put('credits', newCredits);
       userDatabase.put('permCredits', newPermCredits);
@@ -671,43 +644,34 @@ class Functions {
                         title: Row(
                           children: [
                             // Image.asset('assets/app_icon_tower.png'),
-                            Text(appBarTitle,
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                            Text(appBarTitle, maxLines: 1, overflow: TextOverflow.ellipsis),
                           ],
                         ),
                       ),
                       body: WebView(
-                        initialUrl: isPdf
-                            ? 'http://docs.google.com/viewer?url=$linkUrl'
-                            : linkUrl,
+                        initialUrl: isPdf ? 'http://docs.google.com/viewer?url=$linkUrl' : linkUrl,
                         javascriptMode: JavascriptMode.unrestricted,
-                        onWebResourceError:
-                            (WebResourceError webResourceError) {
+                        onWebResourceError: (WebResourceError webResourceError) {
                           Navigator.pop(context);
                           Messages.showMessage(
-                              context: context,
-                              message: 'Could not launch link',
-                              isAlert: true);
+                              context: context, message: 'Could not launch link', isAlert: true);
                         },
                       ))),
             ).then((_) => !userIsPremium &&
                   interstitialAd != null &&
-                  interstitialAd.responseInfo.responseId !=
-                      userDatabase.get('interstitialAdId')
+                  interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId')
               ? AdMobLibrary().interstitialAdShow(interstitialAd)
               : null);
     } else {
       if (context != null) {
-        Messages.showMessage(
-            context: context, message: 'Could not launch link', isAlert: true);
+        Messages.showMessage(context: context, message: 'Could not launch link', isAlert: true);
       }
     }
   }
 
   /// THIS FUNCTION SHOWS A POP UP SCREEN REQUESTING THE USER
   /// TO UPGRADE AFTER TAPPING ON A PREMIUM FEATURE
-  static Future<void> requestInAppPurchase(
-      BuildContext context, bool userIsPremium,
+  static Future<void> requestInAppPurchase(BuildContext context, bool userIsPremium,
       {whatToShow = 'all' /*[all, upgrades,credits]*/}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     try {
@@ -726,8 +690,7 @@ class Functions {
           isScrollControlled: false,
           enableDrag: true,
           builder: (context) {
-            return SharedWidgets.appUpgradeDialog(
-                context, userDatabase, offers, userIsPremium,
+            return SharedWidgets.appUpgradeDialog(context, userDatabase, offers, userIsPremium,
                 whatToShow: whatToShow);
           },
         );
@@ -764,8 +727,7 @@ class Functions {
       try {
         deviceInfoMap = Map.from(userDatabase.get('deviceInfo'));
       } catch (e) {
-        logger
-            .w('***** CURRENT DEVICE INFO MAP ERROR: $e - Resetting... *****');
+        logger.w('***** CURRENT DEVICE INFO MAP ERROR: $e - Resetting... *****');
         userDatabase.put('deviceInfo', {});
       }
     }
@@ -833,8 +795,7 @@ class Functions {
           logger.d('***** APPLICATION UPDATE DIALOG WILL GO HERE... *****');
         }
 
-        if (userDatabase.get('packageInfo')['buildNumber'] !=
-            packageData.buildNumber) {
+        if (userDatabase.get('packageInfo')['buildNumber'] != packageData.buildNumber) {
           logger.d('***** PACKAGE DATA BUILD MISMATCH... Updating... *****');
           userDatabase.put('packageInfo', packageMap);
         }
@@ -964,8 +925,8 @@ class Functions {
 
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
-      currentPositionData = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
+      currentPositionData =
+          await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
 
       // logger.d('***** CURRENT POSITION DATA: $_currentPositionData');
 
@@ -1010,8 +971,7 @@ class Functions {
         logger.d('***** CURRENT POSITION DATA IS NULL *****');
       }
 
-      if (currentPositionData.latitude != null &&
-          currentPositionData.longitude != null) {
+      if (currentPositionData.latitude != null && currentPositionData.longitude != null) {
         logger.d('***** Determining Placemark Address *****');
         List<Placemark> placemarks = [];
         placemarks = await placemarkFromCoordinates(
@@ -1036,11 +996,9 @@ class Functions {
           //     '***** Placemark Address\n***** Map: $currentFullAddressMap\n***** String: $currentFullAddress\n*****');
           userDatabase.put('currentAddress', currentFullAddressMap);
 
-          if (statesMap.keys
-                  .contains(placemarks.first.isoCountryCode.toUpperCase()) &&
+          if (statesMap.keys.contains(placemarks.first.isoCountryCode.toUpperCase()) &&
               userDatabase.get('representativesLocation')['state'].isEmpty) {
-            logger.d(
-                '***** Representatives Location Info Is Empty. Updating... *****');
+            logger.d('***** Representatives Location Info Is Empty. Updating... *****');
             final Map<String, dynamic> repLocation = {
               "city": placemarks.first.locality.toLowerCase().trim(),
               "state": statesMap.entries
@@ -1069,8 +1027,7 @@ class Functions {
     }
   }
 
-  static Future<List<ChamberMember>> getMembersList(
-      int congress, String chamber,
+  static Future<List<ChamberMember>> getMembersList(int congress, String chamber,
       {BuildContext context, List<String> memberIdsToRemove}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
@@ -1083,14 +1040,13 @@ class Functions {
     List<ChamberMember> currentMembersList = [];
 
     try {
-      currentMembersList = memberPayloadFromJson(
-              userDatabase.get('${chamber.toLowerCase()}MembersList'))
-          .results
-          .first
-          .members;
+      currentMembersList =
+          memberPayloadFromJson(userDatabase.get('${chamber.toLowerCase()}MembersList'))
+              .results
+              .first
+              .members;
     } catch (e) {
-      logger.w(
-          '^^^^^ ERROR DURING ${chamber.toUpperCase()} MEMBERS LIST (FUNCTION): $e ^^^^^');
+      logger.w('^^^^^ ERROR DURING ${chamber.toUpperCase()} MEMBERS LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('${chamber.toLowerCase()}MembersList', {});
       currentMembersList = [];
     }
@@ -1106,21 +1062,19 @@ class Functions {
       final url = 'congress/v1/${congress.toString()}/$chamber/members.json';
       final headers = PropublicaApi().apiHeaders;
 
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
+      final response = await http.get(Uri.https(authority, url), headers: headers);
 
       if (response.statusCode == 200) {
         MemberPayload members = memberPayloadFromJson(response.body);
-        if (members.status == 'OK' &&
-            members.results.first.members.isNotEmpty) {
+        if (members.status == 'OK' && members.results.first.members.isNotEmpty) {
           finalMembersList = members.results.first.members;
 
           /// REMOVE VICE PRESIDENT, EXPIRED MEMBERS
           /// AND ANY OTHER MISCELLANEOUS OUTLIERS
           // List<String> _pruneMembersList = memberIdsToRemove;
           // memberIdsToRemove.forEach((element) {
-          finalMembersList.removeWhere((mem) => memberIdsToRemove.any(
-                  (element) => element.toLowerCase() == mem.id.toLowerCase())
+          finalMembersList.removeWhere((mem) =>
+                  memberIdsToRemove.any((element) => element.toLowerCase() == mem.id.toLowerCase())
               //      ||
               // !mem.inOffice
               );
@@ -1129,11 +1083,9 @@ class Functions {
           if (currentMembersList.isEmpty) currentMembersList = finalMembersList;
 
           try {
-            userDatabase.put('${chamber.toLowerCase()}MembersList',
-                memberPayloadToJson(members));
+            userDatabase.put('${chamber.toLowerCase()}MembersList', memberPayloadToJson(members));
           } catch (e) {
-            logger.w(
-                'ERROR: ${chamber.toUpperCase()} MEMBERS NOT SAVED TO DATABASE - $e');
+            logger.w('ERROR: ${chamber.toUpperCase()} MEMBERS NOT SAVED TO DATABASE - $e');
             userDatabase.put('${chamber.toLowerCase()}MembersList', {});
           }
         }
@@ -1155,8 +1107,7 @@ class Functions {
           } else if (ModalRoute.of(context).isCurrent) {
             Messages.showMessage(
                 context: context,
-                message:
-                    '🧑🏽‍💼 The list of US $chamber members has been updated',
+                message: '🧑🏽‍💼 The list of US $chamber members has been updated',
                 networkImageUrl:
                     '${PropublicaApi().memberImageRootUrl}${finalMembersList.first.id}.jpg',
                 isAlert: false,
@@ -1169,21 +1120,18 @@ class Functions {
         logger.w(
             'API ERROR: LOADING ${chamber.toUpperCase()} MEMBERS FROM DBASE - ${response.statusCode}');
 
-        return finalMembersList =
-            currentMembersList.isNotEmpty ? currentMembersList : [];
+        return finalMembersList = currentMembersList.isNotEmpty ? currentMembersList : [];
       }
     } else {
       logger.d(
           '***** CURRENT ${chamber.toUpperCase()} MEMBERS LIST: ${currentMembersList.map((e) => e.id)} *****');
       finalMembersList = currentMembersList;
-      logger.d(
-          '***** ${chamber.toUpperCase()} MEMBERS NOT UPDATED: LIST IS CURRENT *****');
+      logger.d('***** ${chamber.toUpperCase()} MEMBERS NOT UPDATED: LIST IS CURRENT *****');
       return finalMembersList;
     }
   }
 
-  static Future<List<StatementsResults>> fetchStatements(
-      {BuildContext context}) async {
+  static Future<List<StatementsResults>> fetchStatements({BuildContext context}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     List<bool> userLevels = await getUserLevels();
@@ -1194,8 +1142,7 @@ class Functions {
     List<StatementsResults> currentStatementsList = [];
 
     try {
-      currentStatementsList =
-          statementsFromJson(userDatabase.get('statementsResponse')).results;
+      currentStatementsList = statementsFromJson(userDatabase.get('statementsResponse')).results;
     } catch (e) {
       logger.w('^^^^^ ERROR DURING STATEMENTS LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('statementsResponse', {});
@@ -1211,10 +1158,8 @@ class Functions {
       final url = PropublicaApi().memberStatementsApi;
       final headers = PropublicaApi().apiHeaders;
       final authority = PropublicaApi().authority;
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
-      logger.d(
-          '***** STATEMENTS API RESPONSE CODE: ${response.statusCode} *****');
+      final response = await http.get(Uri.https(authority, url), headers: headers);
+      logger.d('***** STATEMENTS API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** STATEMENTS RETRIEVAL SUCCESS! *****');
@@ -1226,45 +1171,36 @@ class Functions {
         if (statements.status == 'OK' && statements.results.isNotEmpty) {
           finalStatementsList = statements.results;
           finalStatementsList.removeWhere((element) =>
-              element.date.isAfter(DateTime.now()) ||
-              element.title == '' ||
-              element.title == null);
+              element.date.isAfter(DateTime.now()) || element.title == '' || element.title == null);
 
           List<StatementsResults> unsortedStatementsList = finalStatementsList;
 
           /// SORT ALL STATEMENTS BY DATE
           logger.d('***** FILTERING AND SORTING FINAL STATEMENTS LIST *****');
-          finalStatementsList
-              .sort((a, b) => b.date.toString().compareTo(a.date.toString()));
+          finalStatementsList.sort((a, b) => b.date.toString().compareTo(a.date.toString()));
 
           /// REORDER ALL STATEMENTS TO SHOW THOSE MEMBERS THE USER
           /// IS SUBSCRIBED TO AT THE TOP OF THE LIST
           List<StatementsResults> subscribedMemberStatements = [];
           List<StatementsResults> notSubscribedMemberStatements = [];
           for (var statement in finalStatementsList) {
-            if (List.from(userDatabase.get('subscriptionAlertsList')).any(
-                (item) => item
-                    .toString()
-                    .toLowerCase()
-                    .contains(statement.memberId.toLowerCase()))) {
+            if (List.from(userDatabase.get('subscriptionAlertsList')).any((item) =>
+                item.toString().toLowerCase().contains(statement.memberId.toLowerCase()))) {
               subscribedMemberStatements.add(statement);
             } else {
               notSubscribedMemberStatements.add(statement);
             }
           }
 
-          finalStatementsList =
-              subscribedMemberStatements + notSubscribedMemberStatements;
+          finalStatementsList = subscribedMemberStatements + notSubscribedMemberStatements;
 
           if (finalStatementsList.isNotEmpty) {
             if (currentStatementsList.isEmpty ||
-                statements.results.first.title !=
-                    currentStatementsList.first.title) {
+                statements.results.first.title != currentStatementsList.first.title) {
               userDatabase.put('newStatements', true);
 
               try {
-                membersList = memberPayloadFromJson(
-                            userDatabase.get('houseMembersList'))
+                membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
                         .results
                         .first
                         .members +
@@ -1277,24 +1213,21 @@ class Functions {
                     element.id.toLowerCase() ==
                     unsortedStatementsList.first.memberId.toLowerCase());
               } catch (e) {
-                logger.w(
-                    'ERROR DURING RETRIEVAL OF MEMBERS LIST (Statements Function): $e');
+                logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (Statements Function): $e');
               }
 
               if (userIsDev && thisMember != null) {
                 thisStatement = unsortedStatementsList.first;
 
-                final subject =
-                    'Public statement from ${thisStatement.name}'.toUpperCase();
+                final subject = 'Public statement from ${thisStatement.name}'.toUpperCase();
                 final messageBody =
                     '${thisMember == null ? thisStatement.name : '.@${thisMember.twitterAccount}'}: ${thisStatement.title.length > 150 ? thisStatement.title.replaceRange(150, null, '...') : thisStatement.title}';
 
-                List<String> capitolBabbleNotificationsList = List<String>.from(
-                    userDatabase.get('capitolBabbleNotificationsList'));
+                List<String> capitolBabbleNotificationsList =
+                    List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
                 capitolBabbleNotificationsList.add(
                     '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>${thisStatement.url == null || thisStatement.url.isEmpty ? '' : thisStatement.url}');
-                userDatabase.put('capitolBabbleNotificationsList',
-                    capitolBabbleNotificationsList);
+                userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
               }
             }
 
@@ -1304,11 +1237,9 @@ class Functions {
 
             try {
               logger.d('***** SAVING NEW STATEMENTS TO DBASE *****');
-              userDatabase.put(
-                  'statementsResponse', statementsToJson(statements));
+              userDatabase.put('statementsResponse', statementsToJson(statements));
             } catch (e) {
-              logger.w(
-                  '^^^^^ ERROR SAVING STATEMENTS LIST TO DBASE (FUNCTION): $e ^^^^^');
+              logger.w('^^^^^ ERROR SAVING STATEMENTS LIST TO DBASE (FUNCTION): $e ^^^^^');
               userDatabase.put('statementsResponse', {});
             }
           } else {
@@ -1318,15 +1249,11 @@ class Functions {
         }
 
         // if (_finalStatementsList.isNotEmpty) {
-        bool memberWatched = await hasSubscription(
-            userIsPremium,
-            userIsLegacy,
-            (finalStatementsList.map((e) => e.memberId)).toList().asMap(),
-            'member_',
+        bool memberWatched = await hasSubscription(userIsPremium, userIsLegacy,
+            (finalStatementsList.map((e) => e.memberId)).toList().asMap(), 'member_',
             userIsDev: userIsDev);
 
-        if (thisMember != null &&
-            (userDatabase.get('statementAlerts') || memberWatched) &&
+        if ((userDatabase.get('statementAlerts') || memberWatched) &&
             (currentStatementsList.first.title.toLowerCase() !=
                     statements.results.first.title.toLowerCase() ||
                 userDatabase.get('lastStatement').toString().toLowerCase() !=
@@ -1338,29 +1265,24 @@ class Functions {
                 'Public Statement',
                 'Public Statements from Congressional Members',
                 'Public Statement',
-                '🧑🏽‍💼 Congressional Statements',
-                memberWatched
-                    ? thisMember == null
-                        ? ''
-                        : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
-                    : thisStatement.title,
-                statements.results);
-          } else if (thisMember != null && ModalRoute.of(context).isCurrent) {
+                thisMember == null
+                    ? 'New Congressional Statement'
+                    : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement',
+                thisStatement.title,
+                'statements');
+          } else if (ModalRoute.of(context).isCurrent) {
             Messages.showMessage(
                 context: context,
-                message: memberWatched
-                    ? thisMember == null
-                        ? ''
-                        : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement'
-                    : thisStatement.title,
+                message: thisMember == null
+                    ? 'New Congressional Statement'
+                    : '${thisMember.shortTitle.replaceFirst('Rep.', 'Hon.')} ${thisMember.firstName} ${thisMember.lastName} has made a public statement',
                 networkImageUrl:
                     '${PropublicaApi().memberImageRootUrl}${thisStatement.memberId.toLowerCase()}.jpg',
                 isAlert: false,
                 removeCurrent: false);
           }
         }
-        userDatabase.put(
-            'lastStatement', finalStatementsList.first.title.toLowerCase());
+        userDatabase.put('lastStatement', finalStatementsList.first.title.toLowerCase());
         userDatabase.put('lastStatementsRefresh', '${DateTime.now()}');
 
         return finalStatementsList;
@@ -1369,23 +1291,22 @@ class Functions {
         //   return [];
         // }
       } else {
-        logger.w(
-            '***** API ERROR: LOADING STATEMENTS FROM DBASE: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING STATEMENTS FROM DBASE: ${response.statusCode} *****');
 
-        return finalStatementsList =
-            currentStatementsList.isNotEmpty ? currentStatementsList : [];
+        return finalStatementsList = currentStatementsList.isNotEmpty ? currentStatementsList : [];
       }
     } else {
-      logger.d(
-          '***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
+      logger.d('***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
       finalStatementsList = currentStatementsList;
       logger.d('***** STATEMENTS NOT UPDATED: LIST IS CURRENT *****');
       return finalStatementsList;
     }
   }
 
-  static Future<List<UpdatedBill>> fetchBills(
-      {BuildContext context, int congress = 117}) async {
+  static Future<List<UpdatedBill>> fetchBills({
+    BuildContext context,
+    /* int congress = 117*/
+  }) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
 
     List<bool> userLevels = await getUserLevels();
@@ -1393,14 +1314,13 @@ class Functions {
     bool userIsPremium = userLevels[1];
     bool userIsLegacy = userLevels[2];
 
+    int currentCongress = userDatabase.get('congress');
+
     List<UpdatedBill> currentUpdatedBillsList = [];
 
     try {
       currentUpdatedBillsList =
-          recentbillsFromJson(userDatabase.get('recentBills'))
-              .results
-              .first
-              .bills;
+          recentbillsFromJson(userDatabase.get('recentBills')).results.first.bills;
     } catch (e) {
       logger.w('^^^^^ ERROR DURING BILL LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('recentBills', {});
@@ -1413,38 +1333,33 @@ class Functions {
         DateTime.parse(userDatabase.get('lastBillsRefresh'))
             .isBefore(DateTime.now().subtract(const Duration(hours: 3)))) {
       logger.d('***** RETRIEVING LATEST BILLS... *****');
-      String url = 'congress/v1/$congress/both/bills/active.json';
+      String url = 'congress/v1/$currentCongress/both/bills/active.json';
       final headers = PropublicaApi().apiHeaders;
       final authority = PropublicaApi().authority;
 
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
+      final response = await http.get(Uri.https(authority, url), headers: headers);
       logger.d('***** BILLS API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         Recentbills recentBills = recentbillsFromJson(response.body);
-        logger.d(
-            '***** BILLS RETRIEVAL SUCCESS! Status: ${recentBills.status} *****');
+        logger.d('***** BILLS RETRIEVAL SUCCESS! Status: ${recentBills.status} *****');
         if (recentBills.status == 'OK' && recentBills.results.isNotEmpty) {
           finalUpdatedBillsList = recentBills.results.first.bills;
 
           if (currentUpdatedBillsList.isEmpty ||
-              finalUpdatedBillsList.first.billId !=
-                  currentUpdatedBillsList.first.billId) {
+              finalUpdatedBillsList.first.billId != currentUpdatedBillsList.first.billId) {
             userDatabase.put('newBills', true);
 
             if (userIsDev) {
-              final subject =
-                  'BILL ${finalUpdatedBillsList.first.billId.toUpperCase()} UPDATED';
+              final subject = 'BILL ${finalUpdatedBillsList.first.billId.toUpperCase()} UPDATED';
               final messageBody =
                   'BILL ${finalUpdatedBillsList.first.billId.toUpperCase()} UPDATED: ${finalUpdatedBillsList.first.shortTitle.length > 150 ? finalUpdatedBillsList.first.shortTitle.replaceRange(150, null, '...') : finalUpdatedBillsList.first.shortTitle} ➭ ${finalUpdatedBillsList.first.latestMajorAction}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
@@ -1456,17 +1371,19 @@ class Functions {
             logger.d('***** SAVING NEW BILLS TO DBASE *****');
             userDatabase.put('recentBills', recentbillsToJson(recentBills));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING BILL LIST TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING BILL LIST TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('recentBills', {});
           }
         }
 
-        bool billWatched = await hasSubscription(
-            userIsPremium,
-            userIsLegacy,
-            ((finalUpdatedBillsList.map((e) => e.billId).toList()).asMap()),
-            'bill_',
+        /// CHECK FOR UPDATED CONGRESS
+        int retrievedCongress = recentBills.results.first.congress;
+        if (currentCongress < retrievedCongress) {
+          userDatabase.put('congress', retrievedCongress);
+        }
+
+        bool billWatched = await hasSubscription(userIsPremium, userIsLegacy,
+            ((finalUpdatedBillsList.map((e) => e.billId).toList()).asMap()), 'bill_',
             userIsDev: userIsDev);
 
         if (
@@ -1498,20 +1415,17 @@ class Functions {
                 removeCurrent: false);
           }
         }
-        userDatabase.put(
-            'lastBill', finalUpdatedBillsList.first.billId.toLowerCase());
+        userDatabase.put('lastBill', finalUpdatedBillsList.first.billId.toLowerCase());
         userDatabase.put('lastBillsRefresh', '${DateTime.now()}');
         return finalUpdatedBillsList;
       } else {
-        logger.w(
-            '***** API ERROR: LOADING BILLS FROM DBASE: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING BILLS FROM DBASE: ${response.statusCode} *****');
 
         return finalUpdatedBillsList =
             currentUpdatedBillsList.isNotEmpty ? currentUpdatedBillsList : [];
       }
     } else {
-      logger.d(
-          '***** CURRENT BILLS LIST: ${currentUpdatedBillsList.map((e) => e.billId)} *****');
+      logger.d('***** CURRENT BILLS LIST: ${currentUpdatedBillsList.map((e) => e.billId)} *****');
       finalUpdatedBillsList = currentUpdatedBillsList;
       logger.d('***** BILLS NOT UPDATED: LIST IS CURRENT *****');
       return finalUpdatedBillsList;
@@ -1530,8 +1444,7 @@ class Functions {
     List<Vote> currentVotesList = [];
 
     try {
-      currentVotesList =
-          payloadFromJson(userDatabase.get('recentVotes')).results.votes;
+      currentVotesList = payloadFromJson(userDatabase.get('recentVotes')).results.votes;
     } catch (e) {
       logger.w('^^^^^ ERROR DURING VOTE LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('recentVotes', {});
@@ -1549,20 +1462,17 @@ class Functions {
       final url = PropublicaApi().recentChamberVotesApi;
       final headers = PropublicaApi().apiHeaders;
 
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
+      final response = await http.get(Uri.https(authority, url), headers: headers);
       logger.d('***** VOTES API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** VOTES RETRIEVAL SUCCESS! *****');
         Payload recentVotes = payloadFromJson(response.body);
-        if (recentVotes.status == 'OK' &&
-            recentVotes.results.votes.isNotEmpty) {
+        if (recentVotes.status == 'OK' && recentVotes.results.votes.isNotEmpty) {
           finalVotesList = recentVotes.results.votes;
 
           if (currentVotesList.isEmpty ||
-              finalVotesList.first.description !=
-                  currentVotesList.first.description) {
+              finalVotesList.first.description != currentVotesList.first.description) {
             userDatabase.put('newVotes', true);
 
             if (userIsDev) {
@@ -1571,12 +1481,11 @@ class Functions {
               final messageBody =
                   '${finalVotesList.first.chamber == null ? '' : '${finalVotesList.first.chamber.name} '}Roll Call #${finalVotesList.first.rollCall} ${finalVotesList.first.bill.billId.toLowerCase() == 'nobillid' ? '' : 'Vote On Bill ${finalVotesList.first.bill.billId.toUpperCase()}'} [${finalVotesList.first.result == null || finalVotesList.first.result.toString() == 'No Results' ? 'RECORDED' : finalVotesList.first.result.name.toUpperCase()}] :: ${finalVotesList.first.question} => ${finalVotesList.first.description.length > 150 ? finalVotesList.first.description.replaceRange(150, null, '...') : finalVotesList.first.description}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
@@ -1586,17 +1495,13 @@ class Functions {
             logger.d('***** SAVING NEW VOTES TO DBASE *****');
             userDatabase.put('recentVotes', payloadToJson(recentVotes));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING VOTES LIST TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING VOTES LIST TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('recentVotes', {});
           }
         }
 
-        bool billWatched = await hasSubscription(
-            userIsPremium,
-            userIsLegacy,
-            (finalVotesList.map((e) => e.bill.billId)).toList().asMap(),
-            'bill_',
+        bool billWatched = await hasSubscription(userIsPremium, userIsLegacy,
+            (finalVotesList.map((e) => e.bill.billId)).toList().asMap(), 'bill_',
             userIsDev: userIsDev);
 
         logger.i(
@@ -1648,33 +1553,29 @@ class Functions {
             List<ChamberMember> membersList = [];
             Map<String, dynamic> memberVotePositions = {};
 
-            final List<RcPosition> rollCallPositions =
-                await getRollCallPositions(
-                    finalVotesList.first.congress,
-                    finalVotesList.first.chamber.name.toLowerCase(),
-                    finalVotesList.first.session,
-                    finalVotesList.first.rollCall);
+            final List<RcPosition> rollCallPositions = await getRollCallPositions(
+                finalVotesList.first.congress,
+                finalVotesList.first.chamber.name.toLowerCase(),
+                finalVotesList.first.session,
+                finalVotesList.first.rollCall);
 
             try {
-              List<ChamberMember> membersList = memberPayloadFromJson(
-                          userDatabase.get('houseMembersList'))
-                      .results
-                      .first
-                      .members +
-                  memberPayloadFromJson(userDatabase.get('senateMembersList'))
-                      .results
-                      .first
-                      .members;
+              List<ChamberMember> membersList =
+                  memberPayloadFromJson(userDatabase.get('houseMembersList'))
+                          .results
+                          .first
+                          .members +
+                      memberPayloadFromJson(userDatabase.get('senateMembersList'))
+                          .results
+                          .first
+                          .members;
               membersList = membersList
-                  .where((member) =>
-                      subscribedMembers.any((item) => item.contains(member.id)))
+                  .where((member) => subscribedMembers.any((item) => item.contains(member.id)))
                   .toList();
 
-              debugPrint(
-                  membersList.map((e) => '${e.id}: ${e.firstName}').toString());
+              debugPrint(membersList.map((e) => '${e.id}: ${e.firstName}').toString());
             } catch (e) {
-              debugPrint(
-                  'ERROR DURING RETRIEVAL OF MEMBERS LIST (Fetch Votes Function): $e');
+              debugPrint('ERROR DURING RETRIEVAL OF MEMBERS LIST (Fetch Votes Function): $e');
             }
 
             if (membersList.isNotEmpty && subscribedMembers.isNotEmpty) {
@@ -1683,8 +1584,8 @@ class Functions {
               for (var mem in membersList) {
                 RcPosition thisMemberPosition;
                 try {
-                  thisMemberPosition = rollCallPositions.firstWhere(
-                      (e) => e.memberId.toLowerCase() == mem.id.toLowerCase());
+                  thisMemberPosition = rollCallPositions
+                      .firstWhere((e) => e.memberId.toLowerCase() == mem.id.toLowerCase());
                 } catch (e) {
                   debugPrint(
                       'ERROR DURING ROLLCALL POSITION RETRIEVAL OF ${mem.firstName} ${mem.id}: Looks like the roll call position call for this member info returns null (Fetch Votes Function): $e');
@@ -1697,9 +1598,8 @@ class Functions {
                   });
                 }
 
-                debugPrint(memberVotePositions.entries
-                    .map((e) => '${e.key}: ${e.value}')
-                    .toString());
+                debugPrint(
+                    memberVotePositions.entries.map((e) => '${e.key}: ${e.value}').toString());
               }
 
               if (context == null || !ModalRoute.of(context).isCurrent) {
@@ -1732,8 +1632,7 @@ class Functions {
                   '***** MEMBER ROLLCALL VOTE POSITIONS NOT RETRIEVED: FULL MEMBERS LIST OR SUBSCRIBED MEMBERS LIST IS EMPTY *****');
             }
           } else {
-            debugPrint(
-                '***** NO FOLLOWED MEMBER ROLLCALL VOTE POSITIONS *****');
+            debugPrint('***** NO FOLLOWED MEMBER ROLLCALL VOTE POSITIONS *****');
           }
         }
 
@@ -1741,15 +1640,12 @@ class Functions {
         userDatabase.put('lastVotesRefresh', '${DateTime.now()}');
         return finalVotesList;
       } else {
-        logger.w(
-            '***** API ERROR: LOADING VOTES FROM DBASE: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING VOTES FROM DBASE: ${response.statusCode} *****');
 
-        return finalVotesList =
-            currentVotesList.isNotEmpty ? currentVotesList : [];
+        return finalVotesList = currentVotesList.isNotEmpty ? currentVotesList : [];
       }
     } else {
-      logger.d(
-          '***** CURRENT VOTES LIST: ${currentVotesList.map((e) => e.rollCall)} *****');
+      logger.d('***** CURRENT VOTES LIST: ${currentVotesList.map((e) => e.rollCall)} *****');
       finalVotesList = currentVotesList;
       logger.d('***** VOTES NOT UPDATED: LIST IS CURRENT *****');
       return finalVotesList;
@@ -1768,11 +1664,10 @@ class Functions {
 
     List<LobbyingRepresentation> currentLobbyingEventsList = [];
     try {
-      currentLobbyingEventsList =
-          lobbyEventFromJson(userDatabase.get('lobbyingEventsList'))
-              .results
-              .first
-              .lobbyingRepresentations;
+      currentLobbyingEventsList = lobbyEventFromJson(userDatabase.get('lobbyingEventsList'))
+          .results
+          .first
+          .lobbyingRepresentations;
     } catch (e) {
       logger.d('***** CURRENT Lobbying Actions ERROR: $e - Resetting... *****');
       userDatabase.put('lobbyingEventsList', {});
@@ -1790,8 +1685,7 @@ class Functions {
       final url = PropublicaApi().latestLobbyingApi;
       final headers = PropublicaApi().apiHeaders;
 
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
+      final response = await http.get(Uri.https(authority, url), headers: headers);
       logger.d('***** LOBBY API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
@@ -1800,16 +1694,14 @@ class Functions {
 
         if (lobbyEvent.status == 'OK' &&
             lobbyEvent.results.first.lobbyingRepresentations.isNotEmpty) {
-          finalLobbyingEventsList =
-              lobbyEvent.results.first.lobbyingRepresentations;
+          finalLobbyingEventsList = lobbyEvent.results.first.lobbyingRepresentations;
 
           finalLobbyingEventsList.removeWhere((element) =>
               element.specificIssues.isEmpty ||
               element.specificIssues.first.toLowerCase() == 'none');
 
           if (currentLobbyingEventsList.isEmpty ||
-              finalLobbyingEventsList.first.id !=
-                  currentLobbyingEventsList.first.id) {
+              finalLobbyingEventsList.first.id != currentLobbyingEventsList.first.id) {
             userDatabase.put('newLobbies', true);
 
             if (userIsDev) {
@@ -1818,12 +1710,11 @@ class Functions {
               final messageBody =
                   '${finalLobbyingEventsList.first.lobbyingClient.name} is lobbying congress ➭ ${finalLobbyingEventsList.first.specificIssues.first.length > 150 ? finalLobbyingEventsList.first.specificIssues.first.replaceRange(150, null, '...') : finalLobbyingEventsList.first.specificIssues.first}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
@@ -1833,20 +1724,15 @@ class Functions {
 
           try {
             logger.i('***** SAVING NEW LOBBIES TO DBASE *****');
-            userDatabase.put(
-                'lobbyingEventsList', lobbyEventToJson(lobbyEvent));
+            userDatabase.put('lobbyingEventsList', lobbyEventToJson(lobbyEvent));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING LOBBY LIST TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING LOBBY LIST TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('lobbyingEventsList', {});
           }
         }
 
-        bool lobbyWatched = await hasSubscription(
-            userIsPremium,
-            userIsLegacy,
-            (finalLobbyingEventsList.map((e) => e.id)).toList().asMap(),
-            'lobby_',
+        bool lobbyWatched = await hasSubscription(userIsPremium, userIsLegacy,
+            (finalLobbyingEventsList.map((e) => e.id)).toList().asMap(), 'lobby_',
             userIsDev: userIsDev);
 
         if ((userIsPremium || userIsLegacy) &&
@@ -1855,9 +1741,7 @@ class Functions {
 
                     /// THIS COMPARISON CHECK IS SKETCHY
                     !currentLobbyingEventsList.map((e) => e.id).any((element) =>
-                        finalLobbyingEventsList
-                            .map((e) => e.id)
-                            .contains(element)))) &&
+                        finalLobbyingEventsList.map((e) => e.id).contains(element)))) &&
             (currentLobbyingEventsList.first.id.toLowerCase() !=
                     finalLobbyingEventsList.first.id.toLowerCase() ||
                 userDatabase.get('lastLobby').toString().toLowerCase() !=
@@ -1886,21 +1770,17 @@ class Functions {
             );
           }
         }
-        userDatabase.put(
-            'lastLobby', finalLobbyingEventsList.first.id.toLowerCase());
+        userDatabase.put('lastLobby', finalLobbyingEventsList.first.id.toLowerCase());
         userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
         return finalLobbyingEventsList;
       } else {
-        logger.w(
-            '***** API ERROR: LOADING LOBBIES FROM DBASE: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING LOBBIES FROM DBASE: ${response.statusCode} *****');
 
-        return finalLobbyingEventsList = currentLobbyingEventsList.isNotEmpty
-            ? currentLobbyingEventsList
-            : [];
+        return finalLobbyingEventsList =
+            currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
       }
     } else {
-      logger.d(
-          '***** CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
+      logger.d('***** CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
       finalLobbyingEventsList = currentLobbyingEventsList;
       logger.d('***** LOBBIES NOT UPDATED: LIST IS CURRENT *****');
       return finalLobbyingEventsList;
@@ -1921,8 +1801,7 @@ class Functions {
     List<PrivateTripResult> currentPrivateFundedTripList = [];
     try {
       currentPrivateFundedTripList =
-          privateFundedTripFromJson(userDatabase.get('privateFundedTripsList'))
-              .results;
+          privateFundedTripFromJson(userDatabase.get('privateFundedTripsList')).results;
     } catch (e) {
       logger.d('***** CURRENT PRIVATE TRIPS ERROR: $e - Resetting... *****');
       userDatabase.put('privateFundedTripsList', {});
@@ -1940,20 +1819,16 @@ class Functions {
       final url = 'congress/v1/$congress/private-trips.json';
       final headers = PropublicaApi().apiHeaders;
 
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
-      logger
-          .d('***** PRIVATE TRIPS RESPONSE CODE: ${response.statusCode} *****');
+      final response = await http.get(Uri.https(authority, url), headers: headers);
+      logger.d('***** PRIVATE TRIPS RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** PRIVATE TRIPS RETRIEVAL SUCCESS! *****');
-        PrivateFundedTrip privateFundedTrip =
-            privateFundedTripFromJson(response.body);
+        PrivateFundedTrip privateFundedTrip = privateFundedTripFromJson(response.body);
         List<ChamberMember> membersList = [];
         ChamberMember thisMember;
 
-        if (privateFundedTrip.status == 'OK' &&
-            privateFundedTrip.results.isNotEmpty) {
+        if (privateFundedTrip.status == 'OK' && privateFundedTrip.results.isNotEmpty) {
           finalPrivateFundedTripList = privateFundedTrip.results;
 
           if (currentPrivateFundedTripList.isEmpty ||
@@ -1962,8 +1837,7 @@ class Functions {
             userDatabase.put('newTrips', true);
 
             try {
-              membersList = memberPayloadFromJson(
-                          userDatabase.get('houseMembersList'))
+              membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
                       .results
                       .first
                       .members +
@@ -1976,8 +1850,7 @@ class Functions {
                   element.id.toLowerCase() ==
                   finalPrivateFundedTripList.first.memberId.toLowerCase());
             } catch (e) {
-              logger.w(
-                  'ERROR DURING RETRIEVAL OF MEMBERS LIST (Funded Travel Function): $e');
+              logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (Funded Travel Function): $e');
             }
 
             if (userIsDev) {
@@ -1986,12 +1859,11 @@ class Functions {
               final messageBody =
                   '${thisMember == null ? finalPrivateFundedTripList.first.displayName : '.@${thisMember.twitterAccount}'} has reported privately funded travel sponsored by ${finalPrivateFundedTripList.first.sponsor}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
@@ -2001,34 +1873,23 @@ class Functions {
 
           try {
             logger.i('***** SAVING NEW PRIVATE TRIPS TO DBASE *****');
-            userDatabase.put('privateFundedTripsList',
-                privateFundedTripToJson(privateFundedTrip));
+            userDatabase.put('privateFundedTripsList', privateFundedTripToJson(privateFundedTrip));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING PRIVATE TRIPS LIST TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING PRIVATE TRIPS LIST TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('privateFundedTripsList', {});
           }
         }
 
-        bool memberWatched = await hasSubscription(
-            userIsPremium,
-            userIsLegacy,
-            (finalPrivateFundedTripList.map((e) => e.memberId))
-                .toList()
-                .asMap(),
-            'member_',
+        bool memberWatched = await hasSubscription(userIsPremium, userIsLegacy,
+            (finalPrivateFundedTripList.map((e) => e.memberId)).toList().asMap(), 'member_',
             userIsDev: userIsDev);
 
         if (userIsPremium &&
             (userDatabase.get('privateFundedTripsAlerts') || memberWatched) &&
             (currentPrivateFundedTripList.first.documentId.toLowerCase() !=
                     finalPrivateFundedTripList.first.documentId.toLowerCase() ||
-                userDatabase
-                        .get('lastPrivateFundedTrip')
-                        .toString()
-                        .toLowerCase() !=
-                    finalPrivateFundedTripList.first.documentId
-                        .toLowerCase())) {
+                userDatabase.get('lastPrivateFundedTrip').toString().toLowerCase() !=
+                    finalPrivateFundedTripList.first.documentId.toLowerCase())) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 7,
@@ -2055,18 +1916,15 @@ class Functions {
             );
           }
         }
-        userDatabase.put('lastPrivateFundedTrip',
-            finalPrivateFundedTripList.first.documentId.toLowerCase());
+        userDatabase.put(
+            'lastPrivateFundedTrip', finalPrivateFundedTripList.first.documentId.toLowerCase());
         userDatabase.put('lastPrivateFundedTripsRefresh', '${DateTime.now()}');
         return finalPrivateFundedTripList;
       } else {
-        logger.w(
-            '***** API ERROR: LOADING PRIVATE TRIPS FROM DBASE: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING PRIVATE TRIPS FROM DBASE: ${response.statusCode} *****');
 
         return finalPrivateFundedTripList =
-            currentPrivateFundedTripList.isNotEmpty
-                ? currentPrivateFundedTripList
-                : [];
+            currentPrivateFundedTripList.isNotEmpty ? currentPrivateFundedTripList : [];
       }
     } else {
       logger.d(
@@ -2091,14 +1949,12 @@ class Functions {
     List<FloorAction> currentSenateFloorActions = [];
 
     try {
-      currentSenateFloorActions =
-          floorActionsFromJson(userDatabase.get('senateFloorActionsList'))
-              .results
-              .first
-              .floorActions;
+      currentSenateFloorActions = floorActionsFromJson(userDatabase.get('senateFloorActionsList'))
+          .results
+          .first
+          .floorActions;
     } catch (e) {
-      logger.w(
-          '***** CURRENT Senate Floor Actions ERROR: $e - Resetting... *****');
+      logger.w('***** CURRENT Senate Floor Actions ERROR: $e - Resetting... *****');
       userDatabase.put('senateFloorActionsList', {});
       currentSenateFloorActions = [];
     }
@@ -2112,10 +1968,8 @@ class Functions {
       final url = PropublicaApi().senateFloorUpdatesApi;
       final headers = PropublicaApi().apiHeaders;
       final authority = PropublicaApi().authority;
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
-      debugPrint(
-          '***** SENATE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
+      final response = await http.get(Uri.https(authority, url), headers: headers);
+      debugPrint('***** SENATE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** SENATE FLOOR ACTIONS RETRIEVAL SUCCESS! *****');
@@ -2123,55 +1977,47 @@ class Functions {
 
         if (senateFloorActions.status == 'OK' &&
             senateFloorActions.results.first.floorActions.isNotEmpty) {
-          finalSenateFloorActions =
-              senateFloorActions.results.first.floorActions;
+          finalSenateFloorActions = senateFloorActions.results.first.floorActions;
 
           debugPrint(
               'CURRENT 1ST SENATE FLOOR ACTION: ${currentSenateFloorActions.isEmpty ? 'No current senate floor actions' : finalSenateFloorActions.first.description}');
-          debugPrint(
-              'NEW 1ST SENATE FLOOR ACTION: ${finalSenateFloorActions.first.description}');
+          debugPrint('NEW 1ST SENATE FLOOR ACTION: ${finalSenateFloorActions.first.description}');
 
           if (currentSenateFloorActions.isEmpty ||
-              finalSenateFloorActions.first.actionId !=
-                  currentSenateFloorActions.first.actionId) {
+              finalSenateFloorActions.first.actionId != currentSenateFloorActions.first.actionId) {
             userDatabase.put('newSenateFloor', true);
 
             if (userIsDev) {
-              final subject = finalSenateFloorActions.first.description
-                      .contains(' - ')
+              final subject = finalSenateFloorActions.first.description.contains(' - ')
                   ? 'SENATE FLOOR: ${finalSenateFloorActions.first.description.split(' - ')[0]}'
                   : 'SENATE FLOOR ACTION UPDATE';
               final messageBody =
                   'SENATE FLOOR: ${finalSenateFloorActions.first.description.length > 150 ? finalSenateFloorActions.first.description.replaceRange(150, null, '...') : finalSenateFloorActions.first.description}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
           if (currentSenateFloorActions.isEmpty) {
-            currentSenateFloorActions =
-                senateFloorActions.results.first.floorActions;
+            currentSenateFloorActions = senateFloorActions.results.first.floorActions;
           }
 
           try {
             logger.d(
                 '***** SAVING NEW SENATE FLOOR ACTIONS TO DBASE: ${senateFloorActions.results.first.floorActions.first.date} *****');
-            userDatabase.put('senateFloorActionsList',
-                floorActionsToJson(senateFloorActions));
+            userDatabase.put('senateFloorActionsList', floorActionsToJson(senateFloorActions));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING SENATE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING SENATE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('senateFloorActionsList', {});
           }
         }
 
-        bool billWatched = await hasSubscription(userIsPremium, userIsLegacy,
-            finalSenateFloorActions.first.billIds.asMap(), 'bill_',
+        bool billWatched = await hasSubscription(
+            userIsPremium, userIsLegacy, finalSenateFloorActions.first.billIds.asMap(), 'bill_',
             userIsDev: userIsDev);
 
         if ((userDatabase.get('floorAlerts') || billWatched) &&
@@ -2202,17 +2048,15 @@ class Functions {
           }
         }
 
-        userDatabase.put(
-            'lastSenateAction', finalSenateFloorActions.first.description);
+        userDatabase.put('lastSenateAction', finalSenateFloorActions.first.description);
         userDatabase.put('lastSenateFloorActionsRefresh', '${DateTime.now()}');
         return finalSenateFloorActions;
       } else {
         logger.w(
             '***** API ERROR: LOADING SENATE FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
 
-        return finalSenateFloorActions = currentSenateFloorActions.isNotEmpty
-            ? currentSenateFloorActions
-            : [];
+        return finalSenateFloorActions =
+            currentSenateFloorActions.isNotEmpty ? currentSenateFloorActions : [];
       }
     } else {
       logger.d(
@@ -2238,11 +2082,10 @@ class Functions {
     List<FloorAction> currentHouseFloorActions = [];
 
     try {
-      currentHouseFloorActions =
-          floorActionsFromJson(userDatabase.get('houseFloorActionsList'))
-              .results
-              .first
-              .floorActions;
+      currentHouseFloorActions = floorActionsFromJson(userDatabase.get('houseFloorActionsList'))
+          .results
+          .first
+          .floorActions;
     } catch (e) {
       logger.w('***** CURRENT House Actions ERROR: $e - Resetting... *****');
       userDatabase.put('houseFloorActionsList', {});
@@ -2257,10 +2100,8 @@ class Functions {
       final url = PropublicaApi().houseFloorUpdatesApi;
       final headers = PropublicaApi().apiHeaders;
       final authority = PropublicaApi().authority;
-      final response =
-          await http.get(Uri.https(authority, url), headers: headers);
-      logger.d(
-          '***** HOUSE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
+      final response = await http.get(Uri.https(authority, url), headers: headers);
+      logger.d('***** HOUSE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** HOUSE FLOOR ACTIONS RETRIEVAL SUCCESS! *****');
@@ -2272,54 +2113,47 @@ class Functions {
 
           debugPrint(
               'CURRENT 1ST HOUSE FLOOR ACTION: ${currentHouseFloorActions.isEmpty ? 'No current senate floor actions' : finalHouseFloorActions.first.description}');
-          debugPrint(
-              'NEW 1ST HOUSE FLOOR ACTION: ${finalHouseFloorActions.first.description}');
+          debugPrint('NEW 1ST HOUSE FLOOR ACTION: ${finalHouseFloorActions.first.description}');
 
           if (currentHouseFloorActions.isEmpty ||
-              finalHouseFloorActions.first.actionId !=
-                  currentHouseFloorActions.first.actionId) {
+              finalHouseFloorActions.first.actionId != currentHouseFloorActions.first.actionId) {
             userDatabase.put('newHouseFloor', true);
 
             if (userIsDev) {
-              final subject = finalHouseFloorActions.first.description
-                      .contains(' - ')
+              final subject = finalHouseFloorActions.first.description.contains(' - ')
                   ? 'HOUSE FLOOR: ${finalHouseFloorActions.first.description.split(' - ')[0]}'
                   : 'HOUSE FLOOR UPDATE';
               final messageBody =
                   'HOUSE FLOOR: ${finalHouseFloorActions.first.description.length > 150 ? finalHouseFloorActions.first.description.replaceRange(150, null, '...') : finalHouseFloorActions.first.description}';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
-              capitolBabbleNotificationsList.add(
-                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList
+                  .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
           if (currentHouseFloorActions.isEmpty) {
-            currentHouseFloorActions =
-                houseFloorActions.results.first.floorActions;
+            currentHouseFloorActions = houseFloorActions.results.first.floorActions;
           }
 
           try {
             logger.d('***** SAVING NEW HOUSE FLOOR ACTIONS TO DBASE *****');
-            userDatabase.put(
-                'houseFloorActionsList', floorActionsToJson(houseFloorActions));
+            userDatabase.put('houseFloorActionsList', floorActionsToJson(houseFloorActions));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING HOUSE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING HOUSE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('houseFloorActionsList', {});
           }
         }
 
-        int congress = int.parse(finalHouseFloorActions.first.congress);
-        if (congress.isFinite && congress != currentCongress) {
-          userDatabase.put('congress', congress);
-        }
+        // int congress = int.parse(finalHouseFloorActions.first.congress);
+        // if (congress.isFinite && congress != currentCongress) {
+        //   userDatabase.put('congress', congress);
+        // }
 
-        bool billWatched = await hasSubscription(userIsPremium, userIsLegacy,
-            finalHouseFloorActions.first.billIds.asMap(), 'bill_',
+        bool billWatched = await hasSubscription(
+            userIsPremium, userIsLegacy, finalHouseFloorActions.first.billIds.asMap(), 'bill_',
             userIsDev: userIsDev);
 
         if ((userDatabase.get('floorAlerts') || billWatched) &&
@@ -2350,8 +2184,7 @@ class Functions {
           }
         }
 
-        userDatabase.put(
-            'lastHouseAction', finalHouseFloorActions.first.description);
+        userDatabase.put('lastHouseAction', finalHouseFloorActions.first.description);
         userDatabase.put('lastHouseFloorActionsRefresh', '${DateTime.now()}');
         return finalHouseFloorActions;
       } else {
@@ -2374,28 +2207,23 @@ class Functions {
   ///
   /// CHECKING RESULTS FOR SUBSCRIBED MEMBERS
   ///
-  static Future<bool> hasSubscription(bool userIsPremium, bool userIsLegacy,
-      Map<int, dynamic> listToSearch, String prefix,
+  static Future<bool> hasSubscription(
+      bool userIsPremium, bool userIsLegacy, Map<int, dynamic> listToSearch, String prefix,
       {bool userIsDev}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     bool subscribed = false;
     if (userIsPremium || userIsLegacy) {
-      List<dynamic> subscribedItems =
-          List.from(userDatabase.get('subscriptionAlertsList'));
+      List<dynamic> subscribedItems = List.from(userDatabase.get('subscriptionAlertsList'));
 
-      subscribedItems
-          .retainWhere((element) => element.toString().startsWith(prefix));
+      subscribedItems.retainWhere((element) => element.toString().startsWith(prefix));
 
       if (listToSearch.isNotEmpty && subscribedItems.isNotEmpty) {
         logger.d('***** SUBSCRIBER CHECK FUNCTION RUNNING HERE... *****');
         for (var item in subscribedItems) {
-          logger.d(
-              '***** CHECKING LIST ${listToSearch.values} FOR ${item.split('_')[1]} *****');
-          if (listToSearch.values.any((val) => val
-              .toString()
-              .toLowerCase()
-              .contains(item.toString().split('_')[1].toLowerCase()))) {
+          logger.d('***** CHECKING LIST ${listToSearch.values} FOR ${item.split('_')[1]} *****');
+          if (listToSearch.values.any((val) =>
+              val.toString().toLowerCase().contains(item.toString().split('_')[1].toLowerCase()))) {
             logger.d(
                 '***** SUB CHECK SUCCESS! ${listToSearch.values} CONTAINS ${item.split('_')[1]} *****');
             subscribed = true;
@@ -2407,8 +2235,7 @@ class Functions {
         }
         return subscribed;
       } else {
-        logger.d(
-            '***** USER IS NOT SUBSCRIBED TO ANY ITEMS. CONTINUING... *****');
+        logger.d('***** USER IS NOT SUBSCRIBED TO ANY ITEMS. CONTINUING... *****');
         return Future<bool>.value(false);
       }
     } else {
@@ -2416,8 +2243,8 @@ class Functions {
     }
   }
 
-  static Future<List<ChamberMember>> getUserCongress(BuildContext context,
-      List<ChamberMember> membersList, String zipCode) async {
+  static Future<List<ChamberMember>> getUserCongress(
+      BuildContext context, List<ChamberMember> membersList, String zipCode) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     // List<bool> userLevels = await getUserLevels();
@@ -2453,25 +2280,21 @@ class Functions {
       if (response.statusCode == 200 && response.body != null) {
         finalUserCongress = jsonDecode(response.body);
 
-        if (finalUserCongress['kind'] ==
-            'civicinfo#representativeInfoResponse') {
+        if (finalUserCongress['kind'] == 'civicinfo#representativeInfoResponse') {
           if (currentUserCongress.isEmpty) {
             currentUserCongress = finalUserCongress;
           }
 
           try {
             logger.d('***** SAVING NEW USER CONGRESS TO DBASE *****');
-            userDatabase.put(
-                'representativesMap', jsonEncode(finalUserCongress));
+            userDatabase.put('representativesMap', jsonEncode(finalUserCongress));
           } catch (e) {
-            logger.w(
-                '^^^^^ ERROR SAVING USER CONGRESS TO DBASE (FUNCTION): $e ^^^^^');
+            logger.w('^^^^^ ERROR SAVING USER CONGRESS TO DBASE (FUNCTION): $e ^^^^^');
             userDatabase.put('representativesMap', {});
           }
         }
       } else {
-        logger.w(
-            '***** API ERROR: LOADING USER CONGRESS: ${response.statusCode} *****');
+        logger.w('***** API ERROR: LOADING USER CONGRESS: ${response.statusCode} *****');
 
         Messages.showMessage(
             context: context,
@@ -2492,12 +2315,9 @@ class Functions {
 
     if (membersList.isNotEmpty) {
       membersList.retainWhere((member) =>
-          nameString.contains(member.firstName
-              .toLowerCase()
-              .replaceAll(RegExp(r'[^a-zA-Z]'), '')) &&
-          nameString.contains(member.lastName
-              .toLowerCase()
-              .replaceAll(RegExp(r'[^a-zA-Z]'), '')));
+          nameString
+              .contains(member.firstName.toLowerCase().replaceAll(RegExp(r'[^a-zA-Z]'), '')) &&
+          nameString.contains(member.lastName.toLowerCase().replaceAll(RegExp(r'[^a-zA-Z]'), '')));
 
       membersList.sort((a, b) => a.shortTitle.compareTo(b.shortTitle));
 
@@ -2515,16 +2335,14 @@ class Functions {
     }
   }
 
-  static Future<List<RcPosition>> getRollCallPositions(int congress,
-      String chamber, int sessionNumber, int rollCallNumber) async {
+  static Future<List<RcPosition>> getRollCallPositions(
+      int congress, String chamber, int sessionNumber, int rollCallNumber) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
-    final url =
-        'congress/v1/$congress/$chamber/sessions/$sessionNumber/votes/$rollCallNumber.json';
+    final url = 'congress/v1/$congress/$chamber/sessions/$sessionNumber/votes/$rollCallNumber.json';
     final headers = PropublicaApi().apiHeaders;
     final authority = PropublicaApi().authority;
-    final response =
-        await http.get(Uri.https(authority, url), headers: headers);
+    final response = await http.get(Uri.https(authority, url), headers: headers);
 
     if (response.statusCode == 200) {
       RollCall rollCall = rollCallFromJson(response.body);
@@ -2533,14 +2351,12 @@ class Functions {
         List<RcPosition> rcPositions = rollCall.results.rcVotes.vote.positions;
 
         List<RcPosition> followingPositions = rcPositions
-            .where((element) => userDatabase
-                .get('subscriptionAlertsList')
-                .contains(element.memberId.toLowerCase()))
+            .where((element) =>
+                userDatabase.get('subscriptionAlertsList').contains(element.memberId.toLowerCase()))
             .toList();
 
-        rcPositions.retainWhere((element) => !userDatabase
-            .get('subscriptionAlertsList')
-            .contains(element.memberId.toLowerCase()));
+        rcPositions.retainWhere((element) =>
+            !userDatabase.get('subscriptionAlertsList').contains(element.memberId.toLowerCase()));
 
         return followingPositions + rcPositions;
       } else {
@@ -2600,8 +2416,7 @@ class Functions {
                     style: GoogleFonts.bangers(fontSize: 25),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                     child: Form(
                       key: formKey,
                       child: Row(
@@ -2616,10 +2431,8 @@ class Functions {
                                       : null,
                               decoration: InputDecoration(
                                   hintText: 'What shall we call you?',
-                                  errorStyle: TextStyle(
-                                      color: darkTheme
-                                          ? altHighlightColor
-                                          : null)),
+                                  errorStyle:
+                                      TextStyle(color: darkTheme ? altHighlightColor : null)),
                               onChanged: (val) => data = val,
                             ),
                           ),
@@ -2633,31 +2446,25 @@ class Functions {
                                   debugPrint('INPUT TEXT DATA: $data');
 
                                   if (source == 'user_name') {
-                                    String dataReduced =
-                                        data.replaceAll(' ', '');
-                                    List<String> currentUserIdList = List.from(
-                                        userDatabase.get('userIdList'));
+                                    String dataReduced = data.replaceAll(' ', '');
+                                    List<String> currentUserIdList =
+                                        List.from(userDatabase.get('userIdList'));
                                     if (!currentUserIdList.any((element) =>
-                                        element.startsWith(
-                                            '$newUserIdPrefix$dataReduced'))) {
+                                        element.startsWith('$newUserIdPrefix$dataReduced'))) {
                                       currentUserIdList.add(
                                           '$newUserIdPrefix$dataReduced<|:|>${DateTime.now()}');
-                                    } else if (currentUserIdList.any(
-                                        (element) => element.startsWith(
-                                            '$newUserIdPrefix$dataReduced'))) {
-                                      int existingUserNameIndex =
-                                          currentUserIdList.indexWhere(
-                                              (element) => element.startsWith(
-                                                  '$newUserIdPrefix$dataReduced'));
+                                    } else if (currentUserIdList.any((element) =>
+                                        element.startsWith('$newUserIdPrefix$dataReduced'))) {
+                                      int existingUserNameIndex = currentUserIdList.indexWhere(
+                                          (element) =>
+                                              element.startsWith('$newUserIdPrefix$dataReduced'));
 
                                       String existingUserName =
-                                          currentUserIdList
-                                              .removeAt(existingUserNameIndex);
+                                          currentUserIdList.removeAt(existingUserNameIndex);
 
                                       currentUserIdList.add(existingUserName);
                                     }
-                                    userDatabase.put(
-                                        'userIdList', currentUserIdList);
+                                    userDatabase.put('userIdList', currentUserIdList);
                                   }
                                 } else {
                                   logger.d('***** Data is invalid *****');

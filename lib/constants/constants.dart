@@ -362,6 +362,7 @@ Map<String, dynamic> initialUserData = {
   "permCredits": 100,
   "purchCredits": 0,
   "appOpens": 0,
+  "backgroundFetches": 0,
   "hashtags": [],
   "lastPromoNotification": "${DateTime.now()}",
   "githubData": {},

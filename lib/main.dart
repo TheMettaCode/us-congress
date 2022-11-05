@@ -52,6 +52,8 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   await dotenv.load(fileName: ".env");
   debugPrint('***** OPENING DATA BOX (Background Fetch) *****');
   await Functions.initializeBox();
+  Box userDatabase = Hive.box(appDatabase);
+  await userDatabase.put('backgroundFetches', userDatabase.get('backgroundFetches') + 1);
   await Functions.processCredits(false, creditsToRemove: 15);
   await RapidApiFunctions.fetchNewsArticles();
   // await RapidApiFunctions.getFloorActions(isHouseChamber: true);
@@ -166,21 +168,18 @@ class MyAppState extends State<MyApp> {
 
     /// ECWID STORE PRODUCTS LIST
     try {
-      setState(() => ecwidProductsList =
-          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
+      setState(
+          () => ecwidProductsList = ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
     } catch (e) {
-      logger.w(
-          '^^^^^ ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (MAIN.DART): $e ^^^^^');
+      logger.w('^^^^^ ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (MAIN.DART): $e ^^^^^');
     }
 
     /// PRODUCT ORDERS LIST
     try {
       setState(() => productOrdersList =
-          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList'))
-              .orders);
+          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders);
     } catch (e) {
-      logger.w(
-          '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (MAIN.DART): $e ^^^^^');
+      logger.w('^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (MAIN.DART): $e ^^^^^');
     }
 
     setState(() {
@@ -245,15 +244,13 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
+        valueListenable: Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
         builder: (context, box, widget) {
           credits = userDatabase.get('credits');
           permCredits = userDatabase.get('permCredits');
           try {
-            productOrdersList = orderDetailListFromJson(
-                    userDatabase.get('ecwidProductOrdersList'))
-                .orders;
+            productOrdersList =
+                orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders;
           } catch (e) {
             productOrdersList = [];
             logger.w(
@@ -265,25 +262,21 @@ class MyAppState extends State<MyApp> {
           userIdList = List.from(userDatabase.get('userIdList'));
           userIsPremium = userDatabase.get('userIsPremium');
           userIsLegacy = !userDatabase.get('userIsPremium') &&
-                  List.from(userDatabase.get('userIdList')).any((element) =>
-                      element.toString().startsWith(oldUserIdPrefix))
+                  List.from(userDatabase.get('userIdList'))
+                      .any((element) => element.toString().startsWith(oldUserIdPrefix))
               ? true
               : false;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: "US Congress",
-            theme: userDatabase.get('darkTheme')
-                ? darkThemeData
-                : defaultThemeData,
+            theme: userDatabase.get('darkTheme') ? darkThemeData : defaultThemeData,
             home: userDatabase.get('onboarding') == true
                 ? const OnBoardingPage()
                 : Scaffold(
-                    endDrawer:
-                        OrientationBuilder(builder: (context, orientation) {
+                    endDrawer: OrientationBuilder(builder: (context, orientation) {
                       return SafeArea(
                         child: Drawer(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).primaryColorDark,
@@ -294,9 +287,7 @@ class MyAppState extends State<MyApp> {
                                 orientation == Orientation.landscape
                                     ? const SizedBox.shrink()
                                     : Container(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: Theme.of(context).colorScheme.primary,
                                         // height: 125,
                                         child: Stack(
                                           alignment: Alignment.bottomCenter,
@@ -304,109 +295,88 @@ class MyAppState extends State<MyApp> {
                                             FadeIn(
                                               child: Image.asset(
                                                 'assets/congress_pic_$bannerImageIndex.png',
-                                                color: Theme.of(context)
-                                                    .primaryColor,
+                                                color: Theme.of(context).primaryColor,
                                                 fit: BoxFit.cover,
-                                                colorBlendMode:
-                                                    BlendMode.overlay,
+                                                colorBlendMode: BlendMode.overlay,
                                               ),
                                             ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.all(5.0),
+                                              padding: const EdgeInsets.all(5.0),
                                               child: SizedBox(
                                                 height: 22,
                                                 child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
-                                                    userDatabase.get(
-                                                                'interstitialAdIsNew') &&
+                                                    userDatabase.get('interstitialAdIsNew') &&
                                                             userIsDev
                                                         ? Expanded(
-                                                            child: OutlinedButton
-                                                                .icon(
-                                                                    icon: const Icon(
-                                                                        Icons
-                                                                            .ad_units,
-                                                                        size:
-                                                                            10),
-                                                                    label:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets.all(
-                                                                              3),
-                                                                      child: Text(
-                                                                          ((1 - ((userDatabase.get('credits') + userDatabase.get('permCredits')) / adChanceToShowThreshold)) * 100) > 0
-                                                                              ? '${((1 - ((userDatabase.get('credits') + userDatabase.get('permCredits')) / adChanceToShowThreshold)) * 100).toStringAsFixed(2)}%'
-                                                                              : '0.00%',
-                                                                          style: Styles.regularStyle.copyWith(
+                                                            child: OutlinedButton.icon(
+                                                                icon: const Icon(Icons.ad_units,
+                                                                    size: 10),
+                                                                label: Padding(
+                                                                  padding: const EdgeInsets.all(3),
+                                                                  child: Text(
+                                                                      ((1 -
+                                                                                      ((userDatabase.get(
+                                                                                                  'credits') +
+                                                                                              userDatabase.get(
+                                                                                                  'permCredits')) /
+                                                                                          adChanceToShowThreshold)) *
+                                                                                  100) >
+                                                                              0
+                                                                          ? '${((1 - ((userDatabase.get('credits') + userDatabase.get('permCredits')) / adChanceToShowThreshold)) * 100).toStringAsFixed(2)}%'
+                                                                          : '0.00%',
+                                                                      style: Styles.regularStyle
+                                                                          .copyWith(
                                                                               fontSize: 11,
-                                                                              fontWeight: FontWeight.bold)),
-                                                                    ),
-                                                                    style: ButtonStyle(
-                                                                        backgroundColor: MaterialStateProperty.all<
+                                                                              fontWeight:
+                                                                                  FontWeight.bold)),
+                                                                ),
+                                                                style: ButtonStyle(
+                                                                    backgroundColor:
+                                                                        MaterialStateProperty.all<
                                                                             Color>(Theme.of(
                                                                                 context)
                                                                             .colorScheme
                                                                             .background
-                                                                            .withOpacity(
-                                                                                0.85))),
-                                                                    onPressed: () =>
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(
-                                                                              builder: (context) => const DeveloperPage(),
-                                                                            ))),
+                                                                            .withOpacity(0.85))),
+                                                                onPressed: () => Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          const DeveloperPage(),
+                                                                    ))),
                                                           )
-                                                        : const SizedBox
-                                                            .shrink(),
-                                                    userDatabase.get(
-                                                                'interstitialAdIsNew') &&
+                                                        : const SizedBox.shrink(),
+                                                    userDatabase.get('interstitialAdIsNew') &&
                                                             userIsDev
-                                                        ? const SizedBox(
-                                                            width: 3)
-                                                        : const SizedBox
-                                                            .shrink(),
+                                                        ? const SizedBox(width: 3)
+                                                        : const SizedBox.shrink(),
                                                     Expanded(
                                                       // flex: 2,
-                                                      child:
-                                                          OutlinedButton.icon(
+                                                      child: OutlinedButton.icon(
                                                         style: ButtonStyle(
                                                             backgroundColor:
-                                                                MaterialStateProperty.all<
-                                                                    Color>(Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .background
-                                                                    .withOpacity(
-                                                                        0.85))),
-                                                        icon: const FaIcon(
-                                                            FontAwesomeIcons
-                                                                .coins,
+                                                                MaterialStateProperty.all<Color>(
+                                                                    Theme.of(context)
+                                                                        .colorScheme
+                                                                        .background
+                                                                        .withOpacity(0.85))),
+                                                        icon: const FaIcon(FontAwesomeIcons.coins,
                                                             size: 10),
                                                         label: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(3),
+                                                          padding: const EdgeInsets.all(3),
                                                           child: Text(
                                                               'Credits: ${userDatabase.get('credits') + userDatabase.get('permCredits') + userDatabase.get('purchCredits')}'
                                                                   .toUpperCase(),
-                                                              style: Styles
-                                                                  .regularStyle
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          11,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold)),
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 11,
+                                                                  fontWeight: FontWeight.bold)),
                                                         ),
-                                                        onPressed: () => Functions
-                                                            .requestInAppPurchase(
-                                                                context,
-                                                                userIsPremium,
-                                                                whatToShow:
-                                                                    'credits'),
+                                                        onPressed: () =>
+                                                            Functions.requestInAppPurchase(
+                                                                context, userIsPremium,
+                                                                whatToShow: 'credits'),
                                                       ),
                                                     ),
                                                     // Expanded(
@@ -516,38 +486,29 @@ class MyAppState extends State<MyApp> {
                                       ),
                                 BounceInRight(
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 5),
+                                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                     child: Card(
                                       elevation: 5,
                                       color: darkTheme
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .background
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          ? Theme.of(context).colorScheme.background
+                                          : Theme.of(context).colorScheme.primary,
                                       child: ListTile(
                                         enabled: true,
                                         enableFeedback: true,
                                         dense: true,
                                         title: FadeInRight(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
                                                 children: [
                                                   Icon(
                                                       userIsPremium
-                                                          ? Icons
-                                                              .workspace_premium
+                                                          ? Icons.workspace_premium
                                                           : userIsLegacy
                                                               ? Icons.stars
-                                                              : Icons
-                                                                  .free_breakfast,
+                                                              : Icons.free_breakfast,
                                                       size: 20,
                                                       color: userIsPremium
                                                           ? altHighlightColor
@@ -561,52 +522,38 @@ class MyAppState extends State<MyApp> {
                                                         : userIsLegacy
                                                             ? 'Legacy User'
                                                             : 'Free User',
-                                                    style: Styles.googleStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor,
-                                                            fontSize: 23),
+                                                    style: Styles.googleStyle.copyWith(
+                                                        color: darkThemeTextColor, fontSize: 23),
                                                   ),
                                                   appRated
                                                       ? Stack(
-                                                          alignment:
-                                                              Alignment.center,
+                                                          alignment: Alignment.center,
                                                           children: [
                                                             Icon(
-                                                              Icons
-                                                                  .star_border_purple500_rounded,
+                                                              Icons.star_border_purple500_rounded,
                                                               size: 15,
-                                                              color: Theme.of(
-                                                                      context)
+                                                              color: Theme.of(context)
                                                                   .colorScheme
                                                                   .primary,
                                                             ),
                                                             const Icon(
-                                                              Icons
-                                                                  .star_border_purple500_rounded,
+                                                              Icons.star_border_purple500_rounded,
                                                               size: 12,
-                                                              color:
-                                                                  altHighlightColor,
+                                                              color: altHighlightColor,
                                                             ),
                                                           ],
                                                         )
                                                       : const SizedBox.shrink(),
                                                   const Spacer(),
                                                   Text(
-                                                      userIdList.last.split(
-                                                                  '<|:|>')[1] ==
-                                                              dotenv
-                                                                  .env['dCode']
-                                                          ? 'MettaCode Dev'
-                                                              .toUpperCase()
+                                                      userIdList.last.split('<|:|>')[1] ==
+                                                              dotenv.env['dCode']
+                                                          ? 'MettaCode Dev'.toUpperCase()
                                                           : userIdList.last
                                                               .split('<|:|>')[1]
                                                               .toUpperCase(),
-                                                      style: Styles.regularStyle
-                                                          .copyWith(
-                                                              color:
-                                                                  darkThemeTextColor,
-                                                              fontSize: 12)),
+                                                      style: Styles.regularStyle.copyWith(
+                                                          color: darkThemeTextColor, fontSize: 12)),
                                                 ],
                                               ),
                                             ],
@@ -624,16 +571,14 @@ class MyAppState extends State<MyApp> {
                                 ),
                                 !userIsPremium
                                     ? BounceInRight(
-                                        duration:
-                                            const Duration(milliseconds: 800),
-                                        child: SharedWidgets
-                                            .premiumUpgradeContainer(
-                                                context,
-                                                userIsPremium,
-                                                userIsLegacy,
-                                                devUpgraded,
-                                                freeTrialUsed,
-                                                userDatabase),
+                                        duration: const Duration(milliseconds: 800),
+                                        child: SharedWidgets.premiumUpgradeContainer(
+                                            context,
+                                            userIsPremium,
+                                            userIsLegacy,
+                                            devUpgraded,
+                                            freeTrialUsed,
+                                            userDatabase),
                                       )
                                     : const SizedBox.shrink(),
                                 Column(
@@ -641,32 +586,24 @@ class MyAppState extends State<MyApp> {
                                     isCommenting
                                         ? const SizedBox.shrink()
                                         : BounceInRight(
-                                            duration: const Duration(
-                                                milliseconds: 400),
+                                            duration: const Duration(milliseconds: 400),
                                             child: ListTile(
                                               enabled: true,
                                               dense: true,
-                                              leading: const FaIcon(
-                                                  FontAwesomeIcons.bug,
-                                                  size: 12,
-                                                  color: darkThemeTextColor),
+                                              leading: const FaIcon(FontAwesomeIcons.bug,
+                                                  size: 12, color: darkThemeTextColor),
                                               title: Text(
                                                   commentSent
                                                       ? 'Your message was sent'
                                                       : 'Report A Bug',
                                                   style: Styles.regularStyle
-                                                      .copyWith(
-                                                          color:
-                                                              darkThemeTextColor)),
+                                                      .copyWith(color: darkThemeTextColor)),
                                               subtitle: Text(
                                                   commentSent
                                                       ? 'Tap to send another'
                                                       : 'Or message the development team',
-                                                  style: Styles.regularStyle
-                                                      .copyWith(
-                                                          color:
-                                                              darkThemeTextColor,
-                                                          fontSize: 12)),
+                                                  style: Styles.regularStyle.copyWith(
+                                                      color: darkThemeTextColor, fontSize: 12)),
                                               trailing: isCommenting
                                                   ? const Icon(Icons.close,
                                                       color: darkThemeTextColor)
@@ -679,9 +616,7 @@ class MyAppState extends State<MyApp> {
                                               },
                                             ),
                                           ),
-                                    isCommenting
-                                        ? commentBox()
-                                        : const SizedBox.shrink()
+                                    isCommenting ? commentBox() : const SizedBox.shrink()
                                   ],
                                 ),
                                 Expanded(
@@ -690,26 +625,18 @@ class MyAppState extends State<MyApp> {
                                     physics: const BouncingScrollPhysics(),
                                     children: <Widget>[
                                       BounceInRight(
-                                        duration:
-                                            const Duration(milliseconds: 800),
+                                        duration: const Duration(milliseconds: 800),
                                         child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: const Icon(
-                                              FontAwesomeIcons.share,
-                                              size: 15,
-                                              color: darkThemeTextColor),
+                                          leading: const Icon(FontAwesomeIcons.share,
+                                              size: 15, color: darkThemeTextColor),
                                           title: Text('Share The App',
                                               style: Styles.regularStyle
-                                                  .copyWith(
-                                                      color:
-                                                          darkThemeTextColor)),
-                                          subtitle: Text(
-                                              'Receive credits for sharing with others',
-                                              style: Styles.regularStyle
-                                                  .copyWith(
-                                                      color: darkThemeTextColor,
-                                                      fontSize: 12)),
+                                                  .copyWith(color: darkThemeTextColor)),
+                                          subtitle: Text('Receive credits for sharing with others',
+                                              style: Styles.regularStyle.copyWith(
+                                                  color: darkThemeTextColor, fontSize: 12)),
                                           onTap: () async {
                                             Navigator.pop(context);
                                             await Messages.shareContent(true);
@@ -719,44 +646,29 @@ class MyAppState extends State<MyApp> {
                                       appRated
                                           ? const SizedBox.shrink()
                                           : BounceInRight(
-                                              duration: const Duration(
-                                                  milliseconds: 1000),
+                                              duration: const Duration(milliseconds: 1000),
                                               child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: const Icon(
-                                                    FontAwesomeIcons.star,
-                                                    size: 15,
-                                                    color: darkThemeTextColor),
+                                                leading: const Icon(FontAwesomeIcons.star,
+                                                    size: 15, color: darkThemeTextColor),
                                                 title: Text('Rate The App',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
+                                                        .copyWith(color: darkThemeTextColor)),
                                                 subtitle: Text(
                                                     'Receive credits for rating US Congress App',
-                                                    style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor,
-                                                            fontSize: 12)),
+                                                    style: Styles.regularStyle.copyWith(
+                                                        color: darkThemeTextColor, fontSize: 12)),
                                                 onTap: () async {
                                                   Navigator.pop(context);
-                                                  await Functions.linkLaunch(
-                                                          context,
-                                                          googleAppLink,
-                                                          userDatabase,
-                                                          userIsPremium,
-                                                          appBarTitle:
-                                                              'Thank you for your rating!',
+                                                  await Functions.linkLaunch(context, googleAppLink,
+                                                          userDatabase, userIsPremium,
+                                                          appBarTitle: 'Thank you for your rating!',
                                                           interstitialAd: null)
                                                       .then((_) async {
-                                                    userDatabase.put(
-                                                        'appRated', true);
-                                                    await Functions
-                                                        .processCredits(true,
-                                                            isPermanent: true,
-                                                            creditsToAdd: 100);
+                                                    userDatabase.put('appRated', true);
+                                                    await Functions.processCredits(true,
+                                                        isPermanent: true, creditsToAdd: 100);
                                                   });
                                                 },
                                               ),
@@ -764,61 +676,46 @@ class MyAppState extends State<MyApp> {
                                       ecwidProductsList.isEmpty
                                           ? const SizedBox.shrink()
                                           : BounceInRight(
-                                              duration: const Duration(
-                                                  milliseconds: 600),
+                                              duration: const Duration(milliseconds: 600),
                                               child: ListTile(
                                                 enabled: true,
                                                 enableFeedback: true,
-                                                leading: const Icon(
-                                                    FontAwesomeIcons.store,
-                                                    size: 15,
-                                                    color: darkThemeTextColor),
+                                                leading: const Icon(FontAwesomeIcons.store,
+                                                    size: 15, color: darkThemeTextColor),
                                                 title: Text('Shop Merchandise',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
+                                                        .copyWith(color: darkThemeTextColor)),
                                                 subtitle: productOrdersList.isEmpty
                                                     ? const SizedBox.shrink()
-                                                    : Text(
-                                                        'Long press to view past orders',
-                                                        style: Styles
-                                                            .regularStyle
-                                                            .copyWith(
-                                                                color:
-                                                                    darkThemeTextColor,
-                                                                fontSize: 12)),
+                                                    : Text('Long press to view past orders',
+                                                        style: Styles.regularStyle.copyWith(
+                                                            color: darkThemeTextColor,
+                                                            fontSize: 12)),
                                                 onTap: () async {
                                                   Navigator.pop(context);
 
                                                   showModalBottomSheet(
-                                                      backgroundColor:
-                                                          Colors.transparent,
+                                                      backgroundColor: Colors.transparent,
                                                       isScrollControlled: false,
                                                       enableDrag: true,
                                                       context: context,
                                                       builder: (context) {
-                                                        return SharedWidgets
-                                                            .ecwidProductsListing(
-                                                                context,
-                                                                ecwidProductsList,
-                                                                userDatabase,
-                                                                userLevels,
-                                                                productOrdersList);
+                                                        return SharedWidgets.ecwidProductsListing(
+                                                            context,
+                                                            ecwidProductsList,
+                                                            userDatabase,
+                                                            userLevels,
+                                                            productOrdersList);
                                                       });
                                                 },
-                                                onLongPress: productOrdersList
-                                                        .isEmpty
+                                                onLongPress: productOrdersList.isEmpty
                                                     ? null
                                                     : () async {
                                                         Navigator.pop(context);
 
                                                         showModalBottomSheet(
-                                                            backgroundColor:
-                                                                Colors
-                                                                    .transparent,
-                                                            isScrollControlled:
-                                                                false,
+                                                            backgroundColor: Colors.transparent,
+                                                            isScrollControlled: false,
                                                             enableDrag: true,
                                                             context: context,
                                                             builder: (context) {
@@ -845,45 +742,36 @@ class MyAppState extends State<MyApp> {
                                     leading: const FaIcon(FontAwesomeIcons.gear,
                                         size: 13, color: darkThemeTextColor),
                                     title: Text('Settings',
-                                        style: Styles.regularStyle.copyWith(
-                                            color: darkThemeTextColor)),
+                                        style: Styles.regularStyle
+                                            .copyWith(color: darkThemeTextColor)),
                                     onTap: () async {
                                       Navigator.pop(context);
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Settings(),
+                                            builder: (context) => const Settings(),
                                           ));
                                     },
                                   ),
                                 ),
-                                List.from(userDatabase.get('userIdList')).any(
-                                        (element) => element
-                                            .toString()
-                                            .contains(devCode))
+                                List.from(userDatabase.get('userIdList'))
+                                        .any((element) => element.toString().contains(devCode))
                                     ? FadeInRight(
-                                        duration:
-                                            const Duration(milliseconds: 2000),
+                                        duration: const Duration(milliseconds: 2000),
                                         child: ListTile(
                                           enabled: true,
                                           enableFeedback: true,
-                                          leading: const Icon(
-                                              Icons.developer_board,
-                                              size: 15,
-                                              color: darkThemeTextColor),
+                                          leading: const Icon(Icons.developer_board,
+                                              size: 15, color: darkThemeTextColor),
                                           title: Text('Developer Page',
                                               style: Styles.regularStyle
-                                                  .copyWith(
-                                                      color:
-                                                          darkThemeTextColor)),
+                                                  .copyWith(color: darkThemeTextColor)),
                                           onTap: () async {
                                             Navigator.pop(context);
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DeveloperPage(),
+                                                  builder: (context) => const DeveloperPage(),
                                                 ));
                                           },
                                         ),
@@ -914,11 +802,9 @@ class MyAppState extends State<MyApp> {
               borderRadius: const BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
                   opacity: 0.15,
-                  image: AssetImage(
-                      'assets/congress_pic_$commentBoxImageIndex.png'),
+                  image: AssetImage('assets/congress_pic_$commentBoxImageIndex.png'),
                   fit: BoxFit.cover,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.grey, BlendMode.color)),
+                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.color)),
             ),
             child: Form(
               key: _formKey,
@@ -930,10 +816,9 @@ class MyAppState extends State<MyApp> {
                     decoration: InputDecoration(
                         errorStyle: const TextStyle(color: Colors.white),
                         hintText: 'Your email',
-                        hintStyle: Styles.regularStyle
-                            .copyWith(color: darkThemeTextColor, fontSize: 15),
-                        counterStyle:
-                            const TextStyle(color: darkThemeTextColor)),
+                        hintStyle:
+                            Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
+                        counterStyle: const TextStyle(color: darkThemeTextColor)),
                     style: const TextStyle(color: darkThemeTextColor),
                     validator: (val) =>
                         // _val.isEmpty ||
@@ -941,9 +826,7 @@ class MyAppState extends State<MyApp> {
                         //             .hasMatch(_val)
                         //     ? "Enter a valid email"
                         //     : null,
-                        EmailValidator.validate(val)
-                            ? null
-                            : "Please enter a valid email",
+                        EmailValidator.validate(val) ? null : "Please enter a valid email",
                     onChanged: (email) {
                       setState(() => userEmail = email);
                       logger.d(userEmail);
@@ -962,14 +845,12 @@ class MyAppState extends State<MyApp> {
                     decoration: InputDecoration(
                         errorStyle: const TextStyle(color: Colors.white),
                         hintText: 'Your comment',
-                        hintStyle: Styles.regularStyle
-                            .copyWith(color: darkThemeTextColor, fontSize: 15),
-                        counterStyle:
-                            const TextStyle(color: darkThemeTextColor)),
+                        hintStyle:
+                            Styles.regularStyle.copyWith(color: darkThemeTextColor, fontSize: 15),
+                        counterStyle: const TextStyle(color: darkThemeTextColor)),
                     style: const TextStyle(color: darkThemeTextColor),
-                    validator: (val) => val.isEmpty || val.length < 10
-                        ? 'Not enough information'
-                        : null,
+                    validator: (val) =>
+                        val.isEmpty || val.length < 10 ? 'Not enough information' : null,
                     onChanged: (comment) {
                       setState(() => userComment = comment);
                       logger.d(userComment);
@@ -986,8 +867,7 @@ class MyAppState extends State<MyApp> {
                           TextButton(
                               style: ButtonStyle(
                                   foregroundColor: darkThemeTextMSPColor,
-                                  padding: MaterialStateProperty.all(
-                                      const EdgeInsets.all(5))),
+                                  padding: MaterialStateProperty.all(const EdgeInsets.all(5))),
                               onPressed: () => setState(() {
                                     isCommenting = false;
                                     userComment = '';
@@ -997,37 +877,27 @@ class MyAppState extends State<MyApp> {
                           ElevatedButton.icon(
                               style: ButtonStyle(
                                   backgroundColor: darkTheme
-                                      ? MaterialStateProperty.all<Color>(
-                                          Colors.black)
+                                      ? MaterialStateProperty.all<Color>(Colors.black)
                                       : MaterialStateProperty.all<Color>(
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .primary)),
+                                          Theme.of(context).colorScheme.primary)),
                               icon: commentSending
                                   ? AnimatedWidgets.circularProgressWatchtower(
                                       context, userDatabase, userIsPremium,
-                                      widthAndHeight: 11,
-                                      strokeWidth: 1,
-                                      isFullScreen: false)
-                                  : const Icon(Icons.send,
-                                      size: 10, color: darkThemeTextColor),
+                                      widthAndHeight: 11, strokeWidth: 1, isFullScreen: false)
+                                  : const Icon(Icons.send, size: 10, color: darkThemeTextColor),
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
                                   setState(() => commentSending = true);
 
                                   /// UPDATE DBASE EMAIL LIST WITH NEW EMAIL ADDRESS
-                                  List<String> userEmailList = List.from(
-                                      userDatabase.get('userEmailList'));
+                                  List<String> userEmailList =
+                                      List.from(userDatabase.get('userEmailList'));
                                   if (!userEmailList.any((element) =>
-                                      element.toLowerCase() ==
-                                      userEmail.toLowerCase())) {
-                                    userEmailList.add(
-                                        '$userEmail<|:|>${DateTime.now()}');
-                                    userDatabase.put(
-                                        'userEmailList', userEmailList);
+                                      element.toLowerCase() == userEmail.toLowerCase())) {
+                                    userEmailList.add('$userEmail<|:|>${DateTime.now()}');
+                                    userDatabase.put('userEmailList', userEmailList);
                                   }
-                                  logger.d(
-                                      '${userDatabase.get('userEmailList')}');
+                                  logger.d('${userDatabase.get('userEmailList')}');
 
                                   /// EMAIL COMMENT TO DEVELOPER EMAIL ADDRESS
                                   try {
@@ -1048,8 +918,7 @@ class MyAppState extends State<MyApp> {
                                           'TOTAL CREDITS => ${userDatabase.get('purchCredits')} Purch, ${userDatabase.get('permCredits')} Perm & ${userDatabase.get('credits')} Temp :: CURRENT ADDRESS => ${userDatabase.get('currentAddress')} :: LOCATION INFO => ${userDatabase.get('locationData')}',
                                     );
                                   } catch (e) {
-                                    logger.w(
-                                        'EMAIL ERROR: MESSAGE NOT SENT - $e');
+                                    logger.w('EMAIL ERROR: MESSAGE NOT SENT - $e');
                                   }
 
                                   setState(() {
@@ -1063,8 +932,8 @@ class MyAppState extends State<MyApp> {
                                   });
                                 }
                               },
-                              label: const Text('Send',
-                                  style: TextStyle(color: darkThemeTextColor))),
+                              label:
+                                  const Text('Send', style: TextStyle(color: darkThemeTextColor))),
                         ],
                       ),
                     ),
@@ -1076,148 +945,123 @@ class MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> drawerTextInput(BuildContext context, String titleText,
-      String devLegacyCode, String devPremiumCode, String freeTrialCode) async {
+  Future<void> drawerTextInput(BuildContext context, String titleText, String devLegacyCode,
+      String devPremiumCode, String freeTrialCode) async {
     final formKey = GlobalKey<FormState>();
     final String devCode = dotenv.env['dCode'];
     String data;
     showModalBottomSheet(
-            isScrollControlled: true,
-            context: context,
-            builder: (context) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        titleText,
-                        style: GoogleFonts.bangers(fontSize: 25),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom),
-                        child: Form(
-                          key: formKey,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  keyboardType: TextInputType.text,
-                                  validator: (val) => val == null || val.isEmpty
-                                      ? 'Enter text'
-                                      : val.length < 5 || val.length > 13
-                                          ? 'User must be 5 to 13 characters'
-                                          : null,
-                                  decoration: InputDecoration(
-                                      hintText: !userIsPremium && !userIsLegacy
-                                          ? 'Free users cannot update user name'
-                                          : 'What shall we call you?',
-                                      errorStyle: TextStyle(
-                                          color: darkTheme
-                                              ? altHighlightColor
-                                              : null)),
-                                  onChanged: (val) => setState(
-                                      () => data = val.replaceAll(' ', '')),
-                                ),
-                              ),
-                              IconButton(
-                                  iconSize: 18,
-                                  icon: Icon(!userIsPremium &&
-                                          !userIsLegacy &&
-                                          data != devCode &&
-                                          data != devLegacyCode &&
-                                          data != devPremiumCode &&
-                                          data != freeTrialCode
-                                      ? Icons.workspace_premium
-                                      : Icons.send),
-                                  onPressed: !userIsPremium &&
-                                          !userIsLegacy &&
-                                          data != devCode &&
-                                          data != devLegacyCode &&
-                                          data != devPremiumCode &&
-                                          data != freeTrialCode
-                                      ? () {
-                                          Navigator.pop(context);
-                                          Functions.requestInAppPurchase(
-                                              context, userIsPremium,
-                                              whatToShow: 'upgrades');
-                                        }
-                                      : () async {
-                                          if (formKey.currentState.validate()) {
-                                            Navigator.pop(context);
-
-                                            if (data == devLegacyCode) {
-                                              List<String> userIdList =
-                                                  List.from(userDatabase
-                                                      .get('userIdList'));
-                                              userIdList.insert(
-                                                  0, oldUserIDTag);
-                                              userDatabase.put('devLegacyCode',
-                                                  'DLC${random.nextInt(900000) + 100000}');
-                                              userDatabase.put(
-                                                  'userIdList', userIdList);
-                                              userDatabase.put(
-                                                  'devUpgraded', true);
-                                            } else if (data == devPremiumCode) {
-                                              userDatabase.put(
-                                                  'userIsPremium', true);
-                                              userDatabase.put(
-                                                  'devUpgraded', true);
-                                              userDatabase.put('devPremiumCode',
-                                                  'DPC${random.nextInt(900000) + 100000}');
-                                            } else if (data == freeTrialCode) {
-                                              userDatabase.put(
-                                                  'userIsPremium', true);
-                                              userDatabase.put(
-                                                  'freeTrialUsed', true);
-                                              userDatabase.put(
-                                                  'freeTrialStartDate',
-                                                  '${DateTime.now()}');
-                                              userDatabase.put('freeTrialCode',
-                                                  'FTC${random.nextInt(900000) + 100000}');
-                                            } else {
-                                              List<String> currentUserIdList =
-                                                  List.from(userDatabase
-                                                      .get('userIdList'));
-                                              if (!currentUserIdList.any(
-                                                  (element) => element.startsWith(
-                                                      '$newUserIdPrefix$data'))) {
-                                                currentUserIdList.add(
-                                                    '$newUserIdPrefix$data<|:|>${DateTime.now()}');
-                                              } else if (currentUserIdList.any(
-                                                  (element) => element.startsWith(
-                                                      '$newUserIdPrefix$data'))) {
-                                                int existingUserNameIndex =
-                                                    currentUserIdList
-                                                        .indexWhere((element) =>
-                                                            element.startsWith(
-                                                                '$newUserIdPrefix$data'));
-
-                                                String existingUserName =
-                                                    currentUserIdList.removeAt(
-                                                        existingUserNameIndex);
-
-                                                currentUserIdList
-                                                    .add(existingUserName);
-                                              }
-                                              userDatabase.put('userIdList',
-                                                  currentUserIdList);
-                                            }
-                                          } else {
-                                            logger.d(
-                                                '***** Data is invalid *****');
-                                          }
-                                        })
-                            ],
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    titleText,
+                    style: GoogleFonts.bangers(fontSize: 25),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: Form(
+                      key: formKey,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              keyboardType: TextInputType.text,
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Enter text'
+                                  : val.length < 5 || val.length > 13
+                                      ? 'User must be 5 to 13 characters'
+                                      : null,
+                              decoration: InputDecoration(
+                                  hintText: !userIsPremium && !userIsLegacy
+                                      ? 'Free users cannot update user name'
+                                      : 'What shall we call you?',
+                                  errorStyle:
+                                      TextStyle(color: darkTheme ? altHighlightColor : null)),
+                              onChanged: (val) => setState(() => data = val.replaceAll(' ', '')),
+                            ),
                           ),
-                        ),
-                      )
-                    ]),
-              );
-            })
-        .then((_) async =>
-            await Functions.processCredits(true, isPermanent: false));
+                          IconButton(
+                              iconSize: 18,
+                              icon: Icon(!userIsPremium &&
+                                      !userIsLegacy &&
+                                      data != devCode &&
+                                      data != devLegacyCode &&
+                                      data != devPremiumCode &&
+                                      data != freeTrialCode
+                                  ? Icons.workspace_premium
+                                  : Icons.send),
+                              onPressed: !userIsPremium &&
+                                      !userIsLegacy &&
+                                      data != devCode &&
+                                      data != devLegacyCode &&
+                                      data != devPremiumCode &&
+                                      data != freeTrialCode
+                                  ? () {
+                                      Navigator.pop(context);
+                                      Functions.requestInAppPurchase(context, userIsPremium,
+                                          whatToShow: 'upgrades');
+                                    }
+                                  : () async {
+                                      if (formKey.currentState.validate()) {
+                                        Navigator.pop(context);
+
+                                        if (data == devLegacyCode) {
+                                          List<String> userIdList =
+                                              List.from(userDatabase.get('userIdList'));
+                                          userIdList.insert(0, oldUserIDTag);
+                                          userDatabase.put('devLegacyCode',
+                                              'DLC${random.nextInt(900000) + 100000}');
+                                          userDatabase.put('userIdList', userIdList);
+                                          userDatabase.put('devUpgraded', true);
+                                        } else if (data == devPremiumCode) {
+                                          userDatabase.put('userIsPremium', true);
+                                          userDatabase.put('devUpgraded', true);
+                                          userDatabase.put('devPremiumCode',
+                                              'DPC${random.nextInt(900000) + 100000}');
+                                        } else if (data == freeTrialCode) {
+                                          userDatabase.put('userIsPremium', true);
+                                          userDatabase.put('freeTrialUsed', true);
+                                          userDatabase.put(
+                                              'freeTrialStartDate', '${DateTime.now()}');
+                                          userDatabase.put('freeTrialCode',
+                                              'FTC${random.nextInt(900000) + 100000}');
+                                        } else {
+                                          List<String> currentUserIdList =
+                                              List.from(userDatabase.get('userIdList'));
+                                          if (!currentUserIdList.any((element) =>
+                                              element.startsWith('$newUserIdPrefix$data'))) {
+                                            currentUserIdList
+                                                .add('$newUserIdPrefix$data<|:|>${DateTime.now()}');
+                                          } else if (currentUserIdList.any((element) =>
+                                              element.startsWith('$newUserIdPrefix$data'))) {
+                                            int existingUserNameIndex =
+                                                currentUserIdList.indexWhere((element) =>
+                                                    element.startsWith('$newUserIdPrefix$data'));
+
+                                            String existingUserName =
+                                                currentUserIdList.removeAt(existingUserNameIndex);
+
+                                            currentUserIdList.add(existingUserName);
+                                          }
+                                          userDatabase.put('userIdList', currentUserIdList);
+                                        }
+                                      } else {
+                                        logger.d('***** Data is invalid *****');
+                                      }
+                                    })
+                        ],
+                      ),
+                    ),
+                  )
+                ]),
+          );
+        }).then((_) async => await Functions.processCredits(true, isPermanent: false));
   }
 }

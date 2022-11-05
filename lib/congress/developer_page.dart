@@ -77,6 +77,7 @@ class DeveloperPageState extends State<DeveloperPage> {
   bool userIsSubscribed = false;
   bool userIsLegacy = false;
   int appOpens = 0;
+  int backgroundFetches = 0;
   bool appRated = false;
   bool devUpgraded = false;
   bool freeTrialUsed = false;
@@ -120,6 +121,7 @@ class DeveloperPageState extends State<DeveloperPage> {
           }
           appRated = userDatabase.get('appRated');
           appOpens = userDatabase.get('appOpens');
+          backgroundFetches = userDatabase.get('backgroundFetches');
           devUpgraded = userDatabase.get('devUpgraded');
           freeTrialUsed = userDatabase.get('freeTrialUsed');
           freeTrialDismissed = userDatabase.get('freeTrialDismissed');
@@ -139,6 +141,7 @@ class DeveloperPageState extends State<DeveloperPage> {
                     child: Column(
                       children: <Widget>[
                         InkWell(
+                          onTap: () => userDatabase.put('backgroundFetches', 0),
                           onLongPress: () => userDatabase.put('appOpens', 0),
                           child: Container(
                             height: 50,
@@ -146,7 +149,7 @@ class DeveloperPageState extends State<DeveloperPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('US Congress App - $appOpens Opens',
+                                Text('$appOpens Opens - $backgroundFetches Fetches',
                                     style: Styles.googleStyle
                                         .copyWith(color: darkThemeTextColor)),
                               ],

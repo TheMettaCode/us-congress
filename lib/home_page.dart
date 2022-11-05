@@ -709,7 +709,7 @@ class HomePageState extends State<HomePage> {
       });
 
       setState(() => appLoadingText = 'Checking for bill activity...');
-      await Functions.fetchBills(context: context, congress: congress)
+      await Functions.fetchBills(context: context, /*congress: congress*/)
           .then((value) {
         setState(() => billList = value);
       });
