@@ -12,9 +12,11 @@ import '../services/notifications/notification_api.dart';
 import 'functions.dart';
 
 class RapidApiFunctions {
-  static Future<List<NewsArticle>> fetchNewsArticles({BuildContext context}) async {
+  static Future<List<NewsArticle>> fetchNewsArticles(
+      {BuildContext context}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    List<String> subscriptionAlertsList = List.from(userDatabase.get('subscriptionAlertsList'));
+    List<String> subscriptionAlertsList =
+        List.from(userDatabase.get('subscriptionAlertsList'));
     List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
     // bool userIsPremium = userLevels[1];
@@ -25,7 +27,8 @@ class RapidApiFunctions {
     List<NewsArticle> currentNewsArticlesList = [];
 
     try {
-      currentNewsArticlesList = newsArticleFromJson(userDatabase.get('newsArticles'));
+      currentNewsArticlesList =
+          newsArticleFromJson(userDatabase.get('newsArticles'));
       debugPrint('^^^^^ CURRENT NEWS ARTICLE LIST RETRIEVED (FUNCTION) ^^^^^');
     } catch (e) {
       debugPrint('^^^^^ ERROR DURING NEWS ARTICLE LIST (FUNCTION): $e ^^^^^');
@@ -52,7 +55,8 @@ class RapidApiFunctions {
 
       if (response.statusCode == 200) {
         logger.d('***** NEWS RETRIEVAL SUCCESS! *****');
-        final List<NewsArticle> newsArticles = newsArticleFromJson(response.body);
+        final List<NewsArticle> newsArticles =
+            newsArticleFromJson(response.body);
         List<ChamberMember> membersList = [];
         ChamberMember thisMember;
 
@@ -64,12 +68,14 @@ class RapidApiFunctions {
                   try {
                     if (DateFormat('yyyy/MM/dd')
                         .parse(article.date.trim())
-                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                        .isAfter(DateTime.now()
+                            .subtract(const Duration(days: 14)))) {
                       finalNewsArticlesList.add(article);
                     }
                     debugPrint("^^^ ARTICLE ${article.title} ADDED");
                   } catch (e) {
-                    debugPrint("^^^ ERROR PARSING POLITICO DATE FORMAT FOR ${article.date}: $e");
+                    debugPrint(
+                        "^^^ ERROR PARSING POLITICO DATE FORMAT FOR ${article.date}: $e");
                   }
                 }
                 break;
@@ -79,12 +85,14 @@ class RapidApiFunctions {
                   try {
                     if (DateFormat('yyyy/MM/dd')
                         .parse(article.date.trim())
-                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                        .isAfter(DateTime.now()
+                            .subtract(const Duration(days: 14)))) {
                       finalNewsArticlesList.add(article);
                     }
                     debugPrint("^^^ ARTICLE ${article.title} ADDED");
                   } catch (e) {
-                    debugPrint("^^^ ERROR PARSING USA TODAY DATE FORMAT FOR ${article.date}: $e");
+                    debugPrint(
+                        "^^^ ERROR PARSING USA TODAY DATE FORMAT FOR ${article.date}: $e");
                   }
                 }
                 break;
@@ -94,12 +102,14 @@ class RapidApiFunctions {
                   try {
                     if (DateFormat('yyyy/MM/dd')
                         .parse(article.date.trim())
-                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                        .isAfter(DateTime.now()
+                            .subtract(const Duration(days: 14)))) {
                       finalNewsArticlesList.add(article);
                     }
                     debugPrint("^^^ ARTICLE ${article.title} ADDED");
                   } catch (e) {
-                    debugPrint("^^^ ERROR PARSING NY TIMES DATE FORMAT FOR ${article.date}: $e");
+                    debugPrint(
+                        "^^^ ERROR PARSING NY TIMES DATE FORMAT FOR ${article.date}: $e");
                   }
                 }
                 break;
@@ -109,12 +119,14 @@ class RapidApiFunctions {
                   try {
                     if (DateFormat('MMM dd')
                         .parse(article.date.replaceAll('.', '').trim())
-                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                        .isAfter(DateTime.now()
+                            .subtract(const Duration(days: 14)))) {
                       finalNewsArticlesList.add(article);
                     }
                     debugPrint("^^^ ARTICLE ${article.title} ADDED");
                   } catch (e) {
-                    debugPrint("^^^ ERROR PARSING PROPUBLICA DATE FORMAT FOR ${article.date}: $e");
+                    debugPrint(
+                        "^^^ ERROR PARSING PROPUBLICA DATE FORMAT FOR ${article.date}: $e");
                   }
                 }
                 break;
@@ -124,12 +136,14 @@ class RapidApiFunctions {
                   try {
                     if (DateFormat('MMMM dd, yyyy')
                         .parse(article.date.trim())
-                        .isAfter(DateTime.now().subtract(const Duration(days: 14)))) {
+                        .isAfter(DateTime.now()
+                            .subtract(const Duration(days: 14)))) {
                       finalNewsArticlesList.add(article);
                     }
                     debugPrint("^^^ ARTICLE ${article.title} ADDED");
                   } catch (e) {
-                    debugPrint("^^^ ERROR PARSING AP NEWS DATE FORMAT FOR ${article.date}: $e");
+                    debugPrint(
+                        "^^^ ERROR PARSING AP NEWS DATE FORMAT FOR ${article.date}: $e");
                   }
                 }
                 break;
@@ -144,14 +158,15 @@ class RapidApiFunctions {
           if (finalNewsArticlesList.isNotEmpty) {
             finalNewsArticlesList.sort((a, b) => a.index.compareTo(b.index));
             if (currentNewsArticlesList.isEmpty ||
-                !currentNewsArticlesList
-                    .any((element) => element.title == finalNewsArticlesList.first.title)) {
+                !currentNewsArticlesList.any((element) =>
+                    element.title == finalNewsArticlesList.first.title)) {
               debugPrint('^^^^^ CHECKING TITLES FOR MEMBERS AND NEW ITEMS');
               sendNotifications = true;
               userDatabase.put('newNewsArticles', true);
 
               try {
-                membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
+                membersList = memberPayloadFromJson(
+                            userDatabase.get('houseMembersList'))
                         .results
                         .first
                         .members +
@@ -170,7 +185,8 @@ class RapidApiFunctions {
                 debugPrint(
                     '^^^^^ MEMBER FOUND FOR NEWS ARTICLE RETRIEVAL FUNCTION: ${thisMember.firstName} ${thisMember.lastName}');
               } catch (e) {
-                logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (News Articles Function): $e');
+                logger.w(
+                    'ERROR DURING RETRIEVAL OF MEMBERS LIST (News Articles Function): $e');
               }
 
               if (userIsDev) {
@@ -180,11 +196,12 @@ class RapidApiFunctions {
                 final messageBody =
                     '${thisMember == null ? '' : '.@${thisMember.twitterAccount} in the news:'} ${thisArticle.title.length > 150 ? thisArticle.title.replaceRange(150, null, '...') : thisArticle.title}';
 
-                List<String> capitolBabbleNotificationsList =
-                    List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+                List<String> capitolBabbleNotificationsList = List<String>.from(
+                    userDatabase.get('capitolBabbleNotificationsList'));
                 capitolBabbleNotificationsList.add(
                     '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium<|:|>${thisArticle.url == null || thisArticle.url.isEmpty ? '' : thisArticle.url}');
-                userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
+                userDatabase.put('capitolBabbleNotificationsList',
+                    capitolBabbleNotificationsList);
               }
             }
 
@@ -194,9 +211,11 @@ class RapidApiFunctions {
 
             try {
               logger.d('***** SAVING NEW ARTICLES TO DBASE *****');
-              userDatabase.put('newsArticles', newsArticleToJson(finalNewsArticlesList));
+              userDatabase.put(
+                  'newsArticles', newsArticleToJson(finalNewsArticlesList));
             } catch (e) {
-              logger.w('^^^^^ ERROR SAVING ARTICLES LIST TO DBASE (FUNCTION): $e ^^^^^');
+              logger.w(
+                  '^^^^^ ERROR SAVING ARTICLES LIST TO DBASE (FUNCTION): $e ^^^^^');
               userDatabase.put('newsArticles', {});
             }
           } else {
@@ -206,8 +225,8 @@ class RapidApiFunctions {
         }
 
         bool memberWatched = thisMember != null &&
-            subscriptionAlertsList
-                .any((item) => item.toLowerCase().contains(thisMember.id.toLowerCase()));
+            subscriptionAlertsList.any((item) =>
+                item.toLowerCase().contains(thisMember.id.toLowerCase()));
 
         // bool memberWatched = await hasSubscription(
         //     userIsPremium,
@@ -216,7 +235,8 @@ class RapidApiFunctions {
         //     'member_',
         //     userIsDev: userIsDev);
 
-        if ((userDatabase.get('newsAlerts') || memberWatched) && sendNotifications) {
+        if ((userDatabase.get('newsAlerts') || memberWatched) &&
+            sendNotifications) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 15,
@@ -245,13 +265,15 @@ class RapidApiFunctions {
 
         return finalNewsArticlesList;
       } else {
-        logger.w('***** API ERROR: LOADING ARTICLES FROM DBASE: ${response.statusCode} *****');
+        logger.w(
+            '***** API ERROR: LOADING ARTICLES FROM DBASE: ${response.statusCode} *****');
 
         return finalNewsArticlesList =
             currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
       }
     } else {
-      logger.d('***** CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
+      logger.d(
+          '***** CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
       finalNewsArticlesList = currentNewsArticlesList;
       logger.d('***** ARTICLES NOT UPDATED: LIST IS CURRENT *****');
       return finalNewsArticlesList;
@@ -264,7 +286,8 @@ class RapidApiFunctions {
   }) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     String chamber = isHouseChamber ? 'house' : 'senate';
-    debugPrint('[NEW FLOOR ACTION FUNCTION] ${chamber[0].toUpperCase() + chamber.substring(1)} Floor Actions *****');
+    debugPrint(
+        '[NEW FLOOR ACTION FUNCTION] ${chamber[0].toUpperCase() + chamber.substring(1)} Floor Actions *****');
     List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
     bool userIsPremium = userLevels[1];
@@ -287,11 +310,12 @@ class RapidApiFunctions {
         // ||
         // DateTime.parse(userDatabase.get('last${chamber}FloorActionsRefresh'))
         //     .isBefore(DateTime.now().subtract(const Duration(minutes: 30)))
-    ) {
+        ) {
       final rapidApiKey = dotenv.env['RAPID_API_KEY'];
       final rapidApiHost = dotenv.env['USC_FLOOR_ACTIONS_API_HOST'];
 
-      final url = Uri.parse('https://us-congress-top-news.p.rapidapi.com/$chamber');
+      final url =
+          Uri.parse('https://us-congress-top-news.p.rapidapi.com/$chamber');
       final response = await http.get(url, headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': rapidApiHost,
@@ -306,8 +330,10 @@ class RapidApiFunctions {
           '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTION API RESPONSE CODE: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        debugPrint('[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS RETRIEVAL SUCCESS!');
-        CongressFloorAction floorActions = congressFloorActionFromJson(response.body);
+        debugPrint(
+            '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS RETRIEVAL SUCCESS!');
+        CongressFloorAction floorActions =
+            congressFloorActionFromJson(response.body);
 
         if (floorActions.actionsList.isNotEmpty) {
           finalFloorActions = floorActions.actionsList;
@@ -318,10 +344,15 @@ class RapidApiFunctions {
               '[NEW FLOOR ACTION FUNCTION] NEW 1ST ${chamber.toUpperCase()} FLOOR ACTION: ${finalFloorActions.first.actionItem}');
 
           if (currentFloorActions.isEmpty ||
-              finalFloorActions.first.actionItem != currentFloorActions.first.actionItem) {
-            debugPrint('[NEW FLOOR ACTION FUNCTION] KEY STRING IS: new${chamber[0].toUpperCase() + chamber.substring(1)}Floor');
-            final String keyString = 'new${chamber[0].toUpperCase() + chamber.substring(1)}Floor';
-            userDatabase.put(keyString, true);
+              finalFloorActions.first.actionItem !=
+                  currentFloorActions.first.actionItem) {
+            debugPrint(
+                '[NEW FLOOR ACTION FUNCTION] KEY STRING IS: new${chamber[0].toUpperCase() + chamber.substring(1)}Floor');
+            final String keyString =
+                'new${chamber[0].toUpperCase() + chamber.substring(1)}Floor';
+
+            debugPrint(
+                '[NEW FLOOR ACTION FUNCTION] SETTING NEW ${chamber.toUpperCase()} FLOOR ACTIONS FLAG TO TRUE'); // userDatabase.put(keyString, true);
 
             if (userIsDev) {
               final subject = finalFloorActions.first.header.isNotEmpty
@@ -343,7 +374,8 @@ class RapidApiFunctions {
           }
 
           try {
-           debugPrint('[NEW FLOOR ACTION FUNCTION] SAVING ${chamber.toUpperCase()} FLOOR ACTIONS TO DBASE *****');
+            debugPrint(
+                '[NEW FLOOR ACTION FUNCTION] SAVING ${chamber.toUpperCase()} FLOOR ACTIONS TO DBASE *****');
             // userDatabase.put('${chamber}FloorActionsList', congressFloorActionToJson(floorActions));
           } catch (e) {
             debugPrint(
@@ -371,7 +403,8 @@ class RapidApiFunctions {
           } else if (ModalRoute.of(context).isCurrent) {
             Messages.showMessage(
                 context: context,
-                message: '${chamber.toUpperCase()} FLOOR\n${finalFloorActions.first.actionItem}',
+                message:
+                    '${chamber.toUpperCase()} FLOOR\n${finalFloorActions.first.actionItem}',
                 isAlert: false,
                 removeCurrent: false);
           }
@@ -389,13 +422,15 @@ class RapidApiFunctions {
         debugPrint(
             '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
 
-        return finalFloorActions = currentFloorActions.isNotEmpty ? currentFloorActions : [];
+        return finalFloorActions =
+            currentFloorActions.isNotEmpty ? currentFloorActions : [];
       }
     } else {
       debugPrint(
           '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS LIST: ${currentFloorActions.map((e) => e.actionItem)} *****');
       finalFloorActions = currentFloorActions;
-      debugPrint('[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
+      debugPrint(
+          '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
       return finalFloorActions;
     }
   }
