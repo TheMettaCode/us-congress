@@ -46,21 +46,25 @@ class ActionsList {
     @required this.index,
     @required this.header,
     @required this.actionItem,
+    @required this.actionTimeStamp,
   });
 
   final int index;
   final String header;
   final String actionItem;
+  final String actionTimeStamp;
 
   factory ActionsList.fromJson(Map<String, dynamic> json) => ActionsList(
     index: json["index"],
     header: json["header"],
     actionItem: json["actionItem"],
+    actionTimeStamp: json["actionTimeStamp"],
   );
 
   Map<String, dynamic> toJson() => {
     "index": index,
     "header": header,
     "actionItem": actionItem,
+    "actionTimeStamp":actionTimeStamp,
   };
 }

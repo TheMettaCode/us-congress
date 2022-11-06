@@ -5,16 +5,15 @@ import 'dart:math';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 
 var logger = Logger();
-var loggerNoStack = Logger(
-    printer: PrettyPrinter(colors: true, printEmojis: true, methodCount: 0));
+var loggerNoStack = Logger(printer: PrettyPrinter(colors: true, printEmojis: true, methodCount: 0));
 
 /// DATE-TIME FORMATTING
 final DateFormat formatter = DateFormat.yMEd();
 final DateFormat timeFormatter = DateFormat('h:mm a');
 final DateFormat localTimeFormatter = DateFormat.jm();
 final DateFormat dateWithTimeFormatter = DateFormat('E, M/d h:mm a');
-final DateFormat dateWithTimeAndSecondsFormatter =
-    DateFormat('E, M/d h:mm:ss a');
+final DateFormat dateWithTimeOnlyFormatter = DateFormat('E, M/d h:mm');
+final DateFormat dateWithTimeAndSecondsFormatter = DateFormat('E, M/d h:mm:ss a');
 final DateFormat dateWithDayFormatter = DateFormat('E, M/d');
 final DateFormat dateWithDayAndYearFormatter = DateFormat('E, M/d/y');
 final DateFormat dateFormatter = DateFormat('M/d');
@@ -28,13 +27,11 @@ const String appTitle = 'US Congress';
 // const String appDatabaseName = 'congress.db';
 const String appDatabase = 'congress';
 // const String appDatabaseTableName = 'congress';
-const String googleAppLink =
-    'https://play.google.com/store/apps/details?id=com.uscongress.watch';
+const String googleAppLink = 'https://play.google.com/store/apps/details?id=com.uscongress.watch';
 const String samsungAppLink = 'https://galaxy.store/congress';
 const String amazonAppLink = 'https://www.amazon.com/gp/product/B0B2ZBYTB7';
 const String appWebLink = 'https://us-congress.app';
-const String appShare =
-    'Check out this $appTitle app. I thought you might be interested.\n'
+const String appShare = 'Check out this $appTitle app. I thought you might be interested.\n'
     'Google Play App Store: $googleAppLink\n'
     // 'Samsung Galaxy App Store: $samsungAppLink\n'
     // 'Amazon App Store: $amazonAppLink'
@@ -65,6 +62,9 @@ bool isPeakCapitolBabblePostHours = (((DateTime.now().toUtc().hour >= 13 &&
     (DateTime.now().toUtc().hour >= 20 &&
         DateTime.now().toUtc().hour <= 23 &&
         DateTime.now().toUtc().weekday == DateTime.sunday);
+
+bool isCongressFloorActive =
+    DateTime.now().weekday != DateTime.saturday && DateTime.now().weekday != DateTime.sunday;
 
 // const List<String> wordsToHash = [
 //   "Abortion",
@@ -263,8 +263,7 @@ const String appId = 'ca-app-pub-3834929667159972~4799960334';
 const String defaultBannerId = 'ca-app-pub-3834929667159972/8034011226';
 const String rewardedAdId = 'ca-app-pub-3834929667159972/5759618902';
 const String interstitialAdId = 'ca-app-pub-3834929667159972/9786327541';
-const String interstitialRewardedAdId =
-    'ca-app-pub-3834929667159972/9310780865';
+const String interstitialRewardedAdId = 'ca-app-pub-3834929667159972/9310780865';
 // const String defaultOpenId = 'ca-app-pub-3834929667159972/9402734142';
 // const String defaultNativeAdvancedId = 'ca-app-pub-3834929667159972/3057645627';
 
@@ -303,8 +302,8 @@ const List<String> adMobKeyWords = [
 /// FREE PREMIUM DAYS CONSTANTS
 int freePremiumDaysStartDay = 1;
 int freePremiumDaysEndDay = 6;
-bool freePremiumDaysActive = DateTime.now().day >= freePremiumDaysStartDay &&
-    DateTime.now().day < freePremiumDaysEndDay;
+bool freePremiumDaysActive =
+    DateTime.now().day >= freePremiumDaysStartDay && DateTime.now().day < freePremiumDaysEndDay;
 // &&  DateTime.now().month % 3 == 0;
 int freeTrialPromoDurationDays = 5;
 
@@ -374,20 +373,9 @@ Map<String, dynamic> initialUserData = {
   "packageInfo": {},
   "deviceInfo": {},
   "locationData": {},
-  "currentAddress": {
-    "street": "",
-    "city": "",
-    "state": "",
-    "country": "",
-    "zip": ""
-  },
+  "currentAddress": {"street": "", "city": "", "state": "", "country": "", "zip": ""},
   "representativesMap": {},
-  "representativesLocation": {
-    "city": "",
-    "state": "",
-    "country": "",
-    "zip": ""
-  },
+  "representativesLocation": {"city": "", "state": "", "country": "", "zip": ""},
   "congress": 117,
   "houseMembersList": {},
   "senateMembersList": {},
@@ -422,14 +410,18 @@ Map<String, dynamic> initialUserData = {
   "newMarketOverview": true,
   "lastMarketOverviewRefresh": "${DateTime.now()}",
   "floorAlerts": true,
-  "lastHouseAction": "",
-  "lastSenateAction": "",
-  "senateFloorActionsList": {},
-  "houseFloorActionsList": {},
-  "lastHouseFloorActionsRefresh": "${DateTime.now()}",
-  "lastSenateFloorActionsRefresh": "${DateTime.now()}",
+  "houseFloorActions": {},
+  "senateFloorActions": {},
+  "lastHouseFloorRefresh": "${DateTime.now()}",
+  "lastSenateFloorRefresh": "${DateTime.now()}",
   "newHouseFloor": false,
   "newSenateFloor": false,
+  // "lastHouseAction": "",
+  // "lastSenateAction": "",
+  // "senateFloorActionsList": {},
+  // "houseFloorActionsList": {},
+  // "lastHouseFloorActionsRefresh": "${DateTime.now()}",
+  // "lastSenateFloorActionsRefresh": "${DateTime.now()}",
   "billAlerts": false,
   "recentBills": {},
   "lastBill": "",
@@ -526,8 +518,7 @@ List<PlaylistItem> youTubePlaylistPlaceholder = [
   PlaylistItem.fromJson({
     "kind": "youtube#playlistItem",
     "etag": "yijyoLB5klBdgU9hbCX9lancO8Y",
-    "id":
-        "UExoVmdzanZlMnVuTm4yTmdDS1cwdU1qZ2RlOEwyMEhuYi41Mzk2QTAxMTkzNDk4MDhF",
+    "id": "UExoVmdzanZlMnVuTm4yTmdDS1cwdU1qZ2RlOEwyMEhuYi41Mzk2QTAxMTkzNDk4MDhF",
     "snippet": {
       "publishedAt": "2021-11-20T00:45:32Z",
       "channelId": "UCUrW7YMZDBaVMjP7V3XnpVw",

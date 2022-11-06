@@ -712,7 +712,7 @@ class SettingsState extends State<Settings> {
                       ),
                       ListTile(
                           subtitle: Text(
-                              'Data Sources\nYoutube • Propublica • Stock Watcher • Google Civic Info',
+                              'Data Sources\nMettaCode Developers • Congress.gov • Propublica • Stock Watcher\nGoogle Civic Info • C-SPAN • Politico • Capitol Babble',
                               style: Styles.regularStyle.copyWith(
                                   fontSize: 11,
                                   color: userDatabase.get('darkTheme')

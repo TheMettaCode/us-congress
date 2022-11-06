@@ -56,11 +56,11 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   await userDatabase.put('backgroundFetches', userDatabase.get('backgroundFetches') + 1);
   await Functions.processCredits(false, creditsToRemove: 15);
   await RapidApiFunctions.fetchNewsArticles();
-  // await RapidApiFunctions.getFloorActions(isHouseChamber: true);
-  // await RapidApiFunctions.getFloorActions(isHouseChamber: false);
+  await RapidApiFunctions.getFloorActions(isHouseChamber: true);
+  await RapidApiFunctions.getFloorActions(isHouseChamber: false);
   await Functions.fetchStatements();
-  await Functions.houseFloor();
-  await Functions.senateFloor();
+  // await Functions.houseFloor();
+  // await Functions.senateFloor();
   await Functions.fetchBills();
   await Functions.fetchVotes();
   await Youtube.getYouTubePlaylistItems();
@@ -151,8 +151,6 @@ class MyAppState extends State<MyApp> {
       await Functions.getPosition();
       await Functions.getDeviceInfo();
       await Functions.getPackageInfo();
-      await RapidApiFunctions.getFloorActions(isHouseChamber: true);
-      await RapidApiFunctions.getFloorActions(isHouseChamber: false);
     });
     super.initState();
     initBackgroundFetchPlatformState();
