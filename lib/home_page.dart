@@ -22,7 +22,7 @@ import 'package:us_congress_vote_tracker/functions/functions.dart';
 import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
 import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
 import 'package:us_congress_vote_tracker/models/bill_recent_payload_model.dart';
-import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
+// import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
 import 'package:us_congress_vote_tracker/models/news_article_model.dart';
 import 'package:us_congress_vote_tracker/models/office_expenses_total.dart';
 import 'package:us_congress_vote_tracker/models/order_detail.dart';
@@ -2115,7 +2115,7 @@ class HomePageState extends State<HomePage> {
                     )))
             : houseStockWatchList.isEmpty && senateStockWatchList.isEmpty
                 ? Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                     child: InkWell(
                         onTap: () => getData(),
                         child: ZoomIn(
@@ -2154,86 +2154,16 @@ class HomePageState extends State<HomePage> {
                           ),
                         )))
                 : Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 10, 5, 5),
+                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // const SizedBox(height: 5),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                           child: Text('LATEST MARKET TRADES BY CHAMBER (Reported)',
                               style: Styles.googleStyle.copyWith(fontSize: 18)),
                         ),
-                        const SizedBox(height: 5),
-                        FlipInY(
-                          child: InkWell(
-                            onTap: (houseStockWatchList.isEmpty && senateStockWatchList.isEmpty)
-                                ? null
-                                : () {
-                                    setState(() => _marketPageLoading = true);
-                                    userDatabase.put('newMarketOverview', false);
-                                    Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => MarketActivityPage(
-                                                    houseMembersList + senateMembersList,
-                                                    houseStockWatchList,
-                                                    senateStockWatchList,
-                                                    marketActivityOverviewList)))
-                                        .then((_) => setState(() => _marketPageLoading = false));
-                                  },
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  color: darkTheme
-                                      ? Theme.of(context).primaryColorDark
-                                      : stockWatchColor,
-                                  image: DecorationImage(
-                                      opacity: 0.4,
-                                      image: AssetImage(
-                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 1}.png'),
-                                      fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(
-                                          darkTheme
-                                              ? Theme.of(context).primaryColorDark
-                                              : stockWatchColor,
-                                          BlendMode.color)),
-                                  border: Border.all(
-                                      width: 2,
-                                      color: darkTheme
-                                          ? Theme.of(context).primaryColorDark
-                                          : stockWatchColor),
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: TextButton.icon(
-                                icon: userDatabase.get('newMarketOverview')
-                                    ? AnimatedWidgets.flashingText(context, '!!!',
-                                        userDatabase.get('newMarketOverview'), false,
-                                        size: 13, sameColor: true)
-                                    : _marketPageLoading
-                                        ? const FaIcon(
-                                            FontAwesomeIcons.solidHourglass,
-                                            size: 11,
-                                            color: darkThemeTextColor,
-                                          )
-                                        : const FaIcon(
-                                            FontAwesomeIcons.chartSimple,
-                                            size: 13,
-                                            color: darkThemeTextColor,
-                                          ),
-                                label: Text(
-                                    _marketPageLoading
-                                        ? 'Loading Latest Market Data...'
-                                        : 'Stock Market Activity Overview',
-                                    style: Styles.regularStyle.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkThemeTextColor)),
-                                onPressed: null,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
                         Row(
                           children: [
                             senateStockWatchList.isEmpty
@@ -2472,6 +2402,80 @@ class HomePageState extends State<HomePage> {
                                     ),
                                   ),
                           ],
+                        ),
+                        const SizedBox(height: 5),
+                        FlipInY(
+                          child: InkWell(
+                            onTap: (houseStockWatchList.isEmpty && senateStockWatchList.isEmpty)
+                                ? null
+                                : () {
+                                    setState(() => _marketPageLoading = true);
+                                    userDatabase.put('newMarketOverview', false);
+                                    Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => MarketActivityPage(
+                                                    houseMembersList + senateMembersList,
+                                                    houseStockWatchList,
+                                                    senateStockWatchList,
+                                                    marketActivityOverviewList)))
+                                        .then((_) => setState(() => _marketPageLoading = false));
+                                  },
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: darkTheme
+                                      ? Theme.of(context).primaryColorDark
+                                      : stockWatchColor,
+                                  image: DecorationImage(
+                                      opacity: 0.4,
+                                      image: AssetImage(
+                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 1}.png'),
+                                      fit: BoxFit.cover,
+                                      colorFilter: ColorFilter.mode(
+                                          darkTheme
+                                              ? Theme.of(context).primaryColorDark
+                                              : stockWatchColor,
+                                          BlendMode.color)),
+                                  border: Border.all(
+                                      width: 2,
+                                      color: darkTheme
+                                          ? Theme.of(context).primaryColorDark
+                                          : stockWatchColor),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: TextButton.icon(
+                                icon: userDatabase.get('newMarketOverview')
+                                    ? AnimatedWidgets.flashingText(context, '!!!',
+                                        userDatabase.get('newMarketOverview'), false,
+                                        size: 13,
+                                        color: userDatabase.get('newSenateStock')
+                                            ? altHighlightColor
+                                            : darkThemeTextColor,
+                                        sameColor: true)
+                                    : _marketPageLoading
+                                        ? const FaIcon(
+                                            FontAwesomeIcons.solidHourglass,
+                                            size: 11,
+                                            color: darkThemeTextColor,
+                                          )
+                                        : const FaIcon(
+                                            FontAwesomeIcons.chartSimple,
+                                            size: 13,
+                                            color: darkThemeTextColor,
+                                          ),
+                                label: Text(
+                                    _marketPageLoading
+                                        ? 'Loading Latest Market Data...'
+                                        : 'Stock Market Activity Overview',
+                                    style: Styles.regularStyle.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: darkThemeTextColor)),
+                                onPressed: null,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
