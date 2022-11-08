@@ -88,6 +88,7 @@ class HomePageState extends State<HomePage> {
   // List<Widget> listOfPromotions = [];
   List<GithubNotifications> githubNotificationsList = [];
   GithubNotifications thisGithubNotification;
+
   int headerImageCounter = 0;
   bool randomImageActivated = false;
 
@@ -129,9 +130,9 @@ class HomePageState extends State<HomePage> {
   List<NewsArticle> newsArticlesList = [];
 
   List<ActionsList> currentHouseFloorActions = [];
-  DateTime currentHouseFloorActionsDate;
+  DateTime currentHouseFloorActionsDate = DateTime.now();
   List<ActionsList> currentSenateFloorActions = [];
-  DateTime currentSenateFloorActionsDate;
+  DateTime currentSenateFloorActionsDate = DateTime.now();
 
   // List<FloorAction> senateFloorActions = [];
   // List<FloorAction> houseFloorActions = [];
@@ -1331,8 +1332,8 @@ class HomePageState extends State<HomePage> {
                                             ? const SizedBox.shrink()
                                             : newsArticleSlider(newsArticlesList),
                                         // houseFloorActions.isEmpty && senateFloorActions.isEmpty
-                                        currentHouseFloorActions.isEmpty &&
-                                                currentSenateFloorActions.isEmpty
+                                        githubNotificationsList.isEmpty ||  (currentHouseFloorActions.isEmpty &&
+                                                currentSenateFloorActions.isEmpty)
                                             ? const SizedBox.shrink()
                                             : floorActions(orientation),
                                         congressInfoButtons(subscriptionAlertsList),

@@ -21,6 +21,7 @@ import 'package:us_congress_vote_tracker/services/congress_stock_watch/congress_
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
+import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
@@ -139,7 +140,10 @@ class MyAppState extends State<MyApp> {
   int permCredits = 0;
   List<EcwidStoreItem> ecwidProductsList = [];
   List<Order> productOrdersList = [];
+
   // List<GithubNotifications> githubNotificationsList = [];
+  // GithubNotifications thisGithubNotification;
+
   int appOpens = 0;
   int bannerImageIndex = 0;
   int commentBoxImageIndex = 0;
@@ -163,6 +167,9 @@ class MyAppState extends State<MyApp> {
           userIsPremium = levels[1];
           userIsLegacy = levels[2];
         }));
+
+    /// LOAD GITHUB PROMOTIONAL MESSAGES
+    await GithubApi.getPromoMessages();
 
     /// ECWID STORE PRODUCTS LIST
     try {
