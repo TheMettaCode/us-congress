@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.7.2+157 # MARKET SECTION REORDERED, FIRST LAUNCH FLOOR ACTION BUG FIX
+version: 2.7.2+158 # BUG: HASHTAG LIST RETRIEVAL FROM DBASE, MARKET SECTION REORDERED, FIRST LAUNCH FLOOR ACTION BUG FIX
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

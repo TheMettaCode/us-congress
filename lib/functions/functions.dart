@@ -2375,7 +2375,7 @@ class Functions {
 
   static Future<String> addHashTags(String sentence) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    List<String> hashtags = userDatabase.get('hashtags');
+    List<String> hashtags = List.from(userDatabase.get('hashtags'));
     logger.d('^^^^^ ORIGINAL SENTENCE: $sentence');
     String newSentence = sentence;
 
