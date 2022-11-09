@@ -1,4 +1,4 @@
-# us_congress_app
+# US Congress App
 
 US Congress is an unofficial app that provides up to date details on US Congressional members of the House and Senate.  Join the US Congressional watch and keep an eye on elected officials, votes on bills currently active on the Senate and House floor as well as lobbying and stock market trade activities.
 
