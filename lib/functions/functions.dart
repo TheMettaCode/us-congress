@@ -45,7 +45,7 @@ class Messages {
       int durationInSeconds = 5,
       String networkImageUrl = '',
       String assetImageString = '',
-      String assetImage = 'assets/watchtower.png'}) async {
+      String assetImage = 'assets/watchtower_icon.png'}) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     bool darkTheme = userDatabase.get('darkTheme');
     Color borderColor = Theme.of(context).primaryColorDark;
@@ -2375,12 +2375,12 @@ class Functions {
 
   static Future<String> addHashTags(String sentence) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    List<String> hashtags = List.from(userDatabase.get('hashtags'));
-    logger.d('^^^^^ ORIGINAL SENTENCE: $sentence');
+    // List<String> hashtags = List.from(userDatabase.get('hashtags'));
+    debugPrint('^^^^^ ORIGINAL SENTENCE: $sentence');
     String newSentence = sentence;
 
-    // List<String> allWordsToHash = wordsToHash + statesMap.values.toList();
-    List<String> allWordsToHash = hashtags + statesMap.values.toList();
+    List<String> allWordsToHash = wordsToHash + statesMap.values.toList();
+    // List<String> allWordsToHash = hashtags + statesMap.values.toList();
 
     for (var word in allWordsToHash) {
       RegExp match = RegExp('\\b$word\\b', caseSensitive: false);
@@ -2391,7 +2391,7 @@ class Functions {
         logger.d('^^^^^ REPLACED $word with $newWord');
       }
     }
-    logger.d('^^^^^ NEW SENTENCE WITH HASHTAGS: $newSentence');
+    debugPrint('^^^^^ NEW SENTENCE WITH HASHTAGS: $newSentence');
     return newSentence;
   }
 

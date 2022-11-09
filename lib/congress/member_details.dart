@@ -268,7 +268,7 @@ class MemberDetailState extends State<MemberDetail> {
                                   infinite: true,
                                   animate: true,
                                   spins: 2,
-                                  child: Image.asset('assets/watchtower.png')),
+                                  child: Image.asset('assets/watchtower_icon.png')),
                             ],
                           ),
                         ),

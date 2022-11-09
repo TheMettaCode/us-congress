@@ -321,7 +321,7 @@ class AnimatedWidgets {
                               animate: true,
                               spins: 3,
                               infinite: true,
-                              child: Image.asset('assets/watchtower.png')),
+                              child: Image.asset('assets/watchtower_icon.png')),
                         ],
                       )),
                 ),

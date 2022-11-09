@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.7.2+158 # BUG: HASHTAG LIST RETRIEVAL FROM DBASE, MARKET SECTION REORDERED, FIRST LAUNCH FLOOR ACTION BUG FIX
+version: 2.7.2+159 # REACTIVATED DBASE HASHTAGS LIST,
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -102,7 +102,7 @@ flutter:
     - assets/stock0.png
     - assets/stock1.png
     - assets/stock2.png
-    - assets/watchtower.png
+#    - assets/watchtower.png
     - assets/watchtower_icon.png
     - assets/app_icon.png
     - assets/app_icon_gray.png
@@ -110,17 +110,8 @@ flutter:
     - assets/app_icon_tower.png
     - assets/github.png
     - assets/twitter.png
-    - assets/instagram.png
-    # - assets/venmo.png
-    # - assets/paypal.png
-    # - assets/cashapp.png
-    # - assets/bitcoin.png
-    # - assets/ethereum.png
-    # - assets/litecoin.png
-    # - assets/android_badge.png
+#    - assets/instagram.png
     - assets/google_play_icon.png
-    # - assets/samsung_galaxy_icon.png
-    # - assets/amazon_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -13,29 +13,20 @@ String githubDataToJson(GithubData data) => json.encode(data.toJson());
 class GithubData {
   GithubData({
     @required this.app,
-    // @required this.congress,
     @required this.status,
-    // @required this.updated,
     @required this.notifications,
-    @required this.hashtags,
   });
 
   final String app;
-  // final int congress;
   final String status;
-  // final String updated;
   final List<GithubNotifications> notifications;
-  final List<String> hashtags;
 
   factory GithubData.fromJson(Map<String, dynamic> json) => GithubData(
         app: json["app"] ?? 'us-congress',
-        // congress: json["congress"] ?? 117,
         status: json["status"] ?? "ERR",
-        // updated: json["updated"] ?? DateTime.now().toIso8601String(),
         notifications: List<GithubNotifications>.from(json["notifications"]
                 .map((x) => GithubNotifications.fromJson(x))) ??
             [],
-        hashtags: List<String>.from(json['hashtags']) ?? [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,7 +34,6 @@ class GithubData {
         "status": status ?? "ERR",
         "notifications":
             List<dynamic>.from(notifications.map((x) => x.toJson())),
-        "hashtags": hashtags ?? [],
       };
 }
 
