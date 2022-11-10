@@ -87,12 +87,10 @@ class SettingsState extends State<Settings> {
         actions: const <Widget>[],
       ),
       body: _isLoading
-          ? AnimatedWidgets.circularProgressWatchtower(
-              context, userDatabase, userIsPremium,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
               isFullScreen: true)
           : ValueListenableBuilder(
-              valueListenable: Hive.box(appDatabase)
-                  .listenable(keys: userDatabase.keys.toList()),
+              valueListenable: Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
               builder: (context, box, widget) {
                 userIsSubscribed = userDatabase.get('userIsSubscribed');
                 darkTheme = userDatabase.get('darkTheme');
@@ -102,8 +100,7 @@ class SettingsState extends State<Settings> {
                 billAlerts = userDatabase.get('billAlerts');
                 voteAlerts = userDatabase.get('voteAlerts');
                 lobbyingAlerts = userDatabase.get('lobbyingAlerts');
-                privateTripAlerts =
-                    userDatabase.get('privateFundedTripsAlerts');
+                privateTripAlerts = userDatabase.get('privateFundedTripsAlerts');
                 stockWatchAlerts = userDatabase.get('stockWatchAlerts');
                 statementAlerts = userDatabase.get('statementAlerts');
                 videoAlerts = userDatabase.get('videoAlerts');
@@ -125,11 +122,11 @@ class SettingsState extends State<Settings> {
                                   activeColor: darkTheme
                                       ? alertIndicatorColorBrightGreen
                                       : altHighlightColor,
-                                  secondary: AnimatedWidgets.starryNight(
-                                      context, darkTheme, true, size: 13),
+                                  secondary: AnimatedWidgets.starryNight(context, darkTheme, true,
+                                      size: 13),
                                   title: Text('Dark Mode',
-                                      style: Styles.regularStyle
-                                          .copyWith(color: darkThemeTextColor)),
+                                      style:
+                                          Styles.regularStyle.copyWith(color: darkThemeTextColor)),
                                   value: userDatabase.get('darkTheme'),
                                   onChanged: (dark) async {
                                     setState(() => darkTheme = dark);
@@ -175,15 +172,16 @@ class SettingsState extends State<Settings> {
                                           ? alertIndicatorColorBrightGreen
                                           : darkThemeTextColor),
                                   title: Text('Notifications',
-                                      style: Styles.regularStyle
-                                          .copyWith(color: darkThemeTextColor)),
+                                      style:
+                                          Styles.regularStyle.copyWith(color: darkThemeTextColor)),
                                   trailing: FaIcon(
                                       showAlertOptions
                                           ? FontAwesomeIcons.caretLeft
                                           : FontAwesomeIcons.caretDown,
                                       size: 20,
                                       color: darkThemeTextColor),
-                                  onTap: () => setState(() => showAlertOptions = !showAlertOptions)),
+                                  onTap: () =>
+                                      setState(() => showAlertOptions = !showAlertOptions)),
                             ),
                             !showAlertOptions
                                 ? const SizedBox.shrink()
@@ -192,12 +190,9 @@ class SettingsState extends State<Settings> {
                                     child: Column(
                                       children: <Widget>[
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 10),
+                                          duration: const Duration(milliseconds: 10),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -205,8 +200,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     floorAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: floorAlerts
@@ -214,26 +208,18 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('Floor Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('floorAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('floorAlerts'),
                                                 onChanged: (floor) {
-                                                  setState(() =>
-                                                      floorAlerts = floor);
-                                                  userDatabase.put(
-                                                      'floorAlerts', floor);
+                                                  setState(() => floorAlerts = floor);
+                                                  userDatabase.put('floorAlerts', floor);
                                                 }),
                                           ),
                                         ),
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 10),
+                                          duration: const Duration(milliseconds: 10),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -241,8 +227,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     newsAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: newsAlerts
@@ -250,28 +235,21 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('News Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('newsAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('newsAlerts'),
                                                 onChanged: (news) {
-                                                  setState(
-                                                      () => newsAlerts = news);
-                                                  userDatabase.put(
-                                                      'newsAlerts', news);
+                                                  setState(() => newsAlerts = news);
+                                                  userDatabase.put('newsAlerts', news);
                                                 }),
                                           ),
                                         ),
                                         !userIsPremium && !userIsLegacy
                                             ? const SizedBox.shrink()
                                             : BounceInDown(
-                                                duration: const Duration(
-                                                    milliseconds: 100),
+                                                duration: const Duration(milliseconds: 100),
                                                 child: Theme(
-                                                  data: ThemeData(
-                                                      unselectedWidgetColor:
-                                                          Colors.grey),
+                                                  data:
+                                                      ThemeData(unselectedWidgetColor: Colors.grey),
                                                   child: CheckboxListTile(
                                                       dense: true,
                                                       activeColor: darkTheme
@@ -279,40 +257,26 @@ class SettingsState extends State<Settings> {
                                                           : altHighlightColor,
                                                       secondary: Icon(
                                                           memberAlerts
-                                                              ? Icons
-                                                                  .notifications_active
-                                                              : Icons
-                                                                  .notifications,
+                                                              ? Icons.notifications_active
+                                                              : Icons.notifications,
                                                           size: 15,
                                                           color: memberAlerts
                                                               ? alertIndicatorColorBrightGreen
                                                               : darkThemeTextColor),
-                                                      title: Text(
-                                                          'Member Alerts',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  color:
-                                                                      darkThemeTextColor)),
-                                                      value: userDatabase
-                                                          .get('memberAlerts'),
+                                                      title: Text('Member Alerts',
+                                                          style: Styles.regularStyle
+                                                              .copyWith(color: darkThemeTextColor)),
+                                                      value: userDatabase.get('memberAlerts'),
                                                       onChanged: (member) {
-                                                        setState(() =>
-                                                            memberAlerts =
-                                                                member);
-                                                        userDatabase.put(
-                                                            'memberAlerts',
-                                                            member);
+                                                        setState(() => memberAlerts = member);
+                                                        userDatabase.put('memberAlerts', member);
                                                       }),
                                                 ),
                                               ),
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 200),
+                                          duration: const Duration(milliseconds: 200),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -320,8 +284,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     billAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: billAlerts
@@ -329,26 +292,18 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('Bill Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('billAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('billAlerts'),
                                                 onChanged: (bill) {
-                                                  setState(
-                                                      () => billAlerts = bill);
-                                                  userDatabase.put(
-                                                      'billAlerts', bill);
+                                                  setState(() => billAlerts = bill);
+                                                  userDatabase.put('billAlerts', bill);
                                                 }),
                                           ),
                                         ),
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 300),
+                                          duration: const Duration(milliseconds: 300),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -356,8 +311,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     voteAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: voteAlerts
@@ -365,28 +319,21 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('Vote Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('voteAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('voteAlerts'),
                                                 onChanged: (vote) {
-                                                  setState(
-                                                      () => voteAlerts = vote);
-                                                  userDatabase.put(
-                                                      'voteAlerts', vote);
+                                                  setState(() => voteAlerts = vote);
+                                                  userDatabase.put('voteAlerts', vote);
                                                 }),
                                           ),
                                         ),
                                         !userIsPremium && !userIsLegacy
                                             ? const SizedBox.shrink()
                                             : BounceInDown(
-                                                duration: const Duration(
-                                                    milliseconds: 400),
+                                                duration: const Duration(milliseconds: 400),
                                                 child: Theme(
-                                                  data: ThemeData(
-                                                      unselectedWidgetColor:
-                                                          Colors.grey),
+                                                  data:
+                                                      ThemeData(unselectedWidgetColor: Colors.grey),
                                                   child: CheckboxListTile(
                                                       dense: true,
                                                       activeColor: darkTheme
@@ -394,42 +341,29 @@ class SettingsState extends State<Settings> {
                                                           : altHighlightColor,
                                                       secondary: Icon(
                                                           lobbyingAlerts
-                                                              ? Icons
-                                                                  .notifications_active
-                                                              : Icons
-                                                                  .notifications,
+                                                              ? Icons.notifications_active
+                                                              : Icons.notifications,
                                                           size: 15,
                                                           color: lobbyingAlerts
                                                               ? alertIndicatorColorBrightGreen
                                                               : darkThemeTextColor),
-                                                      title: Text(
-                                                          'Lobbying Alerts',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  color:
-                                                                      darkThemeTextColor)),
-                                                      value: userDatabase.get(
-                                                          'lobbyingAlerts'),
+                                                      title: Text('Lobbying Alerts',
+                                                          style: Styles.regularStyle
+                                                              .copyWith(color: darkThemeTextColor)),
+                                                      value: userDatabase.get('lobbyingAlerts'),
                                                       onChanged: (lobby) {
-                                                        setState(() =>
-                                                            lobbyingAlerts =
-                                                                lobby);
-                                                        userDatabase.put(
-                                                            'lobbyingAlerts',
-                                                            lobby);
+                                                        setState(() => lobbyingAlerts = lobby);
+                                                        userDatabase.put('lobbyingAlerts', lobby);
                                                       }),
                                                 ),
                                               ),
                                         !userIsPremium && !userIsLegacy
                                             ? const SizedBox.shrink()
                                             : BounceInDown(
-                                                duration: const Duration(
-                                                    milliseconds: 400),
+                                                duration: const Duration(milliseconds: 400),
                                                 child: Theme(
-                                                  data: ThemeData(
-                                                      unselectedWidgetColor:
-                                                          Colors.grey),
+                                                  data:
+                                                      ThemeData(unselectedWidgetColor: Colors.grey),
                                                   child: CheckboxListTile(
                                                       dense: true,
                                                       activeColor: darkTheme
@@ -437,42 +371,31 @@ class SettingsState extends State<Settings> {
                                                           : altHighlightColor,
                                                       secondary: Icon(
                                                           privateTripAlerts
-                                                              ? Icons
-                                                                  .notifications_active
-                                                              : Icons
-                                                                  .notifications,
+                                                              ? Icons.notifications_active
+                                                              : Icons.notifications,
                                                           size: 15,
                                                           color: privateTripAlerts
                                                               ? alertIndicatorColorBrightGreen
                                                               : darkThemeTextColor),
-                                                      title: Text(
-                                                          'Funded Trip Alerts',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  color:
-                                                                      darkThemeTextColor)),
-                                                      value: userDatabase.get(
-                                                          'privateFundedTripsAlerts'),
+                                                      title: Text('Funded Trip Alerts',
+                                                          style: Styles.regularStyle
+                                                              .copyWith(color: darkThemeTextColor)),
+                                                      value: userDatabase
+                                                          .get('privateFundedTripsAlerts'),
                                                       onChanged: (trip) {
-                                                        setState(() =>
-                                                            privateTripAlerts =
-                                                                trip);
+                                                        setState(() => privateTripAlerts = trip);
                                                         userDatabase.put(
-                                                            'privateFundedTripsAlerts',
-                                                            trip);
+                                                            'privateFundedTripsAlerts', trip);
                                                       }),
                                                 ),
                                               ),
                                         !userIsPremium
                                             ? const SizedBox.shrink()
                                             : BounceInDown(
-                                                duration: const Duration(
-                                                    milliseconds: 500),
+                                                duration: const Duration(milliseconds: 500),
                                                 child: Theme(
-                                                  data: ThemeData(
-                                                      unselectedWidgetColor:
-                                                          Colors.grey),
+                                                  data:
+                                                      ThemeData(unselectedWidgetColor: Colors.grey),
                                                   child: CheckboxListTile(
                                                       dense: true,
                                                       activeColor: darkTheme
@@ -480,40 +403,27 @@ class SettingsState extends State<Settings> {
                                                           : altHighlightColor,
                                                       secondary: Icon(
                                                           stockWatchAlerts
-                                                              ? Icons
-                                                                  .notifications_active
-                                                              : Icons
-                                                                  .notifications,
+                                                              ? Icons.notifications_active
+                                                              : Icons.notifications,
                                                           size: 15,
                                                           color: stockWatchAlerts
                                                               ? alertIndicatorColorBrightGreen
                                                               : darkThemeTextColor),
-                                                      title: Text(
-                                                          'Stock Trade Alerts',
-                                                          style: Styles
-                                                              .regularStyle
-                                                              .copyWith(
-                                                                  color:
-                                                                      darkThemeTextColor)),
-                                                      value: userDatabase.get(
-                                                          'stockWatchAlerts'),
+                                                      title: Text('Stock Trade Alerts',
+                                                          style: Styles.regularStyle
+                                                              .copyWith(color: darkThemeTextColor)),
+                                                      value: userDatabase.get('stockWatchAlerts'),
                                                       onChanged: (stocks) {
-                                                        setState(() =>
-                                                            stockWatchAlerts =
-                                                                stocks);
+                                                        setState(() => stockWatchAlerts = stocks);
                                                         userDatabase.put(
-                                                            'stockWatchAlerts',
-                                                            stocks);
+                                                            'stockWatchAlerts', stocks);
                                                       }),
                                                 ),
                                               ),
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 600),
+                                          duration: const Duration(milliseconds: 600),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -521,8 +431,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     statementAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: statementAlerts
@@ -530,28 +439,18 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('Statement Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('statementAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('statementAlerts'),
                                                 onChanged: (statement) {
-                                                  setState(() =>
-                                                      statementAlerts =
-                                                          statement);
-                                                  userDatabase.put(
-                                                      'statementAlerts',
-                                                      statement);
+                                                  setState(() => statementAlerts = statement);
+                                                  userDatabase.put('statementAlerts', statement);
                                                 }),
                                           ),
                                         ),
                                         BounceInDown(
-                                          duration:
-                                              const Duration(milliseconds: 700),
+                                          duration: const Duration(milliseconds: 700),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -559,8 +458,7 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     videoAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: videoAlerts
@@ -568,26 +466,18 @@ class SettingsState extends State<Settings> {
                                                         : darkThemeTextColor),
                                                 title: Text('Video Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('videoAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('videoAlerts'),
                                                 onChanged: (video) {
-                                                  setState(() =>
-                                                      videoAlerts = video);
-                                                  userDatabase.put(
-                                                      'videoAlerts', video);
+                                                  setState(() => videoAlerts = video);
+                                                  userDatabase.put('videoAlerts', video);
                                                 }),
                                           ),
                                         ),
                                         BounceInDown(
-                                          duration: const Duration(
-                                              milliseconds: 1000),
+                                          duration: const Duration(milliseconds: 1000),
                                           child: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor:
-                                                    Colors.grey),
+                                            data: ThemeData(unselectedWidgetColor: Colors.grey),
                                             child: CheckboxListTile(
                                                 dense: true,
                                                 activeColor: darkTheme
@@ -595,28 +485,19 @@ class SettingsState extends State<Settings> {
                                                     : altHighlightColor,
                                                 secondary: Icon(
                                                     newProductAlerts
-                                                        ? Icons
-                                                            .notifications_active
+                                                        ? Icons.notifications_active
                                                         : Icons.notifications,
                                                     size: 15,
                                                     color: newProductAlerts
                                                         ? alertIndicatorColorBrightGreen
                                                         : darkThemeTextColor),
-                                                title: Text(
-                                                    'New Product Alerts',
+                                                title: Text('New Product Alerts',
                                                     style: Styles.regularStyle
-                                                        .copyWith(
-                                                            color:
-                                                                darkThemeTextColor)),
-                                                value: userDatabase
-                                                    .get('newProductAlerts'),
+                                                        .copyWith(color: darkThemeTextColor)),
+                                                value: userDatabase.get('newProductAlerts'),
                                                 onChanged: (product) {
-                                                  setState(() =>
-                                                      newProductAlerts =
-                                                          product);
-                                                  userDatabase.put(
-                                                      'newProductAlerts',
-                                                      product);
+                                                  setState(() => newProductAlerts = product);
+                                                  userDatabase.put('newProductAlerts', product);
                                                 }),
                                           ),
                                         ),
@@ -630,19 +511,13 @@ class SettingsState extends State<Settings> {
                                 enabled: true,
                                 dense: true,
                                 leading: AnimatedWidgets.spinningLocation(
-                                    context,
-                                    userDatabase.get('usageInfo'),
-                                    true,
-                                    disabledColor: Colors.white,
-                                    size: 14,
-                                    sameColorBright: true),
+                                    context, userDatabase.get('usageInfo'), true,
+                                    disabledColor: Colors.white, size: 14, sameColorBright: true),
                                 title: Text('Allow Location Data Collection',
-                                    style: Styles.regularStyle
-                                        .copyWith(color: darkThemeTextColor)),
+                                    style: Styles.regularStyle.copyWith(color: darkThemeTextColor)),
                                 subtitle: Text('Tap to update your selection',
-                                    style: Styles.regularStyle.copyWith(
-                                        color: darkThemeTextColor,
-                                        fontSize: 12)),
+                                    style: Styles.regularStyle
+                                        .copyWith(color: darkThemeTextColor, fontSize: 12)),
                                 // trailing: Icon(Icons.info,
                                 //     size: 15, color: darkThemeTextColor),
                                 onTap: () {
@@ -654,32 +529,23 @@ class SettingsState extends State<Settings> {
                             // Divider(),
                             userIsSubscribed
                                 ? BounceInRight(
-                                    duration:
-                                        const Duration(milliseconds: 1000),
+                                    duration: const Duration(milliseconds: 1000),
                                     child: ListTile(
                                       enabled: true,
                                       dense: true,
-                                      leading: const Icon(
-                                          Icons.workspace_premium,
-                                          size: 15,
-                                          color: altHighlightColor),
+                                      leading: const Icon(Icons.workspace_premium,
+                                          size: 15, color: altHighlightColor),
                                       title: Text('Manage Subscription',
-                                          style: Styles.regularStyle.copyWith(
-                                              color: darkThemeTextColor)),
-                                      subtitle: Text(
-                                          'Tap to manage your subscription',
-                                          style: Styles.regularStyle.copyWith(
-                                              color: darkThemeTextColor,
-                                              fontSize: 12)),
+                                          style: Styles.regularStyle
+                                              .copyWith(color: darkThemeTextColor)),
+                                      subtitle: Text('Tap to manage your subscription',
+                                          style: Styles.regularStyle
+                                              .copyWith(color: darkThemeTextColor, fontSize: 12)),
                                       trailing: const Icon(Icons.launch,
                                           size: 15, color: darkThemeTextColor),
-                                      onTap: () => Functions.linkLaunch(
-                                          context,
-                                          customerInfo.managementURL,
-                                          userDatabase,
-                                          userIsPremium,
-                                          appBarTitle: 'Manage Subscription',
-                                          interstitialAd: null),
+                                      onTap: () => Functions.linkLaunch(context,
+                                          customerInfo.managementURL, userDatabase, userIsPremium,
+                                          appBarTitle: 'Manage Subscription', interstitialAd: null),
                                     ),
                                   )
                                 : const SizedBox.shrink(),
@@ -689,13 +555,12 @@ class SettingsState extends State<Settings> {
                               child: ListTile(
                                 enabled: true,
                                 dense: true,
-                                leading: const Icon(Icons.policy,
-                                    size: 15, color: darkThemeTextColor),
+                                leading:
+                                    const Icon(Icons.policy, size: 15, color: darkThemeTextColor),
                                 title: Text('Privacy Policy',
-                                    style: Styles.regularStyle
-                                        .copyWith(color: darkThemeTextColor)),
-                                trailing: const Icon(Icons.launch,
-                                    size: 15, color: darkThemeTextColor),
+                                    style: Styles.regularStyle.copyWith(color: darkThemeTextColor)),
+                                trailing:
+                                    const Icon(Icons.launch, size: 15, color: darkThemeTextColor),
                                 // onTap: () =>
                                 //     showAboutDialog(context: context),
                                 onTap: () => Functions.linkLaunch(
@@ -711,13 +576,16 @@ class SettingsState extends State<Settings> {
                         ),
                       ),
                       ListTile(
-                          subtitle: Text(
-                              'Data Sources\nMettaCode Developers • Congress.gov • Propublica • Stock Watcher\nGoogle Civic Info • C-SPAN • Politico • Capitol Babble',
-                              style: Styles.regularStyle.copyWith(
-                                  fontSize: 11,
-                                  color: userDatabase.get('darkTheme')
-                                      ? Colors.grey
-                                      : Colors.white.withOpacity(0.65))))
+                        subtitle: Text(
+                          'Data Sources\nMettaCode Developers • Congress.gov • Propublica • Stock Watcher\nGoogle Civic Info • C-SPAN • Politico • Capitol Babble',
+                          style: Styles.regularStyle.copyWith(
+                            fontSize: 11,
+                            color: userDatabase.get('darkTheme')
+                                ? Colors.grey
+                                : Colors.white.withOpacity(0.65),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 );
@@ -730,8 +598,7 @@ class SettingsState extends State<Settings> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SharedWidgets.createdByContainer(
-                  context, userIsPremium, userDatabase),
+              SharedWidgets.createdByContainer(context, userIsPremium, userDatabase),
             ],
           ),
         ),
