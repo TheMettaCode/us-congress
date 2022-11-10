@@ -26,7 +26,7 @@ import 'package:us_congress_vote_tracker/models/statements_model.dart';
 import 'package:us_congress_vote_tracker/models/vote_payload_model.dart';
 import 'package:us_congress_vote_tracker/models/vote_roll_call_model.dart';
 import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
-import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
+import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
@@ -1287,7 +1287,8 @@ class Functions {
                   isAlert: false,
                   removeCurrent: false);
             } catch (e) {
-              logger.d('ERROR SENDING MEMBER STATEMENT POP-UP MESSAGE: $e');}
+              logger.d('ERROR SENDING MEMBER STATEMENT POP-UP MESSAGE: $e');
+            }
           }
         }
         userDatabase.put('lastStatement', finalStatementsList.first.title.toLowerCase());
@@ -1307,6 +1308,7 @@ class Functions {
       logger.d('***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
       finalStatementsList = currentStatementsList;
       logger.d('***** STATEMENTS NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('lastStatementsRefresh', '${DateTime.now()}');
       return finalStatementsList;
     }
   }
@@ -1436,6 +1438,7 @@ class Functions {
       logger.d('***** CURRENT BILLS LIST: ${currentUpdatedBillsList.map((e) => e.billId)} *****');
       finalUpdatedBillsList = currentUpdatedBillsList;
       logger.d('***** BILLS NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('lastBillsRefresh', '${DateTime.now()}');
       return finalUpdatedBillsList;
     }
   }
@@ -1606,8 +1609,7 @@ class Functions {
                   });
                 }
 
-                logger.d(
-                    memberVotePositions.entries.map((e) => '${e.key}: ${e.value}').toString());
+                logger.d(memberVotePositions.entries.map((e) => '${e.key}: ${e.value}').toString());
               }
 
               if (context == null || !ModalRoute.of(context).isCurrent) {
@@ -1656,6 +1658,7 @@ class Functions {
       logger.d('***** CURRENT VOTES LIST: ${currentVotesList.map((e) => e.rollCall)} *****');
       finalVotesList = currentVotesList;
       logger.d('***** VOTES NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('lastVotesRefresh', '${DateTime.now()}');
       return finalVotesList;
     }
   }
@@ -1789,6 +1792,7 @@ class Functions {
       logger.d('***** CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
       finalLobbyingEventsList = currentLobbyingEventsList;
       logger.d('***** LOBBIES NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
       return finalLobbyingEventsList;
     }
   }
@@ -1937,6 +1941,7 @@ class Functions {
           '***** CURRENT PRIVATE TRIPS LIST: ${currentPrivateFundedTripList.map((e) => e.documentId)} *****');
       finalPrivateFundedTripList = currentPrivateFundedTripList;
       logger.d('***** PRIVATE TRIPS NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('lastPrivateFundedTripsRefresh', '${DateTime.now()}');
       return finalPrivateFundedTripList;
     }
   }
@@ -2206,6 +2211,7 @@ class Functions {
   //     finalHouseFloorActions = currentHouseFloorActions;
   //     logger.d('***** HOUSE FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
   //     // userDatabase.put('newHouseFloor', false);
+  //       userDatabase.put('lastHouseFloorActionsRefresh', '${DateTime.now()}');
   //     return finalHouseFloorActions;
   //   }
   // }

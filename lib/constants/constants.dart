@@ -367,6 +367,7 @@ Map<String, dynamic> initialUserData = {
   "backgroundFetches": 0,
   "lastPromoNotification": "${DateTime.now()}",
   "githubData": {},
+  "lastGithubPromoNotificationsRefresh": "${DateTime.now()}",
   "lastRefresh": "${DateTime.now()}",
   "capitolBabbleNotificationsList": [],
   "lastCapitolBabble": "${DateTime.now()}",

@@ -5,11 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/functions/functions.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
-import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
+import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 
 class EcwidStoreApi {
-  static Future<List<EcwidStoreItem>> getEcwidStoreProducts(
-      {BuildContext context}) async {
+  static Future<List<EcwidStoreItem>> getEcwidStoreProducts({BuildContext context}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     List<bool> userLevels = await Functions.getUserLevels();
@@ -21,8 +20,7 @@ class EcwidStoreApi {
     // EcwidStoreItem _firstCurrentCustomerProduct;
 
     try {
-      localCurrentEcwidProductsList =
-          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items;
+      localCurrentEcwidProductsList = ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items;
       // _firstCurrentCustomerProduct = localCurrentEcwidProductsList.firstWhere(
       //     (element) => !element.name.toLowerCase().contains('[dev]'));
     } catch (e) {
@@ -64,8 +62,8 @@ class EcwidStoreApi {
           /// PRUNE AND SORT FINAL PRODUCTS LIST
           localFinalEcwidProductsList.removeWhere((item) => !item.enabled);
           if (!userIsDev) {
-            localFinalEcwidProductsList.removeWhere(
-                (item) => item.name.toLowerCase().contains('[dev]'));
+            localFinalEcwidProductsList
+                .removeWhere((item) => item.name.toLowerCase().contains('[dev]'));
           }
 
           localFinalEcwidProductsList.sort((a, b) => a.showOnFrontpage
@@ -73,22 +71,19 @@ class EcwidStoreApi {
               .compareTo(a.createTimestamp.compareTo(b.createTimestamp)));
 
           if (localCurrentEcwidProductsList.isEmpty ||
-              localFinalEcwidProductsList.first.id !=
-                  localCurrentEcwidProductsList.first.id) {
+              localFinalEcwidProductsList.first.id != localCurrentEcwidProductsList.first.id) {
             userDatabase.put("newEcwidProducts", true);
 
             if (userIsDev) {
-              final subject =
-                  'NOW AVAILABLE! ${localFinalEcwidProductsList.first.name}';
+              final subject = 'NOW AVAILABLE! ${localFinalEcwidProductsList.first.name}';
               final messageBody =
                   'Check out our latest product! ${localFinalEcwidProductsList.first.name} is now available in our affiliate SCAPEGOATS™ USA\'s online store! Get 10% OFF with coupon code [BABBLEON].Be one of the 1st to get your hands on one!';
 
-              List<String> capitolBabbleNotificationsList = List<String>.from(
-                  userDatabase.get('capitolBabbleNotificationsList'));
+              List<String> capitolBabbleNotificationsList =
+                  List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
               capitolBabbleNotificationsList.add(
                   '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>${localFinalEcwidProductsList.first.url}');
-              userDatabase.put('capitolBabbleNotificationsList',
-                  capitolBabbleNotificationsList);
+              userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
           }
 
@@ -109,8 +104,7 @@ class EcwidStoreApi {
         }
 
         if (userDatabase.get('newProductAlerts') &&
-            localCurrentEcwidProductsList.first.name !=
-                localFinalEcwidProductsList.first.name) {
+            localCurrentEcwidProductsList.first.name != localFinalEcwidProductsList.first.name) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 13,
@@ -136,18 +130,18 @@ class EcwidStoreApi {
         return localFinalEcwidProductsList;
       } else {
         userDatabase.put("newEcwidProducts", false);
-        logger.w(
-            '***** API ERROR: LOADING ECWID PRODUCTS FROM DBASE: ${response.statusCode} *****');
+        logger
+            .w('***** API ERROR: LOADING ECWID PRODUCTS FROM DBASE: ${response.statusCode} *****');
 
         return localFinalEcwidProductsList =
-            localCurrentEcwidProductsList.isNotEmpty
-                ? localCurrentEcwidProductsList
-                : [];
+            localCurrentEcwidProductsList.isNotEmpty ? localCurrentEcwidProductsList : [];
       }
     } else {
       userDatabase.put("newEcwidProducts", false);
       localFinalEcwidProductsList = localCurrentEcwidProductsList;
       logger.d('***** ECWID PRODUCTS NOT UPDATED: CATALOG IS CURRENT *****');
+      userDatabase.put('lastEcwidProductsRefresh', '${DateTime.now()}');
+
       return localFinalEcwidProductsList;
     }
   }

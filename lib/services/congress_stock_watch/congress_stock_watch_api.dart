@@ -7,7 +7,7 @@ import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/market_activity_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
+import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
 
 class CongressStockWatchApi {
@@ -28,8 +28,7 @@ class CongressStockWatchApi {
         localCurrentHouseStockWatchList =
             houseStockWatchFromJson(userDatabase.get('houseStockWatchList'));
       } catch (e) {
-        logger.d(
-            '***** CURRENT HOUSE STOCK WATCH ERROR: $e - Resetting... *****');
+        logger.d('***** CURRENT HOUSE STOCK WATCH ERROR: $e - Resetting... *****');
         userDatabase.put('houseStockWatchList', []);
         localCurrentHouseStockWatchList = [];
       }
@@ -45,13 +44,11 @@ class CongressStockWatchApi {
             'https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json';
 
         final response = await http.get(Uri.parse(houseStockWatchUrl));
-        logger.d(
-            '***** HOUSE STOCK WATCH RESPONSE CODE: ${response.statusCode} *****');
+        logger.d('***** HOUSE STOCK WATCH RESPONSE CODE: ${response.statusCode} *****');
 
         if (response.statusCode == 200) {
           logger.d('***** HOUSE STOCK WATCH RETRIEVAL SUCCESS! *****');
-          List<HouseStockWatch> houseStockWatchList =
-              houseStockWatchFromJson(response.body);
+          List<HouseStockWatch> houseStockWatchList = houseStockWatchFromJson(response.body);
 
           List<ChamberMember> membersList = [];
           ChamberMember thisMember;
@@ -66,8 +63,8 @@ class CongressStockWatchApi {
 
             localFinalHouseStockWatchList.removeWhere((element) =>
                 element.transactionDate.isAfter(DateTime.now()) ||
-                element.transactionDate.isBefore(
-                    DateTime.now().subtract(const Duration(days: 365))));
+                element.transactionDate
+                    .isBefore(DateTime.now().subtract(const Duration(days: 365))));
 
             if (localCurrentHouseStockWatchList.isEmpty ||
                 localFinalHouseStockWatchList.first.representative !=
@@ -76,8 +73,7 @@ class CongressStockWatchApi {
               userDatabase.put('newMarketOverview', true);
 
               try {
-                membersList = memberPayloadFromJson(
-                            userDatabase.get('houseMembersList'))
+                membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
                         .results
                         .first
                         .members +
@@ -94,8 +90,7 @@ class CongressStockWatchApi {
                         .toLowerCase()
                         .contains(element.lastName.toLowerCase()));
               } catch (e) {
-                logger.w(
-                    'ERROR DURING RETRIEVAL OF MEMBERS LIST (House Stock Watch Function): $e');
+                logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (House Stock Watch Function): $e');
               }
 
               if (userIsDev) {
@@ -104,12 +99,11 @@ class CongressStockWatchApi {
                 final String messageBody =
                     'HOUSE TRADE REPORT: ${thisMember == null ? localFinalHouseStockWatchList.first.representative : '@${thisMember.twitterAccount}'} ${localFinalHouseStockWatchList.first.type.toUpperCase().replaceFirst('_', ' ')} of ${localFinalHouseStockWatchList.first.ticker == 'N/A' || localFinalHouseStockWatchList.first.ticker == '--' || localFinalHouseStockWatchList.first.ticker == null ? '' : '\$${localFinalHouseStockWatchList.first.ticker}'} ${localFinalHouseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
 
-                List<String> capitolBabbleNotificationsList = List<String>.from(
-                    userDatabase.get('capitolBabbleNotificationsList'));
-                capitolBabbleNotificationsList.insert(0,
-                    '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
-                userDatabase.put('capitolBabbleNotificationsList',
-                    capitolBabbleNotificationsList);
+                List<String> capitolBabbleNotificationsList =
+                    List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+                capitolBabbleNotificationsList.insert(
+                    0, '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
+                userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
               }
             }
 
@@ -119,29 +113,24 @@ class CongressStockWatchApi {
 
             try {
               logger.i('***** SAVING NEW HOUSE STOCK DATA TO DBASE *****');
-              userDatabase.put('houseStockWatchList',
-                  houseStockWatchToJson(houseStockWatchList));
+              userDatabase.put('houseStockWatchList', houseStockWatchToJson(houseStockWatchList));
             } catch (e) {
-              logger.w(
-                  '^^^^^ ERROR SAVING HOUSE STOCK DATA TO DBASE (FUNCTION): $e ^^^^^');
+              logger.w('^^^^^ ERROR SAVING HOUSE STOCK DATA TO DBASE (FUNCTION): $e ^^^^^');
               userDatabase.put('houseStockWatchList', []);
             }
 
             try {
               List<String> houseStockMarketActivityList = [];
               for (var item in localFinalHouseStockWatchList) {
-                if (item.ticker != null &&
-                    item.ticker != '--' &&
-                    item.ticker != 'N/A') {
+                if (item.ticker != null && item.ticker != '--' && item.ticker != 'N/A') {
                   houseStockMarketActivityList.add(
                       '${item.ticker}<|:|>${item.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}_${item.type.replaceFirst('_', ' ')}_${item.amount}_${item.representative}_${item.transactionDate}_${item.disclosureDate}_house_${item.owner}');
                 }
               }
-              userDatabase.put(
-                  'houseStockMarketActivityList', houseStockMarketActivityList);
+              userDatabase.put('houseStockMarketActivityList', houseStockMarketActivityList);
             } catch (e) {
-              logger.w(
-                  '^^^^^ ERROR SAVING HOUSE MARKET ACTIVITY LIST TO DBASE (FUNCTION): $e ^^^^^');
+              logger
+                  .w('^^^^^ ERROR SAVING HOUSE MARKET ACTIVITY LIST TO DBASE (FUNCTION): $e ^^^^^');
               userDatabase.put('houseStockMarketActivityList', []);
             }
           }
@@ -149,17 +138,16 @@ class CongressStockWatchApi {
           bool memberWatched = await Functions.hasSubscription(
               userIsPremium,
               userIsLegacy,
-              (localFinalHouseStockWatchList
-                  .map((e) => e.representative.split(' ')[1])).toList().asMap(),
+              (localFinalHouseStockWatchList.map((e) => e.representative.split(' ')[1]))
+                  .toList()
+                  .asMap(),
               'member_',
               userIsDev: userIsDev);
 
           if (userIsPremium &&
               (userDatabase.get('stockWatchAlerts') || memberWatched) &&
-              (localCurrentHouseStockWatchList.first.representative
-                      .toLowerCase() !=
-                  localFinalHouseStockWatchList.first.representative
-                      .toLowerCase()
+              (localCurrentHouseStockWatchList.first.representative.toLowerCase() !=
+                  localFinalHouseStockWatchList.first.representative.toLowerCase()
               /*  ||
                 userDatabase
                         .get('lastHouseStockWatchItem')
@@ -197,23 +185,21 @@ class CongressStockWatchApi {
 
           userDatabase.put('lastHouseStockWatchItem',
               localFinalHouseStockWatchList.first.representative.toLowerCase());
-          userDatabase.put(
-              'lastHouseStockWatchListRefresh', '${DateTime.now()}');
+          userDatabase.put('lastHouseStockWatchListRefresh', '${DateTime.now()}');
           return localFinalHouseStockWatchList;
         } else {
           logger.w(
               '***** API ERROR: LOADING HOUSE STOCK WATCH DATA FROM DBASE: ${response.statusCode} *****');
 
           return localFinalHouseStockWatchList =
-              localCurrentHouseStockWatchList.isNotEmpty
-                  ? localCurrentHouseStockWatchList
-                  : [];
+              localCurrentHouseStockWatchList.isNotEmpty ? localCurrentHouseStockWatchList : [];
         }
       } else {
         logger.d(
             '***** CURRENT HOUSE STOCK DATA LIST: ${localCurrentHouseStockWatchList.map((e) => e.representative)} *****');
         localFinalHouseStockWatchList = localCurrentHouseStockWatchList;
         logger.d('***** HOUSE STOCK DATA NOT UPDATED: LIST IS CURRENT *****');
+        userDatabase.put('lastHouseStockWatchListRefresh', '${DateTime.now()}');
         return localFinalHouseStockWatchList;
       }
     } else {
@@ -238,8 +224,7 @@ class CongressStockWatchApi {
         localCurrentSenateStockWatchList =
             senateStockWatchFromJson(userDatabase.get('senateStockWatchList'));
       } catch (e) {
-        logger.d(
-            '***** CURRENT SENATE STOCK WATCH ERROR: $e - Resetting... *****');
+        logger.d('***** CURRENT SENATE STOCK WATCH ERROR: $e - Resetting... *****');
         userDatabase.put('senateStockWatchList', []);
         localCurrentSenateStockWatchList = [];
       }
@@ -255,13 +240,11 @@ class CongressStockWatchApi {
             'https://senate-stock-watcher-data.s3-us-west-2.amazonaws.com/aggregate/all_transactions.json';
 
         final response = await http.get(Uri.parse(senateStockWatchUrl));
-        logger.d(
-            '***** SENATE STOCK WATCH RESPONSE CODE: ${response.statusCode} *****');
+        logger.d('***** SENATE STOCK WATCH RESPONSE CODE: ${response.statusCode} *****');
 
         if (response.statusCode == 200) {
           logger.d('***** SENATE STOCK WATCH RETRIEVAL SUCCESS! *****');
-          List<SenateStockWatch> senateStockWatchList =
-              senateStockWatchFromJson(response.body);
+          List<SenateStockWatch> senateStockWatchList = senateStockWatchFromJson(response.body);
 
           List<ChamberMember> membersList = [];
           ChamberMember thisMember;
@@ -276,8 +259,8 @@ class CongressStockWatchApi {
 
             localFinalSenateStockWatchList.removeWhere((element) =>
                 element.transactionDate.isAfter(DateTime.now()) ||
-                element.transactionDate.isBefore(
-                    DateTime.now().subtract(const Duration(days: 365))));
+                element.transactionDate
+                    .isBefore(DateTime.now().subtract(const Duration(days: 365))));
 
             if (localCurrentSenateStockWatchList.isEmpty ||
                 localFinalSenateStockWatchList.first.senator !=
@@ -286,8 +269,7 @@ class CongressStockWatchApi {
               userDatabase.put('newMarketOverview', true);
 
               try {
-                membersList = memberPayloadFromJson(
-                            userDatabase.get('houseMembersList'))
+                membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
                         .results
                         .first
                         .members +
@@ -304,8 +286,7 @@ class CongressStockWatchApi {
                         .toLowerCase()
                         .contains(element.lastName.toLowerCase()));
               } catch (e) {
-                logger.w(
-                    'ERROR DURING RETRIEVAL OF MEMBERS LIST (House Stock Watch Function): $e');
+                logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (House Stock Watch Function): $e');
               }
 
               if (userIsDev) {
@@ -314,12 +295,11 @@ class CongressStockWatchApi {
                 final String messageBody =
                     'SENATE TRADE REPORT: ${thisMember == null ? 'Sen. ${localFinalSenateStockWatchList.first.senator}' : '@${thisMember.twitterAccount}'} ${localFinalSenateStockWatchList.first.type} of ${localFinalSenateStockWatchList.first.ticker == 'N/A' || localFinalSenateStockWatchList.first.ticker == null || localFinalSenateStockWatchList.first.ticker == '--' ? '' : '\$${localFinalSenateStockWatchList.first.ticker}'} ${localFinalSenateStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
 
-                List<String> capitolBabbleNotificationsList = List<String>.from(
-                    userDatabase.get('capitolBabbleNotificationsList'));
-                capitolBabbleNotificationsList.insert(0,
-                    '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
-                userDatabase.put('capitolBabbleNotificationsList',
-                    capitolBabbleNotificationsList);
+                List<String> capitolBabbleNotificationsList =
+                    List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
+                capitolBabbleNotificationsList.insert(
+                    0, '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>medium');
+                userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
               }
             }
 
@@ -329,26 +309,22 @@ class CongressStockWatchApi {
 
             try {
               logger.i('***** SAVING NEW SENATE STOCK DATA TO DBASE *****');
-              userDatabase.put('senateStockWatchList',
-                  senateStockWatchToJson(senateStockWatchList));
+              userDatabase.put(
+                  'senateStockWatchList', senateStockWatchToJson(senateStockWatchList));
             } catch (e) {
-              logger.w(
-                  '^^^^^ ERROR SAVING SENATE STOCK DATA TO DBASE (FUNCTION): $e ^^^^^');
+              logger.w('^^^^^ ERROR SAVING SENATE STOCK DATA TO DBASE (FUNCTION): $e ^^^^^');
               userDatabase.put('senateStockWatchList', []);
             }
 
             try {
               List<String> senateStockMarketActivityList = [];
               for (var item in localFinalSenateStockWatchList) {
-                if (item.ticker != null &&
-                    item.ticker != '--' &&
-                    item.ticker != 'N/A') {
+                if (item.ticker != null && item.ticker != '--' && item.ticker != 'N/A') {
                   senateStockMarketActivityList.add(
                       '${item.ticker}<|:|>${item.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')}_${item.type}_${item.amount}_Sen. ${item.senator}_${item.transactionDate}_${item.disclosureDate}_senate_${item.owner}');
                 }
               }
-              userDatabase.put('senateStockMarketActivityList',
-                  senateStockMarketActivityList);
+              userDatabase.put('senateStockMarketActivityList', senateStockMarketActivityList);
             } catch (e) {
               logger.w(
                   '^^^^^ ERROR SAVING SENATE STOCK MARKET ACTIVITY LIST TO DBASE (FUNCTION): $e ^^^^^');
@@ -359,8 +335,7 @@ class CongressStockWatchApi {
           bool memberWatched = await Functions.hasSubscription(
               userIsPremium,
               userIsLegacy,
-              (localFinalSenateStockWatchList
-                  .map((e) => e.senator.split(' ')[0])).toList().asMap(),
+              (localFinalSenateStockWatchList.map((e) => e.senator.split(' ')[0])).toList().asMap(),
               'member_',
               userIsDev: userIsDev);
 
@@ -405,23 +380,21 @@ class CongressStockWatchApi {
 
           userDatabase.put('lastSenateStockWatchItem',
               localFinalSenateStockWatchList.first.senator.toLowerCase());
-          userDatabase.put(
-              'lastSenateStockWatchListRefresh', '${DateTime.now()}');
+          userDatabase.put('lastSenateStockWatchListRefresh', '${DateTime.now()}');
           return localFinalSenateStockWatchList;
         } else {
           logger.w(
               '***** API ERROR: LOADING SENATE STOCK WATCH DATA FROM DBASE: ${response.statusCode} *****');
 
           return localFinalSenateStockWatchList =
-              localCurrentSenateStockWatchList.isNotEmpty
-                  ? localCurrentSenateStockWatchList
-                  : [];
+              localCurrentSenateStockWatchList.isNotEmpty ? localCurrentSenateStockWatchList : [];
         }
       } else {
         logger.d(
             '***** CURRENT SENATE STOCK DATA LIST: ${localCurrentSenateStockWatchList.map((e) => e.senator)} *****');
         localFinalSenateStockWatchList = localCurrentSenateStockWatchList;
         logger.d('***** HOUSE STOCK DATA NOT UPDATED: LIST IS CURRENT *****');
+        userDatabase.put('lastSenateStockWatchListRefresh', '${DateTime.now()}');
         return localFinalSenateStockWatchList;
       }
     } else {
@@ -453,8 +426,7 @@ class CongressStockWatchApi {
       userDatabase.put('marketActivityOverview', {});
     }
 
-    if ((userIsPremium && newMarketOverview) ||
-            localCurrentMarketActivityList.isEmpty
+    if ((userIsPremium && newMarketOverview) || localCurrentMarketActivityList.isEmpty
         // ||
         // DateTime.parse(userDatabase.get('lastMarketOverviewRefresh'))
         //     .isBefore(DateTime.now().subtract(Duration(hours: 12)))
@@ -478,8 +450,7 @@ class CongressStockWatchApi {
       }
 
       List<String> localAllStockMarketActivityList =
-          localHouseStockMarketActivityList +
-              localSenateStockMarketActivityList;
+          localHouseStockMarketActivityList + localSenateStockMarketActivityList;
 
       /// ADD MEMBER IDS TO ALL STOCK MARKET TRADES
       List<String> localNewMarketTradesList = [];
@@ -499,17 +470,14 @@ class CongressStockWatchApi {
                       // .replaceFirst('robert', 'bob')
                       .replaceFirst('william', 'bill')
                       .replaceFirst('earl l.', 'buddy')[0] &&
-              thisTradeMemberName
-                  .toLowerCase()
-                  .contains(m.lastName.toLowerCase()));
+              thisTradeMemberName.toLowerCase().contains(m.lastName.toLowerCase()));
         } catch (e) {
           // debugPrint('NO MEMBER FOUND NAMED $_fName $_lName');
           localThisMember = null;
         }
 
         if (localThisMember != null) {
-          localNewMarketTradesList
-              .add('${trade}_${localThisMember.id.toLowerCase()}');
+          localNewMarketTradesList.add('${trade}_${localThisMember.id.toLowerCase()}');
           // logger.i('MEMBER ${_thisMember.id.toUpperCase()} IS VALID');
         } else {
           localNewMarketTradesList.add('${trade}_noId');
@@ -517,12 +485,11 @@ class CongressStockWatchApi {
         }
       }
 
-      localNewMarketTradesList.retainWhere((element) =>
-          DateTime.parse(element.split('_')[4])
-              .isAfter(DateTime.now().subtract(const Duration(days: 365))));
+      localNewMarketTradesList.retainWhere((element) => DateTime.parse(element.split('_')[4])
+          .isAfter(DateTime.now().subtract(const Duration(days: 365))));
 
-      localNewMarketTradesList.sort((a, b) => DateTime.parse(a.split('_')[4])
-          .compareTo(DateTime.parse(b.split('_')[4])));
+      localNewMarketTradesList.sort(
+          (a, b) => DateTime.parse(a.split('_')[4]).compareTo(DateTime.parse(b.split('_')[4])));
 
       List<MarketActivity> localFinalMarketActivityList = [];
 
@@ -559,8 +526,8 @@ class CongressStockWatchApi {
       }
 
       try {
-        userDatabase.put('marketActivityOverview',
-            marketActivityToJson(localFinalMarketActivityList));
+        userDatabase.put(
+            'marketActivityOverview', marketActivityToJson(localFinalMarketActivityList));
         logger.i('^^^^^ MARKET ACTIVITY OVERVIEW DATA SAVED TO DATABASE ^^^^^');
       } catch (e) {
         logger.w(

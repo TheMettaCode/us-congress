@@ -10,7 +10,7 @@ import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 import 'package:us_congress_vote_tracker/functions/functions.dart';
 import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
-import 'package:us_congress_vote_tracker/services/notifications/notification_api.dart';
+import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 // import 'package:youtube_player_iframe/youtube_player_iframe.dart' as ytWeb;

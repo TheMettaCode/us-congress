@@ -8,7 +8,7 @@ import '../constants/constants.dart';
 import '../models/floor_action_model.dart';
 import '../models/member_payload_model.dart';
 import '../models/news_article_model.dart';
-import '../services/notifications/notification_api.dart';
+import '../notifications_handler/notification_api.dart';
 import 'functions.dart';
 
 class RapidApiFunctions {
