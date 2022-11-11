@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import '../../constants/constants.dart';
 import '../../functions/functions.dart';
 import '../../notifications_handler/notification_api.dart';
@@ -38,7 +39,8 @@ class GithubApi {
 
     try {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
-      currentGithubNotifications = currentGithubData.notifications.toList();
+      // currentGithubNotifications = currentGithubData.notifications.toList();
+      currentGithubNotifications = await pruneAndSort(currentGithubData.notifications.toList(), githubApiUserLevel, now);
       // currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
@@ -72,10 +74,10 @@ class GithubApi {
               githubData.app == 'us-congress' &&
               !notificationListsAreEqual) {
             debugPrint('***** NEW GITHUB DATA RETRIEVED');
-            newGithubNotifications = githubData.notifications;
+            List<GithubNotifications> rawGithubNotifications = githubData.notifications;
 
             /// CREATE LIST OF NOTIFICATIONS ADDED AFTER LAST UPDATE
-            List<GithubNotifications> newNotifications = newGithubNotifications
+            List<GithubNotifications> newNotifications = rawGithubNotifications
                     .where((notification) => notification.startDate.isAfter(lastPromoNotification))
                     .toList() ??
                 [];
@@ -86,14 +88,8 @@ class GithubApi {
               debugPrint('^^^^^ ${newNotifications.length} NEW NOTIFICATIONS ADDED');
             }
 
-            /// PRUNE AND SORT NOTIFICATIONS
-            newGithubNotifications.sort((a, b) =>
-                a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
-
-            newGithubNotifications.retainWhere((element) =>
-                element.startDate.isBefore(now) &&
-                (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
-                element.userLevels.contains(githubApiUserLevel));
+            /// PRUNE AND SORT
+            newGithubNotifications = await pruneAndSort(rawGithubNotifications, githubApiUserLevel, now);
 
             if (appRated) {
               newGithubNotifications.removeWhere((element) => element.additionalData == 'rating');
@@ -176,4 +172,20 @@ class GithubApi {
       return newGithubNotifications;
     }
   }
+}
+
+
+/// PRUNE AND SORT NOTIFICATIONS
+Future<List<GithubNotifications>> pruneAndSort(List<GithubNotifications> list, String githubApiUserLevel, DateTime now) async {
+  debugPrint('[PRUNE & SORT] PRUNING ${list.length} GITHUB PROMO NOTIFICATIONS');
+  list.sort((a, b) =>
+      a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
+
+  list.retainWhere((element) =>
+  element.startDate.isBefore(now) &&
+      (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
+      element.userLevels.contains(githubApiUserLevel));
+
+  debugPrint('[PRUNE & SORT] ${list.length} GITHUB PROMO NOTIFICATIONS REMAIN');
+  return list;
 }
