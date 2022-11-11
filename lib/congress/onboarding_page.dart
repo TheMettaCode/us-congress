@@ -100,27 +100,22 @@ class OnBoardingPageState extends State<OnBoardingPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('US Congress',
-                    style: GoogleFonts.bangers(
-                        fontSize: 30, color: Theme.of(context).primaryColor)),
+                    style:
+                        GoogleFonts.bangers(fontSize: 30, color: Theme.of(context).primaryColor)),
                 const SizedBox(height: 5),
                 const Text(
-                    'Keep watch over US Congressional member activities. Including bills, voting and lobbying.',
+                    'Keep watch over US Congressional member activities. Including bills, chamber voting and roll calls.',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic),
+                        fontWeight: FontWeight.bold, fontSize: 16, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.center),
               ],
             ),
           ),
-          // body:
-          //     "Instead of having to buy an entire share, invest any amount yo am Nunc id euismod lectus, nou want.",
           bodyWidget: Container(
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage(
-                          'assets/congress_pic_${random.nextInt(4)}.png'),
+                      image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                       fit: BoxFit.cover),
                   borderRadius: BorderRadius.circular(5))),
           image: _buildFullScreenImage(),
@@ -139,15 +134,13 @@ class OnBoardingPageState extends State<OnBoardingPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('Stay Informed',
-                    style: GoogleFonts.bangers(
-                        fontSize: 30, color: Theme.of(context).primaryColor)),
+                    style:
+                        GoogleFonts.bangers(fontSize: 30, color: Theme.of(context).primaryColor)),
                 const SizedBox(height: 5),
                 const Text(
-                    'Activate alerts from the Senate and House chambers floor while in session as well as specific congressional members, bills and lobby events.',
+                    'Activate alerts from the Senate and House chambers floor while in session as well as specific congressional members, bills, lobby events and privately funded travel.',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic),
+                        fontWeight: FontWeight.bold, fontSize: 16, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.center),
               ],
             ),
@@ -158,8 +151,7 @@ class OnBoardingPageState extends State<OnBoardingPage> {
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image:
-                          AssetImage('assets/lobbying${random.nextInt(2)}.png'),
+                      image: AssetImage('assets/lobbying${random.nextInt(2)}.png'),
                       fit: BoxFit.cover),
                   borderRadius: BorderRadius.circular(5))),
           image: _buildFullScreenImage(),
@@ -178,15 +170,13 @@ class OnBoardingPageState extends State<OnBoardingPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('Follow The Market',
-                    style: GoogleFonts.bangers(
-                        fontSize: 30, color: Theme.of(context).primaryColor)),
+                    style:
+                        GoogleFonts.bangers(fontSize: 30, color: Theme.of(context).primaryColor)),
                 const SizedBox(height: 5),
                 const Text(
-                    'Keep up to date on commodity and stock market trades executed by congressional members.',
+                    'Premium subscribers are able to keep up to date on commodity and stock market trades executed by congressional members.',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic),
+                        fontWeight: FontWeight.bold, fontSize: 16, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.center),
               ],
             ),
@@ -197,8 +187,7 @@ class OnBoardingPageState extends State<OnBoardingPage> {
               height: 125,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage('assets/stock${random.nextInt(3)}.png'),
-                      fit: BoxFit.cover),
+                      image: AssetImage('assets/stock${random.nextInt(3)}.png'), fit: BoxFit.cover),
                   borderRadius: BorderRadius.circular(5))),
           image: _buildFullScreenImage(),
           decoration: pageDecoration.copyWith(
@@ -293,9 +282,8 @@ class OnBoardingPageState extends State<OnBoardingPage> {
       done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
       curve: Curves.fastLinearToSlowEaseIn,
       controlsMargin: const EdgeInsets.all(16),
-      controlsPadding: kIsWeb
-          ? const EdgeInsets.all(12.0)
-          : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+      controlsPadding:
+          kIsWeb ? const EdgeInsets.all(12.0) : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
       dotsDecorator: const DotsDecorator(
         size: Size(10.0, 10.0),
         color: Color(0xFFBDBDBD),

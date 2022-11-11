@@ -270,15 +270,6 @@ const String interstitialRewardedAdId = 'ca-app-pub-3834929667159972/9310780865'
 // const String defaultOpenId = 'ca-app-pub-3834929667159972/9402734142';
 // const String defaultNativeAdvancedId = 'ca-app-pub-3834929667159972/3057645627';
 
-// const String testBanner = 'ca-app-pub-3940256099942544/6300978111';
-// const String testInterstitial = 'ca-app-pub-3940256099942544/1033173712';
-// const String testInterstitialVideo = 'ca-app-pub-3940256099942544/8691691433';
-// const String testRewarded = 'ca-app-pub-3940256099942544/5224354917';
-// const String testRewardedInterstitial =
-//     'ca-app-pub-3940256099942544/5354046379';
-// const String testNativeAdvanced = 'ca-app-pub-3940256099942544/2247696110';
-// const String testNativeAdvancedVideo = 'ca-app-pub-3940256099942544/1044960115';
-
 const List<String> adMobTestDevices = ['bb0847f0-9df1-4b02-86f6-09ef4c36af0f'];
 const List<String> adMobKeyWords = [
   'united states',
@@ -310,17 +301,6 @@ bool freePremiumDaysActive =
 // &&  DateTime.now().month % 3 == 0;
 int freeTrialPromoDurationDays = 5;
 
-// /// APP PROMOTIONS LIST
-// List<String> appPromotions = [
-//   "Thank you for installing the US Congress App!",
-//   "You earn credits as you move around within the app",
-//   "Trade in your credits for official App merch (coming soon)",
-//   "Earn credits for sharing the app with friends and colleagues!",
-//   "Let us know if there are any features you would like to see",
-//   "Free or legacy user? The more credits, the fewer ads!",
-//   "Credits gradually decrease over time... Don't lose them all!",
-// ];
-
 String oldUserIdPrefix = 'user<|:|>';
 String oldUserIDTag =
     "$oldUserIdPrefix${DateTime.now().year.toString().padLeft(2, '0')}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}${DateTime.now().hour.toString().padLeft(2, '0')}${DateTime.now().minute.toString().padLeft(2, '0')}${DateTime.now().second.toString().padLeft(2, '0')}<|:|>${DateTime.now().toString()}";
@@ -331,9 +311,9 @@ Map<String, dynamic> initialUserData = {
   ],
   "appUpdatesList": [
     //   "Premium Days<|:|>Get 5 days of free premium status during \'Premium Days\' with all features activated!<|:|>high",
-    //   "Data Security<|:|>Updates to app code to further protect user data and security<|:|>high",
-    "App Merch Shop Is Open!<|:|>All users can now begin using their points to shop for cool app merchandise. We'll be adding many more products and streamlining the process as we go! (Currently only available in the US and US Territories)\nA few quick ways to accrue points?\n- Share the app with friends, family and colleagues\n- Rating the app from the 'Support' menu\n- Or just purchase them directly when prompted!<|:|>normal",
-    "Top News<|:|>Now users can keep track of the latest US Congress news from around the world.<|:|>medium",
+      "Data Security<|:|>Updates to app code to further protect user data and security<|:|>high",
+    // "App Merch Shop Is Open!<|:|>All users can now begin using their points to shop for cool app merchandise. We'll be adding many more products and streamlining the process as we go! (Currently only available in the US and US Territories)\nA few quick ways to accrue points?\n- Share the app with friends, family and colleagues\n- Rating the app from the 'Support' menu\n- Or just purchase them directly when prompted!<|:|>normal",
+    // "Top News<|:|>Now users can keep track of the latest US Congress news from around the world.<|:|>medium",
     "App Security<|:|>Minor updates for continued data security<|:|>normal",
     "User Interface<|:|>Minor user interface adjustments<|:|>normal",
     "Miscellaneous<|:|>Minor code upgrades and bug fixes. Earn credits for pointing them out to us!<|:|>normal",

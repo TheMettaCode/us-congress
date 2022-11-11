@@ -40,7 +40,8 @@ class GithubApi {
     try {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
       // currentGithubNotifications = currentGithubData.notifications.toList();
-      currentGithubNotifications = await pruneAndSort(currentGithubData.notifications.toList(), githubApiUserLevel, now);
+      currentGithubNotifications =
+          await pruneAndSort(currentGithubData.notifications.toList(), githubApiUserLevel, now);
       // currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
@@ -89,7 +90,8 @@ class GithubApi {
             }
 
             /// PRUNE AND SORT
-            newGithubNotifications = await pruneAndSort(rawGithubNotifications, githubApiUserLevel, now);
+            newGithubNotifications =
+                await pruneAndSort(rawGithubNotifications, githubApiUserLevel, now);
 
             if (appRated) {
               newGithubNotifications.removeWhere((element) => element.additionalData == 'rating');
@@ -174,17 +176,20 @@ class GithubApi {
   }
 }
 
-
 /// PRUNE AND SORT NOTIFICATIONS
-Future<List<GithubNotifications>> pruneAndSort(List<GithubNotifications> list, String githubApiUserLevel, DateTime now) async {
+Future<List<GithubNotifications>> pruneAndSort(
+    List<GithubNotifications> list, String githubApiUserLevel, DateTime now) async {
   debugPrint('[PRUNE & SORT] PRUNING ${list.length} GITHUB PROMO NOTIFICATIONS');
-  list.sort((a, b) =>
-      a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
 
   list.retainWhere((element) =>
-  element.startDate.isBefore(now) &&
+      element.startDate.isBefore(now) &&
       (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
       element.userLevels.contains(githubApiUserLevel));
+
+  // list.sort((a, b) =>
+  //     a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
+
+  list.sort((a, b) => b.priority.compareTo(a.priority));
 
   debugPrint('[PRUNE & SORT] ${list.length} GITHUB PROMO NOTIFICATIONS REMAIN');
   return list;
