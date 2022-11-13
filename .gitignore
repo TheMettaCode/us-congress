@@ -54,3 +54,4 @@ app.*.map.json
 key.jks
 /lib/services/congress_dot_gov/
 /lib/services/twitter/
+/lib/constants/hive_data_test/

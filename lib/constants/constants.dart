@@ -244,6 +244,9 @@ const List<String> wordsToHash = [
   "Ukraine",
   "Unemployment",
   "US Border",
+  "Veteran",
+  "Veterans",
+  "Veterans Day",
   "Vice President",
   "VPOTUS",
   "Vote",
@@ -311,7 +314,7 @@ Map<String, dynamic> initialUserData = {
   ],
   "appUpdatesList": [
     //   "Premium Days<|:|>Get 5 days of free premium status during \'Premium Days\' with all features activated!<|:|>high",
-      "Data Security<|:|>Updates to app code to further protect user data and security<|:|>high",
+    "Data Security<|:|>Updates to app code to further protect user data and security<|:|>high",
     // "App Merch Shop Is Open!<|:|>All users can now begin using their points to shop for cool app merchandise. We'll be adding many more products and streamlining the process as we go! (Currently only available in the US and US Territories)\nA few quick ways to accrue points?\n- Share the app with friends, family and colleagues\n- Rating the app from the 'Support' menu\n- Or just purchase them directly when prompted!<|:|>normal",
     // "Top News<|:|>Now users can keep track of the latest US Congress news from around the world.<|:|>medium",
     "App Security<|:|>Minor updates for continued data security<|:|>normal",

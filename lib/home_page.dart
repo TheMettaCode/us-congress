@@ -394,8 +394,17 @@ class HomePageState extends State<HomePage> {
     List<GithubNotifications> tempGithubNotificationsList = [];
     GithubNotifications tempGithubNotification;
     try {
-      tempGithubNotificationsList =
-          githubDataFromJson(userDatabase.get('githubData')).notifications;
+      tempGithubNotificationsList = await GithubApi.pruneAndSortPromoNotifications(
+          githubDataFromJson(userDatabase.get('githubData')).notifications,
+          userIsDev
+              ? "developer"
+              : userIsPremium
+                  ? "premium"
+                  : userIsLegacy
+                      ? "legacy"
+                      : "free",
+          DateTime.now());
+      // githubDataFromJson(userDatabase.get('githubData')).notifications;
       tempGithubNotification =
           tempGithubNotificationsList[random.nextInt(tempGithubNotificationsList.length)];
       logger.d(
@@ -1332,8 +1341,9 @@ class HomePageState extends State<HomePage> {
                                             ? const SizedBox.shrink()
                                             : newsArticleSlider(newsArticlesList),
                                         // houseFloorActions.isEmpty && senateFloorActions.isEmpty
-                                        githubNotificationsList.isEmpty ||  (currentHouseFloorActions.isEmpty &&
-                                                currentSenateFloorActions.isEmpty)
+                                        githubNotificationsList.isEmpty ||
+                                                (currentHouseFloorActions.isEmpty &&
+                                                    currentSenateFloorActions.isEmpty)
                                             ? const SizedBox.shrink()
                                             : floorActions(orientation),
                                         congressInfoButtons(subscriptionAlertsList),

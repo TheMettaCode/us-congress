@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 import '../../constants/constants.dart';
 import '../../functions/functions.dart';
 import '../../notifications_handler/notification_api.dart';
@@ -41,7 +40,7 @@ class GithubApi {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
       // currentGithubNotifications = currentGithubData.notifications.toList();
       currentGithubNotifications =
-          await pruneAndSort(currentGithubData.notifications.toList(), githubApiUserLevel, now);
+          await pruneAndSortPromoNotifications(currentGithubData.notifications.toList(), githubApiUserLevel, now);
       // currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
@@ -91,7 +90,7 @@ class GithubApi {
 
             /// PRUNE AND SORT
             newGithubNotifications =
-                await pruneAndSort(rawGithubNotifications, githubApiUserLevel, now);
+                await pruneAndSortPromoNotifications(rawGithubNotifications, githubApiUserLevel, now);
 
             if (appRated) {
               newGithubNotifications.removeWhere((element) => element.additionalData == 'rating');
@@ -174,23 +173,23 @@ class GithubApi {
       return newGithubNotifications;
     }
   }
-}
 
-/// PRUNE AND SORT NOTIFICATIONS
-Future<List<GithubNotifications>> pruneAndSort(
-    List<GithubNotifications> list, String githubApiUserLevel, DateTime now) async {
-  debugPrint('[PRUNE & SORT] PRUNING ${list.length} GITHUB PROMO NOTIFICATIONS');
+  /// PRUNE AND SORT NOTIFICATIONS
+  static Future<List<GithubNotifications>> pruneAndSortPromoNotifications(
+      List<GithubNotifications> list, String githubApiUserLevel, DateTime now) async {
+    debugPrint('[PRUNE & SORT] PRUNING ${list.length} GITHUB PROMO NOTIFICATIONS');
 
-  list.retainWhere((element) =>
-      element.startDate.isBefore(now) &&
-      (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
-      element.userLevels.contains(githubApiUserLevel));
+    list.retainWhere((element) =>
+    element.startDate.isBefore(now) &&
+        (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
+        element.userLevels.contains(githubApiUserLevel));
 
-  // list.sort((a, b) =>
-  //     a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
+    // list.sort((a, b) =>
+    //     a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
 
-  list.sort((a, b) => b.priority.compareTo(a.priority));
+    list.sort((a, b) => b.priority.compareTo(a.priority));
 
-  debugPrint('[PRUNE & SORT] ${list.length} GITHUB PROMO NOTIFICATIONS REMAIN');
-  return list;
+    debugPrint('[PRUNE & SORT] ${list.length} GITHUB PROMO NOTIFICATIONS REMAIN');
+    return list;
+  }
 }
