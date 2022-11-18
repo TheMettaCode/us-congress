@@ -10,6 +10,7 @@ import 'package:us_congress_vote_tracker/functions/functions.dart';
 import 'package:us_congress_vote_tracker/models/news_article_model.dart';
 import 'package:us_congress_vote_tracker/models/order_detail.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
+import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../services/github/usc_app_data_model.dart';
 
@@ -46,19 +47,16 @@ class DeveloperPageState extends State<DeveloperPage> {
           userIsLegacy = status[2];
         })));
 
-    List<NewsArticle> localNewsArticles =
-        newsArticleFromJson(userDatabase.get('newsArticles'));
-    NewsArticle lThisNewsArticle =
-        localNewsArticles[random.nextInt(localNewsArticles.length)];
+    List<NewsArticle> localNewsArticles = newsArticleFromJson(userDatabase.get('newsArticles'));
+    NewsArticle lThisNewsArticle = localNewsArticles[random.nextInt(localNewsArticles.length)];
 
     List<GithubNotifications> localGithubNotifications =
         githubDataFromJson(userDatabase.get('githubData')).notifications;
-    GithubNotifications localThisGithubNotification = localGithubNotifications[
-        random.nextInt(localGithubNotifications.length)];
+    GithubNotifications localThisGithubNotification =
+        localGithubNotifications[random.nextInt(localGithubNotifications.length)];
 
     setState(() {
-      ecwidStoreItems =
-          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items;
+      ecwidStoreItems = ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items;
       appOpens = userDatabase.get('appOpens');
       userIsSubscribed = userDatabase.get('userIsSubscribed');
       newsArticles = localNewsArticles;
@@ -90,30 +88,26 @@ class DeveloperPageState extends State<DeveloperPage> {
   List<Order> productOrdersList = [];
   List<GithubNotifications> githubNotifications = [];
 
-  final String freeTrialTestDate =
-      '${DateTime.now().subtract(const Duration(days: 3))}';
-  final String freeTrialExpiredDate =
-      '${DateTime.now().subtract(const Duration(days: 7))}';
+  final String freeTrialTestDate = '${DateTime.now().subtract(const Duration(days: 3))}';
+  final String freeTrialExpiredDate = '${DateTime.now().subtract(const Duration(days: 7))}';
   final String freeTrialExpiringSoonDate =
       '${DateTime.now().subtract(Duration(seconds: freeTrialPromoDurationDays * 86400 - 60))}';
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
+        valueListenable: Hive.box(appDatabase).listenable(keys: userDatabase.keys.toList()),
         builder: (context, box, widget) {
           userIsPremium = userDatabase.get('userIsPremium');
           userIsSubscribed = userDatabase.get('userIsSubscribed');
           userIsLegacy = !userDatabase.get('userIsPremium') &&
-                  List.from(userDatabase.get('userIdList')).any((element) =>
-                      element.toString().startsWith(oldUserIdPrefix))
+                  List.from(userDatabase.get('userIdList'))
+                      .any((element) => element.toString().startsWith(oldUserIdPrefix))
               ? true
               : false;
           try {
-            productOrdersList = orderDetailListFromJson(
-                    userDatabase.get('ecwidProductOrdersList'))
-                .orders;
+            productOrdersList =
+                orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders;
           } catch (e) {
             productOrdersList = [];
             logger.w(
@@ -133,8 +127,7 @@ class DeveloperPageState extends State<DeveloperPage> {
               title: const Text('Developer Test Page'),
             ),
             body: _loading
-                ? AnimatedWidgets.circularProgressWatchtower(
-                    context, userDatabase, userIsPremium,
+                ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                     isFullScreen: true)
                 : Container(
                     color: Theme.of(context).colorScheme.background,
@@ -150,8 +143,7 @@ class DeveloperPageState extends State<DeveloperPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text('$appOpens Opens - $backgroundFetches Fetches',
-                                    style: Styles.googleStyle
-                                        .copyWith(color: darkThemeTextColor)),
+                                    style: Styles.googleStyle.copyWith(color: darkThemeTextColor)),
                               ],
                             ),
                           ),
@@ -204,12 +196,10 @@ class DeveloperPageState extends State<DeveloperPage> {
                                       'Premium Toggle ${userIsSubscribed ? '(Subscribed)' : '(Not Subscribed)'}'),
                                   onTap: () {
                                     bool localUpgraded = !userIsPremium;
-                                    userDatabase.put(
-                                        'userIsPremium', localUpgraded);
+                                    userDatabase.put('userIsPremium', localUpgraded);
                                     // userDatabase.put('devUpgraded', _upgraded);
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
                                       color: userDatabase.get('userIsPremium')
                                           ? altHighlightColor
@@ -222,29 +212,25 @@ class DeveloperPageState extends State<DeveloperPage> {
                                   enableFeedback: true,
                                   title: const Text('Legacy Toggle'),
                                   onTap: () {
-                                    List<String> localUserIdList = List.from(
-                                        userDatabase.get('userIdList'));
-                                    if (localUserIdList.any((element) =>
-                                        element.startsWith(oldUserIdPrefix))) {
-                                      localUserIdList.removeWhere((element) =>
-                                          element.startsWith(oldUserIdPrefix));
+                                    List<String> localUserIdList =
+                                        List.from(userDatabase.get('userIdList'));
+                                    if (localUserIdList
+                                        .any((element) => element.startsWith(oldUserIdPrefix))) {
+                                      localUserIdList.removeWhere(
+                                          (element) => element.startsWith(oldUserIdPrefix));
                                       // userDatabase.put('devUpgraded', false);
                                     } else {
                                       localUserIdList.insert(0, oldUserIDTag);
                                       // userDatabase.put('devUpgraded', true);
                                     }
 
-                                    userDatabase.put(
-                                        'userIdList', localUserIdList);
+                                    userDatabase.put('userIdList', localUserIdList);
                                     logger.i(userDatabase.get('userIdList'));
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
-                                      color: List<String>.from(userDatabase
-                                                  .get('userIdList'))
-                                              .any((element) => element
-                                                  .startsWith(oldUserIdPrefix))
+                                      color: List<String>.from(userDatabase.get('userIdList'))
+                                              .any((element) => element.startsWith(oldUserIdPrefix))
                                           ? altHighlightColor
                                           : null),
                                 )),
@@ -258,11 +244,9 @@ class DeveloperPageState extends State<DeveloperPage> {
                                       'DLCODE: ${userDatabase.get('devLegacyCode')} DPCODE: ${userDatabase.get('devPremiumCode')}\nFTCODE: ${userDatabase.get('freeTrialCode')}'),
                                   onTap: () {
                                     bool localDevUpgraded = !devUpgraded;
-                                    userDatabase.put(
-                                        'devUpgraded', localDevUpgraded);
+                                    userDatabase.put('devUpgraded', localDevUpgraded);
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
                                       color: userDatabase.get('devUpgraded')
                                           ? altHighlightColor
@@ -278,12 +262,10 @@ class DeveloperPageState extends State<DeveloperPage> {
                                     bool localAppRated = !appRated;
                                     userDatabase.put('appRated', localAppRated);
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
-                                      color: userDatabase.get('appRated')
-                                          ? altHighlightColor
-                                          : null),
+                                      color:
+                                          userDatabase.get('appRated') ? altHighlightColor : null),
                                 )),
                                 Card(
                                     child: ListTile(
@@ -296,11 +278,9 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           .toUpperCase()),
                                   onTap: () {
                                     bool localFreeTrialUsed = !freeTrialUsed;
-                                    userDatabase.put(
-                                        'freeTrialUsed', localFreeTrialUsed);
+                                    userDatabase.put('freeTrialUsed', localFreeTrialUsed);
                                     if (localFreeTrialUsed) {
-                                      userDatabase.put('freeTrialStartDate',
-                                          freeTrialTestDate);
+                                      userDatabase.put('freeTrialStartDate', freeTrialTestDate);
                                     }
                                   },
                                   onLongPress: () {
@@ -308,17 +288,15 @@ class DeveloperPageState extends State<DeveloperPage> {
                                     // userDatabase.put(
                                     //     'freeTrialUsed', _freeTrialUsed);
                                     if (freeTrialUsed) {
-                                      userDatabase.put('freeTrialStartDate',
-                                          freeTrialExpiredDate);
+                                      userDatabase.put('freeTrialStartDate', freeTrialExpiredDate);
                                     } else {
                                       // _freeTrialUsed = !freeTrialUsed;
                                       userDatabase.put('freeTrialUsed', true);
-                                      userDatabase.put('freeTrialStartDate',
-                                          freeTrialExpiringSoonDate);
+                                      userDatabase.put(
+                                          'freeTrialStartDate', freeTrialExpiringSoonDate);
                                     }
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
                                       color: userDatabase.get('freeTrialUsed')
                                           ? altHighlightColor
@@ -329,39 +307,50 @@ class DeveloperPageState extends State<DeveloperPage> {
                                   dense: true,
                                   enabled: true,
                                   enableFeedback: true,
-                                  title:
-                                      const Text('Free Trial Dismissed Toggle'),
+                                  title: const Text('Free Trial Dismissed Toggle'),
                                   onTap: () {
-                                    bool localFreeTrialDismissed =
-                                        !freeTrialDismissed;
-                                    userDatabase.put('freeTrialDismissed',
-                                        localFreeTrialDismissed);
+                                    bool localFreeTrialDismissed = !freeTrialDismissed;
+                                    userDatabase.put('freeTrialDismissed', localFreeTrialDismissed);
                                   },
-                                  trailing: FaIcon(
-                                      FontAwesomeIcons.solidLightbulb,
+                                  trailing: FaIcon(FontAwesomeIcons.solidLightbulb,
                                       size: 18,
-                                      color:
-                                          userDatabase.get('freeTrialDismissed')
-                                              ? altHighlightColor
-                                              : null),
+                                      color: userDatabase.get('freeTrialDismissed')
+                                          ? altHighlightColor
+                                          : null),
                                 )),
+                                Column(
+                                  children: [
+                                    Card(
+                                        child: ListTile(
+                                      dense: true,
+                                      enabled: true,
+                                      enableFeedback: true,
+                                      title: const Text('New YouTube API Test'),
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => const NewVideoPage())),
+                                    )),
+                                  ],
+                                ),
                                 Card(
                                     child: ListTile(
-                                  dense: true,
-                                  enabled: true,
-                                  enableFeedback: true,
-                                  title: const Text('Pop-Up With Image Test'),
-                                  onTap: () async {
-                                    Messages.showMessage(
-                                        context: context,
-                                        message:
-                                            'This is just a test to see if the picture to the left is showing up correctly. If so, it will fade in and have a rounded border.',
-                                        assetImageString:
-                                            'assets/congress_pic_${random.nextInt(4)}.png',
-                                        isAlert: false,
-                                        removeCurrent: false);
-                                  },
-                                )),
+                                        dense: true,
+                                        enabled: true,
+                                        enableFeedback: true,
+                                        title: const Text('Pop-Up With Image Test'),
+                                        onTap: () async {
+                                          Messages.showMessage(
+                                              context: context,
+                                              message:
+                                                  'This is just a test to see if the picture to the left is showing up correctly. If so, it will fade in and have a rounded border.',
+                                              assetImageString:
+                                                  'assets/congress_pic_${random.nextInt(4)}.png',
+                                              isAlert: false,
+                                              removeCurrent: false);
+                                        },
+                                        onLongPress: () => userDatabase.put(
+                                            'newHouseFloor', !userDatabase.get('newHouseFloor')))),
                                 // Card(
                                 //     child: ListTile(
                                 //   dense: true,
@@ -375,8 +364,7 @@ class DeveloperPageState extends State<DeveloperPage> {
                                 //       style: Styles.googleStyle),
                                 // )),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: InkWell(
@@ -388,10 +376,8 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           ),
                                         ),
                                         onTap: () {
-                                          int credits =
-                                              userDatabase.get('credits');
-                                          userDatabase.put(
-                                              'credits', credits + 100);
+                                          int credits = userDatabase.get('credits');
+                                          userDatabase.put('credits', credits + 100);
                                         },
                                       ),
                                     ),
@@ -406,20 +392,16 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           ),
                                         ),
                                         onTap: () {
-                                          int credits =
-                                              userDatabase.get('credits');
+                                          int credits = userDatabase.get('credits');
                                           if (credits >= 100) {
-                                            userDatabase.put(
-                                                'credits', credits - 100);
+                                            userDatabase.put('credits', credits - 100);
                                           }
                                         },
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 20.0),
-                                      child: Text(
-                                          '${userDatabase.get('credits')}',
+                                      padding: const EdgeInsets.only(left: 10, right: 20.0),
+                                      child: Text('${userDatabase.get('credits')}',
                                           style: Styles.googleStyle),
                                     ),
                                   ],
@@ -427,25 +409,20 @@ class DeveloperPageState extends State<DeveloperPage> {
                                 capitolBabbleNotificationsList.isEmpty
                                     ? const SizedBox.shrink()
                                     : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: InkWell(
                                               child: const Card(
                                                 child: Padding(
                                                   padding: EdgeInsets.all(10),
-                                                  child: Text(
-                                                      'Remove First Babble',
-                                                      textAlign:
-                                                          TextAlign.center),
+                                                  child: Text('Remove First Babble',
+                                                      textAlign: TextAlign.center),
                                                 ),
                                               ),
                                               onTap: () {
-                                                capitolBabbleNotificationsList
-                                                    .removeAt(0);
-                                                userDatabase.put(
-                                                    'capitolBabbleNotificationsList',
+                                                capitolBabbleNotificationsList.removeAt(0);
+                                                userDatabase.put('capitolBabbleNotificationsList',
                                                     capitolBabbleNotificationsList);
                                               },
                                             ),
@@ -456,28 +433,21 @@ class DeveloperPageState extends State<DeveloperPage> {
                                               child: const Card(
                                                 child: Padding(
                                                   padding: EdgeInsets.all(10),
-                                                  child: Text(
-                                                      'Remove Last Babble',
-                                                      textAlign:
-                                                          TextAlign.center),
+                                                  child: Text('Remove Last Babble',
+                                                      textAlign: TextAlign.center),
                                                 ),
                                               ),
                                               onTap: () {
-                                                capitolBabbleNotificationsList
-                                                    .removeLast();
-                                                userDatabase.put(
-                                                    'capitolBabbleNotificationsList',
+                                                capitolBabbleNotificationsList.removeLast();
+                                                userDatabase.put('capitolBabbleNotificationsList',
                                                     capitolBabbleNotificationsList);
                                               },
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10, right: 20.0),
+                                            padding: const EdgeInsets.only(left: 10, right: 20.0),
                                             child: Text(
-                                                capitolBabbleNotificationsList
-                                                    .length
-                                                    .toString(),
+                                                capitolBabbleNotificationsList.length.toString(),
                                                 style: Styles.googleStyle),
                                           ),
                                         ],
@@ -491,23 +461,17 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           enableFeedback: true,
                                           leading: CircleAvatar(
                                               maxRadius: 15,
-                                              backgroundColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                              backgroundImage: NetworkImage(
-                                                  thisNewsArticle.imageUrl)),
+                                              backgroundColor:
+                                                  Theme.of(context).colorScheme.primary,
+                                              backgroundImage:
+                                                  NetworkImage(thisNewsArticle.imageUrl)),
                                           title: Text(thisNewsArticle.source),
                                           subtitle: Text(thisNewsArticle.title),
-                                          trailing: Text(
-                                              newsArticles.length.toString(),
+                                          trailing: Text(newsArticles.length.toString(),
                                               style: Styles.googleStyle),
-                                          onTap: () => Functions.linkLaunch(
-                                              context,
-                                              thisNewsArticle.url,
-                                              userDatabase,
-                                              userIsPremium,
-                                              appBarTitle:
-                                                  thisNewsArticle.source),
+                                          onTap: () => Functions.linkLaunch(context,
+                                              thisNewsArticle.url, userDatabase, userIsPremium,
+                                              appBarTitle: thisNewsArticle.source),
                                         ),
                                       ),
                                 thisGithubNotification == null
@@ -524,13 +488,9 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           //         .primary,
                                           //     backgroundImage: NetworkImage(
                                           //         thisNewsArticle.imageUrl)),
-                                          title: Text(
-                                              thisGithubNotification.title),
-                                          subtitle: Text(
-                                              thisGithubNotification.message),
-                                          trailing: Text(
-                                              githubNotifications.length
-                                                  .toString(),
+                                          title: Text(thisGithubNotification.title),
+                                          subtitle: Text(thisGithubNotification.message),
+                                          trailing: Text(githubNotifications.length.toString(),
                                               style: Styles.googleStyle),
                                           // onTap: () => Functions.linkLaunch(
                                           //     context,
@@ -546,30 +506,22 @@ class DeveloperPageState extends State<DeveloperPage> {
                                   child: Container(
                                       // height: 200,
                                       decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .primaryColorDark
-                                              .withOpacity(0.5),
-                                          border:
-                                              Border.all(color: Colors.black),
-                                          borderRadius:
-                                              BorderRadius.circular(3)),
+                                          color:
+                                              Theme.of(context).primaryColorDark.withOpacity(0.5),
+                                          border: Border.all(color: Colors.black),
+                                          borderRadius: BorderRadius.circular(3)),
                                       padding: const EdgeInsets.all(10),
                                       child: Column(
                                         // shrinkWrap: true,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Text('Data Output',
                                                   style: Styles.googleStyle
-                                                      .copyWith(
-                                                          color:
-                                                              darkThemeTextColor)),
+                                                      .copyWith(color: darkThemeTextColor)),
                                             ],
                                           ),
                                           const Divider(),
@@ -605,8 +557,7 @@ class DeveloperPageState extends State<DeveloperPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('Bottom Navigation Bar',
-                        style: Styles.googleStyle
-                            .copyWith(color: darkThemeTextColor)),
+                        style: Styles.googleStyle.copyWith(color: darkThemeTextColor)),
                   ],
                 )),
           ));

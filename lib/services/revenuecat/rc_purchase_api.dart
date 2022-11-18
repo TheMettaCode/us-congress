@@ -193,7 +193,7 @@ class RcPurchaseApi {
             0,
             Order(
                 orderDate: DateTime.now(),
-                orderId: 'GPIAP-RC${thisTransaction.revenueCatIdentifier}',
+                orderId: 'REVCAT${thisTransaction.revenueCatIdentifier}',
                 orderIdExtended: '',
                 userName: lastUserId.split('<|:|>')[0],
                 userId: initialUserId.split('<|:|>')[1],

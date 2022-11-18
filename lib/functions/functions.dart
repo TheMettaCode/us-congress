@@ -1308,7 +1308,7 @@ class Functions {
       logger.d('***** CURRENT STATEMENTS LIST: ${currentStatementsList.map((e) => e.title)} *****');
       finalStatementsList = currentStatementsList;
       logger.d('***** STATEMENTS NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastStatementsRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastStatementsRefresh', '${DateTime.now()}');
       return finalStatementsList;
     }
   }
@@ -1438,7 +1438,7 @@ class Functions {
       logger.d('***** CURRENT BILLS LIST: ${currentUpdatedBillsList.map((e) => e.billId)} *****');
       finalUpdatedBillsList = currentUpdatedBillsList;
       logger.d('***** BILLS NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastBillsRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastBillsRefresh', '${DateTime.now()}');
       return finalUpdatedBillsList;
     }
   }
@@ -1658,7 +1658,7 @@ class Functions {
       logger.d('***** CURRENT VOTES LIST: ${currentVotesList.map((e) => e.rollCall)} *****');
       finalVotesList = currentVotesList;
       logger.d('***** VOTES NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastVotesRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastVotesRefresh', '${DateTime.now()}');
       return finalVotesList;
     }
   }
@@ -1792,7 +1792,7 @@ class Functions {
       logger.d('***** CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
       finalLobbyingEventsList = currentLobbyingEventsList;
       logger.d('***** LOBBIES NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
       return finalLobbyingEventsList;
     }
   }
@@ -1941,7 +1941,7 @@ class Functions {
           '***** CURRENT PRIVATE TRIPS LIST: ${currentPrivateFundedTripList.map((e) => e.documentId)} *****');
       finalPrivateFundedTripList = currentPrivateFundedTripList;
       logger.d('***** PRIVATE TRIPS NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastPrivateFundedTripsRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastPrivateFundedTripsRefresh', '${DateTime.now()}');
       return finalPrivateFundedTripList;
     }
   }

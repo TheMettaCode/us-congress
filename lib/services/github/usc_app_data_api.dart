@@ -39,8 +39,8 @@ class GithubApi {
     try {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
       // currentGithubNotifications = currentGithubData.notifications.toList();
-      currentGithubNotifications =
-          await pruneAndSortPromoNotifications(currentGithubData.notifications.toList(), githubApiUserLevel, now);
+      currentGithubNotifications = await pruneAndSortPromoNotifications(
+          currentGithubData.notifications.toList(), githubApiUserLevel, now);
       // currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
@@ -52,7 +52,7 @@ class GithubApi {
     List<GithubNotifications> newGithubNotifications = [];
 
     if (currentGithubNotifications.isEmpty ||
-        DateTime.parse(userDatabase.get('lastGithubPromoNotificationsRefresh'))
+        lastPromoNotification // DateTime.parse(userDatabase.get('lastGithubPromoNotificationsRefresh'))
             .isBefore(DateTime.now().subtract(const Duration(hours: 4)))) {
       try {
         final Map headers = <String, String>{"Accept": "application/json"};
@@ -89,16 +89,17 @@ class GithubApi {
             }
 
             /// PRUNE AND SORT
-            newGithubNotifications =
-                await pruneAndSortPromoNotifications(rawGithubNotifications, githubApiUserLevel, now);
+            newGithubNotifications = await pruneAndSortPromoNotifications(
+                rawGithubNotifications, githubApiUserLevel, now);
 
             if (appRated) {
               newGithubNotifications.removeWhere((element) => element.additionalData == 'rating');
             }
 
             /// SET 'NEW NOTIFICATIONS RETRIEVED' FLAG TO TRUE
-            if (newGithubNotifications.isNotEmpty &&
-                newGithubNotifications.first.userLevels.contains(githubApiUserLevel)) {
+            if (newNotifications.isNotEmpty &&
+                newNotifications.any(
+                    (item) => item.userLevels.any((element) => element == githubApiUserLevel))) {
               newUserLevelMessagesRetrieved = true;
             }
             // }
@@ -109,7 +110,8 @@ class GithubApi {
                 (newUserLevelMessagesRetrieved ||
                     lastPromoNotification.isBefore(now.subtract(const Duration(days: 3))))) {
               GithubNotifications thisPromotion = newUserLevelMessagesRetrieved
-                  ? newGithubNotifications.first
+                  ? newNotifications.firstWhere(
+                      (item) => item.userLevels.any((element) => element == githubApiUserLevel))
                   : newGithubNotifications[random.nextInt(newGithubNotifications.length)];
               String title = thisPromotion.title;
               String messageBody = thisPromotion.message;
@@ -143,10 +145,10 @@ class GithubApi {
               // Additional Data: ${notification.additionalData}
               // ''');
               //   }
-            }
 
-            userDatabase.put('lastPromoNotification', DateTime.now().toIso8601String());
-            userDatabase.put('lastGithubPromoNotificationsRefresh', '${DateTime.now()}');
+              userDatabase.put('lastPromoNotification', DateTime.now().toIso8601String());
+              // userDatabase.put('lastGithubPromoNotificationsRefresh', '${DateTime.now()}');
+            }
             return newGithubNotifications;
           } else {
             debugPrint('***** CURRENT GITHUB MESSAGES ARE UP TO DATE. NO NOTIFICATIONS TO SEND');
@@ -169,7 +171,7 @@ class GithubApi {
           '***** CURRENT GITHUB PROMO NOTIFICATIONS LIST: ${currentGithubNotifications.map((e) => e.title)} *****');
       newGithubNotifications = currentGithubNotifications;
       logger.d('***** GITHUB PROMO NOTIFICATIONS LIST NOT UPDATED: LIST IS CURRENT *****');
-      userDatabase.put('lastGithubPromoNotificationsRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastGithubPromoNotificationsRefresh', '${DateTime.now()}');
       return newGithubNotifications;
     }
   }
@@ -180,7 +182,7 @@ class GithubApi {
     debugPrint('[PRUNE & SORT] PRUNING ${list.length} GITHUB PROMO NOTIFICATIONS');
 
     list.retainWhere((element) =>
-    element.startDate.isBefore(now) &&
+        element.startDate.isBefore(now) &&
         (element.expirationDate.toString() == "" || element.expirationDate.isAfter(now)) &&
         element.userLevels.contains(githubApiUserLevel));
 

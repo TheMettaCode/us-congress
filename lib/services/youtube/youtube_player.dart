@@ -522,7 +522,7 @@ class Youtube {
         DateTime.parse(userDatabase.get('lastRefresh')).isBefore(DateTime.now()
             .subtract(context == null
                 ? const Duration(hours: 1)
-                : const Duration(minutes: 5)))) {
+                : const Duration(minutes: 10)))) {
       debugPrint('***** GENERATING LIST OF YOUTUBE PLAYLIST ITEMS  *****');
       final response = await http.get(
         Uri.parse(

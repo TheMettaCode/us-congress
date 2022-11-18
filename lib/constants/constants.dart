@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
+// import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 // import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
 import 'dart:math';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
@@ -190,12 +190,13 @@ const List<String> wordsToHash = [
   "Oil",
   "On Sale",
   "partisan",
-  "power",
   "Palestine",
+  "Pandemic",
   "Pelosi",
   "pharmaceutical",
   "police",
   "poor",
+  "power",
   "President",
   "Press Secretary",
   "prison",
@@ -423,6 +424,8 @@ Map<String, dynamic> initialUserData = {
   "newNewsArticles": false,
   "videoAlerts": true,
   "youTubePlaylist": {},
+  "youtubeVideoIds": [],
+  // "youtubeVideoList":{},
   "lastVideosRefresh": "${DateTime.now()}",
   "newVideos": false,
   "ecwidProducts": {},

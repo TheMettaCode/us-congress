@@ -140,7 +140,7 @@ class EcwidStoreApi {
       userDatabase.put("newEcwidProducts", false);
       localFinalEcwidProductsList = localCurrentEcwidProductsList;
       logger.d('***** ECWID PRODUCTS NOT UPDATED: CATALOG IS CURRENT *****');
-      userDatabase.put('lastEcwidProductsRefresh', '${DateTime.now()}');
+      // userDatabase.put('lastEcwidProductsRefresh', '${DateTime.now()}');
 
       return localFinalEcwidProductsList;
     }

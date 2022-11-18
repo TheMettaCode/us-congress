@@ -812,13 +812,13 @@ class SharedWidgets {
     final bool darkTheme = userDatabase.get('darkTheme');
     final bool appRated = userDatabase.get('appRated');
 
-    logger.d(
-        '^^^^ INCLUDED GITHUB NOTIFICATIONS LIST ELEMENTS: ${githubNotificationsList.length}');
+    logger.d('^^^^ INCLUDED GITHUB NOTIFICATIONS LIST ELEMENTS: ${githubNotificationsList.length}');
     List<GithubNotifications> thisGithubNotificationsList = githubNotificationsList;
     thisGithubNotificationsList.retainWhere((element) => element.supportOption == true);
     if (appRated) {
       thisGithubNotificationsList.removeWhere((element) => element.additionalData == 'rating');
     }
+    thisGithubNotificationsList.sort((a, b) => b.priority.compareTo(a.priority));
     logger.d(
         '^^^^ FINAL THIS GITHUB NOTIFICATIONS LIST ELEMENTS: ${thisGithubNotificationsList.length}');
 
@@ -5096,18 +5096,25 @@ class SharedWidgets {
                                               // dateWithTimeFormatter.format(
                                               //     thisFloorAction.timestamp),
                                               chamber.toLowerCase() == 'house'
-                                                  ? dateWithTimeOnlyFormatter
-                                                      .format(DateFormat('EEE, dd MMM yyyy h:mm:ss')
-                                                          .parse(thisFloorAction.actionTimeStamp).toLocal())
-                                                      .toString()
-                                                      .toUpperCase()
+                                                  ? thisFloorAction.header == '--'
+                                                      ? dateWithTimeOnlyFormatter
+                                                          .format(DateFormat(
+                                                                  'EEE, dd MMM yyyy h:mm:ss')
+                                                              .parse(
+                                                                  thisFloorAction.actionTimeStamp)
+                                                              .toLocal())
+                                                          .toString()
+                                                          .toUpperCase()
+                                                      : thisFloorAction.header.toUpperCase()
                                                   : chamber.toLowerCase() == 'senate'
                                                       ? thisFloorAction.actionTimeStamp == '--'
                                                           ? thisFloorAction.header.toUpperCase()
-                                                          :dateWithTimeFormatter
-                                                  .format(DateFormat('EEE, dd MMM yyyy h:mm:ss')
-                                                  .parse(thisFloorAction.actionTimeStamp))
-                                                  .toString()
+                                                          : dateWithTimeFormatter
+                                                              .format(DateFormat(
+                                                                      'EEE, dd MMM yyyy h:mm:ss')
+                                                                  .parse(thisFloorAction
+                                                                      .actionTimeStamp))
+                                                              .toString()
                                                       : '$chamber ACTION'.toUpperCase(),
                                               thisFloorAction.actionItem),
                                           // trailing: thisFloorAction
@@ -5579,8 +5586,7 @@ class SharedWidgets {
                       logger.d(
                           '^^^^^ NAME: ${thisItem.name}\nCREATED: ${thisItem.created}\nUPDATED: ${thisItem.updated}\nDAYS LISTED: $daysListed\nITEM IS NEW: $itemIsNew\nSKU: ${thisItem.sku}\nATTRIBUTES: ${thisItem.attributes}\nCATEGORIES: ${thisItem.categories.map((e) => e.id)}\nCOMBINATIONS: ${thisItem.combinations}\nCHOICES: ${thisItem.options.map((e) => e.choices.map((c) => c.text))}\nFAV COUNT: ${thisItem.favorites.count}\nFAV DISPLAYED: ${thisItem.favorites.displayedCount}');
 
-                      logger.d(
-                          '^^^^^ OPTIONS: ${thisItem.options.map((e) => e.name.toString())}');
+                      logger.d('^^^^^ OPTIONS: ${thisItem.options.map((e) => e.name.toString())}');
                       return FadeIn(
                           child: InkWell(
                               onTap: () async => await showModalBottomSheet(

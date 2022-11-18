@@ -40,15 +40,22 @@ class RapidApiFunctions {
             .isBefore(DateTime.now().subtract(const Duration(minutes: 30)))) {
       logger.d('***** RETRIEVING LATEST NEWS... *****');
 
-      final rapidApiKey = dotenv.env['RAPID_API_KEY'];
-      final rapidApiHost = dotenv.env['USC_NEWS_API_HOST'];
+      // final rapidApiKey = dotenv.env['RAPID_API_KEY'];
+      // final rapidApiHost = dotenv.env['USC_NEWS_API_HOST'];
+      //
+      // final url = Uri.parse('https://us-congress-top-news.p.rapidapi.com/news');
+      // final response = await http.get(url, headers: {
+      //   'X-RapidAPI-Key': rapidApiKey,
+      //   'X-RapidAPI-Host': rapidApiHost,
+      // });
+      // logger.d('***** NEWS API RESPONSE CODE: ${response.statusCode} *****');
 
-      final url = Uri.parse('https://us-congress-top-news.p.rapidapi.com/news');
-      final response = await http.get(url, headers: {
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': rapidApiHost,
-      });
-      logger.d('***** NEWS API RESPONSE CODE: ${response.statusCode} *****');
+      final Map headers = <String, String>{"Accept": "application/json"};
+      final response = await http.get(
+          Uri.parse(
+              "https://themettacode.github.io/us-congress-news-api/top_congressional_news.json"),
+          headers: headers);
+      debugPrint('[GITHUB TOP NEWS] API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
         logger.d('***** NEWS RETRIEVAL SUCCESS! *****');
@@ -290,19 +297,26 @@ class RapidApiFunctions {
             DateTime.parse(userDatabase
                     .get('last${chamber[0].toUpperCase() + chamber.substring(1)}FloorRefresh'))
                 .isBefore(DateTime.now().subtract(const Duration(minutes: 15))))) {
-      final rapidApiKey = dotenv.env['RAPID_API_KEY'];
-      final rapidApiHost = dotenv.env['USC_FLOOR_ACTIONS_API_HOST'];
+      // final rapidApiKey = dotenv.env['RAPID_API_KEY'];
+      // final rapidApiHost = dotenv.env['USC_FLOOR_ACTIONS_API_HOST'];
+      //
+      // final url = Uri.parse('https://us-congress-top-news.p.rapidapi.com/$chamber');
+      // final response = await http.get(url, headers: {
+      //   'X-RapidAPI-Key': rapidApiKey,
+      //   'X-RapidAPI-Host': rapidApiHost,
+      // });
+      // logger.d(
+      //     '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTION API RESPONSE CODE: ${response.statusCode}');
 
-      final url = Uri.parse('https://us-congress-top-news.p.rapidapi.com/$chamber');
-      final response = await http.get(url, headers: {
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': rapidApiHost,
-      });
-      logger.d(
-          '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTION API RESPONSE CODE: ${response.statusCode}');
+      final Map headers = <String, String>{"Accept": "application/json"};
+      final response = await http.get(
+          Uri.parse(
+              "https://themettacode.github.io/congressional-floor-actions-api/floor_actions_$chamber.json"),
+          headers: headers);
+      debugPrint('[GITHUB FLOOR ACTIONS] API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
-        logger.d(
+        debugPrint(
             '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS RETRIEVAL SUCCESS!');
         CongressFloorAction congressFloorActions = congressFloorActionFromJson(response.body);
         try {

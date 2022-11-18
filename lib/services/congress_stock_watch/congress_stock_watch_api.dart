@@ -199,7 +199,7 @@ class CongressStockWatchApi {
             '***** CURRENT HOUSE STOCK DATA LIST: ${localCurrentHouseStockWatchList.map((e) => e.representative)} *****');
         localFinalHouseStockWatchList = localCurrentHouseStockWatchList;
         logger.d('***** HOUSE STOCK DATA NOT UPDATED: LIST IS CURRENT *****');
-        userDatabase.put('lastHouseStockWatchListRefresh', '${DateTime.now()}');
+        // userDatabase.put('lastHouseStockWatchListRefresh', '${DateTime.now()}');
         return localFinalHouseStockWatchList;
       }
     } else {
@@ -394,7 +394,7 @@ class CongressStockWatchApi {
             '***** CURRENT SENATE STOCK DATA LIST: ${localCurrentSenateStockWatchList.map((e) => e.senator)} *****');
         localFinalSenateStockWatchList = localCurrentSenateStockWatchList;
         logger.d('***** HOUSE STOCK DATA NOT UPDATED: LIST IS CURRENT *****');
-        userDatabase.put('lastSenateStockWatchListRefresh', '${DateTime.now()}');
+        // userDatabase.put('lastSenateStockWatchListRefresh', '${DateTime.now()}');
         return localFinalSenateStockWatchList;
       }
     } else {

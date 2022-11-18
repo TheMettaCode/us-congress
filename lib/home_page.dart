@@ -41,6 +41,7 @@ import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
 import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
+import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -148,6 +149,7 @@ class HomePageState extends State<HomePage> {
   List<ChamberMember> userCongressList = [];
 
   List<PlaylistItem> youTubePlaylist = [];
+  List<String> youtubeVideoIdsList = [];
 
   // AnimationController animationController;
   ScrollController scrollController = ScrollController();
@@ -193,6 +195,10 @@ class HomePageState extends State<HomePage> {
     /// BEGIN VIDEO SCROLL ANIMATIONS
     if (youTubePlaylist.isNotEmpty) {
       _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
+          duration: const Duration(seconds: 30), curve: Curves.linear);
+    }
+    if (youtubeVideoIdsList.isNotEmpty) {
+      _videoListController.animateTo((youtubeVideoIdsList.length.toDouble() - 1) * 150,
           duration: const Duration(seconds: 30), curve: Curves.linear);
     }
 
@@ -305,6 +311,13 @@ class HomePageState extends State<HomePage> {
               duration: const Duration(seconds: 30), curve: Curves.linear);
         } else if (_videoListController.offset <= 30) {
           _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
+              duration: const Duration(seconds: 30), curve: Curves.linear);
+        }
+        if (_videoListController.offset >= (youtubeVideoIdsList.length.toDouble() - 1) * 150) {
+          _videoListController.animateTo(0,
+              duration: const Duration(seconds: 30), curve: Curves.linear);
+        } else if (_videoListController.offset <= 30) {
+          _videoListController.animateTo((youtubeVideoIdsList.length.toDouble() - 1) * 150,
               duration: const Duration(seconds: 30), curve: Curves.linear);
         }
       }
@@ -431,6 +444,12 @@ class HomePageState extends State<HomePage> {
     } catch (e) {
       logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
       userDatabase.put('youTubePlaylist', {});
+    }
+    try {
+      setState(() => youtubeVideoIdsList = List.from(userDatabase.get('youtubeVideoIds')));
+    } catch (e) {
+      logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      userDatabase.put('youtubeVideoIds', []);
     }
 
     /// NEWS ARTICLES LIST
@@ -705,6 +724,8 @@ class HomePageState extends State<HomePage> {
       setState(() => appLoadingText = 'Checking for videos...');
       await Youtube.getYouTubePlaylistItems(context: context)
           .then((value) => setState(() => youTubePlaylist = value));
+      await YouTubeVideosApi.getYoutubeVideoIds()
+          .then((value) => setState(() => youtubeVideoIdsList = value));
 
       setState(() => appLoadingText = 'Retrieving latest news...');
       await RapidApiFunctions.fetchNewsArticles(context: context).then((value) {
@@ -1211,10 +1232,11 @@ class HomePageState extends State<HomePage> {
                           children: [
                             Container(
                               color: Theme.of(context).colorScheme.background,
-                              width:
-                                  orientation == Orientation.landscape && youTubePlaylist.isNotEmpty
-                                      ? MediaQuery.of(context).size.width * 0.58333
-                                      : MediaQuery.of(context).size.width,
+                              width: orientation == Orientation.landscape &&
+                                      youTubePlaylist.isNotEmpty &&
+                                      youtubeVideoIdsList.isNotEmpty
+                                  ? MediaQuery.of(context).size.width * 0.58333
+                                  : MediaQuery.of(context).size.width,
                               child: Column(
                                 children: [
                                   _connectionLost
@@ -1277,7 +1299,9 @@ class HomePageState extends State<HomePage> {
                                           ),
                                         )
                                       : const SizedBox.shrink(),
-                                  orientation == Orientation.landscape || youTubePlaylist.isEmpty
+                                  orientation == Orientation.landscape ||
+                                          youTubePlaylist.isEmpty ||
+                                          youtubeVideoIdsList.isEmpty
                                       ? const SizedBox.shrink()
                                       : Stack(
                                           alignment: Alignment.centerLeft,
@@ -1358,7 +1382,9 @@ class HomePageState extends State<HomePage> {
                             ),
 
                             /// RIGHT SIDE OF MAIN ROW
-                            orientation == Orientation.portrait || youTubePlaylist.isEmpty
+                            orientation == Orientation.portrait ||
+                                    youTubePlaylist.isEmpty ||
+                                    youtubeVideoIdsList.isEmpty
                                 ? const SizedBox.shrink()
                                 : Container(
                                     padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
@@ -2093,406 +2119,431 @@ class HomePageState extends State<HomePage> {
     String buyIndicator = '🟢 ';
     String sellIndicator = '🔴 ';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        !userIsPremium
-            ? Padding(
-                padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                child: InkWell(
-                    onTap: () async => Functions.requestInAppPurchase(context, userIsPremium,
-                        whatToShow: 'upgrades'),
-                    child: BounceInDown(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                opacity: 0.15,
-                                image: AssetImage(
-                                    'assets/stock${randomImageActivated ? random.nextInt(3) : headerImageCounter}.png'),
-                                fit: BoxFit.cover,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.color)),
-                            color: Colors.grey,
-                            border: Border.all(width: 2, color: Colors.grey[600]),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Text('GET LATEST CONGRESSIONAL MEMBER MARKET TRADES',
-                            style: Styles.googleStyle.copyWith(
-                                fontSize: 18,
-                                color: darkTheme
-                                    ? Theme.of(context).primaryColorDark
-                                    : darkThemeTextColor)),
-                      ),
-                    )))
-            : houseStockWatchList.isEmpty && senateStockWatchList.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                    child: InkWell(
-                        onTap: () => getData(),
-                        child: ZoomIn(
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        opacity: 0.15,
-                                        image: AssetImage('assets/stock${random.nextInt(3)}.png'),
-                                        fit: BoxFit.cover,
-                                        colorFilter: ColorFilter.mode(
-                                            darkTheme
-                                                ? Theme.of(context).primaryColorDark
-                                                : stockWatchColor,
-                                            BlendMode.color)),
-                                    color: darkTheme
-                                        ? Theme.of(context).primaryColorDark
-                                        : stockWatchColor,
-                                    border: Border.all(
-                                        width: 2,
-                                        color: darkTheme
-                                            ? Theme.of(context).primaryColorDark
-                                            : stockWatchColor),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: Text('TAP HERE TO REFRESH MARKET TRADE DATA',
-                                    style: Styles.googleStyle
-                                        .copyWith(fontSize: 18, color: darkThemeTextColor)),
-                              ),
-                              dataRefresh
-                                  ? const LinearProgressIndicator(color: stockWatchColor)
-                                  : const SizedBox.shrink()
-                            ],
-                          ),
-                        )))
-                : Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // const SizedBox(height: 5),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                          child: Text('LATEST MARKET TRADES BY CHAMBER (Reported)',
-                              style: Styles.googleStyle.copyWith(fontSize: 18)),
-                        ),
-                        Row(
-                          children: [
-                            senateStockWatchList.isEmpty
-                                ? const SizedBox.shrink()
-                                : Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        userDatabase.put('newSenateStock', false);
-                                        showModalBottomSheet(
-                                            backgroundColor: Colors.transparent,
-                                            isScrollControlled: false,
-                                            enableDrag: true,
-                                            context: context,
-                                            builder: (context) {
-                                              return SharedWidgets.stockWatchList(
-                                                context,
-                                                false,
-                                                userDatabase,
-                                                houseStockWatchList,
-                                                senateStockWatchList,
-                                                senateMembersList + houseMembersList,
-                                                userIsPremium,
-                                              );
-                                            });
-
-                                        // userDatabase.put(
-                                        //     'newSenateStock', false);
-                                      },
-                                      child: SlideInRight(
-                                        child: Stack(
-                                          alignment: Alignment.topRight,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      opacity: 0.4,
-                                                      image: AssetImage(
-                                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 0}.png'),
-                                                      fit: BoxFit.cover,
-                                                      colorFilter: ColorFilter.mode(
-                                                          darkTheme
-                                                              ? Theme.of(context).primaryColorDark
-                                                              : stockWatchColor,
-                                                          BlendMode.color)),
-                                                  color: darkTheme
-                                                      ? Theme.of(context).primaryColorDark
-                                                      : stockWatchColor,
-                                                  border: Border.all(
-                                                      width: 2,
-                                                      color: darkTheme
-                                                          ? Theme.of(context).primaryColorDark
-                                                          : stockWatchColor),
-                                                  borderRadius: BorderRadius.circular(3)),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: FadeInRight(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                          'Sen. ${senateStockWatchList.first.senator}',
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: Styles.regularStyle.copyWith(
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: darkThemeTextColor)),
-                                                      Text(
-                                                        'Exec. ${dateWithDayAndYearFormatter.format(senateStockWatchList.first.transactionDate)}',
-                                                        style: Styles.regularStyle.copyWith(
-                                                            fontSize: 11,
-                                                            fontWeight: FontWeight.normal,
-                                                            color: darkThemeTextColor),
-                                                      ),
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment.center,
-                                                        children: [
-                                                          Flexible(
-                                                            child: Text(
-                                                              '${senateStockWatchList.first.type == null || senateStockWatchList.first.type == 'N/A' ? '' : senateStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : senateStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${senateStockWatchList.first.ticker == null || senateStockWatchList.first.ticker == '--' || senateStockWatchList.first.ticker == 'N/A' ? senateStockWatchList.first.assetType : '\$${senateStockWatchList.first.ticker}'}',
-                                                              maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: Styles.regularStyle.copyWith(
-                                                                  fontSize: 12,
-                                                                  fontWeight: FontWeight.normal,
-                                                                  color: darkThemeTextColor),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: userDatabase.get('newSenateStock')
-                                                  ? AnimatedWidgets.flashingText(context, '!!!',
-                                                      userDatabase.get('newSenateStock'), false,
-                                                      size: 14,
-                                                      color: darkTheme
-                                                          ? altHighlightColor
-                                                          : darkThemeTextColor)
-                                                  : FaIcon(Icons.more_vert,
-                                                      size: 14,
-                                                      color: userDatabase.get('newSenateStock')
-                                                          ? altHighlightColor
-                                                          : darkThemeTextColor),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                            houseStockWatchList.isEmpty || senateStockWatchList.isEmpty
-                                ? const SizedBox.shrink()
-                                : const SizedBox(width: 5),
-                            houseStockWatchList.isEmpty
-                                ? const SizedBox.shrink()
-                                : Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        userDatabase.put('newHouseStock', false);
-                                        showModalBottomSheet(
-                                            backgroundColor: Colors.transparent,
-                                            isScrollControlled: false,
-                                            enableDrag: true,
-                                            context: context,
-                                            builder: (context) {
-                                              return SharedWidgets.stockWatchList(
-                                                  context,
-                                                  true,
-                                                  userDatabase,
-                                                  houseStockWatchList,
-                                                  senateStockWatchList,
-                                                  senateMembersList + houseMembersList,
-                                                  userIsPremium);
-                                            });
-
-                                        // userDatabase.put(
-                                        //     'newHouseStock', false);
-                                      },
-                                      child: SlideInRight(
-                                        child: Stack(
-                                          alignment: Alignment.topRight,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      opacity: 0.4,
-                                                      image: AssetImage(
-                                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 2}.png'),
-                                                      fit: BoxFit.cover,
-                                                      colorFilter: ColorFilter.mode(
-                                                          darkTheme
-                                                              ? Theme.of(context).primaryColorDark
-                                                              : stockWatchColor,
-                                                          BlendMode.color)),
-                                                  color: darkTheme
-                                                      ? Theme.of(context).primaryColorDark
-                                                      : stockWatchColor,
-                                                  border: Border.all(
-                                                      width: 2,
-                                                      color: darkTheme
-                                                          ? Theme.of(context).primaryColorDark
-                                                          : stockWatchColor),
-                                                  borderRadius: BorderRadius.circular(3)),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: FadeInRight(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(houseStockWatchList.first.representative,
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                          style: Styles.regularStyle.copyWith(
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: darkThemeTextColor)),
-                                                      Text(
-                                                        'Exec. ${dateWithDayAndYearFormatter.format(houseStockWatchList.first.transactionDate)}',
-                                                        style: Styles.regularStyle.copyWith(
-                                                            fontSize: 11,
-                                                            fontWeight: FontWeight.normal,
-                                                            color: darkThemeTextColor),
-                                                      ),
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment.center,
-                                                        // mainAxisAlignment:
-                                                        //     MainAxisAlignment
-                                                        //         .center,
-                                                        children: [
-                                                          Flexible(
-                                                            child: Text(
-                                                              '${houseStockWatchList.first.type == null || houseStockWatchList.first.type == '--' ? '' : houseStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : houseStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${houseStockWatchList.first.ticker == null || houseStockWatchList.first.ticker == 'N/A' || houseStockWatchList.first.ticker == '--' ? houseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '') : '\$${houseStockWatchList.first.ticker}'}',
-                                                              // textAlign:
-                                                              //     TextAlign
-                                                              //         .center,
-                                                              maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: Styles.regularStyle.copyWith(
-                                                                  fontSize: 12,
-                                                                  fontWeight: FontWeight.normal,
-                                                                  color: darkThemeTextColor),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: userDatabase.get('newHouseStock')
-                                                  ? AnimatedWidgets.flashingText(context, '!!!',
-                                                      userDatabase.get('newHouseStock'), false,
-                                                      size: 14,
-                                                      color: darkTheme
-                                                          ? altHighlightColor
-                                                          : darkThemeTextColor)
-                                                  : FaIcon(Icons.more_vert,
-                                                      size: 14,
-                                                      color: userDatabase.get('newHouseStock')
-                                                          ? altHighlightColor
-                                                          : darkThemeTextColor),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        FlipInY(
-                          child: InkWell(
-                            onTap: (houseStockWatchList.isEmpty && senateStockWatchList.isEmpty)
-                                ? null
-                                : () {
-                                    setState(() => _marketPageLoading = true);
-                                    userDatabase.put('newMarketOverview', false);
-                                    Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => MarketActivityPage(
-                                                    houseMembersList + senateMembersList,
-                                                    houseStockWatchList,
-                                                    senateStockWatchList,
-                                                    marketActivityOverviewList)))
-                                        .then((_) => setState(() => _marketPageLoading = false));
-                                  },
+    return !userIsPremium && freeTrialUsed
+        ? const SizedBox.shrink()
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              !userIsPremium
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                      child: InkWell(
+                          onTap: () async => Functions.requestInAppPurchase(context, userIsPremium,
+                              whatToShow: 'upgrades'),
+                          child: BounceInDown(
                             child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                               alignment: Alignment.center,
-                              height: 40,
                               decoration: BoxDecoration(
-                                  color: darkTheme
-                                      ? Theme.of(context).primaryColorDark
-                                      : stockWatchColor,
                                   image: DecorationImage(
-                                      opacity: 0.4,
+                                      opacity: 0.15,
                                       image: AssetImage(
-                                          'assets/stock${randomImageActivated ? random.nextInt(3) : 1}.png'),
+                                          'assets/stock${randomImageActivated ? random.nextInt(3) : headerImageCounter}.png'),
                                       fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(
-                                          darkTheme
-                                              ? Theme.of(context).primaryColorDark
-                                              : stockWatchColor,
-                                          BlendMode.color)),
-                                  border: Border.all(
-                                      width: 2,
+                                      colorFilter:
+                                          const ColorFilter.mode(Colors.grey, BlendMode.color)),
+                                  color: Colors.grey,
+                                  border: Border.all(width: 2, color: Colors.grey[600]),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: Text('GET LATEST CONGRESSIONAL MEMBER MARKET TRADES',
+                                  style: Styles.googleStyle.copyWith(
+                                      fontSize: 18,
                                       color: darkTheme
                                           ? Theme.of(context).primaryColorDark
-                                          : stockWatchColor),
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: TextButton.icon(
-                                icon: userDatabase.get('newMarketOverview')
-                                    ? AnimatedWidgets.flashingText(context, '!!!',
-                                        userDatabase.get('newMarketOverview'), false,
-                                        size: 13,
-                                        color: userDatabase.get('newSenateStock')
-                                            ? altHighlightColor
-                                            : darkThemeTextColor,
-                                        sameColor: true)
-                                    : _marketPageLoading
-                                        ? const FaIcon(
-                                            FontAwesomeIcons.solidHourglass,
-                                            size: 11,
-                                            color: darkThemeTextColor,
-                                          )
-                                        : const FaIcon(
-                                            FontAwesomeIcons.chartSimple,
-                                            size: 13,
-                                            color: darkThemeTextColor,
-                                          ),
-                                label: Text(
-                                    _marketPageLoading
-                                        ? 'Loading Latest Market Data...'
-                                        : 'Stock Market Activity Overview',
-                                    style: Styles.regularStyle.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkThemeTextColor)),
-                                onPressed: null,
-                              ),
+                                          : darkThemeTextColor)),
                             ),
+                          )))
+                  : houseStockWatchList.isEmpty && senateStockWatchList.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                          child: InkWell(
+                              onTap: () => getData(),
+                              child: ZoomIn(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              opacity: 0.15,
+                                              image: AssetImage(
+                                                  'assets/stock${random.nextInt(3)}.png'),
+                                              fit: BoxFit.cover,
+                                              colorFilter: ColorFilter.mode(
+                                                  darkTheme
+                                                      ? Theme.of(context).primaryColorDark
+                                                      : stockWatchColor,
+                                                  BlendMode.color)),
+                                          color: darkTheme
+                                              ? Theme.of(context).primaryColorDark
+                                              : stockWatchColor,
+                                          border: Border.all(
+                                              width: 2,
+                                              color: darkTheme
+                                                  ? Theme.of(context).primaryColorDark
+                                                  : stockWatchColor),
+                                          borderRadius: BorderRadius.circular(5)),
+                                      child: Text('TAP HERE TO REFRESH MARKET TRADE DATA',
+                                          style: Styles.googleStyle
+                                              .copyWith(fontSize: 18, color: darkThemeTextColor)),
+                                    ),
+                                    dataRefresh
+                                        ? const LinearProgressIndicator(color: stockWatchColor)
+                                        : const SizedBox.shrink()
+                                  ],
+                                ),
+                              )))
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // const SizedBox(height: 5),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                child: Text('LATEST MARKET TRADES BY CHAMBER (Reported)',
+                                    style: Styles.googleStyle.copyWith(fontSize: 18)),
+                              ),
+                              Row(
+                                children: [
+                                  senateStockWatchList.isEmpty
+                                      ? const SizedBox.shrink()
+                                      : Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              userDatabase.put('newSenateStock', false);
+                                              showModalBottomSheet(
+                                                  backgroundColor: Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return SharedWidgets.stockWatchList(
+                                                      context,
+                                                      false,
+                                                      userDatabase,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList,
+                                                      senateMembersList + houseMembersList,
+                                                      userIsPremium,
+                                                    );
+                                                  });
+
+                                              // userDatabase.put(
+                                              //     'newSenateStock', false);
+                                            },
+                                            child: SlideInRight(
+                                              child: Stack(
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                            opacity: 0.4,
+                                                            image: AssetImage(
+                                                                'assets/stock${randomImageActivated ? random.nextInt(3) : 0}.png'),
+                                                            fit: BoxFit.cover,
+                                                            colorFilter: ColorFilter.mode(
+                                                                darkTheme
+                                                                    ? Theme.of(context)
+                                                                        .primaryColorDark
+                                                                    : stockWatchColor,
+                                                                BlendMode.color)),
+                                                        color: darkTheme
+                                                            ? Theme.of(context).primaryColorDark
+                                                            : stockWatchColor,
+                                                        border: Border.all(
+                                                            width: 2,
+                                                            color: darkTheme
+                                                                ? Theme.of(context).primaryColorDark
+                                                                : stockWatchColor),
+                                                        borderRadius: BorderRadius.circular(3)),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: FadeInRight(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                                'Sen. ${senateStockWatchList.first.senator}',
+                                                                maxLines: 1,
+                                                                overflow: TextOverflow.ellipsis,
+                                                                style: Styles.regularStyle.copyWith(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkThemeTextColor)),
+                                                            Text(
+                                                              'Exec. ${dateWithDayAndYearFormatter.format(senateStockWatchList.first.transactionDate)}',
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 11,
+                                                                  fontWeight: FontWeight.normal,
+                                                                  color: darkThemeTextColor),
+                                                            ),
+                                                            Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment.center,
+                                                              children: [
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    '${senateStockWatchList.first.type == null || senateStockWatchList.first.type == 'N/A' ? '' : senateStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : senateStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${senateStockWatchList.first.ticker == null || senateStockWatchList.first.ticker == '--' || senateStockWatchList.first.ticker == 'N/A' ? senateStockWatchList.first.assetType : '\$${senateStockWatchList.first.ticker}'}',
+                                                                    maxLines: 1,
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                    style: Styles.regularStyle
+                                                                        .copyWith(
+                                                                            fontSize: 12,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                            color:
+                                                                                darkThemeTextColor),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: userDatabase.get('newSenateStock')
+                                                        ? AnimatedWidgets.flashingText(
+                                                            context,
+                                                            '!!!',
+                                                            userDatabase.get('newSenateStock'),
+                                                            false,
+                                                            size: 14,
+                                                            color: darkTheme
+                                                                ? altHighlightColor
+                                                                : darkThemeTextColor)
+                                                        : FaIcon(Icons.more_vert,
+                                                            size: 14,
+                                                            color:
+                                                                userDatabase.get('newSenateStock')
+                                                                    ? altHighlightColor
+                                                                    : darkThemeTextColor),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  houseStockWatchList.isEmpty || senateStockWatchList.isEmpty
+                                      ? const SizedBox.shrink()
+                                      : const SizedBox(width: 5),
+                                  houseStockWatchList.isEmpty
+                                      ? const SizedBox.shrink()
+                                      : Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              userDatabase.put('newHouseStock', false);
+                                              showModalBottomSheet(
+                                                  backgroundColor: Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return SharedWidgets.stockWatchList(
+                                                        context,
+                                                        true,
+                                                        userDatabase,
+                                                        houseStockWatchList,
+                                                        senateStockWatchList,
+                                                        senateMembersList + houseMembersList,
+                                                        userIsPremium);
+                                                  });
+
+                                              // userDatabase.put(
+                                              //     'newHouseStock', false);
+                                            },
+                                            child: SlideInRight(
+                                              child: Stack(
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                            opacity: 0.4,
+                                                            image: AssetImage(
+                                                                'assets/stock${randomImageActivated ? random.nextInt(3) : 2}.png'),
+                                                            fit: BoxFit.cover,
+                                                            colorFilter: ColorFilter.mode(
+                                                                darkTheme
+                                                                    ? Theme.of(context)
+                                                                        .primaryColorDark
+                                                                    : stockWatchColor,
+                                                                BlendMode.color)),
+                                                        color: darkTheme
+                                                            ? Theme.of(context).primaryColorDark
+                                                            : stockWatchColor,
+                                                        border: Border.all(
+                                                            width: 2,
+                                                            color: darkTheme
+                                                                ? Theme.of(context).primaryColorDark
+                                                                : stockWatchColor),
+                                                        borderRadius: BorderRadius.circular(3)),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: FadeInRight(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                                houseStockWatchList
+                                                                    .first.representative,
+                                                                maxLines: 1,
+                                                                overflow: TextOverflow.ellipsis,
+                                                                style: Styles.regularStyle.copyWith(
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: darkThemeTextColor)),
+                                                            Text(
+                                                              'Exec. ${dateWithDayAndYearFormatter.format(houseStockWatchList.first.transactionDate)}',
+                                                              style: Styles.regularStyle.copyWith(
+                                                                  fontSize: 11,
+                                                                  fontWeight: FontWeight.normal,
+                                                                  color: darkThemeTextColor),
+                                                            ),
+                                                            Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment.center,
+                                                              // mainAxisAlignment:
+                                                              //     MainAxisAlignment
+                                                              //         .center,
+                                                              children: [
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    '${houseStockWatchList.first.type == null || houseStockWatchList.first.type == '--' ? '' : houseStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : houseStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${houseStockWatchList.first.ticker == null || houseStockWatchList.first.ticker == 'N/A' || houseStockWatchList.first.ticker == '--' ? houseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '') : '\$${houseStockWatchList.first.ticker}'}',
+                                                                    // textAlign:
+                                                                    //     TextAlign
+                                                                    //         .center,
+                                                                    maxLines: 1,
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                    style: Styles.regularStyle
+                                                                        .copyWith(
+                                                                            fontSize: 12,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                            color:
+                                                                                darkThemeTextColor),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: userDatabase.get('newHouseStock')
+                                                        ? AnimatedWidgets.flashingText(
+                                                            context,
+                                                            '!!!',
+                                                            userDatabase.get('newHouseStock'),
+                                                            false,
+                                                            size: 14,
+                                                            color: darkTheme
+                                                                ? altHighlightColor
+                                                                : darkThemeTextColor)
+                                                        : FaIcon(Icons.more_vert,
+                                                            size: 14,
+                                                            color: userDatabase.get('newHouseStock')
+                                                                ? altHighlightColor
+                                                                : darkThemeTextColor),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              FlipInY(
+                                child: InkWell(
+                                  onTap: (houseStockWatchList.isEmpty &&
+                                          senateStockWatchList.isEmpty)
+                                      ? null
+                                      : () {
+                                          setState(() => _marketPageLoading = true);
+                                          userDatabase.put('newMarketOverview', false);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => MarketActivityPage(
+                                                      houseMembersList + senateMembersList,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList,
+                                                      marketActivityOverviewList))).then(
+                                              (_) => setState(() => _marketPageLoading = false));
+                                        },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        color: darkTheme
+                                            ? Theme.of(context).primaryColorDark
+                                            : stockWatchColor,
+                                        image: DecorationImage(
+                                            opacity: 0.4,
+                                            image: AssetImage(
+                                                'assets/stock${randomImageActivated ? random.nextInt(3) : 1}.png'),
+                                            fit: BoxFit.cover,
+                                            colorFilter: ColorFilter.mode(
+                                                darkTheme
+                                                    ? Theme.of(context).primaryColorDark
+                                                    : stockWatchColor,
+                                                BlendMode.color)),
+                                        border: Border.all(
+                                            width: 2,
+                                            color: darkTheme
+                                                ? Theme.of(context).primaryColorDark
+                                                : stockWatchColor),
+                                        borderRadius: BorderRadius.circular(3)),
+                                    child: TextButton.icon(
+                                      icon: userDatabase.get('newMarketOverview')
+                                          ? AnimatedWidgets.flashingText(context, '!!!',
+                                              userDatabase.get('newMarketOverview'), false,
+                                              size: 13,
+                                              color: userDatabase.get('newSenateStock')
+                                                  ? altHighlightColor
+                                                  : darkThemeTextColor,
+                                              sameColor: true)
+                                          : _marketPageLoading
+                                              ? const FaIcon(
+                                                  FontAwesomeIcons.solidHourglass,
+                                                  size: 11,
+                                                  color: darkThemeTextColor,
+                                                )
+                                              : const FaIcon(
+                                                  FontAwesomeIcons.chartSimple,
+                                                  size: 13,
+                                                  color: darkThemeTextColor,
+                                                ),
+                                      label: Text(
+                                          _marketPageLoading
+                                              ? 'Loading Latest Market Data...'
+                                              : 'Stock Market Activity Overview',
+                                          style: Styles.regularStyle.copyWith(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: darkThemeTextColor)),
+                                      onPressed: null,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-      ],
-    );
+            ],
+          );
   }
 
   Widget floorActions(Orientation orientation) {
@@ -2599,6 +2650,8 @@ class HomePageState extends State<HomePage> {
 
                                           userDatabase.put('newHouseFloor', false);
                                         },
+                                        // onHorizontalDragEnd: (swipe) =>
+                                        //     userDatabase.put('newHouseFloor', false),
                                         child: Container(
                                           width: orientation == Orientation.landscape
                                               ? MediaQuery.of(context).size.width * 0.5
@@ -2619,16 +2672,16 @@ class HomePageState extends State<HomePage> {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      dateWithTimeOnlyFormatter.format(
-                                                          DateFormat('EEE, dd MMM yyyy h:mm:ss')
-                                                              .parse(currentHouseFloorActions[index]
-                                                                  .actionTimeStamp)
-                                                              .toLocal()),
-
-                                                      // dateWithTimeFormatter.format(
-                                                      //     currentHouseFloorActions[index]
-                                                      //         .timestamp
-                                                      //         .toLocal()),
+                                                      currentHouseFloorActions[index].header == '--'
+                                                          ? dateWithTimeOnlyFormatter.format(
+                                                              DateFormat('EEE, dd MMM yyyy h:mm:ss')
+                                                                  .parse(currentHouseFloorActions[
+                                                                          index]
+                                                                      .actionTimeStamp)
+                                                                  .toLocal())
+                                                          : currentHouseFloorActions[index]
+                                                              .header
+                                                              .toUpperCase(),
                                                       style: const TextStyle(
                                                         fontSize: 11,
                                                         fontWeight: FontWeight.bold,
@@ -2756,6 +2809,8 @@ class HomePageState extends State<HomePage> {
 
                                               userDatabase.put('newSenateFloor', false);
                                             },
+                                            // onHorizontalDragEnd: (swipe) =>
+                                            //     userDatabase.put('newSenateFloor', false),
                                             child: Container(
                                               width: orientation == Orientation.landscape
                                                   ? MediaQuery.of(context).size.width * 0.5
@@ -3034,70 +3089,12 @@ class HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        child: SizedBox(
-          height: 30,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: FlipInY(
-                  child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                        backgroundColor: !userIsPremium && !userIsLegacy
-                            ? disabledMSPColorGray
-                            : darkTheme
-                                ? primaryMSPColorDark
-                                : lobbyingEventsList.isEmpty
-                                    ? disabledMSPColorGray
-                                    : alertIndicatorMSPColorDarkGreen,
-                      ),
-                      icon: (userIsPremium || userIsLegacy) && userDatabase.get('newLobbies')
-                          ? AnimatedWidgets.flashingText(
-                              context, '!!!', userDatabase.get('newLobbies'), false,
-                              size: 13, sameColor: true)
-                          : FaIcon(
-                              FontAwesomeIcons.moneyBills,
-                              size: 13,
-                              color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
-                            ),
-                      label: Text('Lobbying',
-                          style: TextStyle(
-                            color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
-                          )),
-                      onPressed: !userIsPremium && !userIsLegacy
-                          ? () async => Functions.requestInAppPurchase(context, userIsPremium,
-                              whatToShow: 'upgrades')
-                          : lobbyingEventsList.isEmpty
-                              ? null
-                              : () async {
-                                  showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: false,
-                                      enableDrag: true,
-                                      context: context,
-                                      builder: (context) {
-                                        return SharedWidgets.lobbyingList(
-                                          context,
-                                          userDatabase,
-                                          lobbyingEventsList,
-                                        );
-                                      }).then((_) => !userIsPremium &&
-                                          interstitialAd != null &&
-                                          interstitialAd.responseInfo.responseId !=
-                                              userDatabase.get('interstitialAdId')
-                                      ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                      : null);
-
-                                  userDatabase.put('newLobbies', false);
-                                  await Functions.processCredits(true, isPermanent: false);
-                                }),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
+      !userIsPremium && freeTrialUsed
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: SizedBox(
+                height: 30,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -3110,29 +3107,28 @@ class HomePageState extends State<HomePage> {
                                   ? disabledMSPColorGray
                                   : darkTheme
                                       ? primaryMSPColorDark
-                                      : privatelyFundedTripsList.isEmpty
+                                      : lobbyingEventsList.isEmpty
                                           ? disabledMSPColorGray
-                                          : MaterialStateProperty.all<Color>(
-                                              const Color.fromARGB(255, 0, 80, 100)),
+                                          : alertIndicatorMSPColorDarkGreen,
                             ),
-                            icon: (userIsPremium || userIsLegacy) && userDatabase.get('newTrips')
+                            icon: (userIsPremium || userIsLegacy) && userDatabase.get('newLobbies')
                                 ? AnimatedWidgets.flashingText(
-                                    context, '!!!', userDatabase.get('newTrips'), false,
+                                    context, '!!!', userDatabase.get('newLobbies'), false,
                                     size: 13, sameColor: true)
                                 : FaIcon(
-                                    FontAwesomeIcons.planeDeparture,
+                                    FontAwesomeIcons.moneyBills,
                                     size: 13,
                                     color:
                                         userIsPremium || userIsLegacy ? darkThemeTextColor : null,
                                   ),
-                            label: Text('Funded Travel',
+                            label: Text('Lobbying',
                                 style: TextStyle(
                                   color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
                                 )),
                             onPressed: !userIsPremium && !userIsLegacy
                                 ? () async => Functions.requestInAppPurchase(context, userIsPremium,
                                     whatToShow: 'upgrades')
-                                : privatelyFundedTripsList.isEmpty
+                                : lobbyingEventsList.isEmpty
                                     ? null
                                     : () async {
                                         showModalBottomSheet(
@@ -3141,28 +3137,96 @@ class HomePageState extends State<HomePage> {
                                             enableDrag: true,
                                             context: context,
                                             builder: (context) {
-                                              return SharedWidgets.privateFundedTripsList(
-                                                  context,
-                                                  userDatabase,
-                                                  privatelyFundedTripsList,
-                                                  senateMembersList + houseMembersList,
-                                                  houseStockWatchList,
-                                                  senateStockWatchList,
-                                                  userIsPremium);
-                                            });
+                                              return SharedWidgets.lobbyingList(
+                                                context,
+                                                userDatabase,
+                                                lobbyingEventsList,
+                                              );
+                                            }).then((_) => !userIsPremium &&
+                                                interstitialAd != null &&
+                                                interstitialAd.responseInfo.responseId !=
+                                                    userDatabase.get('interstitialAdId')
+                                            ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                            : null);
 
-                                        userDatabase.put('newTrips', false);
+                                        userDatabase.put('newLobbies', false);
                                         await Functions.processCredits(true, isPermanent: false);
                                       }),
                       ),
                     ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                    backgroundColor: !userIsPremium && !userIsLegacy
+                                        ? disabledMSPColorGray
+                                        : darkTheme
+                                            ? primaryMSPColorDark
+                                            : privatelyFundedTripsList.isEmpty
+                                                ? disabledMSPColorGray
+                                                : MaterialStateProperty.all<Color>(
+                                                    const Color.fromARGB(255, 0, 80, 100)),
+                                  ),
+                                  icon: (userIsPremium || userIsLegacy) &&
+                                          userDatabase.get('newTrips')
+                                      ? AnimatedWidgets.flashingText(
+                                          context, '!!!', userDatabase.get('newTrips'), false,
+                                          size: 13, sameColor: true)
+                                      : FaIcon(
+                                          FontAwesomeIcons.planeDeparture,
+                                          size: 13,
+                                          color: userIsPremium || userIsLegacy
+                                              ? darkThemeTextColor
+                                              : null,
+                                        ),
+                                  label: Text('Funded Travel',
+                                      style: TextStyle(
+                                        color: userIsPremium || userIsLegacy
+                                            ? darkThemeTextColor
+                                            : null,
+                                      )),
+                                  onPressed: !userIsPremium && !userIsLegacy
+                                      ? () async => Functions.requestInAppPurchase(
+                                          context, userIsPremium,
+                                          whatToShow: 'upgrades')
+                                      : privatelyFundedTripsList.isEmpty
+                                          ? null
+                                          : () async {
+                                              showModalBottomSheet(
+                                                  backgroundColor: Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return SharedWidgets.privateFundedTripsList(
+                                                        context,
+                                                        userDatabase,
+                                                        privatelyFundedTripsList,
+                                                        senateMembersList + houseMembersList,
+                                                        houseStockWatchList,
+                                                        senateStockWatchList,
+                                                        userIsPremium);
+                                                  });
+
+                                              userDatabase.put('newTrips', false);
+                                              await Functions.processCredits(true,
+                                                  isPermanent: false);
+                                            }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
     ]);
   }
 
