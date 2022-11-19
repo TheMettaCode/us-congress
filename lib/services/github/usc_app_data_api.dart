@@ -189,7 +189,7 @@ class GithubApi {
     // list.sort((a, b) =>
     //     a.startDate.compareTo(b.startDate).compareTo(a.priority.compareTo(b.priority)));
 
-    list.sort((a, b) => b.priority.compareTo(a.priority));
+    list.sort((a, b) => a.priority.compareTo(b.priority));
 
     debugPrint('[PRUNE & SORT] ${list.length} GITHUB PROMO NOTIFICATIONS REMAIN');
     return list;

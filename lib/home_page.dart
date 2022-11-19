@@ -2556,16 +2556,16 @@ class HomePageState extends State<HomePage> {
           padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
           child: (currentHouseFloorActions.isNotEmpty &&
                       currentHouseFloorActionsDate
-                          .isBefore(DateTime.now().subtract(const Duration(days: 1)))) &&
+                          .isBefore(DateTime.now().subtract(const Duration(hours: 36)))) &&
                   (currentSenateFloorActions.isNotEmpty &&
                       currentSenateFloorActionsDate
-                          .isBefore(DateTime.now().subtract(const Duration(days: 1))))
+                          .isBefore(DateTime.now().subtract(const Duration(hours: 36))))
               ? const SizedBox.shrink()
               : Text('Latest Floor Actions', style: GoogleFonts.bangers(fontSize: 18)),
         ),
         currentHouseFloorActions.isNotEmpty &&
                 currentHouseFloorActionsDate
-                    .isBefore(DateTime.now().subtract(const Duration(days: 2)))
+                    .isBefore(DateTime.now().subtract(const Duration(hours: 36)))
             ? const SizedBox.shrink()
             : Container(
                 padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
@@ -2682,6 +2682,8 @@ class HomePageState extends State<HomePage> {
                                                           : currentHouseFloorActions[index]
                                                               .header
                                                               .toUpperCase(),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
                                                       style: const TextStyle(
                                                         fontSize: 11,
                                                         fontWeight: FontWeight.bold,
@@ -2718,7 +2720,7 @@ class HomePageState extends State<HomePage> {
         // const SizedBox(height: 5),
         currentSenateFloorActions.isNotEmpty &&
                 currentSenateFloorActionsDate
-                    .isBefore(DateTime.now().subtract(const Duration(days: 2)))
+                    .isBefore(DateTime.now().subtract(const Duration(hours: 36)))
             ? const SizedBox.shrink()
             : Container(
                 padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -2795,7 +2797,7 @@ class HomePageState extends State<HomePage> {
                                                       SharedWidgets.floorActionsList(
                                                           context,
                                                           'Senate',
-                                                          currentSenateFloorActions,
+                                                          currentSenateFloorActions.reversed,
                                                           userDatabase,
                                                           houseStockWatchList,
                                                           senateStockWatchList)).then((_) =>

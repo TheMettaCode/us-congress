@@ -818,7 +818,7 @@ class SharedWidgets {
     if (appRated) {
       thisGithubNotificationsList.removeWhere((element) => element.additionalData == 'rating');
     }
-    thisGithubNotificationsList.sort((a, b) => b.priority.compareTo(a.priority));
+    thisGithubNotificationsList.sort((a, b) => a.priority.compareTo(b.priority));
     logger.d(
         '^^^^ FINAL THIS GITHUB NOTIFICATIONS LIST ELEMENTS: ${thisGithubNotificationsList.length}');
 
