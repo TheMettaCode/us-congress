@@ -21,7 +21,6 @@ import 'package:us_congress_vote_tracker/services/congress_stock_watch/congress_
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
 import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
 import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
-import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
@@ -382,7 +381,7 @@ class MyAppState extends State<MyApp> {
                                                         ),
                                                         onPressed: () =>
                                                             Functions.requestInAppPurchase(
-                                                                context, userIsPremium,
+                                                                context, null, userIsPremium,
                                                                 whatToShow: 'credits'),
                                                       ),
                                                     ),
@@ -581,6 +580,7 @@ class MyAppState extends State<MyApp> {
                                         duration: const Duration(milliseconds: 800),
                                         child: SharedWidgets.premiumUpgradeContainer(
                                             context,
+                                            null,
                                             userIsPremium,
                                             userIsLegacy,
                                             devUpgraded,
@@ -709,6 +709,7 @@ class MyAppState extends State<MyApp> {
                                                       builder: (context) {
                                                         return SharedWidgets.ecwidProductsListing(
                                                             context,
+                                                            null,
                                                             ecwidProductsList,
                                                             userDatabase,
                                                             userLevels,
@@ -1012,7 +1013,7 @@ class MyAppState extends State<MyApp> {
                                       data != freeTrialCode
                                   ? () {
                                       Navigator.pop(context);
-                                      Functions.requestInAppPurchase(context, userIsPremium,
+                                      Functions.requestInAppPurchase(context, null, userIsPremium,
                                           whatToShow: 'upgrades');
                                     }
                                   : () async {

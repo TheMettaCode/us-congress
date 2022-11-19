@@ -24,8 +24,7 @@ class AdMobLibrary {
         listener: BannerAdListener(
           // Called when an ad is successfully received.
           onAdLoaded: (Ad ad) {
-            logger.d(
-                '***** Ad Unit ID Loaded: ${ad.responseInfo.responseId} *****');
+            logger.d('***** Ad Unit ID Loaded: ${ad.responseInfo.responseId} *****');
             logger.d('***** Banner Results: ${ad?.responseInfo?.responseId}');
           },
           // Called when an ad request failed.
@@ -34,8 +33,7 @@ class AdMobLibrary {
                 '***** Ad failed to load, Code: ${error.code} - Domain: ${error.domain} - Message: ${error.message} *****');
           },
           // Called when an ad opens an overlay that covers the screen.
-          onAdOpened: (Ad ad) async =>
-              await Functions.processCredits(true, creditsToAdd: 5),
+          onAdOpened: (Ad ad) async => await Functions.processCredits(true, creditsToAdd: 5),
           // Called when an ad removes an overlay that covers the screen.
           onAdClosed: (Ad ad) {
             logger.d('Ad closed.');
@@ -43,8 +41,7 @@ class AdMobLibrary {
         ),
       );
 
-      logger.d(
-          '***** Default Banner Response: ${myBanner?.responseInfo?.responseId} *****');
+      logger.d('***** Default Banner Response: ${myBanner?.responseInfo?.responseId} *****');
       return myBanner;
     } else {
       logger.d('USER IS PREMIUM... NO BANNER ADS');
@@ -69,136 +66,61 @@ class AdMobLibrary {
     );
   }
 
-  void interstitialAdShow(InterstitialAd interstitialAd) async {
+  static void interstitialAdShow(InterstitialAd interstitialAd) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     final bool userIsPremium = userDatabase.get('userIsPremium');
-    // final bool userIsLegacy = !userDatabase.get('userIsPremium') &&
-    //     List.from(userDatabase.get('userIdList')).any(
-    //         (element) => element.toString().startsWith('$oldUserIdPrefix'));
-    if (!userIsPremium) {
-      int totalEarnedCredits =
-          userDatabase.get('credits') + userDatabase.get('permCredits');
-      double chanceToShow = 0;
+    final int adShowAttempts = userDatabase.get('adShowAttempts');
+    final bool newAdId = interstitialAd == null
+        ? false
+        : interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId');
 
-      if (totalEarnedCredits <= adChanceToShowThreshold) {
-        chanceToShow = 1 - (totalEarnedCredits / adChanceToShowThreshold);
-      } else {
-        chanceToShow = 0;
-      }
+    int totalEarnedCredits = userDatabase.get('credits') + userDatabase.get('permCredits');
+    double chanceToShow = 0;
 
-      bool willShow = random.nextDouble() < chanceToShow;
-
-      debugPrint('^^^^^ CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
-      debugPrint('^^^^^ WILL SHOW AD: $willShow ^^^^^');
-
-      if (interstitialAd != null && willShow) {
-        interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-          onAdShowedFullScreenContent: (interstitialAd) => userDatabase.put(
-              'interstitialAdId', interstitialAd.responseInfo.responseId),
-          onAdDismissedFullScreenContent: (InterstitialAd interstitialAd) {
-            userDatabase.put('interstitialAdIsNew', false);
-            interstitialAd.dispose();
-          },
-          onAdFailedToShowFullScreenContent: (interstitialAd, error) {
-            userDatabase.put('interstitialAdIsNew', false);
-            interstitialAd.dispose();
-          },
-          onAdImpression: (interstitialAd) => userDatabase.put(
-              'interstitialAdCount',
-              userDatabase.get('interstitialAdCount') + 1),
-          onAdClicked: (interstitialAd) {
-            debugPrint("Ad was clicked.");
-          },
-        );
-
-        interstitialAd.show();
-        // return null;
-      } else {
-        logger.d(
-            '***** INTERSTITIAL AD DATA IS NULL: AND MAY RELOAD DURING APP REFRESH');
-      }
+    if (totalEarnedCredits <= adChanceToShowThreshold) {
+      chanceToShow = 1 - (totalEarnedCredits / adChanceToShowThreshold);
     } else {
-      logger.d('USER IS UPGRADED TO PREMIUM STATUS!');
+      chanceToShow = 0;
+    }
+
+    bool willShow = random.nextDouble() < chanceToShow;
+
+    debugPrint('^^^^^ CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
+    debugPrint('^^^^^ WILL SHOW AD: $willShow ^^^^^');
+
+    if (!userIsPremium && interstitialAd != null && newAdId && (adShowAttempts < 3 || willShow)) {
+      interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
+        onAdShowedFullScreenContent: (interstitialAd) =>
+            userDatabase.put('interstitialAdId', interstitialAd.responseInfo.responseId),
+        onAdDismissedFullScreenContent: (InterstitialAd interstitialAd) {
+          userDatabase.put('interstitialAdIsNew', false);
+          interstitialAd.dispose();
+        },
+        onAdFailedToShowFullScreenContent: (interstitialAd, error) {
+          userDatabase.put('interstitialAdIsNew', false);
+          interstitialAd.dispose();
+        },
+        onAdImpression: (interstitialAd) =>
+            userDatabase.put('interstitialAdCount', userDatabase.get('interstitialAdCount') + 1),
+        onAdClicked: (interstitialAd) {
+          debugPrint("Ad was clicked.");
+        },
+      );
+      debugPrint(
+          '[INTERSTITIAL AD SHOW] DATA: User is Premium ? $userIsPremium - Ad Status = ${interstitialAd.responseInfo.responseId} - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
+      userDatabase.put('adShowAttempts', 0);
+      interstitialAd.show();
+    } else {
+      debugPrint(
+          '[INTERSTITIAL AD SHOW] DATA: User is Premium ? $userIsPremium - Ad Status = $interstitialAd - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
+      if (!userIsPremium) {
+        userDatabase.put('adShowAttempts', adShowAttempts + 1);
+      }
     }
   }
 
-  // void rewardedInterstitialAdShow(RewardedInterstitialAd interstitialAd) {
-  //   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-  //   final bool userIsPremium = userDatabase.get('userIsPremium');
-  //   // final bool userIsLegacy = !userDatabase.get('userIsPremium') &&
-  //   //     List.from(userDatabase.get('userIdList')).any(
-  //   //         (element) => element.toString().startsWith('$oldUserIdPrefix'));
-  //   if (!userIsPremium) {
-  //     int totalEarnedCredits =
-  //         userDatabase.get('credits') + userDatabase.get('permCredits');
-  //     double chanceToShow = 0;
-
-  //     if (totalEarnedCredits <= adChanceToShowThreshold)
-  //       chanceToShow = 1 - (totalEarnedCredits / adChanceToShowThreshold);
-  //     else
-  //       chanceToShow = 0;
-
-  //     bool willShow = random.nextDouble() < chanceToShow;
-
-  //     logger.d('^^^^^ CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
-  //     logger.d('^^^^^ WILL SHOW AD: $willShow ^^^^^');
-
-  //     if (interstitialAd != null && willShow) {
-  //       interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-  //         onAdShowedFullScreenContent:
-  //             (RewardedInterstitialAd interstitialAd) => userDatabase.put(
-  //                 'interstitialRewardedAdId',
-  //                 interstitialAd.responseInfo.responseId),
-  //         onAdDismissedFullScreenContent:
-  //             (RewardedInterstitialAd interstitialAd) {
-  //           userDatabase.put('interstitialRewardedAdIsNew', false);
-  //           interstitialAd.dispose();
-  //         },
-  //         onAdFailedToShowFullScreenContent:
-  //             (RewardedInterstitialAd interstitialAd, AdError error) {
-  //           userDatabase.put('interstitialRewardedAdIsNew', false);
-  //           interstitialAd.dispose();
-  //         },
-  //         onAdImpression: (RewardedInterstitialAd interstitialAd) =>
-  //             userDatabase.put('interstitialRewardedAdCount',
-  //                 userDatabase.get('interstitialRewardedAdCount') + 1),
-  //       );
-  //       interstitialAd.show(
-  //         onUserEarnedReward: (interstitialAd, RewardItem rewardItem) async {
-  //           logger.d('*****\nImplementing reward now!!!\n*****'.toUpperCase());
-  //           await Functions.processCredits(true,
-  //               isPermanent: false, creditsToAdd: 5);
-  //         },
-  //       );
-  //       return null;
-  //     } else
-  //       logger.d(
-  //           '***** INTERSTITIAL AD DATA IS NULL: AND MAY RELOAD DURING APP REFRESH');
-  //   } else
-  //     logger.d('USER IS UPGRADED TO PREMIUM STATUS!');
-  // }
-
   void rewardedAdShow(RewardedAd ad /*, {override = false}*/) {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-    // final bool userIsPremium = userDatabase.get('userIsPremium');
-    // final bool userIsLegacy = !userDatabase.get('userIsPremium') &&
-    //     List.from(userDatabase.get('userIdList')).any(
-    //         (element) => element.toString().startsWith('$oldUserIdPrefix'));
-    // if (!userIsPremium || (userIsPremium && override)) {
-    // int totalEarnedCredits =
-    //     userDatabase.get('credits') + userDatabase.get('permCredits');
-    // double chanceToShow = 0;
-    // Random random = Random();
-
-    // if (totalEarnedCredits <= adChanceToShowThreshold)
-    //   chanceToShow = 1 - (totalEarnedCredits / adChanceToShowThreshold);
-    // else
-    //   chanceToShow = 0;
-
-    // bool willShow = random.nextDouble() < chanceToShow;
-
-    // logger.d('^^^^^ CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
-    // logger.d('^^^^^ WILL SHOW AD: $willShow ^^^^^');
 
     if (ad != null) {
       ad.fullScreenContentCallback = FullScreenContentCallback(
@@ -212,21 +134,18 @@ class AdMobLibrary {
           userDatabase.put('rewardedAdIsNew', false);
           ad.dispose();
         },
-        onAdImpression: (RewardedAd ad) => userDatabase.put(
-            'rewardedAdCount', userDatabase.get('rewardedAdCount') + 1),
+        onAdImpression: (RewardedAd ad) =>
+            userDatabase.put('rewardedAdCount', userDatabase.get('rewardedAdCount') + 1),
       );
       ad.show(
         onUserEarnedReward: (ad, RewardItem rewardItem) async {
           logger.d('*****\nImplementing reward now!!!\n*****'.toUpperCase());
-          await Functions.processCredits(true,
-              isPermanent: true, creditsToAdd: 50);
+          await Functions.processCredits(true, isPermanent: true, creditsToAdd: 50);
         },
       );
       return;
     } else {
       logger.d('***** AD DATA IS NULL: AND MAY RELOAD DURING APP REFRESH');
     }
-    // } else
-    //   logger.d('USER IS UPGRADED TO PREMIUM STATUS!');
   }
 }

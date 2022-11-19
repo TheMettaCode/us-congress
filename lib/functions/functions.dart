@@ -20,7 +20,6 @@ import 'package:us_congress_vote_tracker/constants/widgets.dart';
 import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
 import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
 import 'package:us_congress_vote_tracker/models/bill_recent_payload_model.dart';
-import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
 import 'package:us_congress_vote_tracker/models/private_funded_trips_model.dart';
 import 'package:us_congress_vote_tracker/models/statements_model.dart';
 import 'package:us_congress_vote_tracker/models/vote_payload_model.dart';
@@ -366,7 +365,7 @@ class Functions {
   }
 
   static Future<void> getTrialStatus(
-      BuildContext context, bool userIsPremium, bool userIsLegacy) async {
+      BuildContext context, InterstitialAd interstitialAd, bool userIsPremium, bool userIsLegacy) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     /// PROCESS FREE TRIAL TIME FRAME
@@ -403,7 +402,7 @@ class Functions {
           enableDrag: true,
           builder: (context) {
             return SharedWidgets.freeTrialEndedDialog(
-                context, userDatabase, userIsPremium, userIsLegacy);
+                context, interstitialAd, userDatabase, userIsPremium, userIsLegacy);
           });
     } else if (!userIsPremium &&
         freePremiumDaysActive &&
@@ -516,7 +515,7 @@ class Functions {
     }
   }
 
-  static Future<void> checkRewards(BuildContext context, RewardedAd ad, List<bool> userLevels,
+  static Future<void> checkRewards(BuildContext context, InterstitialAd interstitialAd, RewardedAd ad, List<bool> userLevels,
       List<GithubNotifications> githubNotificationsList) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     // bool userIsDev = userLevels[0];
@@ -547,7 +546,7 @@ class Functions {
         enableDrag: true,
         builder: (context) {
           return SharedWidgets.supportOptions(
-              context, userDatabase, ad, userLevels, githubNotificationsList);
+              context, interstitialAd, userDatabase, ad, userLevels, githubNotificationsList);
         },
       );
       await processCredits(true, isPermanent: true, creditsToAdd: 30);
@@ -616,6 +615,15 @@ class Functions {
         '^^^^^ UPDATED CREDIT VALUES\n- TEMPORARY: ${userDatabase.get('credits')}\n- PERMANENT: ${userDatabase.get('permCredits')}\n- PURCHASED: ${userDatabase.get('purchCredits')}');
   }
 
+  // static Future<void> showAd(bool userIsPremium, InterstitialAd interstitialAd) async {
+  //   // Box userDatabase = Hive.box<dynamic>(appDatabase);
+  //   // if (!userIsPremium &&
+  //   //     interstitialAd != null &&
+  //   //     interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId')) {
+  //     AdMobLibrary.interstitialAdShow(interstitialAd);
+  //   // }
+  // }
+
   static Future<void> linkLaunch(
     BuildContext context,
     String linkUrl,
@@ -657,11 +665,19 @@ class Functions {
                               context: context, message: 'Could not launch link', isAlert: true);
                         },
                       ))),
-            ).then((_) => !userIsPremium &&
-                  interstitialAd != null &&
-                  interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId')
-              ? AdMobLibrary().interstitialAdShow(interstitialAd)
-              : null);
+            ).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+      // .then((_) => !userIsPremium &&
+      //     interstitialAd != null &&
+      //     interstitialAd.responseInfo.responseId !=
+      //         userDatabase.get('interstitialAdId')
+      // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+      // : null);
+
+      // .then((_) => !userIsPremium &&
+      //         interstitialAd != null &&
+      //         interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId')
+      //     ? AdMobLibrary().interstitialAdShow(interstitialAd)
+      //     : null);
     } else {
       if (context != null) {
         Messages.showMessage(context: context, message: 'Could not launch link', isAlert: true);
@@ -671,7 +687,7 @@ class Functions {
 
   /// THIS FUNCTION SHOWS A POP UP SCREEN REQUESTING THE USER
   /// TO UPGRADE AFTER TAPPING ON A PREMIUM FEATURE
-  static Future<void> requestInAppPurchase(BuildContext context, bool userIsPremium,
+  static Future<void> requestInAppPurchase(BuildContext context, InterstitialAd interstitialAd, bool userIsPremium,
       {whatToShow = 'all' /*[all, upgrades,credits]*/}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     try {
@@ -693,7 +709,7 @@ class Functions {
             return SharedWidgets.appUpgradeDialog(context, userDatabase, offers, userIsPremium,
                 whatToShow: whatToShow);
           },
-        );
+        ).then((_)=>AdMobLibrary.interstitialAdShow(interstitialAd));
       }
     } catch (e) {
       logger.w(e);

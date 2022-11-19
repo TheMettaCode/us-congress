@@ -18,7 +18,6 @@ import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/constants/styles.dart';
 import 'package:us_congress_vote_tracker/constants/themes.dart';
 import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
 import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
 import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
 import 'package:us_congress_vote_tracker/models/bill_recent_payload_model.dart';
@@ -390,7 +389,7 @@ class SharedWidgets {
         });
   }
 
-  static Widget premiumUpgradeContainer(BuildContext context, bool userIsPremium, bool userIsLegacy,
+  static Widget premiumUpgradeContainer(BuildContext context, InterstitialAd interstitialAd, bool userIsPremium, bool userIsLegacy,
       bool devUpgraded, bool freeTrialUsed, Box userDatabase,
       {color = const Color.fromARGB(255, 30, 150, 0)}) {
     return !freeTrialUsed && (freePremiumDaysActive || userDatabase.get('appOpens') < 5)
@@ -422,7 +421,7 @@ class SharedWidgets {
                 ),
                 onTap: () {
                   Navigator.maybePop(context);
-                  Functions.requestInAppPurchase(context, userIsPremium, whatToShow: 'upgrades');
+                  Functions.requestInAppPurchase(context,interstitialAd, userIsPremium, whatToShow: 'upgrades');
                 },
               ),
             ),
@@ -493,7 +492,7 @@ class SharedWidgets {
   }
 
   static Widget freeTrialEndedDialog(
-      BuildContext context, Box userDatabase, bool userIsPremium, bool userIsLegacy) {
+      BuildContext context, InterstitialAd interstitialAd, Box userDatabase, bool userIsPremium, bool userIsLegacy) {
     // final bool _darkTheme = userDatabase.get('darkTheme');
     final bool devUpgraded = userDatabase.get('devUpgraded');
     final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
@@ -547,7 +546,7 @@ class SharedWidgets {
               ),
             ),
             BounceInUp(
-                child: premiumUpgradeContainer(context, userIsPremium, userIsLegacy, devUpgraded,
+                child: premiumUpgradeContainer(context, interstitialAd, userIsPremium, userIsLegacy, devUpgraded,
                     freeTrialUsed, userDatabase)),
           ],
         ),
@@ -801,7 +800,7 @@ class SharedWidgets {
     );
   }
 
-  static Widget supportOptions(BuildContext context, Box userDatabase, RewardedAd ad,
+  static Widget supportOptions(BuildContext context, InterstitialAd interstitialAd , Box userDatabase, RewardedAd ad,
       List<bool> userLevels, List<GithubNotifications> githubNotificationsList) {
     // bool userIsDev = userLevels[0];
     bool userIsPremium = userDatabase.get('userIsPremium');
@@ -867,7 +866,7 @@ class SharedWidgets {
                     children: [
                           !userIsPremium /*&& !userIsLegacy*/
                               ? FlipInY(
-                                  child: premiumUpgradeContainer(context, userIsPremium,
+                                  child: premiumUpgradeContainer(context, interstitialAd, userIsPremium,
                                       userIsLegacy, devUpgraded, freeTrialUsed, userDatabase))
                               : const SizedBox.shrink(),
                           ad != null &&
@@ -957,7 +956,7 @@ class SharedWidgets {
                                                   ? const Icon(Icons.launch, size: 16)
                                                   : const SizedBox.shrink(),
                                       onTap: () => notification.additionalData == 'credits'
-                                          ? Functions.requestInAppPurchase(context, userIsPremium,
+                                          ? Functions.requestInAppPurchase(context, interstitialAd, userIsPremium,
                                               whatToShow: notification.additionalData)
                                           : notification.additionalData == 'share'
                                               ? Messages.shareContent(true)
@@ -5186,7 +5185,8 @@ class SharedWidgets {
       StatementsResults statement,
       List<HouseStockWatch> houseStockWatchList,
       List<SenateStockWatch> senateStockWatchList,
-      bool userIsPremium) {
+      bool userIsPremium,
+      InterstitialAd interstitialAd) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     final party = statement.party.toString().replaceFirst('Party.', '');
     final chamber = statement.chamber.toString().replaceFirst('Chamber.', '');
@@ -5243,7 +5243,13 @@ class SharedWidgets {
                               builder: (context) => MemberDetail(
                                   statement.memberId, houseStockWatchList, senateStockWatchList),
                             ),
-                          );
+                          ).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                          // .then((_) => !userIsPremium &&
+                          //     interstitialAd != null &&
+                          //     interstitialAd.responseInfo.responseId !=
+                          //         userDatabase.get('interstitialAdId')
+                          // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                          // : null);
                         },
                         child: Stack(
                           alignment: Alignment.bottomLeft,
@@ -5466,6 +5472,7 @@ class SharedWidgets {
 
   static Widget ecwidProductsListing(
     BuildContext context,
+    InterstitialAd interstitialAd,
     List<EcwidStoreItem> ecwidProductsList,
     Box userDatabase,
     List<bool> userLevels,
@@ -5595,7 +5602,7 @@ class SharedWidgets {
                                     isScrollControlled: false,
                                     context: context,
                                     builder: (context) => ecwidProductDetail(
-                                        context, userDatabase, darkTheme, thisItem, userLevels),
+                                        context, interstitialAd, userDatabase, darkTheme, thisItem, userLevels),
                                   ),
                               child: Stack(
                                 alignment: Alignment.topLeft,
@@ -5729,6 +5736,7 @@ class SharedWidgets {
 
   static Widget ecwidProductDetail(
     BuildContext context,
+    InterstitialAd interstitialAd,
     Box userDatabase,
     bool darkTheme,
     EcwidStoreItem thisEcwidProduct,
@@ -6029,7 +6037,7 @@ class SharedWidgets {
                                                     ));
                                               }
                                         : () => Functions.requestInAppPurchase(
-                                            context, userIsPremium,
+                                            context, interstitialAd, userIsPremium,
                                             whatToShow: 'credits')
                                     : () => null,
                                 child: Text(

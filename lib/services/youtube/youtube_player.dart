@@ -208,6 +208,9 @@ class Youtube {
       bool randomImageActivated,
       List<bool> userLevels) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
+    // bool userIsDev = userLevels[0];
+    // bool userIsPremium = userLevels[1];
+    // bool userIsLegacy = userLevels[2];
     bool technicalDifficulties =
         localThisVideo.snippet.description.contains('technical difficulties')
             ? true
@@ -258,11 +261,12 @@ class Youtube {
                 ).then((_) async {
                   userDatabase.put('newVideos', false);
                   await Functions.processCredits(true, isPermanent: false);
-                  if (interstitialAd != null &&
-                      interstitialAd.responseInfo.responseId !=
-                          userDatabase.get('interstitialAdId')) {
-                    AdMobLibrary().interstitialAdShow(interstitialAd);
-                  }
+                  AdMobLibrary.interstitialAdShow(interstitialAd);
+                  // if (interstitialAd != null &&
+                  //     interstitialAd.responseInfo.responseId !=
+                  //         userDatabase.get('interstitialAdId')) {
+                  //   AdMobLibrary().interstitialAdShow(interstitialAd);
+                  // }
                 }),
         child: ZoomIn(
           child: Container(

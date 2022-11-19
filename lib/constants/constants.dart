@@ -1,7 +1,5 @@
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-// import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
-// import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
 import 'dart:math';
 import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 
@@ -265,16 +263,12 @@ const String playlistId = 'PLhVgsjve2unNn2NgCKW0uMjgde8L20Hnb';
 const String adSenseClientId = 'ca-pub-9188084311019420';
 
 /// ADMOB DATAApp Open	ca-app-pub-3940256099942544/3419835294
-const int adChanceToShowThreshold = 2000;
+const int adChanceToShowThreshold = 3000;
 const String appId = 'ca-app-pub-3834929667159972~4799960334';
 const String defaultBannerId = 'ca-app-pub-3834929667159972/8034011226';
 const String rewardedAdId = 'ca-app-pub-3834929667159972/5759618902';
 const String interstitialAdId = 'ca-app-pub-3834929667159972/9786327541';
-const String interstitialRewardedAdId = 'ca-app-pub-3834929667159972/9310780865';
-// const String defaultOpenId = 'ca-app-pub-3834929667159972/9402734142';
-// const String defaultNativeAdvancedId = 'ca-app-pub-3834929667159972/3057645627';
 
-const List<String> adMobTestDevices = ['bb0847f0-9df1-4b02-86f6-09ef4c36af0f'];
 const List<String> adMobKeyWords = [
   'united states',
   'government',
@@ -338,12 +332,10 @@ Map<String, dynamic> initialUserData = {
   "interstitialAdId": "",
   "interstitialAdIsNew": false,
   "interstitialAdCount": 0,
-  "interstitialRewardedAdId": "",
-  "interstitialRewardedAdIsNew": false,
-  "interstitialRewardedAdCount": 0,
   "rewardedAdId": "",
   "rewardedAdIsNew": false,
   "rewardedAdCount": 0,
+  "adShowAttempts":0,
   "credits": 0,
   "permCredits": 100,
   "purchCredits": 0,

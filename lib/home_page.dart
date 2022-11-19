@@ -237,7 +237,7 @@ class HomePageState extends State<HomePage> {
         }));
 
     // if (userIsPremium && freeTrialUsed)
-    await Functions.getTrialStatus(context, userIsPremium, userIsLegacy);
+    await Functions.getTrialStatus(context, interstitialAd, userIsPremium, userIsLegacy);
 
     /// RETREIVE ALL MEMBERS DATA
     await getMembers('all');
@@ -248,7 +248,8 @@ class HomePageState extends State<HomePage> {
         }));
 
     /// CHECK FOR USER APP USAGE REWARDS
-    await Functions.checkRewards(context, rewardedAd, userLevels, githubNotificationsList);
+    await Functions.checkRewards(
+        context, interstitialAd, rewardedAd, userLevels, githubNotificationsList);
 
     /// IF USER IS NEW, REQUEST USAGE INFORMATION APPROVAL
     if (!userDatabase.get('usageInfo') && !userDatabase.get('usageInfoSelected')) {
@@ -292,7 +293,7 @@ class HomePageState extends State<HomePage> {
                     .difference(DateTime.parse(userDatabase.get('freeTrialStartDate')))
                     .inMinutes <=
             0) {
-          await Functions.getTrialStatus(context, userIsPremium, userIsLegacy);
+          await Functions.getTrialStatus(context, interstitialAd, userIsPremium, userIsLegacy);
         }
       }
 
@@ -1170,12 +1171,14 @@ class HomePageState extends State<HomePage> {
                                               houseStockWatchList,
                                               senateStockWatchList),
                                         ),
-                                      ).then((_) => !userIsPremium &&
-                                              interstitialAd != null &&
-                                              interstitialAd.responseInfo.responseId !=
-                                                  userDatabase.get('interstitialAdId')
-                                          ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                          : null);
+                                      ).then(
+                                          (_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                      // .then((_) => !userIsPremium &&
+                                      //     interstitialAd != null &&
+                                      //     interstitialAd.responseInfo.responseId !=
+                                      //         userDatabase.get('interstitialAdId')
+                                      // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                      // : null);
                                     },
                                     label: const Text('Search'),
                                   )
@@ -1201,16 +1204,18 @@ class HomePageState extends State<HomePage> {
                                 builder: (context) {
                                   return SharedWidgets.ecwidProductsListing(
                                       context,
+                                      interstitialAd,
                                       ecwidProductsList,
                                       userDatabase,
                                       userLevels,
                                       productOrdersList);
-                                }).then((_) => !userIsPremium &&
-                                    interstitialAd != null &&
-                                    interstitialAd.responseInfo.responseId !=
-                                        userDatabase.get('interstitialAdId')
-                                ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                : null);
+                                }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                            // .then((_) => !userIsPremium &&
+                            //     interstitialAd != null &&
+                            //     interstitialAd.responseInfo.responseId !=
+                            //         userDatabase.get('interstitialAdId')
+                            // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                            // : null);
                           },
                           icon: const Icon(Icons.store),
                         )),
@@ -1282,7 +1287,7 @@ class HomePageState extends State<HomePage> {
                                   userIsPremium && freeTrialUsed
                                       ? InkWell(
                                           onTap: () async => await Functions.requestInAppPurchase(
-                                              context, userIsPremium,
+                                              context, interstitialAd, userIsPremium,
                                               whatToShow: 'upgrades'),
                                           child: Container(
                                             color: altHighlightColor,
@@ -1820,23 +1825,26 @@ class HomePageState extends State<HomePage> {
                               : () {
                                   userDatabase.put('newEcwidProducts', false);
                                   showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: false,
-                                      enableDrag: true,
-                                      context: context,
-                                      builder: (context) {
-                                        return SharedWidgets.ecwidProductsListing(
-                                            context,
-                                            ecwidProductsList,
-                                            userDatabase,
-                                            userLevels,
-                                            productOrdersList);
-                                      }).then((_) => !userIsPremium &&
-                                          interstitialAd != null &&
-                                          interstitialAd.responseInfo.responseId !=
-                                              userDatabase.get('interstitialAdId')
-                                      ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                      : null);
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: false,
+                                          enableDrag: true,
+                                          context: context,
+                                          builder: (context) {
+                                            return SharedWidgets.ecwidProductsListing(
+                                                context,
+                                                interstitialAd,
+                                                ecwidProductsList,
+                                                userDatabase,
+                                                userLevels,
+                                                productOrdersList);
+                                          })
+                                      .then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                  // .then((_) => !userIsPremium &&
+                                  //     interstitialAd != null &&
+                                  //     interstitialAd.responseInfo.responseId !=
+                                  //         userDatabase.get('interstitialAdId')
+                                  // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                  // : null);
                                 },
                         ),
                       ),
@@ -1873,14 +1881,20 @@ class HomePageState extends State<HomePage> {
                                 enableDrag: true,
                                 context: context,
                                 builder: (context) {
-                                  return SharedWidgets.supportOptions(context, userDatabase,
-                                      rewardedAd, userLevels, githubNotificationsList);
-                                }).then((_) => !userIsPremium &&
-                                    interstitialAd != null &&
-                                    interstitialAd.responseInfo.responseId !=
-                                        userDatabase.get('interstitialAdId')
-                                ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                : null);
+                                  return SharedWidgets.supportOptions(
+                                      context,
+                                      interstitialAd,
+                                      userDatabase,
+                                      rewardedAd,
+                                      userLevels,
+                                      githubNotificationsList);
+                                }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                            // .then((_) => !userIsPremium &&
+                            //     interstitialAd != null &&
+                            //     interstitialAd.responseInfo.responseId !=
+                            //         userDatabase.get('interstitialAdId')
+                            // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                            // : null);
                           },
                         ),
                       ),
@@ -2128,7 +2142,8 @@ class HomePageState extends State<HomePage> {
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                       child: InkWell(
-                          onTap: () async => Functions.requestInAppPurchase(context, userIsPremium,
+                          onTap: () async => Functions.requestInAppPurchase(
+                              context, interstitialAd, userIsPremium,
                               whatToShow: 'upgrades'),
                           child: BounceInDown(
                             child: Container(
@@ -2640,13 +2655,13 @@ class HomePageState extends State<HomePage> {
                                                   userDatabase,
                                                   houseStockWatchList,
                                                   senateStockWatchList)).then((_) =>
-                                              !userIsPremium &&
-                                                      interstitialAd != null &&
-                                                      interstitialAd.responseInfo.responseId !=
-                                                          userDatabase.get('interstitialAdId')
-                                                  ? AdMobLibrary()
-                                                      .interstitialAdShow(interstitialAd)
-                                                  : null);
+                                              AdMobLibrary.interstitialAdShow(interstitialAd));
+                                          // .then((_) => !userIsPremium &&
+                                          //     interstitialAd != null &&
+                                          //     interstitialAd.responseInfo.responseId !=
+                                          //         userDatabase.get('interstitialAdId')
+                                          // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                          // : null);
 
                                           userDatabase.put('newHouseFloor', false);
                                         },
@@ -2801,13 +2816,13 @@ class HomePageState extends State<HomePage> {
                                                           userDatabase,
                                                           houseStockWatchList,
                                                           senateStockWatchList)).then((_) =>
-                                                  !userIsPremium &&
-                                                          interstitialAd != null &&
-                                                          interstitialAd.responseInfo.responseId !=
-                                                              userDatabase.get('interstitialAdId')
-                                                      ? AdMobLibrary()
-                                                          .interstitialAdShow(interstitialAd)
-                                                      : null);
+                                                  AdMobLibrary.interstitialAdShow(interstitialAd));
+                                              // .then((_) => !userIsPremium &&
+                                              //     interstitialAd != null &&
+                                              //     interstitialAd.responseInfo.responseId !=
+                                              //         userDatabase.get('interstitialAdId')
+                                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                              // : null);
 
                                               userDatabase.put('newSenateFloor', false);
                                             },
@@ -2920,12 +2935,13 @@ class HomePageState extends State<HomePage> {
                                   builder: (context) {
                                     return SharedWidgets.recentBillsList(context, userDatabase,
                                         billList, houseStockWatchList, senateStockWatchList);
-                                  }).then((_) => !userIsPremium &&
-                                      interstitialAd != null &&
-                                      interstitialAd.responseInfo.responseId !=
-                                          userDatabase.get('interstitialAdId')
-                                  ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                  : null);
+                                  }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                              // .then((_) => !userIsPremium &&
+                              //     interstitialAd != null &&
+                              //     interstitialAd.responseInfo.responseId !=
+                              //         userDatabase.get('interstitialAdId')
+                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                              // : null);
 
                               userDatabase.put('newBills', false);
                               await Functions.processCredits(true, isPermanent: false);
@@ -2963,12 +2979,13 @@ class HomePageState extends State<HomePage> {
                                         voteList,
                                         houseStockWatchList,
                                         senateStockWatchList);
-                                  }).then((_) => !userIsPremium &&
-                                      interstitialAd != null &&
-                                      interstitialAd.responseInfo.responseId !=
-                                          userDatabase.get('interstitialAdId')
-                                  ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                  : null);
+                                  }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                              // .then((_) => !userIsPremium &&
+                              //     interstitialAd != null &&
+                              //     interstitialAd.responseInfo.responseId !=
+                              //         userDatabase.get('interstitialAdId')
+                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                              // : null);
 
                               userDatabase.put('newVotes', false);
                               await Functions.processCredits(true, isPermanent: false);
@@ -3011,18 +3028,18 @@ class HomePageState extends State<HomePage> {
                           ? null
                           : () async {
                               showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: false,
-                                      enableDrag: true,
-                                      context: context,
-                                      builder: (context) {
-                                        return membersListContainer(senateMembersList, 'Senators',
-                                            houseStockWatchList: houseStockWatchList,
-                                            senateStockWatchList: senateStockWatchList);
-                                      })
-                                  .whenComplete(() => setState(() => membersSearchString = ''))
-                                  .then((value) async =>
-                                      await Functions.processCredits(true, isPermanent: false));
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: false,
+                                  enableDrag: true,
+                                  context: context,
+                                  builder: (context) {
+                                    return membersListContainer(senateMembersList, 'Senators',
+                                        houseStockWatchList: houseStockWatchList,
+                                        senateStockWatchList: senateStockWatchList);
+                                  }).then((_) {
+                                Functions.processCredits(true, isPermanent: false);
+                                AdMobLibrary.interstitialAdShow(interstitialAd);
+                              }).whenComplete(() => setState(() => membersSearchString = ''));
                             },
                       icon: loadingSenators
                           ? const SizedBox(
@@ -3070,19 +3087,18 @@ class HomePageState extends State<HomePage> {
                         ? null
                         : () async {
                             showModalBottomSheet(
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: false,
-                                    enableDrag: true,
-                                    context: context,
-                                    builder: (context) {
-                                      return membersListContainer(
-                                          houseMembersList, 'Representatives',
-                                          houseStockWatchList: houseStockWatchList,
-                                          senateStockWatchList: senateStockWatchList);
-                                    })
-                                .whenComplete(() => setState(() => membersSearchString = ''))
-                                .then((value) async =>
-                                    await Functions.processCredits(true, isPermanent: false));
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: false,
+                                enableDrag: true,
+                                context: context,
+                                builder: (context) {
+                                  return membersListContainer(houseMembersList, 'Representatives',
+                                      houseStockWatchList: houseStockWatchList,
+                                      senateStockWatchList: senateStockWatchList);
+                                }).then((value) {
+                              Functions.processCredits(true, isPermanent: false);
+                              AdMobLibrary.interstitialAdShow(interstitialAd);
+                            }).whenComplete(() => setState(() => membersSearchString = ''));
                           },
                   ),
                 ),
@@ -3128,28 +3144,32 @@ class HomePageState extends State<HomePage> {
                                   color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
                                 )),
                             onPressed: !userIsPremium && !userIsLegacy
-                                ? () async => Functions.requestInAppPurchase(context, userIsPremium,
+                                ? () async => Functions.requestInAppPurchase(
+                                    context, interstitialAd, userIsPremium,
                                     whatToShow: 'upgrades')
                                 : lobbyingEventsList.isEmpty
                                     ? null
                                     : () async {
                                         showModalBottomSheet(
-                                            backgroundColor: Colors.transparent,
-                                            isScrollControlled: false,
-                                            enableDrag: true,
-                                            context: context,
-                                            builder: (context) {
-                                              return SharedWidgets.lobbyingList(
-                                                context,
-                                                userDatabase,
-                                                lobbyingEventsList,
-                                              );
-                                            }).then((_) => !userIsPremium &&
-                                                interstitialAd != null &&
-                                                interstitialAd.responseInfo.responseId !=
-                                                    userDatabase.get('interstitialAdId')
-                                            ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                            : null);
+                                                backgroundColor: Colors.transparent,
+                                                isScrollControlled: false,
+                                                enableDrag: true,
+                                                context: context,
+                                                builder: (context) {
+                                                  return SharedWidgets.lobbyingList(
+                                                    context,
+                                                    userDatabase,
+                                                    lobbyingEventsList,
+                                                  );
+                                                })
+                                            .then((_) =>
+                                                AdMobLibrary.interstitialAdShow(interstitialAd));
+                                        // .then((_) => !userIsPremium &&
+                                        //     interstitialAd != null &&
+                                        //     interstitialAd.responseInfo.responseId !=
+                                        //         userDatabase.get('interstitialAdId')
+                                        // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                        // : null);
 
                                         userDatabase.put('newLobbies', false);
                                         await Functions.processCredits(true, isPermanent: false);
@@ -3195,7 +3215,7 @@ class HomePageState extends State<HomePage> {
                                       )),
                                   onPressed: !userIsPremium && !userIsLegacy
                                       ? () async => Functions.requestInAppPurchase(
-                                          context, userIsPremium,
+                                          context, interstitialAd, userIsPremium,
                                           whatToShow: 'upgrades')
                                       : privatelyFundedTripsList.isEmpty
                                           ? null
@@ -3368,12 +3388,14 @@ class HomePageState extends State<HomePage> {
                                           builder: (context) => MemberDetail(official.id,
                                               houseStockWatchList, senateStockWatchList),
                                         ),
-                                      ).then((_) => !userIsPremium &&
-                                              interstitialAd != null &&
-                                              interstitialAd.responseInfo.responseId !=
-                                                  userDatabase.get('interstitialAdId')
-                                          ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                          : null);
+                                      ).then(
+                                          (_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                      // .then((_) => !userIsPremium &&
+                                      //     interstitialAd != null &&
+                                      //     interstitialAd.responseInfo.responseId !=
+                                      //         userDatabase.get('interstitialAdId')
+                                      // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                      // : null);
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -3514,7 +3536,8 @@ class HomePageState extends State<HomePage> {
                                     thisStatement,
                                     houseStockWatchList,
                                     senateStockWatchList,
-                                    userIsPremium)),
+                                    userIsPremium,
+                                    interstitialAd)),
                           ],
                         );
                         // });
@@ -3536,8 +3559,8 @@ class HomePageState extends State<HomePage> {
             : !userIsPremium && showBannerAd
                 ? showPremiumPromo
                     ? BounceInUp(
-                        child: SharedWidgets.premiumUpgradeContainer(context, userIsPremium,
-                            userIsLegacy, devUpgraded, freeTrialUsed, userDatabase,
+                        child: SharedWidgets.premiumUpgradeContainer(context, interstitialAd,
+                            userIsPremium, userIsLegacy, devUpgraded, freeTrialUsed, userDatabase,
                             color: Theme.of(context).colorScheme.primary),
                       )
                     : bannerAdContainer
