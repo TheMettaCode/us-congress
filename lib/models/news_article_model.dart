@@ -39,7 +39,7 @@ class NewsArticle {
         imageUrl: json["imageUrl"] == null || json["imageUrl"] == ''
             ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Capitol_at_Dusk_2.jpg/1200px-Capitol_at_Dusk_2.jpg'
             : json["imageUrl"],
-        date: json['date'] ?? DateTime.now().toString(),
+        date: json['date'], // ?? DateTime.now().toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +54,6 @@ class NewsArticle {
             //     // ? Uri.parse(imageUrl).data
             //     ? '${base64Decode(imageUrl.split(',').last)}'
             : imageUrl,
-        "date": date ?? DateTime.now().toString(),
+        "date": date, // ?? DateTime.now().toString(),
       };
 }

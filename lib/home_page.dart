@@ -42,8 +42,6 @@ import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart
 import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
-import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
-import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'constants/constants.dart';
 import 'functions/propublica_api_functions.dart';
@@ -148,8 +146,8 @@ class HomePageState extends State<HomePage> {
   List<ChamberMember> senateIndependentsList = [];
   List<ChamberMember> userCongressList = [];
 
-  List<PlaylistItem> youTubePlaylist = [];
-  List<String> youtubeVideoIdsList = [];
+  // List<PlaylistItem> youTubePlaylist = [];
+  List<ChannelVideos> youtubeVideosList = [];
 
   // AnimationController animationController;
   ScrollController scrollController = ScrollController();
@@ -193,12 +191,12 @@ class HomePageState extends State<HomePage> {
     await GithubApi.getPromoMessages(context);
 
     /// BEGIN VIDEO SCROLL ANIMATIONS
-    if (youTubePlaylist.isNotEmpty) {
-      _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
-          duration: const Duration(seconds: 30), curve: Curves.linear);
-    }
-    if (youtubeVideoIdsList.isNotEmpty) {
-      _videoListController.animateTo((youtubeVideoIdsList.length.toDouble() - 1) * 150,
+    // if (youTubePlaylist.isNotEmpty) {
+    //   _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
+    //       duration: const Duration(seconds: 30), curve: Curves.linear);
+    // }
+    if (youtubeVideosList.isNotEmpty) {
+      _videoListController.animateTo((youtubeVideosList.length.toDouble() - 1) * 150,
           duration: const Duration(seconds: 30), curve: Curves.linear);
     }
 
@@ -307,18 +305,18 @@ class HomePageState extends State<HomePage> {
         }
 
         /// REVERSE SLIDER ANIMATION
-        if (_videoListController.offset >= (youTubePlaylist.length.toDouble() - 1) * 150) {
+        // if (_videoListController.offset >= (youTubePlaylist.length.toDouble() - 1) * 150) {
+        //   _videoListController.animateTo(0,
+        //       duration: const Duration(seconds: 30), curve: Curves.linear);
+        // } else if (_videoListController.offset <= 30) {
+        //   _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
+        //       duration: const Duration(seconds: 30), curve: Curves.linear);
+        // }
+        if (_videoListController.offset >= (youtubeVideosList.length.toDouble() - 1) * 150) {
           _videoListController.animateTo(0,
               duration: const Duration(seconds: 30), curve: Curves.linear);
         } else if (_videoListController.offset <= 30) {
-          _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
-              duration: const Duration(seconds: 30), curve: Curves.linear);
-        }
-        if (_videoListController.offset >= (youtubeVideoIdsList.length.toDouble() - 1) * 150) {
-          _videoListController.animateTo(0,
-              duration: const Duration(seconds: 30), curve: Curves.linear);
-        } else if (_videoListController.offset <= 30) {
-          _videoListController.animateTo((youtubeVideoIdsList.length.toDouble() - 1) * 150,
+          _videoListController.animateTo((youtubeVideosList.length.toDouble() - 1) * 150,
               duration: const Duration(seconds: 30), curve: Curves.linear);
         }
       }
@@ -439,27 +437,37 @@ class HomePageState extends State<HomePage> {
     });
 
     /// YOUTUBE VIDEOS LIST
+    // try {
+    //   setState(() =>
+    //       youTubePlaylist = youTubePlaylistFromJson(userDatabase.get('youTubePlaylist')).items);
+    // } catch (e) {
+    //   logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
+    //   userDatabase.put('youTubePlaylist', {});
+    // }
+
     try {
-      setState(() =>
-          youTubePlaylist = youTubePlaylistFromJson(userDatabase.get('youTubePlaylist')).items);
+      List<ChannelVideos> xVideosList =
+          topCongressionalVideosFromJson(userDatabase.get('youtubeVideosList'))
+              .channels
+              .map((e) => e.channelVideos)
+              .expand((element) => element)
+              .toList();
+      await YouTubeVideosApi.convertAllDates(xVideosList)
+          .then((value) => setState(() => youtubeVideosList = value));
     } catch (e) {
       logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
-      userDatabase.put('youTubePlaylist', {});
-    }
-    try {
-      setState(() => youtubeVideoIdsList = List.from(userDatabase.get('youtubeVideoIds')));
-    } catch (e) {
-      logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
-      userDatabase.put('youtubeVideoIds', []);
+      userDatabase.put('youtubeVideosList', {});
     }
 
     /// NEWS ARTICLES LIST
     try {
-      setState(() => newsArticlesList = newsArticleFromJson(userDatabase.get('newsArticles')));
-      newsArticlesList.shuffle();
+      List<NewsArticle> tempNewsList = newsArticleFromJson(userDatabase.get('newsArticles'));
+      await RapidApiFunctions.processNewsArticleDates(tempNewsList)
+          .then((value) => setState(() => newsArticlesList = value));
+      debugPrint('[HOME PAGE INITIAL DATA] ${newsArticlesList.length} NEWS ARTICLES');
     } catch (e) {
       logger.w('^^^^^ ERROR DURING NEWS ARTICLES LIST INITIAL VARIABLES SETUP: $e ^^^^^');
-      userDatabase.put('newsArticles', {});
+      // userDatabase.put('newsArticles', {});
     }
 
     /// HOUSE FLOOR ACTIONS
@@ -477,23 +485,9 @@ class HomePageState extends State<HomePage> {
       setState(() => houseFloorLoading = false);
     } catch (e) {
       logger.w('[NEW FLOOR ACTION FUNCTION] CURRENT HOUSE Actions ERROR: $e - Resetting... *****');
-      // userDatabase.put('houseFloorActions', {});
+      userDatabase.put('houseFloorActions', {});
       // currentFloorActions = [];
     }
-
-    // try {
-    //   setState(() => houseFloorActions =
-    //       floorActionsFromJson(userDatabase.get('houseFloorActionsList'))
-    //           .results
-    //           .first
-    //           .floorActions);
-    //   logger.d('FIRST HOUSE DATE: ${houseFloorActions.first.date.toString()}');
-    //   setState(() => houseFloorLoading = false);
-    // } catch (e) {
-    //   logger.w('^^^^^ ERROR DURING HOUSE FLOOR LIST INITIAL VARIABLES SETUP: $e ^^^^^');
-    //   userDatabase.put('houseFloorActionsList', {});
-    //   // setState(() => houseFloorActions = []);
-    // }
 
     /// SENATE FLOOR ACTIONS
     try {
@@ -513,19 +507,6 @@ class HomePageState extends State<HomePage> {
       userDatabase.put('senateFloorActions', {});
       // currentFloorActions = [];
     }
-
-    // try {
-    //   setState(() => senateFloorActions =
-    //       floorActionsFromJson(userDatabase.get('senateFloorActionsList'))
-    //           .results
-    //           .first
-    //           .floorActions);
-    //   logger.d('FIRST SENATE DATE: ${senateFloorActions.first.date.toString()}');
-    //   setState(() => senateFloorLoading = false);
-    // } catch (e) {
-    //   logger.w('^^^^^ ERROR DURING SENATE FLOOR LIST INITIAL VARIABLES SETUP: $e ^^^^^');
-    //   userDatabase.put('senateFloorActionsList', {});
-    // }
 
     /// LOBBYING EVENTS LIST
     try {
@@ -723,20 +704,20 @@ class HomePageState extends State<HomePage> {
       });
 
       setState(() => appLoadingText = 'Checking for videos...');
-      await Youtube.getYouTubePlaylistItems(context: context)
-          .then((value) => setState(() => youTubePlaylist = value));
-      await YouTubeVideosApi.getYoutubeVideoIds()
-          .then((value) => setState(() => youtubeVideoIdsList = value));
+      // await Youtube.getYouTubePlaylistItems(context: context)
+      //     .then((value) => setState(() => youTubePlaylist = value));
+
+      await YouTubeVideosApi.getYoutubeVideos()
+          .then((value) => setState(() => youtubeVideosList = value));
 
       setState(() => appLoadingText = 'Retrieving latest news...');
-      await RapidApiFunctions.fetchNewsArticles(context: context).then((value) {
-        value.shuffle();
-        setState(() => newsArticlesList = value);
-      });
+      await RapidApiFunctions.fetchNewsArticles(context: context)
+          .then((value) => setState(() => newsArticlesList = value));
+      debugPrint('[HOME PAGE GET DATA] ${newsArticlesList.length} NEWS ARTICLES');
 
       setState(() => appLoadingText = 'Checking for bill activity...');
       await Functions.fetchBills(
-        context: context, /*congress: congress*/
+        context: context,
       ).then((value) {
         setState(() => billList = value);
       });
@@ -805,29 +786,12 @@ class HomePageState extends State<HomePage> {
 
       setState(() => appLoadingText = 'Checking for new house floor actions...');
 
-      // await Functions.houseFloor(context: context).then((value) => setState(() {
-      //       houseFloorActions = value;
-      //       houseFloorLoading = false;
-      //     }));
-
       await RapidApiFunctions.getFloorActions(context: context).then((value) => setState(() {
             currentHouseFloorActions = value;
             houseFloorLoading = false;
           }));
 
       setState(() => appLoadingText = 'Checking for new senate floor actions...');
-
-      // await Functions.senateFloor(context: context).then((value) {
-      //   if (userDatabase.get('congress') != int.parse(value.first.congress)) {
-      //     setState(() => congress = int.parse(value.first.congress));
-      //     userDatabase.put('congress', int.parse(value.first.congress));
-      //   }
-      //
-      //   setState(() {
-      //     senateFloorActions = value;
-      //     senateFloorLoading = false;
-      //   });
-      // });
 
       await RapidApiFunctions.getFloorActions(context: context, isHouseChamber: false)
           .then((value) => setState(() {
@@ -1173,12 +1137,6 @@ class HomePageState extends State<HomePage> {
                                         ),
                                       ).then(
                                           (_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                                      // .then((_) => !userIsPremium &&
-                                      //     interstitialAd != null &&
-                                      //     interstitialAd.responseInfo.responseId !=
-                                      //         userDatabase.get('interstitialAdId')
-                                      // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                      // : null);
                                     },
                                     label: const Text('Search'),
                                   )
@@ -1210,12 +1168,6 @@ class HomePageState extends State<HomePage> {
                                       userLevels,
                                       productOrdersList);
                                 }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                            // .then((_) => !userIsPremium &&
-                            //     interstitialAd != null &&
-                            //     interstitialAd.responseInfo.responseId !=
-                            //         userDatabase.get('interstitialAdId')
-                            // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                            // : null);
                           },
                           icon: const Icon(Icons.store),
                         )),
@@ -1238,8 +1190,8 @@ class HomePageState extends State<HomePage> {
                             Container(
                               color: Theme.of(context).colorScheme.background,
                               width: orientation == Orientation.landscape &&
-                                      youTubePlaylist.isNotEmpty &&
-                                      youtubeVideoIdsList.isNotEmpty
+                                      // youTubePlaylist.isNotEmpty &&
+                                      youtubeVideosList.isNotEmpty
                                   ? MediaQuery.of(context).size.width * 0.58333
                                   : MediaQuery.of(context).size.width,
                               child: Column(
@@ -1304,9 +1256,7 @@ class HomePageState extends State<HomePage> {
                                           ),
                                         )
                                       : const SizedBox.shrink(),
-                                  orientation == Orientation.landscape ||
-                                          youTubePlaylist.isEmpty ||
-                                          youtubeVideoIdsList.isEmpty
+                                  orientation == Orientation.landscape || youtubeVideosList.isEmpty
                                       ? const SizedBox.shrink()
                                       : Stack(
                                           alignment: Alignment.centerLeft,
@@ -1319,7 +1269,9 @@ class HomePageState extends State<HomePage> {
                                                     width: MediaQuery.of(context).size.width,
                                                     fit: BoxFit.cover,
                                                     color: Theme.of(context).primaryColor,
-                                                    colorBlendMode: BlendMode.softLight),
+                                                    colorBlendMode: darkTheme
+                                                        ? BlendMode.color
+                                                        : BlendMode.softLight),
                                               ),
                                             ),
                                             Container(
@@ -1340,14 +1292,17 @@ class HomePageState extends State<HomePage> {
                                                   controller: _videoListController,
                                                   shrinkWrap: true,
                                                   scrollDirection: Axis.horizontal,
-                                                  itemCount: youTubePlaylist.length,
+                                                  itemCount: youtubeVideosList
+                                                      .length, // youTubePlaylist.length,
                                                   itemBuilder: (context, index) {
-                                                    final PlaylistItem thisVideo =
-                                                        youTubePlaylist[index];
+                                                    // final PlaylistItem thisVideo =
+                                                    //     youTubePlaylist[index];
+                                                    final ChannelVideos thisVideo =
+                                                        youtubeVideosList[index];
 
-                                                    return Youtube().youTubeVideoTile(
+                                                    return YouTubeVideosApi.videoTile(
                                                         context,
-                                                        youTubePlaylist,
+                                                        youtubeVideosList,
                                                         thisVideo,
                                                         index,
                                                         orientation,
@@ -1388,8 +1343,8 @@ class HomePageState extends State<HomePage> {
 
                             /// RIGHT SIDE OF MAIN ROW
                             orientation == Orientation.portrait ||
-                                    youTubePlaylist.isEmpty ||
-                                    youtubeVideoIdsList.isEmpty
+                                    // youTubePlaylist.isEmpty ||
+                                    youtubeVideosList.isEmpty
                                 ? const SizedBox.shrink()
                                 : Container(
                                     padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
@@ -1397,6 +1352,18 @@ class HomePageState extends State<HomePage> {
                                     width: MediaQuery.of(context).size.width * 2.5 / 6,
                                     child: Container(
                                       alignment: Alignment.topCenter,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.background,
+                                        image: DecorationImage(
+                                            opacity: 0.25,
+                                            image: AssetImage(
+                                                'assets/congress_pic_$headerImageCounter.png'),
+                                            fit: BoxFit.cover,
+                                            // repeat: ImageRepeat.repeat,
+                                            colorFilter: ColorFilter.mode(
+                                                Theme.of(context).colorScheme.background,
+                                                BlendMode.color)),
+                                      ),
                                       child: Stack(
                                         alignment: Alignment.topLeft,
                                         children: [
@@ -1421,12 +1388,15 @@ class HomePageState extends State<HomePage> {
                                                         physics: const BouncingScrollPhysics(),
                                                         controller: _videoListController,
                                                         shrinkWrap: true,
-                                                        itemCount: youTubePlaylist.length,
+                                                        itemCount: youtubeVideosList
+                                                            .length, // youTubePlaylist.length,
                                                         itemBuilder: (context, index) {
-                                                          final thisVideo = youTubePlaylist[index];
-                                                          return Youtube().youTubeVideoTile(
+                                                          final thisVideo =
+                                                              youtubeVideosList[index];
+
+                                                          return YouTubeVideosApi.videoTile(
                                                               context,
-                                                              youTubePlaylist,
+                                                              youtubeVideosList,
                                                               thisVideo,
                                                               index,
                                                               orientation,
@@ -1907,6 +1877,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget newsArticleSlider(List<NewsArticle> newsArticles) {
+    // debugPrint('[HOME PAGE ARTICLE SLIDER] ${newsArticles.length} NEWS ARTICLES');
     return Padding(
         padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
         child: Container(
@@ -1970,51 +1941,74 @@ class HomePageState extends State<HomePage> {
                                   //             BlendMode.color))),
                                   child: Row(
                                     children: [
-                                      Container(
-                                        width: 55,
-                                        // height: 25,
-                                        decoration: BoxDecoration(
-                                          // shape: BoxShape.circle,
-                                          // border: Border.all(width: 1),
-                                          borderRadius: BorderRadius.circular(5),
+                                      Stack(
+                                        alignment: Alignment.bottomLeft,
+                                        children: [
+                                          Container(
+                                            width: 55,
+                                            // height: 25,
+                                            decoration: BoxDecoration(
+                                              // shape: BoxShape.circle,
+                                              // border: Border.all(width: 1),
+                                              borderRadius: BorderRadius.circular(5),
 
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  'assets/congress_pic_$headerImageCounter.png'),
-                                              fit: BoxFit.cover),
-                                        ),
-                                        foregroundDecoration: BoxDecoration(
-                                          // shape: BoxShape.circle,
-                                          border: Border.all(width: 1),
-                                          borderRadius: BorderRadius.circular(5),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/congress_pic_$headerImageCounter.png'),
+                                                  fit: BoxFit.cover),
+                                            ),
+                                            foregroundDecoration: BoxDecoration(
+                                              // shape: BoxShape.circle,
+                                              border: Border.all(width: 1),
+                                              borderRadius: BorderRadius.circular(5),
 
-                                          image: DecorationImage(
-                                              image: NetworkImage(thisArticle.imageUrl),
-                                              fit: BoxFit.cover),
-                                        ),
-                                        // child: FadeInImage(
-                                        //     width: 45,
-                                        //     height: 35,
-                                        //     placeholder: AssetImage(
-                                        //         'assets/congress_pic_$headerImageCounter.png'),
-                                        //     image: NetworkImage(
-                                        //         thisArticle.imageUrl),
-                                        //     fit: BoxFit.cover),
+                                              image: DecorationImage(
+                                                  image: NetworkImage(thisArticle.imageUrl),
+                                                  fit: BoxFit.cover),
+                                            ),
+                                            // child: FadeInImage(
+                                            //     width: 45,
+                                            //     height: 35,
+                                            //     placeholder: AssetImage(
+                                            //         'assets/congress_pic_$headerImageCounter.png'),
+                                            //     image: NetworkImage(
+                                            //         thisArticle.imageUrl),
+                                            //     fit: BoxFit.cover),
+                                          ),
+                                          // CircleAvatar(
+                                          //   backgroundColor: darkTheme
+                                          //       ? alertIndicatorColorBrightGreen
+                                          //       : altHighlightColor,
+                                          //   radius: 5,
+                                          // )
+                                        ],
                                       ),
                                       const SizedBox(width: 10),
                                       Flexible(
-                                        child: Text(
-                                          // thisArticle.title.length > 100
-                                          //     ? thisArticle.title
-                                          //         .replaceRange(100, null, '...')
-                                          //     :
-                                          thisArticle.title,
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Styles.regularStyle.copyWith(
-                                              fontSize: 12,
-                                              color: darkTheme ? darkThemeTextColor : null,
-                                              fontWeight: FontWeight.bold),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              thisArticle.title,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Styles.regularStyle.copyWith(
+                                                  fontSize: 12,
+                                                  color: darkTheme ? darkThemeTextColor : null,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              '${thisArticle.source} ${dateWithDayFormatter.format(DateTime.parse(thisArticle.date))}',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Styles.regularStyle.copyWith(
+                                                  fontSize: 9,
+                                                  color: darkTheme
+                                                      ? darkThemeTextColor.withOpacity(0.85)
+                                                      : null,
+                                                  fontWeight: FontWeight.normal),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -2022,9 +2016,6 @@ class HomePageState extends State<HomePage> {
                             )),
                       );
                     })),
-            // CircleAvatar(
-            //   backgroundColor: Colors.purple,
-            // )
           ]),
         ));
   }
@@ -2812,7 +2803,7 @@ class HomePageState extends State<HomePage> {
                                                       SharedWidgets.floorActionsList(
                                                           context,
                                                           'Senate',
-                                                          currentSenateFloorActions.reversed,
+                                                          currentSenateFloorActions,
                                                           userDatabase,
                                                           houseStockWatchList,
                                                           senateStockWatchList)).then((_) =>

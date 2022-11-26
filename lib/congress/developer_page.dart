@@ -318,21 +318,22 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           ? altHighlightColor
                                           : null),
                                 )),
-                                Column(
-                                  children: [
-                                    Card(
-                                        child: ListTile(
-                                      dense: true,
-                                      enabled: true,
-                                      enableFeedback: true,
-                                      title: const Text('New YouTube API Test'),
-                                      onTap: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => const NewVideoPage())),
-                                    )),
-                                  ],
-                                ),
+                                // Column(
+                                //   children: [
+                                //     Card(
+                                //         child: ListTile(
+                                //       dense: true,
+                                //       enabled: true,
+                                //       enableFeedback: true,
+                                //       title: const Text('New YouTube API Test'),
+                                //       onTap: () => Navigator.push(
+                                //           context,
+                                //           MaterialPageRoute(
+                                //               builder: (context) => const NewVideoPlayer())),
+                                //     )),
+                                //   ],
+                                // ),
+                                // const NewVideoPlayer('',[]),
                                 Card(
                                     child: ListTile(
                                         dense: true,

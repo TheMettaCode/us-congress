@@ -155,7 +155,7 @@ class SharedWidgets {
 
                           Future.delayed(const Duration(milliseconds: 750), () async {
                             // Do something
-                            Navigator.pop(context);
+                            Navigator.maybePop(context);
                             Messages.showMessage(
                                 context: context,
                                 message:
@@ -389,8 +389,8 @@ class SharedWidgets {
         });
   }
 
-  static Widget premiumUpgradeContainer(BuildContext context, InterstitialAd interstitialAd, bool userIsPremium, bool userIsLegacy,
-      bool devUpgraded, bool freeTrialUsed, Box userDatabase,
+  static Widget premiumUpgradeContainer(BuildContext context, InterstitialAd interstitialAd,
+      bool userIsPremium, bool userIsLegacy, bool devUpgraded, bool freeTrialUsed, Box userDatabase,
       {color = const Color.fromARGB(255, 30, 150, 0)}) {
     return !freeTrialUsed && (freePremiumDaysActive || userDatabase.get('appOpens') < 5)
         ? freeTrialContainer(
@@ -421,7 +421,8 @@ class SharedWidgets {
                 ),
                 onTap: () {
                   Navigator.maybePop(context);
-                  Functions.requestInAppPurchase(context,interstitialAd, userIsPremium, whatToShow: 'upgrades');
+                  Functions.requestInAppPurchase(context, interstitialAd, userIsPremium,
+                      whatToShow: 'upgrades');
                 },
               ),
             ),
@@ -491,8 +492,8 @@ class SharedWidgets {
     );
   }
 
-  static Widget freeTrialEndedDialog(
-      BuildContext context, InterstitialAd interstitialAd, Box userDatabase, bool userIsPremium, bool userIsLegacy) {
+  static Widget freeTrialEndedDialog(BuildContext context, InterstitialAd interstitialAd,
+      Box userDatabase, bool userIsPremium, bool userIsLegacy) {
     // final bool _darkTheme = userDatabase.get('darkTheme');
     final bool devUpgraded = userDatabase.get('devUpgraded');
     final bool freeTrialUsed = userDatabase.get('freeTrialUsed');
@@ -546,8 +547,8 @@ class SharedWidgets {
               ),
             ),
             BounceInUp(
-                child: premiumUpgradeContainer(context, interstitialAd, userIsPremium, userIsLegacy, devUpgraded,
-                    freeTrialUsed, userDatabase)),
+                child: premiumUpgradeContainer(context, interstitialAd, userIsPremium, userIsLegacy,
+                    devUpgraded, freeTrialUsed, userDatabase)),
           ],
         ),
       ),
@@ -800,8 +801,13 @@ class SharedWidgets {
     );
   }
 
-  static Widget supportOptions(BuildContext context, InterstitialAd interstitialAd , Box userDatabase, RewardedAd ad,
-      List<bool> userLevels, List<GithubNotifications> githubNotificationsList) {
+  static Widget supportOptions(
+      BuildContext context,
+      InterstitialAd interstitialAd,
+      Box userDatabase,
+      RewardedAd ad,
+      List<bool> userLevels,
+      List<GithubNotifications> githubNotificationsList) {
     // bool userIsDev = userLevels[0];
     bool userIsPremium = userDatabase.get('userIsPremium');
     bool userIsLegacy = userLevels[2];
@@ -866,8 +872,14 @@ class SharedWidgets {
                     children: [
                           !userIsPremium /*&& !userIsLegacy*/
                               ? FlipInY(
-                                  child: premiumUpgradeContainer(context, interstitialAd, userIsPremium,
-                                      userIsLegacy, devUpgraded, freeTrialUsed, userDatabase))
+                                  child: premiumUpgradeContainer(
+                                      context,
+                                      interstitialAd,
+                                      userIsPremium,
+                                      userIsLegacy,
+                                      devUpgraded,
+                                      freeTrialUsed,
+                                      userDatabase))
                               : const SizedBox.shrink(),
                           ad != null &&
                                   ad.responseInfo.responseId != userDatabase.get('rewardedAdId')
@@ -956,7 +968,8 @@ class SharedWidgets {
                                                   ? const Icon(Icons.launch, size: 16)
                                                   : const SizedBox.shrink(),
                                       onTap: () => notification.additionalData == 'credits'
-                                          ? Functions.requestInAppPurchase(context, interstitialAd, userIsPremium,
+                                          ? Functions.requestInAppPurchase(
+                                              context, interstitialAd, userIsPremium,
                                               whatToShow: notification.additionalData)
                                           : notification.additionalData == 'share'
                                               ? Messages.shareContent(true)
@@ -1825,7 +1838,9 @@ class SharedWidgets {
                                               ? darkTheme
                                                   ? alertIndicatorColorBrightGreen
                                                   : alertIndicatorColorDarkGreen
-                                              : const Color.fromRGBO(158, 158, 158, 1)),
+                                              : darkTheme
+                                                  ? const Color.fromRGBO(158, 158, 158, 1)
+                                                  : null),
                                   const SizedBox(width: 5),
                                   Text(
                                     thisVote.result == null
@@ -1847,7 +1862,9 @@ class SharedWidgets {
                                             : thisVote.result.toString().toUpperCase() ==
                                                     'RESULT.FAILED'
                                                 ? const Color.fromARGB(255, 255, 17, 0)
-                                                : const Color.fromRGBO(158, 158, 158, 1),
+                                                : darkTheme
+                                            ? const Color.fromRGBO(158, 158, 158, 1)
+                                            : null,
                                         fontSize: 14.0,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -5602,7 +5619,12 @@ class SharedWidgets {
                                     isScrollControlled: false,
                                     context: context,
                                     builder: (context) => ecwidProductDetail(
-                                        context, interstitialAd, userDatabase, darkTheme, thisItem, userLevels),
+                                        context,
+                                        interstitialAd,
+                                        userDatabase,
+                                        darkTheme,
+                                        thisItem,
+                                        userLevels),
                                   ),
                               child: Stack(
                                 alignment: Alignment.topLeft,

@@ -577,7 +577,7 @@ class SettingsState extends State<Settings> {
                       ),
                       ListTile(
                         subtitle: Text(
-                          'Data Sources\nMettaCode Developers • Congress.gov • Propublica • Stock Watcher\nGoogle Civic Info • C-SPAN • Politico • Capitol Babble',
+                          'Data Sources\nMettaCode Developers • Congress.gov • Propublica • Stock Watcher • Google Civic Info',
                           style: Styles.regularStyle.copyWith(
                             fontSize: 11,
                             color: userDatabase.get('darkTheme')

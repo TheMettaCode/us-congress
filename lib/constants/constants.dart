@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'dart:math';
-import 'package:us_congress_vote_tracker/services/youtube/youtube_playlist_model.dart';
 
 var logger = Logger();
 var loggerNoStack = Logger(printer: PrettyPrinter(colors: true, printEmojis: true, methodCount: 0));
@@ -20,6 +19,7 @@ final NumberFormat formatCurrency = NumberFormat.simpleCurrency();
 
 /// MATH
 final Random random = Random();
+const int newUserThreshold = 3;
 
 /// App Constants
 const String appTitle = 'US Congress';
@@ -395,17 +395,17 @@ Map<String, dynamic> initialUserData = {
   "lastSenateFloorRefresh": "${DateTime.now()}",
   "newHouseFloor": false,
   "newSenateFloor": false,
-  "billAlerts": false,
+  "billAlerts": true,
   "recentBills": {},
   "lastBill": "",
   "lastBillsRefresh": "${DateTime.now()}",
   "newBills": false,
-  "voteAlerts": false,
+  "voteAlerts": true,
   "recentVotes": {},
   "lastVote": "",
   "lastVotesRefresh": "${DateTime.now()}",
   "newVotes": false,
-  "statementAlerts": false,
+  "statementAlerts": true,
   "statementsResponse": {},
   "lastStatement": "",
   "lastStatementsRefresh": "${DateTime.now()}",
@@ -415,9 +415,9 @@ Map<String, dynamic> initialUserData = {
   "lastNewsArticlesRefresh": "${DateTime.now()}",
   "newNewsArticles": false,
   "videoAlerts": true,
-  "youTubePlaylist": {},
-  "youtubeVideoIds": [],
-  // "youtubeVideoList":{},
+  // "youTubePlaylist": {},
+  // "youtubeVideoIds": [],
+  "youtubeVideosList":{},
   "lastVideosRefresh": "${DateTime.now()}",
   "newVideos": false,
   "ecwidProducts": {},
@@ -489,53 +489,53 @@ Map<String, String> statesMap = {
   "WY": "Wyoming"
 };
 
-List<PlaylistItem> youTubePlaylistPlaceholder = [
-  PlaylistItem.fromJson({
-    "kind": "youtube#playlistItem",
-    "etag": "yijyoLB5klBdgU9hbCX9lancO8Y",
-    "id": "UExoVmdzanZlMnVuTm4yTmdDS1cwdU1qZ2RlOEwyMEhuYi41Mzk2QTAxMTkzNDk4MDhF",
-    "snippet": {
-      "publishedAt": "2021-11-20T00:45:32Z",
-      "channelId": "UCUrW7YMZDBaVMjP7V3XnpVw",
-      "title": "Wages Must Rise to Fight Inflation says U.S. Labor Chief",
-      "description":
-          "U.S. Labor Secretary Marty Walsh tells David Westin that higher-paying jobs are the key to fighting inflation. He also talks about his upcoming trip to Los Angeles, where he's going to speak to truck drivers in an effort to resolve the supply-chain crisis. \n --------\nFollow Bloomberg for business news & analysis, up-to-the-minute market data, features, profiles and more: http://www.bloomberg.com\nConnect with us on...\nTwitter: https://twitter.com/business\nFacebook: https://www.facebook.com/bloombergbusiness\nInstagram: https://www.instagram.com/bloombergbusiness/",
-      "thumbnails": {
-        "default": {
-          "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/default.jpg",
-          "width": 120,
-          "height": 90
-        },
-        "medium": {
-          "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/mqdefault.jpg",
-          "width": 320,
-          "height": 180
-        },
-        "high": {
-          "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/hqdefault.jpg",
-          "width": 480,
-          "height": 360
-        },
-        "standard": {
-          "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/sddefault.jpg",
-          "width": 640,
-          "height": 480
-        },
-        "maxres": {
-          "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/maxresdefault.jpg",
-          "width": 1280,
-          "height": 720
-        }
-      },
-      "channelTitle": "MettaCode Developers",
-      "playlistId": "PLhVgsjve2unNn2NgCKW0uMjgde8L20Hnb",
-      "position": 4,
-      "resourceId": {"kind": "youtube#video", "videoId": "Zlc-Sg5ql_A"},
-      "videoOwnerChannelTitle": "Bloomberg Politics",
-      "videoOwnerChannelId": "UCV61VqLMr2eIhH4f51PV0gA"
-    }
-  })
-];
+// List<PlaylistItem> youTubePlaylistPlaceholder = [
+//   PlaylistItem.fromJson({
+//     "kind": "youtube#playlistItem",
+//     "etag": "yijyoLB5klBdgU9hbCX9lancO8Y",
+//     "id": "UExoVmdzanZlMnVuTm4yTmdDS1cwdU1qZ2RlOEwyMEhuYi41Mzk2QTAxMTkzNDk4MDhF",
+//     "snippet": {
+//       "publishedAt": "2021-11-20T00:45:32Z",
+//       "channelId": "UCUrW7YMZDBaVMjP7V3XnpVw",
+//       "title": "Wages Must Rise to Fight Inflation says U.S. Labor Chief",
+//       "description":
+//           "U.S. Labor Secretary Marty Walsh tells David Westin that higher-paying jobs are the key to fighting inflation. He also talks about his upcoming trip to Los Angeles, where he's going to speak to truck drivers in an effort to resolve the supply-chain crisis. \n --------\nFollow Bloomberg for business news & analysis, up-to-the-minute market data, features, profiles and more: http://www.bloomberg.com\nConnect with us on...\nTwitter: https://twitter.com/business\nFacebook: https://www.facebook.com/bloombergbusiness\nInstagram: https://www.instagram.com/bloombergbusiness/",
+//       "thumbnails": {
+//         "default": {
+//           "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/default.jpg",
+//           "width": 120,
+//           "height": 90
+//         },
+//         "medium": {
+//           "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/mqdefault.jpg",
+//           "width": 320,
+//           "height": 180
+//         },
+//         "high": {
+//           "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/hqdefault.jpg",
+//           "width": 480,
+//           "height": 360
+//         },
+//         "standard": {
+//           "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/sddefault.jpg",
+//           "width": 640,
+//           "height": 480
+//         },
+//         "maxres": {
+//           "url": "https://i.ytimg.com/vi/Zlc-Sg5ql_A/maxresdefault.jpg",
+//           "width": 1280,
+//           "height": 720
+//         }
+//       },
+//       "channelTitle": "MettaCode Developers",
+//       "playlistId": "PLhVgsjve2unNn2NgCKW0uMjgde8L20Hnb",
+//       "position": 4,
+//       "resourceId": {"kind": "youtube#video", "videoId": "Zlc-Sg5ql_A"},
+//       "videoOwnerChannelTitle": "Bloomberg Politics",
+//       "videoOwnerChannelId": "UCV61VqLMr2eIhH4f51PV0gA"
+//     }
+//   })
+// ];
 
 // List<GithubNotifications> githubNotificationsPlaceholder = [
 //   GithubNotifications(

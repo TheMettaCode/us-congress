@@ -364,8 +364,8 @@ class Functions {
     }
   }
 
-  static Future<void> getTrialStatus(
-      BuildContext context, InterstitialAd interstitialAd, bool userIsPremium, bool userIsLegacy) async {
+  static Future<void> getTrialStatus(BuildContext context, InterstitialAd interstitialAd,
+      bool userIsPremium, bool userIsLegacy) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     /// PROCESS FREE TRIAL TIME FRAME
@@ -515,7 +515,11 @@ class Functions {
     }
   }
 
-  static Future<void> checkRewards(BuildContext context, InterstitialAd interstitialAd, RewardedAd ad, List<bool> userLevels,
+  static Future<void> checkRewards(
+      BuildContext context,
+      InterstitialAd interstitialAd,
+      RewardedAd ad,
+      List<bool> userLevels,
       List<GithubNotifications> githubNotificationsList) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     // bool userIsDev = userLevels[0];
@@ -687,7 +691,8 @@ class Functions {
 
   /// THIS FUNCTION SHOWS A POP UP SCREEN REQUESTING THE USER
   /// TO UPGRADE AFTER TAPPING ON A PREMIUM FEATURE
-  static Future<void> requestInAppPurchase(BuildContext context, InterstitialAd interstitialAd, bool userIsPremium,
+  static Future<void> requestInAppPurchase(
+      BuildContext context, InterstitialAd interstitialAd, bool userIsPremium,
       {whatToShow = 'all' /*[all, upgrades,credits]*/}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     try {
@@ -709,7 +714,7 @@ class Functions {
             return SharedWidgets.appUpgradeDialog(context, userDatabase, offers, userIsPremium,
                 whatToShow: whatToShow);
           },
-        ).then((_)=>AdMobLibrary.interstitialAdShow(interstitialAd));
+        ).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
       }
     } catch (e) {
       logger.w(e);
@@ -1149,7 +1154,7 @@ class Functions {
 
   static Future<List<StatementsResults>> fetchStatements({BuildContext context}) async {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-
+    bool newUser = userDatabase.get('appOpens') < newUserThreshold;
     List<bool> userLevels = await getUserLevels();
     bool userIsDev = userLevels[0];
     bool userIsPremium = userLevels[1];
@@ -1269,7 +1274,7 @@ class Functions {
             (finalStatementsList.map((e) => e.memberId)).toList().asMap(), 'member_',
             userIsDev: userIsDev);
 
-        if ((userDatabase.get('statementAlerts') || memberWatched) &&
+        if (!newUser && (userDatabase.get('statementAlerts') || memberWatched) &&
             (currentStatementsList.first.title.toLowerCase() !=
                     statements.results.first.title.toLowerCase() ||
                 userDatabase.get('lastStatement').toString().toLowerCase() !=
@@ -1334,7 +1339,7 @@ class Functions {
     /* int congress = 117*/
   }) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
-
+    bool newUser = userDatabase.get('appOpens') < newUserThreshold;
     List<bool> userLevels = await getUserLevels();
     bool userIsDev = userLevels[0];
     bool userIsPremium = userLevels[1];
@@ -1413,7 +1418,7 @@ class Functions {
             userIsDev: userIsDev);
 
         if (
-            // (userIsPremium || userIsLegacy) &&
+            !newUser &&
             (userDatabase.get('billAlerts') || billWatched) &&
                 (currentUpdatedBillsList.first.billId.toLowerCase() !=
                         finalUpdatedBillsList.first.billId.toLowerCase() ||
@@ -1464,6 +1469,7 @@ class Functions {
   }) async {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
     List<bool> userLevels = await getUserLevels();
+    bool newUser = userDatabase.get('appOpens') < newUserThreshold;
     bool userIsDev = userLevels[0];
     bool userIsPremium = userLevels[1];
     bool userIsLegacy = userLevels[2];
@@ -1536,7 +1542,7 @@ class Functions {
 
         /// SEND NOTIFICATIONS IF SUBSCRIBED TO VOTE ALERTS
         if (
-            // (userIsPremium || userIsLegacy) &&
+            !newUser &&
             (userDatabase.get('voteAlerts') || billWatched) &&
                 (currentVotesList.first.rollCall.toString() !=
                         finalVotesList.first.rollCall.toString() ||
@@ -1961,276 +1967,6 @@ class Functions {
       return finalPrivateFundedTripList;
     }
   }
-
-  // static Future<List<FloorAction>> senateFloor({
-  //   BuildContext context,
-  // }) async {
-  //   logger.d('***** [Begin] Senate Floor Actions *****');
-  //   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-  //
-  //   List<bool> userLevels = await getUserLevels();
-  //   bool userIsDev = userLevels[0];
-  //   bool userIsPremium = userLevels[1];
-  //   bool userIsLegacy = userLevels[2];
-  //
-  //   List<FloorAction> currentSenateFloorActions = [];
-  //
-  //   try {
-  //     currentSenateFloorActions = floorActionsFromJson(userDatabase.get('senateFloorActionsList'))
-  //         .results
-  //         .first
-  //         .floorActions;
-  //   } catch (e) {
-  //     logger.w('***** CURRENT Senate Floor Actions ERROR: $e - Resetting... *****');
-  //     userDatabase.put('senateFloorActionsList', {});
-  //     currentSenateFloorActions = [];
-  //   }
-  //
-  //   List<FloorAction> finalSenateFloorActions = [];
-  //
-  //   if (currentSenateFloorActions.isEmpty ||
-  //       DateTime.parse(userDatabase.get('lastSenateFloorActionsRefresh'))
-  //           .isBefore(DateTime.now().subtract(const Duration(minutes: 30)))) {
-  //     logger.d('CHECKING FOR UPDATED SENATE FLOOR ACTIONS...');
-  //     final url = PropublicaApi().senateFloorUpdatesApi;
-  //     final headers = PropublicaApi().apiHeaders;
-  //     final authority = PropublicaApi().authority;
-  //     final response = await http.get(Uri.https(authority, url), headers: headers);
-  //     logger.d('***** SENATE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
-  //
-  //     if (response.statusCode == 200) {
-  //       logger.d('***** SENATE FLOOR ACTIONS RETRIEVAL SUCCESS! *****');
-  //       FloorActions senateFloorActions = floorActionsFromJson(response.body);
-  //
-  //       if (senateFloorActions.status == 'OK' &&
-  //           senateFloorActions.results.first.floorActions.isNotEmpty) {
-  //         finalSenateFloorActions = senateFloorActions.results.first.floorActions;
-  //
-  //         logger.d(
-  //             'CURRENT 1ST SENATE FLOOR ACTION: ${currentSenateFloorActions.isEmpty ? 'No current senate floor actions' : finalSenateFloorActions.first.description}');
-  //         logger.d('NEW 1ST SENATE FLOOR ACTION: ${finalSenateFloorActions.first.description}');
-  //
-  //         if (currentSenateFloorActions.isEmpty ||
-  //             finalSenateFloorActions.first.actionId != currentSenateFloorActions.first.actionId) {
-  //           userDatabase.put('newSenateFloor', true);
-  //
-  //           if (userIsDev) {
-  //             final subject = finalSenateFloorActions.first.description.contains(' - ')
-  //                 ? 'SENATE FLOOR: ${finalSenateFloorActions.first.description.split(' - ')[0]}'
-  //                 : 'SENATE FLOOR ACTION UPDATE';
-  //             final messageBody =
-  //                 'SENATE FLOOR: ${finalSenateFloorActions.first.description.length > 150 ? finalSenateFloorActions.first.description.replaceRange(150, null, '...') : finalSenateFloorActions.first.description}';
-  //
-  //             List<String> capitolBabbleNotificationsList =
-  //                 List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
-  //             capitolBabbleNotificationsList
-  //                 .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
-  //             userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
-  //           }
-  //         }
-  //
-  //         if (currentSenateFloorActions.isEmpty) {
-  //           currentSenateFloorActions = senateFloorActions.results.first.floorActions;
-  //         }
-  //
-  //         try {
-  //           logger.d(
-  //               '***** SAVING NEW SENATE FLOOR ACTIONS TO DBASE: ${senateFloorActions.results.first.floorActions.first.date} *****');
-  //           userDatabase.put('senateFloorActionsList', floorActionsToJson(senateFloorActions));
-  //         } catch (e) {
-  //           logger.w('^^^^^ ERROR SAVING SENATE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
-  //           userDatabase.put('senateFloorActionsList', {});
-  //         }
-  //       }
-  //
-  //       bool billWatched = await hasSubscription(
-  //           userIsPremium, userIsLegacy, finalSenateFloorActions.first.billIds.asMap(), 'bill_',
-  //           userIsDev: userIsDev);
-  //
-  //       if ((userDatabase.get('floorAlerts') || billWatched) &&
-  //           (currentSenateFloorActions.first.description.toLowerCase() !=
-  //                   finalSenateFloorActions.first.description.toLowerCase() ||
-  //               userDatabase.get('lastSenateAction').toString().toLowerCase() !=
-  //                   finalSenateFloorActions.first.description.toLowerCase())) {
-  //         if (context == null || !ModalRoute.of(context).isCurrent) {
-  //           await NotificationApi.showBigTextNotification(
-  //               8,
-  //               'senatefloor',
-  //               'Senate Floor',
-  //               'Floor Actions from the Senate',
-  //               'Senate Floor',
-  //               '📢 Senate Floor Action',
-  //               billWatched
-  //                   ? 'A bill you\'re watching is being discussed on the Senate Floor'
-  //                   : finalSenateFloorActions.first.description,
-  //               senateFloorActions);
-  //         } else if (ModalRoute.of(context).isCurrent) {
-  //           Messages.showMessage(
-  //               context: context,
-  //               message: billWatched
-  //                   ? 'A bill you\'re watching is being discussed on the Senate Floor'
-  //                   : 'SENATE FLOOR\n${finalSenateFloorActions.first.description}',
-  //               isAlert: false,
-  //               removeCurrent: false);
-  //         }
-  //       }
-  //
-  //       userDatabase.put('lastSenateAction', finalSenateFloorActions.first.description);
-  //       userDatabase.put('lastSenateFloorActionsRefresh', '${DateTime.now()}');
-  //       return finalSenateFloorActions;
-  //     } else {
-  //       logger.w(
-  //           '***** API ERROR: LOADING SENATE FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
-  //
-  //       return finalSenateFloorActions =
-  //           currentSenateFloorActions.isNotEmpty ? currentSenateFloorActions : [];
-  //     }
-  //   } else {
-  //     logger.d(
-  //         '***** CURRENT SENATE FLOOR ACTIONS LIST: ${currentSenateFloorActions.map((e) => e.description)} *****');
-  //     finalSenateFloorActions = currentSenateFloorActions;
-  //     logger.d('***** SENATE FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
-  //     return finalSenateFloorActions;
-  //   }
-  // }
-  //
-  // static Future<List<FloorAction>> houseFloor({
-  //   BuildContext context,
-  // }) async {
-  //   logger.d('***** [Begin] House Floor Actions *****');
-  //   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-  //
-  //   List<bool> userLevels = await getUserLevels();
-  //   bool userIsDev = userLevels[0];
-  //   bool userIsPremium = userLevels[1];
-  //   bool userIsLegacy = userLevels[2];
-  //
-  //   int currentCongress = userDatabase.get('congress');
-  //   List<FloorAction> currentHouseFloorActions = [];
-  //
-  //   try {
-  //     currentHouseFloorActions = floorActionsFromJson(userDatabase.get('houseFloorActionsList'))
-  //         .results
-  //         .first
-  //         .floorActions;
-  //   } catch (e) {
-  //     logger.w('***** CURRENT House Actions ERROR: $e - Resetting... *****');
-  //     userDatabase.put('houseFloorActionsList', {});
-  //     currentHouseFloorActions = [];
-  //   }
-  //
-  //   List<FloorAction> finalHouseFloorActions = [];
-  //
-  //   if (currentHouseFloorActions.isEmpty ||
-  //       DateTime.parse(userDatabase.get('lastHouseFloorActionsRefresh'))
-  //           .isBefore(DateTime.now().subtract(const Duration(minutes: 30)))) {
-  //     final url = PropublicaApi().houseFloorUpdatesApi;
-  //     final headers = PropublicaApi().apiHeaders;
-  //     final authority = PropublicaApi().authority;
-  //     final response = await http.get(Uri.https(authority, url), headers: headers);
-  //     logger.d('***** HOUSE FLOOR ACTION API RESPONSE CODE: ${response.statusCode} *****');
-  //
-  //     if (response.statusCode == 200) {
-  //       logger.d('***** HOUSE FLOOR ACTIONS RETRIEVAL SUCCESS! *****');
-  //       FloorActions houseFloorActions = floorActionsFromJson(response.body);
-  //
-  //       if (houseFloorActions.status == 'OK' &&
-  //           houseFloorActions.results.first.floorActions.isNotEmpty) {
-  //         finalHouseFloorActions = houseFloorActions.results.first.floorActions;
-  //
-  //         logger.d(
-  //             'CURRENT 1ST HOUSE FLOOR ACTION: ${currentHouseFloorActions.isEmpty ? 'No current senate floor actions' : finalHouseFloorActions.first.description}');
-  //         logger.d('NEW 1ST HOUSE FLOOR ACTION: ${finalHouseFloorActions.first.description}');
-  //
-  //         if (currentHouseFloorActions.isEmpty ||
-  //             finalHouseFloorActions.first.actionId != currentHouseFloorActions.first.actionId) {
-  //           userDatabase.put('newHouseFloor', true);
-  //
-  //           if (userIsDev) {
-  //             final subject = finalHouseFloorActions.first.description.contains(' - ')
-  //                 ? 'HOUSE FLOOR: ${finalHouseFloorActions.first.description.split(' - ')[0]}'
-  //                 : 'HOUSE FLOOR UPDATE';
-  //             final messageBody =
-  //                 'HOUSE FLOOR: ${finalHouseFloorActions.first.description.length > 150 ? finalHouseFloorActions.first.description.replaceRange(150, null, '...') : finalHouseFloorActions.first.description}';
-  //
-  //             List<String> capitolBabbleNotificationsList =
-  //                 List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
-  //             capitolBabbleNotificationsList
-  //                 .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>high');
-  //             userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
-  //           }
-  //         }
-  //
-  //         if (currentHouseFloorActions.isEmpty) {
-  //           currentHouseFloorActions = houseFloorActions.results.first.floorActions;
-  //         }
-  //
-  //         try {
-  //           logger.d('***** SAVING NEW HOUSE FLOOR ACTIONS TO DBASE *****');
-  //           userDatabase.put('houseFloorActionsList', floorActionsToJson(houseFloorActions));
-  //         } catch (e) {
-  //           logger.w('^^^^^ ERROR SAVING HOUSE FLOOR ACTIONS TO DBASE (FUNCTION): $e ^^^^^');
-  //           userDatabase.put('houseFloorActionsList', {});
-  //         }
-  //       }
-  //
-  //       // int congress = int.parse(finalHouseFloorActions.first.congress);
-  //       // if (congress.isFinite && congress != currentCongress) {
-  //       //   userDatabase.put('congress', congress);
-  //       // }
-  //
-  //       bool billWatched = await hasSubscription(
-  //           userIsPremium, userIsLegacy, finalHouseFloorActions.first.billIds.asMap(), 'bill_',
-  //           userIsDev: userIsDev);
-  //
-  //       if ((userDatabase.get('floorAlerts') || billWatched) &&
-  //           (currentHouseFloorActions.first.description.toLowerCase() !=
-  //                   finalHouseFloorActions.first.description.toLowerCase() ||
-  //               userDatabase.get('lastHouseAction').toString().toLowerCase() !=
-  //                   finalHouseFloorActions.first.description.toLowerCase())) {
-  //         if (context == null || !ModalRoute.of(context).isCurrent) {
-  //           await NotificationApi.showBigTextNotification(
-  //               9,
-  //               'housefloor',
-  //               'House Floor',
-  //               'Floor Actions from the House of Representatives.',
-  //               'House Floor',
-  //               '📢 House Floor Action',
-  //               billWatched
-  //                   ? 'A bill you\'re watching is being discussed on the House Floor'
-  //                   : finalHouseFloorActions.first.description,
-  //               houseFloorActions);
-  //         } else if (ModalRoute.of(context).isCurrent) {
-  //           Messages.showMessage(
-  //               context: context,
-  //               message: billWatched
-  //                   ? 'A bill you\'re watching is being discussed on the House Floor'
-  //                   : 'HOUSE FLOOR\n${finalHouseFloorActions.first.description}',
-  //               isAlert: false,
-  //               removeCurrent: false);
-  //         }
-  //       }
-  //
-  //       userDatabase.put('lastHouseAction', finalHouseFloorActions.first.description);
-  //       userDatabase.put('lastHouseFloorActionsRefresh', '${DateTime.now()}');
-  //       return finalHouseFloorActions;
-  //     } else {
-  //       logger.w(
-  //           '***** API ERROR: LOADING HOUSE FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
-  //
-  //       return finalHouseFloorActions =
-  //           currentHouseFloorActions.isNotEmpty ? currentHouseFloorActions : [];
-  //     }
-  //   } else {
-  //     logger.d(
-  //         '***** CURRENT HOUSE FLOOR ACTIONS: ${currentHouseFloorActions.map((e) => e.description)} *****');
-  //     finalHouseFloorActions = currentHouseFloorActions;
-  //     logger.d('***** HOUSE FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
-  //     // userDatabase.put('newHouseFloor', false);
-  //       userDatabase.put('lastHouseFloorActionsRefresh', '${DateTime.now()}');
-  //     return finalHouseFloorActions;
-  //   }
-  // }
 
   ///
   /// CHECKING RESULTS FOR SUBSCRIBED MEMBERS

@@ -64,8 +64,8 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   // await Functions.senateFloor();
   await Functions.fetchBills();
   await Functions.fetchVotes();
-  await Youtube.getYouTubePlaylistItems(); // TODO: Remove when new video api is working
-  await YouTubeVideosApi.getYoutubeVideoIds();
+  // await Youtube.getYouTubePlaylistItems(); // TODO: Remove when new video api is working
+  await YouTubeVideosApi.getYoutubeVideos();
   await Functions.fetchRecentLobbyEvents();
   await CongressStockWatchApi.fetchHouseStockDisclosures();
   await CongressStockWatchApi.fetchSenateStockDisclosures();
