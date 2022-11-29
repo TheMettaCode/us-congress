@@ -304,14 +304,6 @@ class HomePageState extends State<HomePage> {
           setState(() => showPremiumPromo = !showPremiumPromo);
         }
 
-        /// REVERSE SLIDER ANIMATION
-        // if (_videoListController.offset >= (youTubePlaylist.length.toDouble() - 1) * 150) {
-        //   _videoListController.animateTo(0,
-        //       duration: const Duration(seconds: 30), curve: Curves.linear);
-        // } else if (_videoListController.offset <= 30) {
-        //   _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
-        //       duration: const Duration(seconds: 30), curve: Curves.linear);
-        // }
         if (_videoListController.offset >= (youtubeVideosList.length.toDouble() - 1) * 150) {
           _videoListController.animateTo(0,
               duration: const Duration(seconds: 30), curve: Curves.linear);
@@ -435,15 +427,6 @@ class HomePageState extends State<HomePage> {
       githubNotificationsList = tempGithubNotificationsList;
       thisGithubNotification = tempGithubNotification;
     });
-
-    /// YOUTUBE VIDEOS LIST
-    // try {
-    //   setState(() =>
-    //       youTubePlaylist = youTubePlaylistFromJson(userDatabase.get('youTubePlaylist')).items);
-    // } catch (e) {
-    //   logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
-    //   userDatabase.put('youTubePlaylist', {});
-    // }
 
     try {
       List<ChannelVideos> xVideosList =
@@ -2513,15 +2496,17 @@ class HomePageState extends State<HomePage> {
                                                 : stockWatchColor),
                                         borderRadius: BorderRadius.circular(3)),
                                     child: TextButton.icon(
-                                      icon: userDatabase.get('newMarketOverview')
-                                          ? AnimatedWidgets.flashingText(context, '!!!',
-                                              userDatabase.get('newMarketOverview'), false,
-                                              size: 13,
-                                              color: userDatabase.get('newSenateStock')
-                                                  ? altHighlightColor
-                                                  : darkThemeTextColor,
-                                              sameColor: true)
-                                          : _marketPageLoading
+                                      icon:
+                                      // userDatabase.get('newMarketOverview')
+                                      //     ? AnimatedWidgets.flashingText(context, '!!!',
+                                      //         userDatabase.get('newMarketOverview'), false,
+                                      //         size: 13,
+                                      //         color: userDatabase.get('newSenateStock')
+                                      //             ? altHighlightColor
+                                      //             : darkThemeTextColor,
+                                      //         sameColor: true)
+                                      //     :
+                                      _marketPageLoading
                                               ? const FaIcon(
                                                   FontAwesomeIcons.solidHourglass,
                                                   size: 11,

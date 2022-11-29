@@ -334,24 +334,24 @@ class DeveloperPageState extends State<DeveloperPage> {
                                 //   ],
                                 // ),
                                 // const NewVideoPlayer('',[]),
-                                Card(
-                                    child: ListTile(
-                                        dense: true,
-                                        enabled: true,
-                                        enableFeedback: true,
-                                        title: const Text('Pop-Up With Image Test'),
-                                        onTap: () async {
-                                          Messages.showMessage(
-                                              context: context,
-                                              message:
-                                                  'This is just a test to see if the picture to the left is showing up correctly. If so, it will fade in and have a rounded border.',
-                                              assetImageString:
-                                                  'assets/congress_pic_${random.nextInt(4)}.png',
-                                              isAlert: false,
-                                              removeCurrent: false);
-                                        },
-                                        onLongPress: () => userDatabase.put(
-                                            'newHouseFloor', !userDatabase.get('newHouseFloor')))),
+                                // Card(
+                                //     child: ListTile(
+                                //         dense: true,
+                                //         enabled: true,
+                                //         enableFeedback: true,
+                                //         title: const Text('Pop-Up With Image Test'),
+                                //         onTap: () async {
+                                //           Messages.showMessage(
+                                //               context: context,
+                                //               message:
+                                //                   'This is just a test to see if the picture to the left is showing up correctly. If so, it will fade in and have a rounded border.',
+                                //               assetImageString:
+                                //                   'assets/congress_pic_${random.nextInt(4)}.png',
+                                //               isAlert: false,
+                                //               removeCurrent: false);
+                                //         },
+                                //         onLongPress: () => userDatabase.put(
+                                //             'newHouseFloor', !userDatabase.get('newHouseFloor')))),
                                 // Card(
                                 //     child: ListTile(
                                 //   dense: true,
@@ -453,55 +453,55 @@ class DeveloperPageState extends State<DeveloperPage> {
                                           ),
                                         ],
                                       ),
-                                thisNewsArticle == null
-                                    ? const SizedBox.shrink()
-                                    : Card(
-                                        child: ListTile(
-                                          dense: true,
-                                          enabled: true,
-                                          enableFeedback: true,
-                                          leading: CircleAvatar(
-                                              maxRadius: 15,
-                                              backgroundColor:
-                                                  Theme.of(context).colorScheme.primary,
-                                              backgroundImage:
-                                                  NetworkImage(thisNewsArticle.imageUrl)),
-                                          title: Text(thisNewsArticle.source),
-                                          subtitle: Text(thisNewsArticle.title),
-                                          trailing: Text(newsArticles.length.toString(),
-                                              style: Styles.googleStyle),
-                                          onTap: () => Functions.linkLaunch(context,
-                                              thisNewsArticle.url, userDatabase, userIsPremium,
-                                              appBarTitle: thisNewsArticle.source),
-                                        ),
-                                      ),
-                                thisGithubNotification == null
-                                    ? const SizedBox.shrink()
-                                    : Card(
-                                        child: ListTile(
-                                          dense: true,
-                                          enabled: true,
-                                          enableFeedback: true,
-                                          // leading: CircleAvatar(
-                                          //     maxRadius: 15,
-                                          //     backgroundColor: Theme.of(context)
-                                          //         .colorScheme
-                                          //         .primary,
-                                          //     backgroundImage: NetworkImage(
-                                          //         thisNewsArticle.imageUrl)),
-                                          title: Text(thisGithubNotification.title),
-                                          subtitle: Text(thisGithubNotification.message),
-                                          trailing: Text(githubNotifications.length.toString(),
-                                              style: Styles.googleStyle),
-                                          // onTap: () => Functions.linkLaunch(
-                                          //     context,
-                                          //     thisNewsArticle.url,
-                                          //     userDatabase,
-                                          //     userIsPremium,
-                                          //     appBarTitle:
-                                          //         thisNewsArticle.source),
-                                        ),
-                                      ),
+                                // thisNewsArticle == null
+                                //     ? const SizedBox.shrink()
+                                //     : Card(
+                                //         child: ListTile(
+                                //           dense: true,
+                                //           enabled: true,
+                                //           enableFeedback: true,
+                                //           leading: CircleAvatar(
+                                //               maxRadius: 15,
+                                //               backgroundColor:
+                                //                   Theme.of(context).colorScheme.primary,
+                                //               backgroundImage:
+                                //                   NetworkImage(thisNewsArticle.imageUrl)),
+                                //           title: Text(thisNewsArticle.source),
+                                //           subtitle: Text(thisNewsArticle.title),
+                                //           trailing: Text(newsArticles.length.toString(),
+                                //               style: Styles.googleStyle),
+                                //           onTap: () => Functions.linkLaunch(context,
+                                //               thisNewsArticle.url, userDatabase, userIsPremium,
+                                //               appBarTitle: thisNewsArticle.source),
+                                //         ),
+                                //       ),
+                                // thisGithubNotification == null
+                                //     ? const SizedBox.shrink()
+                                //     : Card(
+                                //         child: ListTile(
+                                //           dense: true,
+                                //           enabled: true,
+                                //           enableFeedback: true,
+                                //           // leading: CircleAvatar(
+                                //           //     maxRadius: 15,
+                                //           //     backgroundColor: Theme.of(context)
+                                //           //         .colorScheme
+                                //           //         .primary,
+                                //           //     backgroundImage: NetworkImage(
+                                //           //         thisNewsArticle.imageUrl)),
+                                //           title: Text(thisGithubNotification.title),
+                                //           subtitle: Text(thisGithubNotification.message),
+                                //           trailing: Text(githubNotifications.length.toString(),
+                                //               style: Styles.googleStyle),
+                                //           // onTap: () => Functions.linkLaunch(
+                                //           //     context,
+                                //           //     thisNewsArticle.url,
+                                //           //     userDatabase,
+                                //           //     userIsPremium,
+                                //           //     appBarTitle:
+                                //           //         thisNewsArticle.source),
+                                //         ),
+                                //       ),
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Container(

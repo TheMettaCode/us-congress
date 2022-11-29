@@ -242,7 +242,6 @@ class AnimatedWidgets {
     bool isHomePage = false,
     GithubNotifications thisGithubNotification,
     String backgroundImage = '',
-    // Color color = const Color.fromARGB(255, 51, 255, 0),
   }) {
     final int randomImageIndex = random.nextInt(isMarket
         ? 3
@@ -316,39 +315,69 @@ class AnimatedWidgets {
                         ],
                       )),
                 ),
-                isHomePage &&
-                        thisGithubNotification != null &&
-                        thisGithubNotification.message.isNotEmpty
-                    ? InkWell(
-                        onTap: () => thisGithubNotification.url.isEmpty
-                            ? null
-                            : Functions.linkLaunch(
-                                context, thisGithubNotification.url, userDatabase, userIsPremium),
-                        child: SlideInUp(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Text(
-                              thisGithubNotification.message,
-                              textAlign: TextAlign.center,
-                              style: Styles.regularStyle.copyWith(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/),
+                isHomePage
+                    ? thisGithubNotification != null && thisGithubNotification.message.isNotEmpty
+                        ? InkWell(
+                            onTap: () => thisGithubNotification.url.isEmpty
+                                ? null
+                                : Functions.linkLaunch(context, thisGithubNotification.url,
+                                    userDatabase, userIsPremium),
+                            child: SlideInUp(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      thisGithubNotification.title,
+                                      textAlign: TextAlign.center,
+                                      style: Styles.googleStyle.copyWith(
+                                        fontSize: 22,
+                                        // fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      thisGithubNotification.message,
+                                      textAlign: TextAlign.center,
+                                      style: Styles.regularStyle.copyWith(
+                                          fontSize: 18,
+                                          fontWeight:
+                                              FontWeight.bold /*, color: darkThemeTextColor*/),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )
-                    : SlideInUp(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          child: Text(
-                            'Thank you for downloading the US Congress App and giving us a chance to keep you informed!',
-                            textAlign: TextAlign.center,
-                            style: Styles.regularStyle.copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/),
-                          ),
-                        ),
-                      ),
+                          )
+                        : SlideInUp(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Thank You!',
+                                    textAlign: TextAlign.center,
+                                    style: Styles.googleStyle.copyWith(
+                                      fontSize: 22,
+                                      // fontWeight: FontWeight.bold /*, color: darkThemeTextColor*/,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'Thank you for downloading the US Congress App and giving us a chance to keep you informed!',
+                                    textAlign: TextAlign.center,
+                                    style: Styles.regularStyle.copyWith(
+                                        fontSize: 18,
+                                        fontWeight:
+                                            FontWeight.bold /*, color: darkThemeTextColor*/),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),

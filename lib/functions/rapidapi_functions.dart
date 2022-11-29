@@ -21,30 +21,26 @@ class RapidApiFunctions {
     // bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
 
-    bool sendNotifications = false;
+    // bool sendNotifications = false;
 
     List<NewsArticle> currentNewsArticlesList = [];
 
-    debugPrint(
-        '[RETRIEVING CURRENT NEWS ARTICLES ATTEMPT FUNCTION] ${currentNewsArticlesList.length} CURRENT NEWS ARTICLES');
     try {
       List<NewsArticle> tempArticleList = newsArticleFromJson(userDatabase.get('newsArticles'));
       currentNewsArticlesList = await processNewsArticleDates(tempArticleList);
     } catch (e) {
-      logger.d(
-          '[CURRENT NEWS ARTICLES RETRIEVAL FUNCTION] ERROR DURING NEWS ARTICLE LIST (FUNCTION): $e ^^^^^');
+      logger.d('[NEWS ARTICLES API] ERROR DURING NEWS ARTICLE LIST (FUNCTION): $e ^^^^^');
       userDatabase.put('newsArticles', {});
       currentNewsArticlesList = [];
     }
-    debugPrint(
-        '[CURRENT NEWS ARTICLES RETRIEVAL FUNCTION] ${currentNewsArticlesList.length} CURRENT NEWS ARTICLES');
+    debugPrint('[NEWS ARTICLES API] ${currentNewsArticlesList.length} CURRENT NEWS ARTICLES');
 
     List<NewsArticle> finalNewsArticlesList = [];
 
     if (currentNewsArticlesList.isEmpty ||
         DateTime.parse(userDatabase.get('lastNewsArticlesRefresh'))
             .isBefore(DateTime.now().subtract(const Duration(minutes: 30)))) {
-      logger.d('***** RETRIEVING LATEST NEWS... *****');
+      logger.d('[NEWS ARTICLES API] RETRIEVING LATEST NEWS... *****');
 
       final rapidApiKey = dotenv.env['RAPID_API_KEY'];
       final rapidApiHost = dotenv.env['USC_NEWS_API_HOST'];
@@ -55,7 +51,7 @@ class RapidApiFunctions {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': rapidApiHost,
       });
-      debugPrint('***** NEWS API RESPONSE CODE: ${response.statusCode} *****');
+      debugPrint('[NEWS ARTICLES API] NEWS API RESPONSE CODE: ${response.statusCode} *****');
 
       // final Map headers = <String, String>{"Accept": "application/json"};
       // final response = await http.get(
@@ -65,47 +61,70 @@ class RapidApiFunctions {
       // debugPrint('[GITHUB TOP NEWS] API RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
-        logger.d('***** NEWS RETRIEVAL SUCCESS! *****');
+        logger.d('[NEWS ARTICLES API] NEWS RETRIEVAL SUCCESS! *****');
         final List<NewsArticle> newsArticles = newsArticleFromJson(response.body);
+
+        /// SAVE NEW DATA TO LOCAL DBASE
+        try {
+          debugPrint('[NEWS ARTICLES API] SAVING NEW ARTICLES TO DBASE *****');
+          userDatabase.put('newsArticles', newsArticleToJson(newsArticles));
+        } catch (e) {
+          debugPrint(
+              '[NEWS ARTICLES API] ERROR SAVING ARTICLES LIST TO DBASE (FUNCTION): $e ^^^^^');
+          userDatabase.put('newsArticles', {});
+        }
 
         List<ChamberMember> membersList = [];
         ChamberMember thisMember;
+        NewsArticle thisMemberArticle;
 
         if (newsArticles.isNotEmpty) {
           List<NewsArticle> allArticles = newsArticles;
 
           finalNewsArticlesList = await processNewsArticleDates(allArticles);
 
-          if (currentNewsArticlesList.isEmpty ||
-              !currentNewsArticlesList
-                  .any((element) => element.title.contains(finalNewsArticlesList.first.title))) {
-            sendNotifications = true;
+          /// IDENTIFY ALL NEWLY ADDED VIDEOS
+          List<NewsArticle> newlyAddedArticles = [];
+          for (NewsArticle article in finalNewsArticlesList) {
+            if (!currentNewsArticlesList.map((e) => e.title).contains(article.title)) {
+              newlyAddedArticles.add(article);
+            }
+          }
+
+          if (newlyAddedArticles.isNotEmpty) {
             userDatabase.put('newNewsArticles', true);
+            debugPrint('[NEWS ARTICLES API] ${newlyAddedArticles.length} NEW ARTICLES RETRIEVED.');
+
+            /// DETERMINE IF ANY TITLES CONTAIN MEMBERS THAT THE USER IS FOLLOWING
+            try {
+              logger.d('[NEWS ARTICLES API] CHECKING TITLES FOR MEMBERS AND NEW ITEMS');
+              membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
+                      .results
+                      .first
+                      .members +
+                  memberPayloadFromJson(userDatabase.get('senateMembersList'))
+                      .results
+                      .first
+                      .members;
+
+              thisMember = membersList.firstWhere((element) =>
+              newlyAddedArticles.first.title.toLowerCase().contains(element.firstName.toLowerCase()) &&
+                  newlyAddedArticles.first.title.toLowerCase().contains(element.lastName.toLowerCase()));
+
+              if (thisMember != null) {
+                thisMemberArticle = newlyAddedArticles.first;
+              }
+              debugPrint(
+                  '[NEWS ARTICLES API] MEMBER FOUND FOR NEWS ARTICLE RETRIEVAL FUNCTION: ${thisMember.firstName} ${thisMember.lastName}');
+            } catch (e) {
+              logger.w(
+                  '[NEWS ARTICLES API] ERROR DURING RETRIEVAL OF MEMBERS LIST (News Articles Function): $e');
+            }
           }
 
-          try {
-            logger.d('^^^^^ CHECKING TITLES FOR MEMBERS AND NEW ITEMS');
-            membersList = memberPayloadFromJson(userDatabase.get('houseMembersList'))
-                    .results
-                    .first
-                    .members +
-                memberPayloadFromJson(userDatabase.get('senateMembersList')).results.first.members;
-
-            thisMember = membersList.firstWhere((element) =>
-                finalNewsArticlesList.first.title
-                    .toLowerCase()
-                    .contains(element.firstName.toLowerCase()) &&
-                finalNewsArticlesList.first.title
-                    .toLowerCase()
-                    .contains(element.lastName.toLowerCase()));
-            logger.d(
-                '^^^^^ MEMBER FOUND FOR NEWS ARTICLE RETRIEVAL FUNCTION: ${thisMember.firstName} ${thisMember.lastName}');
-          } catch (e) {
-            logger.w('ERROR DURING RETRIEVAL OF MEMBERS LIST (News Articles Function): $e');
-          }
-
-          if (userIsDev && sendNotifications) {
-            final NewsArticle thisArticle = finalNewsArticlesList.first;
+          if (userIsDev && newlyAddedArticles.isNotEmpty) {
+            final NewsArticle thisArticle =
+                thisMember == null ? newlyAddedArticles.first : thisMemberArticle;
 
             final subject = thisArticle.title.toUpperCase();
             final messageBody =
@@ -118,63 +137,58 @@ class RapidApiFunctions {
             userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
           }
 
-          if (currentNewsArticlesList.isEmpty) {
-            currentNewsArticlesList = finalNewsArticlesList;
-          }
+          bool memberWatched = thisMember != null &&
+              subscriptionAlertsList
+                  .any((item) => item.toLowerCase().contains(thisMember.id.toLowerCase()));
 
-          try {
-            debugPrint('***** SAVING NEW ARTICLES TO DBASE *****');
-            userDatabase.put('newsArticles', newsArticleToJson(newsArticles));
-          } catch (e) {
-            debugPrint('^^^^^ ERROR SAVING ARTICLES LIST TO DBASE (FUNCTION): $e ^^^^^');
-            userDatabase.put('newsArticles', {});
+          if (!newUser &&
+              newlyAddedArticles.isNotEmpty &&
+              (userDatabase.get('newsAlerts') || memberWatched)) {
+            if (context == null || !ModalRoute.of(context).isCurrent) {
+              await NotificationApi.showBigTextNotification(
+                  15,
+                  'news_articles',
+                  'News Article',
+                  'US Congress News',
+                  'Latest News',
+                  'US Congress News',
+                  memberWatched
+                      ? 'A member you\'re watching is in the news!'
+                      : newlyAddedArticles.first.title,
+                  'news');
+            } else if (ModalRoute.of(context).isCurrent) {
+              Messages.showMessage(
+                  context: context,
+                  message: memberWatched
+                      ? '🧑🏽‍💼 A member you\'re watching is in the news!'
+                      : newlyAddedArticles.first.title,
+                  networkImageUrl: newlyAddedArticles.first.imageUrl,
+                  isAlert: false,
+                  removeCurrent: false);
+            }
           }
+          // if (currentNewsArticlesList.isEmpty) {
+          //   currentNewsArticlesList = finalNewsArticlesList;
+          // }
+        } else {
+          debugPrint('[NEWS ARTICLES API] NO NEW VIDEOS RETRIEVED.');
+          return currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
         }
-
-        bool memberWatched = thisMember != null &&
-            subscriptionAlertsList
-                .any((item) => item.toLowerCase().contains(thisMember.id.toLowerCase()));
-
-        if (!newUser && (userDatabase.get('newsAlerts') || memberWatched) && sendNotifications) {
-          if (context == null || !ModalRoute.of(context).isCurrent) {
-            await NotificationApi.showBigTextNotification(
-                15,
-                'news_articles',
-                'News Article',
-                'US Congress News',
-                'Latest News',
-                'US Congress News',
-                memberWatched
-                    ? 'A member you\'re watching is in the news!'
-                    : finalNewsArticlesList.first.title,
-                'news');
-          } else if (ModalRoute.of(context).isCurrent) {
-            Messages.showMessage(
-                context: context,
-                message: memberWatched
-                    ? '🧑🏽‍💼 A member you\'re watching is in the news!'
-                    : finalNewsArticlesList.first.title,
-                networkImageUrl: finalNewsArticlesList.first.imageUrl,
-                isAlert: false,
-                removeCurrent: false);
-          }
-        }
-
         // userDatabase.put('newNewsArticles', false);
         userDatabase.put('lastNewsArticlesRefresh', '${DateTime.now()}');
-
         return finalNewsArticlesList;
       } else {
-        logger.w('***** API ERROR: LOADING ARTICLES FROM DBASE: ${response.statusCode} *****');
-
-        return finalNewsArticlesList =
-            currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
+        logger.w(
+            '[NEWS ARTICLES API] API ERROR: LOADING ARTICLES FROM DBASE: ${response.statusCode} *****');
+        userDatabase.put('newNewsArticles', false);
+        return currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
       }
     } else {
-      logger.d('***** CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
-      finalNewsArticlesList = currentNewsArticlesList;
-      logger.d('***** ARTICLES NOT UPDATED: LIST IS CURRENT *****');
-      return finalNewsArticlesList;
+      logger.d(
+          '[NEWS ARTICLES API] CURRENT ARTICLES LIST: ${currentNewsArticlesList.map((e) => e.title)} *****');
+      logger.d('[NEWS ARTICLES API] ARTICLES NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('newNewsArticles', false);
+      return currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
     }
   }
 
@@ -290,7 +304,9 @@ class RapidApiFunctions {
         //     userIsPremium, userIsLegacy, finalFloorActions.first.billIds.asMap(), 'bill_',
         //     userIsDev: userIsDev);
 
-        if (!newUser && (userDatabase.get('floorAlerts') /*|| billWatched*/) && !floorActionsEqual) {
+        if (!newUser &&
+            (userDatabase.get('floorAlerts') /*|| billWatched*/) &&
+            !floorActionsEqual) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 9,
@@ -322,7 +338,11 @@ class RapidApiFunctions {
         logger.d(
             '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
 
-        return chamber == 'house' && currentFloorActions.isNotEmpty ? currentFloorActions : chamber == 'senate' && currentFloorActions.isNotEmpty ? currentFloorActions.reversed.toList() : [];
+        return chamber == 'house' && currentFloorActions.isNotEmpty
+            ? currentFloorActions
+            : chamber == 'senate' && currentFloorActions.isNotEmpty
+                ? currentFloorActions.reversed.toList()
+                : [];
       }
     } else {
       logger.d(
@@ -458,12 +478,12 @@ class RapidApiFunctions {
     }
 
     if (articlesList.isNotEmpty) {
-      articlesList.sort((a, b) => b.date.compareTo(a.date));
+      articlesList.sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
     }
 
     debugPrint(
         '[PROCESS NEWS DATES FUNCTION] FINISH WITH ${articlesList.length}  ITEMS: NEW 1ST TITLE - ${articlesList.first.title}');
-    return articlesList;
+    return articlesList.length > 25 ? articlesList.take(25).toList() : articlesList;
   }
 }
 

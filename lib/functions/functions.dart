@@ -670,18 +670,6 @@ class Functions {
                         },
                       ))),
             ).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-      // .then((_) => !userIsPremium &&
-      //     interstitialAd != null &&
-      //     interstitialAd.responseInfo.responseId !=
-      //         userDatabase.get('interstitialAdId')
-      // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-      // : null);
-
-      // .then((_) => !userIsPremium &&
-      //         interstitialAd != null &&
-      //         interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId')
-      //     ? AdMobLibrary().interstitialAdShow(interstitialAd)
-      //     : null);
     } else {
       if (context != null) {
         Messages.showMessage(context: context, message: 'Could not launch link', isAlert: true);

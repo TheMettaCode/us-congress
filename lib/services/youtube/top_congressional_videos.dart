@@ -173,6 +173,7 @@ class YouTubeVideosApi {
         final TopCongressionalVideos newRetrievedData =
             topCongressionalVideosFromJson(response.body);
 
+        /// SAVE NEW DATA TO LOCAL DBASE
         try {
           debugPrint('[YOUTUBE VIDEOS API] SAVING NEWLY RETRIEVED DATA TO DBASE');
           userDatabase.put('youtubeVideosList', topCongressionalVideosToJson(newRetrievedData));
@@ -247,18 +248,16 @@ class YouTubeVideosApi {
         userDatabase.put('lastVideosRefresh', '${DateTime.now()}');
         return finalVideosList;
       } else {
-        finalVideosList = currentVideosList.isNotEmpty ? currentVideosList : [];
         debugPrint('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: API CALL ERROR');
         userDatabase.put('newVideos', false);
-        return finalVideosList;
+        return currentVideosList.isNotEmpty ? currentVideosList : [];
       }
     } else {
       debugPrint(
           '[YOUTUBE VIDEOS API] CURRENT VIDEO IDs: ${currentVideosList.map((e) => e.id)} *****');
-      finalVideosList = currentVideosList.isNotEmpty ? currentVideosList : [];
       debugPrint('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: LIST IS CURRENT *****');
       userDatabase.put('newVideos', false);
-      return finalVideosList;
+      return currentVideosList.isNotEmpty ? currentVideosList : [];
     }
   }
 

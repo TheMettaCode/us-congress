@@ -392,7 +392,9 @@ class SharedWidgets {
   static Widget premiumUpgradeContainer(BuildContext context, InterstitialAd interstitialAd,
       bool userIsPremium, bool userIsLegacy, bool devUpgraded, bool freeTrialUsed, Box userDatabase,
       {color = const Color.fromARGB(255, 30, 150, 0)}) {
-    return !freeTrialUsed && (freePremiumDaysActive || userDatabase.get('appOpens') < 5)
+    final appOpens = userDatabase.get('appOpens');
+    return !freeTrialUsed &&
+            (freePremiumDaysActive || appOpens < 5) // (appOpens > 4 && appOpens < 10))
         ? freeTrialContainer(
             context, userIsPremium, userIsLegacy, devUpgraded, freeTrialUsed, userDatabase)
         : Container(
@@ -1863,8 +1865,8 @@ class SharedWidgets {
                                                     'RESULT.FAILED'
                                                 ? const Color.fromARGB(255, 255, 17, 0)
                                                 : darkTheme
-                                            ? const Color.fromRGBO(158, 158, 158, 1)
-                                            : null,
+                                                    ? const Color.fromRGBO(158, 158, 158, 1)
+                                                    : null,
                                         fontSize: 14.0,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -5245,6 +5247,13 @@ class SharedWidgets {
                     color: Theme.of(context).highlightColor.withOpacity(0.2),
                     borderRadius: const BorderRadius.only(
                         bottomRight: Radius.circular(5), topRight: Radius.circular(5)),
+                    // image:  DecorationImage(
+                    //   // image: NetworkImage('https://usflags.design/assets/images/flag-delaware.svg'),
+                    //   image: const AssetImage('assets/intro_background.png'),
+                    //   fit: BoxFit.cover,
+                    //   opacity: 0.5,
+                    //   colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color),
+                    // ),
                   ),
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(5),
@@ -5261,12 +5270,6 @@ class SharedWidgets {
                                   statement.memberId, houseStockWatchList, senateStockWatchList),
                             ),
                           ).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                          // .then((_) => !userIsPremium &&
-                          //     interstitialAd != null &&
-                          //     interstitialAd.responseInfo.responseId !=
-                          //         userDatabase.get('interstitialAdId')
-                          // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                          // : null);
                         },
                         child: Stack(
                           alignment: Alignment.bottomLeft,
@@ -5497,7 +5500,7 @@ class SharedWidgets {
   ) {
     // List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
-    // bool userIsPremium = userLevels[1];
+    bool userIsPremium = userLevels[1];
     // bool userIsLegacy = userLevels[2];
 
     final bool darkTheme = userDatabase.get('darkTheme');
@@ -5518,6 +5521,13 @@ class SharedWidgets {
     ecwidProductsList.sort((a, b) => a.showOnFrontpage
         .compareTo(b.showOnFrontpage)
         .compareTo(a.createTimestamp.compareTo(b.createTimestamp)));
+
+    int totalCredits = userDatabase.get('credits') +
+        userDatabase.get('permCredits') +
+        userDatabase.get('purchCredits');
+
+    bool canPurchaseSomething =
+        ecwidProductsList.any((element) => element.price * 100 <= totalCredits);
 
     return BounceInUp(
       child: Container(
@@ -5560,6 +5570,28 @@ class SharedWidgets {
                         ],
                       ),
                     ),
+                    Container(
+                      height: 22,
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton.icon(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                          ),
+                          onPressed: () => Functions.requestInAppPurchase(
+                              context, interstitialAd, userIsPremium, whatToShow: 'credits'),
+                          label: Text(totalCredits.toString(),
+                              style: Styles.googleStyle.copyWith(
+                                  fontSize: 18,
+                                  color: canPurchaseSomething
+                                      ? alertIndicatorColorBrightGreen
+                                      : darkThemeTextColor)),
+                          icon: Icon(FontAwesomeIcons.coins,
+                              size: 12,
+                              color: canPurchaseSomething
+                                  ? alertIndicatorColorBrightGreen
+                                  : darkThemeTextColor)),
+                    ),
                     productOrdersList.isEmpty
                         ? const SizedBox.shrink()
                         : SizedBox(
@@ -5580,9 +5612,9 @@ class SharedWidgets {
                                     }),
                                 icon: const Icon(Icons.history, color: darkThemeTextColor)),
                           ),
-                    IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: darkThemeTextColor))
+                    // IconButton(
+                    //     onPressed: () => Navigator.pop(context),
+                    //     icon: const Icon(Icons.close, color: darkThemeTextColor))
                   ],
                 ),
               ),

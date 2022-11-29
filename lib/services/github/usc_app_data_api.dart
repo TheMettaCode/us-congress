@@ -32,20 +32,16 @@ class GithubApi {
     debugPrint('LAST PROMO NOTIFICATION WAS: $lastPromoNotification');
 
     GithubData currentGithubData;
-    // List<String> currentGithubHashtags = [];
     List<GithubNotifications> currentGithubNotifications = [];
     bool newUserLevelMessagesRetrieved = false;
 
     try {
       currentGithubData = githubDataFromJson(userDatabase.get('githubData'));
-      // currentGithubNotifications = currentGithubData.notifications.toList();
       currentGithubNotifications = await pruneAndSortPromoNotifications(
           currentGithubData.notifications.toList(), githubApiUserLevel, now);
-      // currentGithubHashtags = currentGithubData.hashtags.toList();
       debugPrint('***** CURRENT GITHUB DATA LOADED SUCCESSFULLY');
     } catch (e) {
       currentGithubNotifications = [];
-      // currentGithubHashtags = [];
       debugPrint('***** CURRENT GITHUB DATA LOAD ERROR: $e');
     }
 

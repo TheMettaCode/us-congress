@@ -44,6 +44,8 @@ class BillDetailState extends State<BillDetail> {
   List<HouseStockWatch> houseStockWatchList = [];
   List<SenateStockWatch> senateStockWatchList = [];
 
+  String randomAssetImageUrl = 'assets/congress_pic_0.png';
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +64,8 @@ class BillDetailState extends State<BillDetail> {
       houseStockWatchList = widget.houseStockWatchList;
       senateStockWatchList = widget.senateStockWatchList;
     });
+
+    setState(() => randomAssetImageUrl = 'assets/congress_pic_${random.nextInt(4)}.png');
   }
 
   Future<void> getBillData() async {
@@ -131,7 +135,17 @@ class BillDetailState extends State<BillDetail> {
                 return RefreshIndicator(
                   onRefresh: getBillData,
                   child: Container(
-                    color: Theme.of(context).colorScheme.background,
+                    // color: Theme.of(context).colorScheme.background,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      image: DecorationImage(
+                          opacity: 0.15,
+                          image: AssetImage(randomAssetImageUrl),
+                          repeat: ImageRepeat.repeat,
+                          // fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.background, BlendMode.color)),
+                    ),
                     child: ListView(
                       physics: const BouncingScrollPhysics(),
                       children: [

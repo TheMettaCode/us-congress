@@ -109,7 +109,17 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
         ],
       ),
       body: Container(
-        color: Theme.of(context).colorScheme.background,
+        // color: Theme.of(context).colorScheme.background,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
+          image: DecorationImage(
+              opacity: 0.15,
+              image: AssetImage(randomBackgroundImageString),
+              repeat: ImageRepeat.repeat,
+              // fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.background, BlendMode.color)),
+        ),
         child: thisSpecificLobbyEvent == null || _isLoading
             ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
                 isLobby: true, isFullScreen: true)
@@ -254,48 +264,6 @@ fetchedEventDetails(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          // new Padding(
-                          //   padding: const EdgeInsets.all(0.0),
-                          //   child: new Column(
-                          //     children: [
-                          //       new GestureDetector(
-                          //         // onTap: () {
-                          //         // Navigator.push(
-                          //         //   context,
-                          //         //   MaterialPageRoute(
-                          //         //     builder: (context) =>
-                          //         //         LobbyEventDetail(
-                          //         //             memberId: bill
-                          //         //                 .first.sponsorId),
-                          //         //   ),
-                          //         // );
-                          //         // },
-                          //         child: new Container(
-                          //           height: 85,
-                          //           width: 60,
-                          //           decoration: BoxDecoration(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(3),
-                          //             image: DecorationImage(
-                          //               fit: BoxFit.cover,
-                          //               image: AssetImage(
-                          //                   'assets/lobbying.png'),
-                          //             ),
-                          //           ),
-                          //           // foregroundDecoration: BoxDecoration(
-                          //           //   borderRadius:
-                          //           //       BorderRadius.circular(3),
-                          //           //   image: DecorationImage(
-                          //           //     fit: BoxFit.cover,
-                          //           //     image:
-                          //           //         NetworkImage(eventImageUrl),
-                          //           //   ),
-                          //           // ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                           Expanded(
                             child: Container(
                               color: alertIndicatorColorDarkGreen.withOpacity(0.15),

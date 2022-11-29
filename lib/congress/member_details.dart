@@ -91,6 +91,20 @@ class MemberDetailState extends State<MemberDetail> {
           userIsLegacy = status[2];
         })));
 
+    // ADMOB INFORMATION HERE
+    if (!userIsPremium) {
+      final BannerAd thisBanner = AdMobLibrary().defaultBanner();
+
+      await thisBanner.load();
+
+      if (thisBanner != null) {
+        setState(() {
+          adLoaded = true;
+          bannerAdContainer = AdMobLibrary().bannerContainer(thisBanner, context);
+        });
+      }
+    }
+
     setState(() => randomAssetImageUrl = 'assets/congress_pic_${random.nextInt(4)}.png');
   }
 
@@ -196,19 +210,6 @@ class MemberDetailState extends State<MemberDetail> {
 
   @override
   Widget build(BuildContext context) {
-    // ADMOB INFORMATION HERE
-    if (!userIsPremium && !adLoaded) {
-      final BannerAd thisBanner = AdMobLibrary().defaultBanner();
-
-      thisBanner.load();
-
-      if (thisBanner != null) {
-        setState(() {
-          adLoaded = true;
-          bannerAdContainer = AdMobLibrary().bannerContainer(thisBanner, context);
-        });
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -287,14 +288,36 @@ class MemberDetailState extends State<MemberDetail> {
                             fit: BoxFit.cover,
                             colorBlendMode: BlendMode.softLight),
                       ),
-                      Card(
-                        elevation: 0.0,
+                      Container(
+                        // elevation: 0.0,
+
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withOpacity(0.15),
+                          // color: Theme.of(context).colorScheme.background,
+                          image: DecorationImage(
+                              opacity: 0.15,
+                              image: AssetImage(randomAssetImageUrl),
+                              fit: BoxFit.cover,
+                              // repeat: ImageRepeat.repeat,
+                              colorFilter: ColorFilter.mode(
+                                  Theme.of(context).colorScheme.background, BlendMode.color)),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
                               padding: const EdgeInsets.all(5.0),
-                              color: Theme.of(context).primaryColor.withOpacity(0.15),
+                              // decoration: BoxDecoration(
+                              //   color: Theme.of(context).primaryColor.withOpacity(0.15),
+                              //   // color: Theme.of(context).colorScheme.background,
+                              //   image: DecorationImage(
+                              //       opacity: 0.15,
+                              //       image: AssetImage(randomAssetImageUrl),
+                              //       fit: BoxFit.cover,
+                              //       // repeat: ImageRepeat.repeat,
+                              //       colorFilter: ColorFilter.mode(
+                              //           Theme.of(context).colorScheme.background, BlendMode.color)),
+                              // ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -372,7 +395,7 @@ class MemberDetailState extends State<MemberDetail> {
                             ),
                             // Divider(),
                             Container(
-                              color: userDatabase.get('darkTheme') == true
+                              color: userDatabase.get('darkTheme')
                                   ? memberContainerColor
                                   : thisMember.currentParty.toLowerCase() == 'd'
                                       ? democratColor

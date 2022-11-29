@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
 import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
 import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
+import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
 
 class BillSearch extends StatefulWidget {
   // QuerySearch({Key key}) : super(key: key);
@@ -16,8 +17,8 @@ class BillSearch extends StatefulWidget {
   final String queryString;
   final List<HouseStockWatch> houseStockWatchList;
   final List<SenateStockWatch> senateStockWatchList;
-  const BillSearch(
-      this.queryString, this.houseStockWatchList, this.senateStockWatchList, {Key key}) : super(key: key);
+  const BillSearch(this.queryString, this.houseStockWatchList, this.senateStockWatchList, {Key key})
+      : super(key: key);
 
   @override
   BillSearchState createState() => BillSearchState();
@@ -45,25 +46,17 @@ class BillSearchState extends State<BillSearch> {
     setState(() {
       userIsPremium = userDatabase.get('userIsPremium');
       userIsLegacy = !userDatabase.get('userIsPremium') &&
-          List.from(userDatabase.get('userIdList')).any(
-              (element) => element.toString().startsWith(oldUserIdPrefix));
+          List.from(userDatabase.get('userIdList'))
+              .any((element) => element.toString().startsWith(oldUserIdPrefix));
       houseStockWatchList = widget.houseStockWatchList;
       senateStockWatchList = widget.senateStockWatchList;
     });
   }
 
   Future<void> getBillQueryList() async {
-    await PropublicaApi.fetchBills(widget.queryString.toLowerCase().trim())
-        .then((value) {
+    await PropublicaApi.fetchBills(widget.queryString.toLowerCase().trim()).then((value) {
       setState(() => billQueryList = value);
       setState(() => _isLoading = false);
-
-      // Future.delayed(Duration(seconds: 2), () async {
-      //   // Do something
-      //   if (ModalRoute.of(context).isCurrent) {
-      //     await AdMobLibrary().defaultRewarded();
-      //   }
-      // });
     });
   }
 
@@ -74,8 +67,7 @@ class BillSearchState extends State<BillSearch> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-            queryString.isEmpty ? 'Bill Search' : 'Search for $queryString',
+        title: Text(queryString.isEmpty ? 'Bill Search' : 'Search for $queryString',
             style: GoogleFonts.bangers(fontSize: 25)),
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
         actions: <Widget>[
@@ -97,14 +89,10 @@ class BillSearchState extends State<BillSearch> {
                         Container(
                           height: 50,
                           alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.15),
+                              color: Theme.of(context).primaryColor.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(10)),
                           child: TextField(
                             keyboardType: TextInputType.text,
@@ -128,8 +116,8 @@ class BillSearchState extends State<BillSearch> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => BillSearch(queryString,
-                                    houseStockWatchList, senateStockWatchList),
+                                builder: (context) => BillSearch(
+                                    queryString, houseStockWatchList, senateStockWatchList),
                               ),
                             );
                           },
@@ -156,13 +144,11 @@ class BillSearchState extends State<BillSearch> {
                       color: Theme.of(context).colorScheme.background,
                       image: DecorationImage(
                           opacity: 0.15,
-                          image: AssetImage(
-                              'assets/congress_pic_${random.nextInt(4)}.png'),
+                          image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                           // fit: BoxFit.fitWidth,
                           repeat: ImageRepeat.repeat,
                           colorFilter: ColorFilter.mode(
-                              Theme.of(context).colorScheme.background,
-                              BlendMode.color)),
+                              Theme.of(context).colorScheme.background, BlendMode.color)),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
                     alignment: Alignment.center,
@@ -183,8 +169,7 @@ class BillSearchState extends State<BillSearch> {
                   ),
                 )
               : Center(
-                  child: Text('No Search Results',
-                      style: GoogleFonts.bangers(fontSize: 30)),
+                  child: Text('No Search Results', style: GoogleFonts.bangers(fontSize: 30)),
                 ),
     );
   }
@@ -192,8 +177,7 @@ class BillSearchState extends State<BillSearch> {
   Widget _getQueryTile(int index) {
     Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     var thisBillQuery = billQueryList[index];
-    List<String> subscriptions =
-        List.from(userDatabase.get('subscriptionAlertsList'));
+    List<String> subscriptions = List.from(userDatabase.get('subscriptionAlertsList'));
     return Container(
       // color: Colors.grey,
       margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
@@ -231,9 +215,7 @@ class BillSearchState extends State<BillSearch> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => BillDetail(
-                              thisBillQuery.billUri,
-                              houseStockWatchList,
-                              senateStockWatchList),
+                              thisBillQuery.billUri, houseStockWatchList, senateStockWatchList),
                         ),
                       );
                     },
@@ -264,21 +246,17 @@ class BillSearchState extends State<BillSearch> {
                                     context,
                                     subscriptions.any((element) => element
                                         .toLowerCase()
-                                        .startsWith(
-                                            'bill_${thisBillQuery.billId.toLowerCase()}')),
+                                        .startsWith('bill_${thisBillQuery.billId.toLowerCase()}')),
                                     false,
                                     size: 10),
                               ],
                             ),
                             Text(
-                              thisBillQuery.active.toString() == 'true'
-                                  ? 'ACTIVE'
-                                  : 'INACTIVE',
+                              thisBillQuery.active.toString() == 'true' ? 'ACTIVE' : 'INACTIVE',
                               style: TextStyle(
-                                  color:
-                                      thisBillQuery.active.toString() == 'true'
-                                          ? Colors.green
-                                          : Colors.grey,
+                                  color: thisBillQuery.active.toString() == 'true'
+                                      ? Colors.green
+                                      : Colors.grey,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -299,8 +277,7 @@ class BillSearchState extends State<BillSearch> {
                             thisBillQuery.introducedDate == null
                                 ? const Text('')
                                 : Text(
-                                    'Intr > ${formatter.format(
-                                            thisBillQuery.introducedDate)}',
+                                    'Intr > ${formatter.format(thisBillQuery.introducedDate)}',
                                     style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
@@ -309,8 +286,7 @@ class BillSearchState extends State<BillSearch> {
                             thisBillQuery.latestMajorActionDate == null
                                 ? const Text('')
                                 : Text(
-                                    'Last > ${formatter.format(thisBillQuery
-                                            .latestMajorActionDate)}',
+                                    'Last > ${formatter.format(thisBillQuery.latestMajorActionDate)}',
                                     style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,

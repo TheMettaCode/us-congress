@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:us_congress_vote_tracker/congress/developer_page.dart';
 import 'package:us_congress_vote_tracker/congress/settings.dart';
 import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
@@ -672,10 +673,11 @@ class MyAppState extends State<MyApp> {
                                                         color: darkThemeTextColor, fontSize: 12)),
                                                 onTap: () async {
                                                   Navigator.pop(context);
-                                                  await Functions.linkLaunch(context, googleAppLink,
-                                                          userDatabase, userIsPremium,
-                                                          appBarTitle: 'Thank you for your rating!',
-                                                          interstitialAd: null)
+                                                  await launchUrl(Uri.parse(googleAppLink), mode: LaunchMode.platformDefault)
+                                                  // await Functions.linkLaunch(context, googleAppLink,
+                                                  //         userDatabase, userIsPremium,
+                                                  //         appBarTitle: 'Thank you for your rating!',
+                                                  //         interstitialAd: null)
                                                       .then((_) async {
                                                     userDatabase.put('appRated', true);
                                                     await Functions.processCredits(true,
