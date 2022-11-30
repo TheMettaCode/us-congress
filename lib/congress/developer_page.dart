@@ -10,6 +10,7 @@ import 'package:us_congress_vote_tracker/functions/functions.dart';
 import 'package:us_congress_vote_tracker/models/news_article_model.dart';
 import 'package:us_congress_vote_tracker/models/order_detail.dart';
 import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
+import 'package:us_congress_vote_tracker/services/twitter/twitter_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../services/github/usc_app_data_model.dart';
@@ -475,33 +476,25 @@ class DeveloperPageState extends State<DeveloperPage> {
                                 //               appBarTitle: thisNewsArticle.source),
                                 //         ),
                                 //       ),
-                                // thisGithubNotification == null
-                                //     ? const SizedBox.shrink()
-                                //     : Card(
-                                //         child: ListTile(
-                                //           dense: true,
-                                //           enabled: true,
-                                //           enableFeedback: true,
-                                //           // leading: CircleAvatar(
-                                //           //     maxRadius: 15,
-                                //           //     backgroundColor: Theme.of(context)
-                                //           //         .colorScheme
-                                //           //         .primary,
-                                //           //     backgroundImage: NetworkImage(
-                                //           //         thisNewsArticle.imageUrl)),
-                                //           title: Text(thisGithubNotification.title),
-                                //           subtitle: Text(thisGithubNotification.message),
-                                //           trailing: Text(githubNotifications.length.toString(),
-                                //               style: Styles.googleStyle),
-                                //           // onTap: () => Functions.linkLaunch(
-                                //           //     context,
-                                //           //     thisNewsArticle.url,
-                                //           //     userDatabase,
-                                //           //     userIsPremium,
-                                //           //     appBarTitle:
-                                //           //         thisNewsArticle.source),
-                                //         ),
-                                //       ),
+                                Card(
+                                        child: ListTile(
+                                          dense: true,
+                                          enabled: true,
+                                          enableFeedback: true,
+                                          // leading: CircleAvatar(
+                                          //     maxRadius: 15,
+                                          //     backgroundColor: Theme.of(context)
+                                          //         .colorScheme
+                                          //         .primary,
+                                          //     backgroundImage: NetworkImage(
+                                          //         thisNewsArticle.imageUrl)),
+                                          title: const Text('Twitter API Test'),
+                                          // subtitle: Text(thisGithubNotification.message),
+                                          // trailing: Text(githubNotifications.length.toString(),
+                                          //     style: Styles.googleStyle),
+                                          onTap: () => TwitterServiceApi.postTweet('Hello World!'),
+                                        ),
+                                      ),
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Container(

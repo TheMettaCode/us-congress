@@ -229,6 +229,7 @@ const List<String> wordsToHash = [
   "sex",
   "semiconductor",
   "Speaker of the House",
+  "SPX",
   "substance abuse",
   "sustainable",
   "Supreme Court",

@@ -97,7 +97,7 @@ class CongressStockWatchApi {
                 final String subject =
                     'MARKET TRADE REPORT FOR ${localFinalHouseStockWatchList.first.representative}';
                 final String messageBody =
-                    'HOUSE TRADE REPORT: ${thisMember == null ? localFinalHouseStockWatchList.first.representative : '@${thisMember.twitterAccount}'} ${localFinalHouseStockWatchList.first.type.toUpperCase().replaceFirst('_', ' ')} of ${localFinalHouseStockWatchList.first.ticker == 'N/A' || localFinalHouseStockWatchList.first.ticker == '--' || localFinalHouseStockWatchList.first.ticker == null ? '' : '\$${localFinalHouseStockWatchList.first.ticker}'} ${localFinalHouseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
+                    'HOUSE TRADE REPORT: ${thisMember == null ? localFinalHouseStockWatchList.first.representative : '@${thisMember.twitterAccount}'} ${localFinalHouseStockWatchList.first.type.toUpperCase().replaceFirst('_', ' ')} of ${localFinalHouseStockWatchList.first.ticker == 'N/A' || localFinalHouseStockWatchList.first.ticker == '--' || localFinalHouseStockWatchList.first.ticker == null ? '' : '\$${localFinalHouseStockWatchList.first.ticker}'} ${localFinalHouseStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse spx trading stock market commodities';
 
                 List<String> capitolBabbleNotificationsList =
                     List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
@@ -293,7 +293,7 @@ class CongressStockWatchApi {
                 final String subject =
                     'MARKET TRADE REPORT FOR SEN. ${localFinalSenateStockWatchList.first.senator}';
                 final String messageBody =
-                    'SENATE TRADE REPORT: ${thisMember == null ? 'Sen. ${localFinalSenateStockWatchList.first.senator}' : '@${thisMember.twitterAccount}'} ${localFinalSenateStockWatchList.first.type} of ${localFinalSenateStockWatchList.first.ticker == 'N/A' || localFinalSenateStockWatchList.first.ticker == null || localFinalSenateStockWatchList.first.ticker == '--' ? '' : '\$${localFinalSenateStockWatchList.first.ticker}'} ${localFinalSenateStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse trading stock market commodities';
+                    'SENATE TRADE REPORT: ${thisMember == null ? 'Sen. ${localFinalSenateStockWatchList.first.senator}' : '@${thisMember.twitterAccount}'} ${localFinalSenateStockWatchList.first.type} of ${localFinalSenateStockWatchList.first.ticker == 'N/A' || localFinalSenateStockWatchList.first.ticker == null || localFinalSenateStockWatchList.first.ticker == '--' ? '' : '\$${localFinalSenateStockWatchList.first.ticker}'} ${localFinalSenateStockWatchList.first.assetDescription.replaceAll(RegExp(r'<(.*)>'), '')} nasdaq nyse spx trading stock market commodities';
 
                 List<String> capitolBabbleNotificationsList =
                     List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));

@@ -5,11 +5,11 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:us_congress_vote_tracker/constants/constants.dart';
 import 'package:us_congress_vote_tracker/functions/functions.dart';
+import 'package:us_congress_vote_tracker/services/twitter/twitter_api.dart';
 
 class EmailjsApi {
   /// SEND USER COMMENT EMAIL
-  static Future<void> sendCommentEmail(
-      String subject, String message, String toEmail,
+  static Future<void> sendCommentEmail(String subject, String message, String toEmail,
       {String fromEmail = 'themettaman@gmail.com',
       String fromName = 'US Congress App (User Comment Email)',
       String toName = 'MettaCode Dev',
@@ -69,22 +69,20 @@ class EmailjsApi {
         capitolBabbleNotificationsList.isNotEmpty &&
         ((isPeakCapitolBabblePostHours &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
-                    DateTime.now().subtract(
-                        const Duration(minutes: capitolBabbleDelayMinutes)))) ||
-            (capitolBabbleNotificationsList.any((element) => element.split('<|:|>')[3].toLowerCase() == 'high') &&
-                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
-                    DateTime.now().subtract(const Duration(
-                        minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
-            (capitolBabbleNotificationsList.any((element) =>
-                    element.split('<|:|>')[3].toLowerCase() == 'medium') &&
-                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
-                    DateTime.now().subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
+                    DateTime.now().subtract(const Duration(minutes: capitolBabbleDelayMinutes)))) ||
+            (capitolBabbleNotificationsList
+                    .any((element) => element.split('<|:|>')[3].toLowerCase() == 'high') &&
+                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
+                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
+            (capitolBabbleNotificationsList
+                    .any((element) => element.split('<|:|>')[3].toLowerCase() == 'medium') &&
+                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
+                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
       capitolBabbleNotificationsList
           .sort((a, b) => a.split('<|:|>')[3].compareTo(b.split('<|:|>')[3]));
 
       if (capitolBabbleNotificationsList.length > 20) {
-        capitolBabbleNotificationsList.removeRange(
-            20, capitolBabbleNotificationsList.length);
+        capitolBabbleNotificationsList.removeRange(20, capitolBabbleNotificationsList.length);
       }
 
       final serviceId = dotenv.env['CBSERVICEID'];
@@ -102,15 +100,22 @@ class EmailjsApi {
         localNextBabbleUrl = localNextBabble.split('<|:|>')[4];
       }
 
-      String localRawMessage = subject.isNotEmpty && messageBody.isNotEmpty
-          ? messageBody
-          : localNextBabbleBody;
+      String localRawMessage =
+          subject.isNotEmpty && messageBody.isNotEmpty ? messageBody : localNextBabbleBody;
       debugPrint('SENDING EMAIL TO CAPITOL BABBLE SOCIALS: $localRawMessage');
 
       String localFinalMessage = '';
       await Functions.addHashTags(localRawMessage)
           .then((str) => localFinalMessage = '$str $localNextBabbleUrl');
 
+      /// POST TWEET TO CAPITOL BABBLE TWITTER ACCOUNT
+      try {
+        TwitterServiceApi.postTweet(localFinalMessage);
+      } catch (e) {
+        debugPrint('ERROR POSTING CAPITOL BABBLE TWEET: $e');
+      }
+
+      /// SEND EMAIL TO CAPITOL BABBLE IFTTT FOR POSTING TO REDDIT
       try {
         final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
         final response = await http.post(url,
@@ -133,8 +138,7 @@ class EmailjsApi {
 
         if (response.statusCode == 200) {
           capitolBabbleNotificationsList.removeAt(0);
-          userDatabase.put(
-              'capitolBabbleNotificationsList', capitolBabbleNotificationsList);
+          userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
           userDatabase.put('lastCapitolBabble', '${DateTime.now()}');
         }
       } catch (error) {
