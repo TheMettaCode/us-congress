@@ -373,17 +373,28 @@ class YouTubeVideosApi {
                   ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                    child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: FadeInImage(
-                          image: thisChannelVideo.thumbnail == null ||
-                                  thisChannelVideo.thumbnail.isEmpty
-                              ? AssetImage("assets/congress_pic_${random.nextInt(4)}.png")
-                              : NetworkImage(thisChannelVideo.thumbnail),
-                          placeholder: AssetImage("assets/congress_pic_${random.nextInt(4)}.png"),
-                          fit: BoxFit.cover,
-                          placeholderFit: BoxFit.cover,
-                        )),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: FadeInImage(
+                              image: thisChannelVideo.thumbnail == null ||
+                                      thisChannelVideo.thumbnail.isEmpty
+                                  ? AssetImage("assets/congress_pic_${random.nextInt(4)}.png")
+                                  : NetworkImage(thisChannelVideo.thumbnail),
+                              placeholder:
+                                  AssetImage("assets/congress_pic_${random.nextInt(4)}.png"),
+                              fit: BoxFit.cover,
+                              placeholderFit: BoxFit.cover,
+                            )),
+                        CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                            child: Icon(Icons.play_arrow,
+                                size: 30, color: darkThemeTextColor.withOpacity(0.75))),
+                      ],
+                    ),
                   ),
                 ),
                 orientation == Orientation.portrait

@@ -956,7 +956,7 @@ class SharedWidgets {
                                                                                       .developer_board
                                                                                   : Icons
                                                                                       .volunteer_activism,
-                                          size: 20,
+                                          size: notification.icon == 'coins' ? 18 : 20,
                                           color: userDatabase.get('darkTheme') == true
                                               ? altHighlightColor
                                               : Theme.of(context).primaryColorDark),

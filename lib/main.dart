@@ -26,7 +26,6 @@ import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
 import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
 import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
 import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
-import 'package:us_congress_vote_tracker/services/youtube/youtube_player.dart';
 import 'package:us_congress_vote_tracker/congress/onboarding_page.dart';
 import 'constants/constants.dart';
 import 'functions/rapidapi_functions.dart';

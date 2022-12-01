@@ -108,8 +108,12 @@ class RapidApiFunctions {
                       .members;
 
               thisMember = membersList.firstWhere((element) =>
-              newlyAddedArticles.first.title.toLowerCase().contains(element.firstName.toLowerCase()) &&
-                  newlyAddedArticles.first.title.toLowerCase().contains(element.lastName.toLowerCase()));
+                  newlyAddedArticles.first.title
+                      .toLowerCase()
+                      .contains(element.firstName.toLowerCase()) &&
+                  newlyAddedArticles.first.title
+                      .toLowerCase()
+                      .contains(element.lastName.toLowerCase()));
 
               if (thisMember != null) {
                 thisMemberArticle = newlyAddedArticles.first;
@@ -203,8 +207,8 @@ class RapidApiFunctions {
     bool newUser = userDatabase.get('appOpens') < newUserThreshold;
     List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
-    bool userIsPremium = userLevels[1];
-    bool userIsLegacy = userLevels[2];
+    // bool userIsPremium = userLevels[1];
+    // bool userIsLegacy = userLevels[2];
     bool floorActionsEqual = false;
     List<ActionsList> currentFloorActions = [];
 
@@ -285,7 +289,7 @@ class RapidApiFunctions {
                   ? '${chamber.toUpperCase()} FLOOR: ${finalFloorActions.first.header}'
                   : '${chamber.toUpperCase()} FLOOR UPDATE';
               final messageBody =
-                  '${chamber.toUpperCase()} FLOOR: ${finalFloorActions.first.actionItem.length > 150 ? finalFloorActions.first.actionItem.replaceRange(150, null, '...') : finalFloorActions.first.actionItem}';
+                  '${chamber.toUpperCase()} Floor: ${finalFloorActions.first.header.isNotEmpty ? '${finalFloorActions.first.header}\n' : ''}${finalFloorActions.first.actionItem.length > 150 ? finalFloorActions.first.actionItem.replaceRange(150, null, '...') : finalFloorActions.first.actionItem}';
 
               List<String> capitolBabbleNotificationsList =
                   List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
