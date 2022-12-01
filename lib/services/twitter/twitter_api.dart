@@ -19,7 +19,7 @@ class TwitterServiceApi {
   static final String capitolBabbleClientId = dotenv.env['CAPITOLBABBLE_TWITTER_CLIENT_ID'];
   static final String capitolBabbleClientSecret = dotenv.env['CAPITOLBABBLE_TWITTER_CLIENT_SECRET'];
 
-  static Future<void> postTweet(String message) async {
+  static Future<void> postTweet(String message, {String assetImageUrl}) async {
     debugPrint('[TWITTER API] BEGINNING TWEET POST PROCESS');
     //! You need to get keys and tokens at https://developer.twitter.com
     final twitter = v2.TwitterApi(
@@ -65,11 +65,31 @@ class TwitterServiceApi {
       // final me = await twitter.users.lookupMe();
       // debugPrint('[TWITTER API] I AM ${me.data.username} [${me.data.name}]');
 
-      //! You can easily post a tweet.
-      await twitter.tweets.createTweet(
-        text: message,
+      //! You can upload media such as image, gif and video.
+      final uploadedMedia = await twitter.media.uploadMedia(
+        file: File.fromUri(Uri.file(assetImageUrl)),
+        altText: 'Uploaded Image',
+
+        //! You can check the upload progress.
+        onProgress: (event) {
+          switch (event.state) {
+            case v2.UploadState.preparing:
+              logger.d('Upload is preparing...');
+              break;
+            case v2.UploadState.inProgress:
+              logger.d('${event.progress}% completed...');
+              break;
+            case v2.UploadState.completed:
+              logger.d('Upload has completed!');
+              break;
+          }
+        },
+        onFailed: (error) => logger.d('Upload failed due to "${error.message}"'),
       );
 
+      //! You can easily post a tweet.
+      await twitter.tweets
+          .createTweet(text: message, media: v2.TweetMediaParam(mediaIds: [uploadedMedia.data.id]));
     } on TimeoutException catch (e) {
       logger.d(e);
     } on v2.UnauthorizedException catch (e) {
