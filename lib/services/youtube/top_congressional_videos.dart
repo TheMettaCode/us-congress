@@ -228,8 +228,8 @@ class YouTubeVideosApi {
                   'Congressional Videos',
                   'New congressional videos',
                   'New videos',
-                  '📺 ${newVideos.first.channel}',
                   newVideos.first.title,
+                  '',
                   'videos');
             } else if (ModalRoute.of(context).isCurrent) {
               Messages.showMessage(
@@ -809,7 +809,7 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                     dense: true,
                     title: Text(
                       videoMetaData == null || videoMetaData.title.isEmpty
-                          ? 'RECENT VIDEO NEWS LOADING. PLEASE STAND BY...'
+                          ? 'YOUR VIDEO IS LOADING.\nPLEASE STAND BY...'
                           : videoMetaData.title
                               .replaceAll('&amp;', '&')
                               .replaceAll("&quot;", "\"")

@@ -81,9 +81,10 @@ class RapidApiFunctions {
         if (newsArticles.isNotEmpty) {
           List<NewsArticle> allArticles = newsArticles;
 
+          /// CONVERT ALL DATE FIELDS TO STANDARD DATETIME FORMAT
           finalNewsArticlesList = await processNewsArticleDates(allArticles);
 
-          /// IDENTIFY ALL NEWLY ADDED VIDEOS
+          /// IDENTIFY ALL NEWLY ADDED ARTICLES
           List<NewsArticle> newlyAddedArticles = [];
           for (NewsArticle article in finalNewsArticlesList) {
             if (!currentNewsArticlesList.map((e) => e.title).contains(article.title)) {
@@ -171,19 +172,15 @@ class RapidApiFunctions {
                   removeCurrent: false);
             }
           }
-          // if (currentNewsArticlesList.isEmpty) {
-          //   currentNewsArticlesList = finalNewsArticlesList;
-          // }
         } else {
           debugPrint('[NEWS ARTICLES API] NO NEW VIDEOS RETRIEVED.');
           return currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
         }
-        // userDatabase.put('newNewsArticles', false);
         userDatabase.put('lastNewsArticlesRefresh', '${DateTime.now()}');
         return finalNewsArticlesList;
       } else {
-        logger.w(
-            '[NEWS ARTICLES API] API ERROR: LOADING ARTICLES FROM DBASE: ${response.statusCode} *****');
+        logger
+            .w('[NEWS ARTICLES API] API ERROR: RETRIEVING ARTICLES: ${response.statusCode} *****');
         userDatabase.put('newNewsArticles', false);
         return currentNewsArticlesList.isNotEmpty ? currentNewsArticlesList : [];
       }
@@ -289,7 +286,7 @@ class RapidApiFunctions {
                   ? '${chamber.toUpperCase()} FLOOR: ${finalFloorActions.first.header}'
                   : '${chamber.toUpperCase()} FLOOR UPDATE';
               final messageBody =
-                  '${chamber.toUpperCase()} Floor: ${finalFloorActions.first.header.isNotEmpty ? '${finalFloorActions.first.header}\n' : ''}${finalFloorActions.first.actionItem.length > 150 ? finalFloorActions.first.actionItem.replaceRange(150, null, '...') : finalFloorActions.first.actionItem}';
+                  '${chamber.toUpperCase()} Floor: ${finalFloorActions.first.header.isNotEmpty && finalFloorActions.first.header != '--' ? '${finalFloorActions.first.header}\n' : ''}${finalFloorActions.first.actionItem.length > 150 ? finalFloorActions.first.actionItem.replaceRange(150, null, '...') : finalFloorActions.first.actionItem}';
 
               List<String> capitolBabbleNotificationsList =
                   List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
@@ -319,7 +316,7 @@ class RapidApiFunctions {
                 'Floor Actions from the ${chamber[0].toUpperCase() + chamber.substring(1)} of Representatives.',
                 '${chamber[0].toUpperCase() + chamber.substring(1)} Floor',
                 '${chamber[0].toUpperCase() + chamber.substring(1)} Floor Action',
-                finalFloorActions.first.actionItem,
+                '${finalFloorActions.first.header.isNotEmpty && finalFloorActions.first.header != '--' ? '${finalFloorActions.first.header}\n' : ''}${finalFloorActions.first.actionItem}',
                 'floor_actions');
           } else if (ModalRoute.of(context).isCurrent) {
             Messages.showMessage(

@@ -379,7 +379,7 @@ Map<String, dynamic> initialUserData = {
   "subscriptionAlertsListBackup": [],
   "lobbyingAlerts": false,
   "lobbyingEventsList": {},
-  "lastLobby": "",
+  // "lastLobby": "",
   "lastLobbyingRefresh": "${DateTime.now()}",
   "newLobbies": false,
   "privateFundedTripsAlerts": false,

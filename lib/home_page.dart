@@ -2660,7 +2660,7 @@ class HomePageState extends State<HomePage> {
                                             children: [
                                               SizedBox(
                                                 width: MediaQuery.of(context).size.width,
-                                                child: Row(
+                                                child: Wrap(
                                                   children: [
                                                     Text(
                                                       currentHouseFloorActions[index].header == '--'
@@ -2681,7 +2681,7 @@ class HomePageState extends State<HomePage> {
                                                         color: Colors.grey,
                                                       ),
                                                     ),
-                                                    const Spacer(),
+                                                    // const Spacer(),
                                                   ],
                                                 ),
                                               ),

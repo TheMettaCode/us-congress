@@ -1197,7 +1197,8 @@ class Functions {
             (finalStatementsList.map((e) => e.memberId)).toList().asMap(), 'member_',
             userIsDev: userIsDev);
 
-        if (!newUser && (userDatabase.get('statementAlerts') || memberWatched) &&
+        if (!newUser &&
+            (userDatabase.get('statementAlerts') || memberWatched) &&
             (currentStatementsList.first.title.toLowerCase() !=
                     statements.results.first.title.toLowerCase() ||
                 userDatabase.get('lastStatement').toString().toLowerCase() !=
@@ -1340,13 +1341,12 @@ class Functions {
             ((finalUpdatedBillsList.map((e) => e.billId).toList()).asMap()), 'bill_',
             userIsDev: userIsDev);
 
-        if (
-            !newUser &&
+        if (!newUser &&
             (userDatabase.get('billAlerts') || billWatched) &&
-                (currentUpdatedBillsList.first.billId.toLowerCase() !=
-                        finalUpdatedBillsList.first.billId.toLowerCase() ||
-                    userDatabase.get('lastBill').toString().toLowerCase() !=
-                        finalUpdatedBillsList.first.billId.toLowerCase())) {
+            (currentUpdatedBillsList.first.billId.toLowerCase() !=
+                    finalUpdatedBillsList.first.billId.toLowerCase() ||
+                userDatabase.get('lastBill').toString().toLowerCase() !=
+                    finalUpdatedBillsList.first.billId.toLowerCase())) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 4,
@@ -1464,13 +1464,12 @@ class Functions {
             'CURRENT 1ST VOTE ROLL CALL: ${currentVotesList.first.rollCall} - FINAL 1ST VOTE ROLL CALL: ${finalVotesList.first.rollCall}');
 
         /// SEND NOTIFICATIONS IF SUBSCRIBED TO VOTE ALERTS
-        if (
-            !newUser &&
+        if (!newUser &&
             (userDatabase.get('voteAlerts') || billWatched) &&
-                (currentVotesList.first.rollCall.toString() !=
-                        finalVotesList.first.rollCall.toString() ||
-                    userDatabase.get('lastVote').toString() !=
-                        finalVotesList.first.rollCall.toString())) {
+            (currentVotesList.first.rollCall.toString() !=
+                    finalVotesList.first.rollCall.toString() ||
+                userDatabase.get('lastVote').toString() !=
+                    finalVotesList.first.rollCall.toString())) {
           if (context == null || !ModalRoute.of(context).isCurrent) {
             await NotificationApi.showBigTextNotification(
                 5,
@@ -1625,7 +1624,7 @@ class Functions {
           .first
           .lobbyingRepresentations;
     } catch (e) {
-      logger.d('***** CURRENT Lobbying Actions ERROR: $e - Resetting... *****');
+      logger.d('[LOBBYING API] CURRENT Lobbying Actions ERROR: $e - Resetting... *****');
       userDatabase.put('lobbyingEventsList', {});
       currentLobbyingEventsList = [];
     }
@@ -1635,36 +1634,54 @@ class Functions {
     if (currentLobbyingEventsList.isEmpty ||
         DateTime.parse(userDatabase.get('lastLobbyingRefresh'))
             .isBefore(DateTime.now().subtract(const Duration(hours: 4)))) {
-      logger.d('***** Retrieving Lobbying Events... *****');
+      logger.d('[LOBBYING API] Retrieving Lobbying Events... *****');
 
       final authority = PropublicaApi().authority;
       final url = PropublicaApi().latestLobbyingApi;
       final headers = PropublicaApi().apiHeaders;
 
       final response = await http.get(Uri.https(authority, url), headers: headers);
-      logger.d('***** LOBBY API RESPONSE CODE: ${response.statusCode} *****');
+      logger.d('[LOBBYING API] RESPONSE CODE: ${response.statusCode} *****');
 
       if (response.statusCode == 200) {
-        logger.d('***** LOBBY RETRIEVAL SUCCESS! *****');
+        logger.d('[LOBBYING API] LOBBY RETRIEVAL SUCCESS! *****');
         LobbyEvent lobbyEvent = lobbyEventFromJson(response.body);
+
+        try {
+          logger.i('[LOBBYING API] SAVING NEW LOBBIES TO DBASE *****');
+          userDatabase.put('lobbyingEventsList', lobbyEventToJson(lobbyEvent));
+        } catch (e) {
+          logger.w('[LOBBYING API] ERROR SAVING LOBBY LIST TO DBASE (FUNCTION): $e ^^^^^');
+          userDatabase.put('lobbyingEventsList', {});
+        }
 
         if (lobbyEvent.status == 'OK' &&
             lobbyEvent.results.first.lobbyingRepresentations.isNotEmpty) {
           finalLobbyingEventsList = lobbyEvent.results.first.lobbyingRepresentations;
 
           finalLobbyingEventsList.removeWhere((element) =>
+              element.specificIssues == null ||
               element.specificIssues.isEmpty ||
               element.specificIssues.first.toLowerCase() == 'none');
 
-          if (currentLobbyingEventsList.isEmpty ||
-              finalLobbyingEventsList.first.id != currentLobbyingEventsList.first.id) {
-            userDatabase.put('newLobbies', true);
+          /// IDENTIFY ALL NEWLY ADDED LOBBIES
+          List<LobbyingRepresentation> newLobbies = [];
+          for (LobbyingRepresentation event in finalLobbyingEventsList) {
+            if (!currentLobbyingEventsList.map((e) => e.id).contains(event.id)) {
+              newLobbies.add(event);
+            }
+          }
 
-            if (userIsDev) {
+          if (newLobbies.isNotEmpty) {
+            userDatabase.put('newLobbies', true);
+            debugPrint('[LOBBYING API] ${newLobbies.length} NEW LOBBYING EVENTS RETRIEVED.');
+
+            if (userIsDev && newLobbies.isNotEmpty) {
+              final LobbyingRepresentation thisLobbyingEvent = newLobbies.first;
               final subject =
-                  'NEW LOBBYING FILED ON BEHALF OF ${finalLobbyingEventsList.first.lobbyingClient.name}';
+                  'NEW LOBBYING FILED ON BEHALF OF ${thisLobbyingEvent.lobbyingClient.name}';
               final messageBody =
-                  '${finalLobbyingEventsList.first.lobbyingClient.name} is lobbying congress ➭ ${finalLobbyingEventsList.first.specificIssues.first.length > 150 ? finalLobbyingEventsList.first.specificIssues.first.replaceRange(150, null, '...') : finalLobbyingEventsList.first.specificIssues.first}';
+                  '${thisLobbyingEvent.lobbyingClient.name} is lobbying congress ➭ ${thisLobbyingEvent.specificIssues.first.length > 150 ? thisLobbyingEvent.specificIssues.first.replaceRange(150, null, '...') : thisLobbyingEvent.specificIssues.first}';
 
               List<String> capitolBabbleNotificationsList =
                   List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
@@ -1672,73 +1689,58 @@ class Functions {
                   .add('${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular');
               userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
             }
-          }
 
-          if (currentLobbyingEventsList.isEmpty) {
-            currentLobbyingEventsList = finalLobbyingEventsList;
-          }
+            bool lobbyWatched = await hasSubscription(userIsPremium, userIsLegacy,
+                (newLobbies.map((e) => e.id)).toList().asMap(), 'lobby_',
+                userIsDev: userIsDev);
 
-          try {
-            logger.i('***** SAVING NEW LOBBIES TO DBASE *****');
-            userDatabase.put('lobbyingEventsList', lobbyEventToJson(lobbyEvent));
-          } catch (e) {
-            logger.w('^^^^^ ERROR SAVING LOBBY LIST TO DBASE (FUNCTION): $e ^^^^^');
-            userDatabase.put('lobbyingEventsList', {});
+            if ((userIsPremium || userIsLegacy) &&
+                (userDatabase.get('lobbyingAlerts') || lobbyWatched)) {
+              if (context == null || !ModalRoute.of(context).isCurrent) {
+                await NotificationApi.showBigTextNotification(
+                    6,
+                    'lobbying',
+                    'Lobbying Activity',
+                    'Congressional Lobbying Activities',
+                    'Lobbying Activity',
+                    '${newLobbies.first.lobbyingClient.name} is lobbying Congress',
+                    newLobbies.first.specificIssues.first,
+                    'lobbying');
+              } else if (ModalRoute.of(context).isCurrent) {
+                Messages.showMessage(
+                    context: context,
+                    message: lobbyWatched
+                        ? 'A lobbying event you\'re watching has been updated'
+                        : 'New lobbying events listed',
+                    assetImageString: 'assets/lobbying${random.nextInt(2)}.png',
+                    isAlert: false,
+                    removeCurrent: false);
+              }
+            }
+          } else {
+            debugPrint('[LOBBYING API] NO NEW LOBBYING EVENTS RETRIEVED.');
+            return currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
           }
+          userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
+          return finalLobbyingEventsList;
+        } else {
+          logger.w(
+              '[LOBBYING API] API ERROR: RETRIEVING LOBBYING EVENTS: ${lobbyEvent.status} *****');
+          userDatabase.put('newLobbies', false);
+          return currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
         }
-
-        bool lobbyWatched = await hasSubscription(userIsPremium, userIsLegacy,
-            (finalLobbyingEventsList.map((e) => e.id)).toList().asMap(), 'lobby_',
-            userIsDev: userIsDev);
-
-        if ((userIsPremium || userIsLegacy) &&
-            (userDatabase.get('lobbyingAlerts') ||
-                (lobbyWatched &&
-
-                    /// THIS COMPARISON CHECK IS SKETCHY
-                    !currentLobbyingEventsList.map((e) => e.id).any((element) =>
-                        finalLobbyingEventsList.map((e) => e.id).contains(element)))) &&
-            (currentLobbyingEventsList.first.id.toLowerCase() !=
-                    finalLobbyingEventsList.first.id.toLowerCase() ||
-                userDatabase.get('lastLobby').toString().toLowerCase() !=
-                    finalLobbyingEventsList.first.id.toLowerCase())) {
-          if (context == null || !ModalRoute.of(context).isCurrent) {
-            await NotificationApi.showBigTextNotification(
-                6,
-                'lobbying',
-                'Lobbying Activity',
-                'Congressional Lobbying Activities',
-                'Lobbying Activity',
-                '${finalLobbyingEventsList.first.lobbyingClient.name} is lobbying Congress',
-                finalLobbyingEventsList.first.specificIssues.first,
-                'lobbying');
-          } else if (ModalRoute.of(context).isCurrent) {
-            Messages.showMessage(
-              context: context,
-              message: lobbyWatched
-                  ? 'A lobbying event you\'re watching has been updated'
-                  : 'New lobbying events listed',
-              assetImageString: 'assets/lobbying${random.nextInt(2)}.png',
-              isAlert: false,
-              removeCurrent: false,
-            );
-          }
-        }
-        userDatabase.put('lastLobby', finalLobbyingEventsList.first.id.toLowerCase());
-        userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
-        return finalLobbyingEventsList;
       } else {
-        logger.w('***** API ERROR: LOADING LOBBIES FROM DBASE: ${response.statusCode} *****');
-
-        return finalLobbyingEventsList =
-            currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
+        logger.w(
+            '[LOBBYING API] API ERROR: RETRIEVING LOBBYING EVENTS: ${response.statusCode} *****');
+        return currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
       }
     } else {
-      logger.d('***** CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
+      logger.d(
+          '[LOBBYING API] CURRENT LOBBY LIST: ${currentLobbyingEventsList.map((e) => e.id)} *****');
       finalLobbyingEventsList = currentLobbyingEventsList;
-      logger.d('***** LOBBIES NOT UPDATED: LIST IS CURRENT *****');
-      // userDatabase.put('lastLobbyingRefresh', '${DateTime.now()}');
-      return finalLobbyingEventsList;
+      logger.d('[LOBBYING API] LOBBIES NOT UPDATED: LIST IS CURRENT *****');
+      userDatabase.put('newLobbies', false);
+      return currentLobbyingEventsList.isNotEmpty ? currentLobbyingEventsList : [];
     }
   }
 

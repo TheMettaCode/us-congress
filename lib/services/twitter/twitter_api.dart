@@ -65,31 +65,38 @@ class TwitterServiceApi {
       // final me = await twitter.users.lookupMe();
       // debugPrint('[TWITTER API] I AM ${me.data.username} [${me.data.name}]');
 
-      //! You can upload media such as image, gif and video.
-      final uploadedMedia = await twitter.media.uploadMedia(
-        file: File.fromUri(Uri.file(assetImageUrl)),
-        altText: 'Uploaded Image',
+      if (assetImageUrl != null) {
+        //! You can upload media such as image, gif and video.
+        final uploadedMedia = await twitter.media.uploadMedia(
+          file: File.fromUri(Uri.file(assetImageUrl)),
+          altText: 'Uploaded Image',
 
-        //! You can check the upload progress.
-        onProgress: (event) {
-          switch (event.state) {
-            case v2.UploadState.preparing:
-              logger.d('Upload is preparing...');
-              break;
-            case v2.UploadState.inProgress:
-              logger.d('${event.progress}% completed...');
-              break;
-            case v2.UploadState.completed:
-              logger.d('Upload has completed!');
-              break;
-          }
-        },
-        onFailed: (error) => logger.d('Upload failed due to "${error.message}"'),
-      );
+          //! You can check the upload progress.
+          onProgress: (event) {
+            switch (event.state) {
+              case v2.UploadState.preparing:
+                logger.d('Upload is preparing...');
+                break;
+              case v2.UploadState.inProgress:
+                logger.d('${event.progress}% completed...');
+                break;
+              case v2.UploadState.completed:
+                logger.d('Upload has completed!');
+                break;
+            }
+          },
+          onFailed: (error) => logger.d('Upload failed due to "${error.message}"'),
+        );
 
-      //! You can easily post a tweet.
-      await twitter.tweets
-          .createTweet(text: message, media: v2.TweetMediaParam(mediaIds: [uploadedMedia.data.id]));
+        //! You can easily post a tweet with uploaded media.
+        await twitter.tweets.createTweet(
+            text: message, media: v2.TweetMediaParam(mediaIds: [uploadedMedia.data.id]));
+      } else {
+        //! You can easily post a tweet.
+        await twitter.tweets.createTweet(
+          text: message,
+        );
+      }
     } on TimeoutException catch (e) {
       logger.d(e);
     } on v2.UnauthorizedException catch (e) {

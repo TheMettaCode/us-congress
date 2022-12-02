@@ -5181,8 +5181,8 @@ class SharedWidgets {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(headerText,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            // maxLines: 1,
+            // overflow: TextOverflow.ellipsis,
             style: Styles.regularStyle.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.bold,
