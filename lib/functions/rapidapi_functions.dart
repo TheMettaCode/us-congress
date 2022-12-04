@@ -261,9 +261,16 @@ class RapidApiFunctions {
         }
 
         if (congressFloorActions.actionsList.isNotEmpty) {
-          finalFloorActions = congressFloorActions.actionsList;
-          floorActionsEqual = listEquals<String>(finalFloorActions.map((e) => e.header).toList(),
+          floorActionsEqual = listEquals<String>(
+              congressFloorActions.actionsList.map((e) => e.header).toList(),
               currentFloorActions.map((e) => e.header).toList());
+
+          if (chamber == 'senate') {
+            finalFloorActions = congressFloorActions.actionsList.reversed.toList();
+          } else {
+            finalFloorActions = congressFloorActions.actionsList;
+          }
+
           logger.d(
               '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS EQUAL: $floorActionsEqual\n${currentFloorActions.length} CURRENT\n${finalFloorActions.length} NEW');
 
@@ -282,6 +289,7 @@ class RapidApiFunctions {
             userDatabase.put(keyString, true);
 
             if (userIsDev) {
+              // List<ActionsList> finalListReversed = finalFloorActions.reversed.toList();
               final subject = finalFloorActions.first.header.isNotEmpty
                   ? '${chamber.toUpperCase()} FLOOR: ${finalFloorActions.first.header}'
                   : '${chamber.toUpperCase()} FLOOR UPDATE';
@@ -296,9 +304,9 @@ class RapidApiFunctions {
             }
           }
 
-          if (currentFloorActions.isEmpty) {
-            currentFloorActions = finalFloorActions;
-          }
+          // if (currentFloorActions.isEmpty) {
+          //   currentFloorActions = finalFloorActions;
+          // }
         }
 
         // bool billWatched = await Functions.hasSubscription(
@@ -334,7 +342,7 @@ class RapidApiFunctions {
         userDatabase.put('last${chamber[0].toUpperCase() + chamber.substring(1)}FloorRefresh',
             '${DateTime.now()}');
 
-        return chamber == 'senate' ? finalFloorActions.reversed.toList() : finalFloorActions;
+        return /* chamber == 'senate' ? finalFloorActions.reversed.toList() : */ finalFloorActions;
       } else {
         logger.d(
             '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS FROM DBASE: ${response.statusCode} *****');
@@ -348,10 +356,15 @@ class RapidApiFunctions {
     } else {
       logger.d(
           '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS LIST: ${currentFloorActions.map((e) => e.actionItem)} *****');
-      finalFloorActions = currentFloorActions;
+      // finalFloorActions = currentFloorActions;
       logger.d(
           '[NEW FLOOR ACTION FUNCTION] ${chamber.toUpperCase()} FLOOR ACTIONS NOT UPDATED: LIST IS CURRENT *****');
-      return chamber == 'senate' ? finalFloorActions.reversed.toList() : finalFloorActions;
+      // return chamber == 'senate' ? finalFloorActions.reversed.toList() : finalFloorActions;
+      return chamber == 'house' && currentFloorActions.isNotEmpty
+          ? currentFloorActions
+          : chamber == 'senate' && currentFloorActions.isNotEmpty
+              ? currentFloorActions.reversed.toList()
+              : [];
     }
   }
 

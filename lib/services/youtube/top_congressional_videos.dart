@@ -227,14 +227,14 @@ class YouTubeVideosApi {
                   'videos',
                   'Congressional Videos',
                   'New congressional videos',
-                  'New videos',
+                  'New video',
+                  'From ${newVideos.first.channel}',
                   newVideos.first.title,
-                  '',
                   'videos');
             } else if (ModalRoute.of(context).isCurrent) {
               Messages.showMessage(
                 context: context,
-                message: 'New videos added',
+                message: 'New video added',
                 networkImageUrl: newVideos.first.thumbnail,
                 isAlert: false,
                 removeCurrent: false,
@@ -390,7 +390,9 @@ class YouTubeVideosApi {
                             )),
                         CircleAvatar(
                             radius: 20,
-                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                            backgroundColor: isCapitolBabble
+                                ? capitolBabbleDark.withOpacity(0.5)
+                                : Theme.of(context).colorScheme.primary.withOpacity(0.5),
                             child: Icon(Icons.play_arrow,
                                 size: 30, color: darkThemeTextColor.withOpacity(0.75))),
                       ],
@@ -736,7 +738,7 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
           ? capitolBabbleDark
           : darkTheme
               ? Theme.of(context).primaryColorDark
-              : null;
+              : Theme.of(context).primaryColorDark.withOpacity(0.25);
     });
   }
 
@@ -816,11 +818,10 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                               .replaceAll("&#39;", "'"),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: Styles.googleStyle
-                          .copyWith(color: isCapitolBabble ? darkThemeTextColor : null),
+                      style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
                     ),
                     trailing: IconButton(
-                        icon: Icon(Icons.close, color: isCapitolBabble ? darkThemeTextColor : null),
+                        icon: const Icon(Icons.close, color: darkThemeTextColor),
                         onPressed: () => Navigator.pop(context)),
                   ),
                 ),
@@ -877,7 +878,7 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                             // _space,
                             // _text('Title', videoMetaData.title),
                             _space,
-                            _text('Channel', videoMetaData.author, darkTheme),
+                            _text('Channel', videoMetaData.author),
                             // _space,
                             // _text('Video Id', videoMetaData.videoId),
                             // _space,
@@ -926,7 +927,12 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.skip_previous),
+                                  icon: Icon(
+                                    Icons.skip_previous,
+                                    color: ids.indexOf(controller.metadata.videoId) > 0
+                                        ? darkThemeTextColor
+                                        : null,
+                                  ),
                                   onPressed:
                                       isPlayerReady && ids.indexOf(controller.metadata.videoId) > 0
                                           ? () => controller.load(ids[
@@ -937,6 +943,7 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                 IconButton(
                                   icon: Icon(
                                     controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                                    color: darkThemeTextColor,
                                   ),
                                   onPressed: isPlayerReady
                                       ? () {
@@ -948,7 +955,10 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                       : null,
                                 ),
                                 IconButton(
-                                  icon: Icon(muted ? Icons.volume_off : Icons.volume_up),
+                                  icon: Icon(
+                                    muted ? Icons.volume_off : Icons.volume_up,
+                                    color: darkThemeTextColor,
+                                  ),
                                   onPressed: isPlayerReady
                                       ? () {
                                           muted ? controller.unMute() : controller.mute();
@@ -960,10 +970,13 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                 ),
                                 FullScreenButton(
                                   controller: controller,
-                                  color: darkTheme ? darkThemeTextColor : Colors.black,
+                                  color: darkThemeTextColor,
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.skip_next),
+                                  icon: const Icon(
+                                    Icons.skip_next,
+                                    color: darkThemeTextColor,
+                                  ),
                                   onPressed: isPlayerReady &&
                                           ids.indexOf(controller.metadata.videoId) < ids.length
                                       ? () => controller.load(ids[
@@ -976,13 +989,16 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                             _space,
                             Row(
                               children: <Widget>[
-                                const Text(
+                                Text(
                                   "Volume",
-                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                  style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
+                                  // style: TextStyle(fontWeight: FontWeight.w300),
                                 ),
                                 Expanded(
                                   child: Slider(
                                     inactiveColor: Colors.transparent,
+                                    activeColor: darkThemeTextColor,
+                                    thumbColor: darkThemeTextColor,
                                     value: volume,
                                     min: 0.0,
                                     max: 100.0,
@@ -1029,21 +1045,23 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
           );
   }
 
-  Widget _text(String title, String value, bool darkTheme) {
+  Widget _text(String title, String value) {
     return RichText(
       text: TextSpan(
-        text: '$title : ',
-        style: TextStyle(
-          color: darkTheme ? darkThemeTextColor : Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
+        text: '', // '''$title : ',
+        style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
+        // style: const TextStyle(
+        //   color: darkThemeTextColor ,
+        //   fontWeight: FontWeight.bold,
+        // ),
         children: [
           TextSpan(
             text: value,
-            style: TextStyle(
-              color: darkTheme ? darkThemeTextColor : Colors.black,
-              fontWeight: FontWeight.w300,
-            ),
+            style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
+            // style: const TextStyle(
+            //   color: darkThemeTextColor,
+            //   fontWeight: FontWeight.w300,
+            // ),
           ),
         ],
       ),
