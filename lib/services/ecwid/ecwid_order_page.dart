@@ -1,18 +1,17 @@
-import 'dart:io';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/styles.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/order_detail.dart';
-import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
-import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/styles.dart';
+import 'package:congress_watcher/constants/themes.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/models/order_detail.dart';
+import 'package:congress_watcher/services/ecwid/ecwid_store_model.dart';
+import 'package:congress_watcher/services/emailjs/emailjs_api.dart';
+
+import '../../app_user/user_profile.dart';
 
 class EcwidOrderPage extends StatefulWidget {
   const EcwidOrderPage(
@@ -32,8 +31,6 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        if (Platform.isAndroid) WebView.platform = AndroidWebView();
-
         await init();
       },
     );
@@ -101,7 +98,7 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
       orderIdExtended =
           'EPO${random.nextInt(999999)}-${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}-${initialUserId.split('<|:|>')[1]}';
       currentUserAddress =
-          Map<String, dynamic>.from(userDatabase.get('currentAddress'));
+          UserAddress.fromJson(userDatabase.get('currentLocation'));
     });
   }
 
@@ -163,7 +160,7 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
 
   String initialUserId = '';
   String lastUserId = '';
-  Map<String, dynamic> currentUserAddress = {};
+  UserAddress currentUserAddress;
   int credits = 0;
   int permCredits = 0;
   int purchCredits = 0;
@@ -229,7 +226,7 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
             ),
             body: _loading || product == null
                 ? AnimatedWidgets.circularProgressWatchtower(
-                    context, userDatabase, userIsPremium,
+                    context, userDatabase,
                     isFullScreen: true)
                 : SafeArea(
                     child: Container(
@@ -585,7 +582,13 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                               backgroundColor: MaterialStateProperty.all<Color>(
                                   Colors.transparent)),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('Maybe Later'),
+                          child: Text(
+                            'Maybe Later',
+                            style: TextStyle(
+                                color: userDatabase.get('darkTheme')
+                                    ? null
+                                    : Theme.of(context).primaryColorDark),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -765,8 +768,7 @@ class EcwidOrderPageState extends State<EcwidOrderPage> {
                                               : userIsLegacy
                                                   ? 'Legacy'
                                                   : 'Free',
-                                      appUserLocation: currentUserAddress.values
-                                          .toList()
+                                      appUserLocation: currentUserAddress
                                           .toString()
                                           .toUpperCase(),
                                     );

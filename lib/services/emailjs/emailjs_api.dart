@@ -3,15 +3,24 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/services/twitter/twitter_api.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/services/twitter/twitter_api.dart';
 
 class EmailjsApi {
+  static final Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+  static final bool stripeTestMode = userDatabase.get('stripeTestMode');
+  static final bool googleTestMode = userDatabase.get('googleTestMode');
+  static final bool amazonTestMode = userDatabase.get('amazonTestMode');
+  static final bool testing = userDatabase.get('stripeTestMode') ||
+      userDatabase.get('googleTestMode') ||
+      userDatabase.get('amazonTestMode');
+
   /// SEND USER COMMENT EMAIL
-  static Future<void> sendCommentEmail(String subject, String message, String toEmail,
+  static Future<void> sendCommentEmail(
+      String subject, String message, String toEmail,
       {String fromEmail = 'themettaman@gmail.com',
-      String fromName = 'US Congress App (User Comment Email)',
+      String fromName = '$appTitle App (User Comment Email)',
       String toName = 'MettaCode Dev',
       String additionalData1 = 'No Additional Data',
       String additionalData2 = 'No Additional Data',
@@ -56,7 +65,7 @@ class EmailjsApi {
   /// SEND CAPITOL BABBLE TWEET EMAIL
   static Future<void> sendCapitolBabbleSocialEmail(
       {String messageBody = '', String subject = ''}) async {
-    Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+    // Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     List<bool> userLevels = await Functions.getUserLevels();
     bool userIsDev = userLevels[0];
     // bool userIsPremium = userLevels[1];
@@ -65,24 +74,27 @@ class EmailjsApi {
     List<String> capitolBabbleNotificationsList =
         List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
 
-    if (userIsDev &&
+    if (!testing &&
+        userIsDev &&
         capitolBabbleNotificationsList.isNotEmpty &&
         ((isPeakCapitolBabblePostHours &&
                 DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
-                    DateTime.now().subtract(const Duration(minutes: capitolBabbleDelayMinutes)))) ||
-            (capitolBabbleNotificationsList
-                    .any((element) => element.split('<|:|>')[3].toLowerCase() == 'high') &&
-                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
-                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
-            (capitolBabbleNotificationsList
-                    .any((element) => element.split('<|:|>')[3].toLowerCase() == 'medium') &&
-                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(DateTime.now()
-                    .subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
+                    DateTime.now().subtract(
+                        const Duration(minutes: capitolBabbleDelayMinutes)))) ||
+            (capitolBabbleNotificationsList.any((element) => element.split('<|:|>')[3].toLowerCase() == 'high') &&
+                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
+                    DateTime.now().subtract(const Duration(
+                        minutes: capitolBabbleDelayMinutes ~/ 4)))) ||
+            (capitolBabbleNotificationsList.any((element) =>
+                    element.split('<|:|>')[3].toLowerCase() == 'medium') &&
+                DateTime.parse(userDatabase.get('lastCapitolBabble')).isBefore(
+                    DateTime.now().subtract(const Duration(minutes: capitolBabbleDelayMinutes ~/ 2)))))) {
       capitolBabbleNotificationsList
           .sort((a, b) => a.split('<|:|>')[3].compareTo(b.split('<|:|>')[3]));
 
       if (capitolBabbleNotificationsList.length > 20) {
-        capitolBabbleNotificationsList.removeRange(20, capitolBabbleNotificationsList.length);
+        capitolBabbleNotificationsList.removeRange(
+            20, capitolBabbleNotificationsList.length);
       }
 
       final serviceId = dotenv.env['CBSERVICEID'];
@@ -100,8 +112,9 @@ class EmailjsApi {
         localNextBabbleUrl = localNextBabble.split('<|:|>')[4];
       }
 
-      String localRawMessage =
-          subject.isNotEmpty && messageBody.isNotEmpty ? messageBody : localNextBabbleBody;
+      String localRawMessage = subject.isNotEmpty && messageBody.isNotEmpty
+          ? messageBody
+          : localNextBabbleBody;
       debugPrint('SENDING EMAIL TO CAPITOL BABBLE SOCIALS: $localRawMessage');
 
       String localFinalMessage = '';
@@ -138,7 +151,8 @@ class EmailjsApi {
 
         if (response.statusCode == 200) {
           capitolBabbleNotificationsList.removeAt(0);
-          userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
+          userDatabase.put(
+              'capitolBabbleNotificationsList', capitolBabbleNotificationsList);
           userDatabase.put('lastCapitolBabble', '${DateTime.now()}');
         }
       } catch (error) {
@@ -153,7 +167,7 @@ class EmailjsApi {
   /// SEND FREE TRIAL STARTED EMAIL
   static Future<void> sendFreeTrialEmail(String subject, String message,
       {String fromEmail = 'themettaman@gmail.com',
-      String fromName = 'US Congress App (Free Trial Notification)',
+      String fromName = '$appTitle App (Free Trial Notification)',
       String toEmail = 'mettacode@gmail.com',
       String toName = 'MettaCode Dev',
       String additionalData1 = 'No Additional Data',
@@ -233,7 +247,7 @@ class EmailjsApi {
           'template_params': {
             'subject': '[PRODUCT ORDER] $subject',
             'message': message,
-            'store_name': 'US Congress App',
+            'store_name': '$appTitle App',
             'store_email': 'mettacode@gmail.com',
             'customer_name': customerName,
             'customer_email': customerEmail,

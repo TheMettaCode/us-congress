@@ -2,9 +2,9 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/styles.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/styles.dart';
+import 'package:congress_watcher/constants/themes.dart';
 
 import '../functions/functions.dart';
 import '../services/github/usc_app_data_model.dart';
@@ -18,7 +18,7 @@ class AnimatedWidgets {
     bool infinite = true,
     double size = 20,
     double spins = 1,
-    Color color = const Color.fromARGB(255, 51, 255, 0),
+    Color color = const Color(0xffffaa00),
     Color disabledColor = Colors.grey,
     bool reverseContrast = false,
     bool sameColorBright = false,
@@ -36,7 +36,8 @@ class AnimatedWidgets {
                   // delay: Duration(milliseconds: 1000),
                   duration: const Duration(milliseconds: 5000),
                   // spins: spins,
-                  child: Icon(Icons.auto_awesome_outlined, size: size / 1.5, color: Colors.white),
+                  child: Icon(Icons.auto_awesome_outlined,
+                      size: size / 1.5, color: Colors.white),
                 ),
               ),
               ZoomIn(
@@ -52,10 +53,10 @@ class AnimatedWidgets {
                         color: sameColorBright
                             ? color
                             : sameColorDark
-                                ? alertIndicatorColorDarkGreen
+                                ? altHighlightColor
                                 : reverseContrast
                                     ? userDatabase.get('darkTheme')
-                                        ? alertIndicatorColorDarkGreen
+                                        ? altHighlightColor
                                         : color
                                     : color),
                   ))
@@ -73,7 +74,7 @@ class AnimatedWidgets {
     bool animate = true,
     bool infinite = true,
     double size = 20,
-    Color color = const Color.fromRGBO(255, 170, 0, 1),
+    Color color = const Color(0xffffaa00),
     Color disabledColor = Colors.grey,
   }) {
     return isActiveWhen
@@ -96,11 +97,12 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget flashingEye(BuildContext context, bool isActiveWhen, bool visibleWhenOff,
+  static Widget flashingEye(
+      BuildContext context, bool isActiveWhen, bool visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 15,
-      Color color = const Color.fromARGB(255, 51, 255, 0),
+      Color color = const Color(0xffffaa00),
       Color disabledColor = Colors.grey,
       bool reverseContrast = false,
       bool sameColorBright = false,
@@ -116,16 +118,14 @@ class AnimatedWidgets {
             child: FaIcon(FontAwesomeIcons.solidEye,
                 size: size,
                 color: sameColorBright
-                    ? color
+                    ? altHighlightColor
                     : sameColorDark
                         ? alertIndicatorColorDarkGreen
                         : reverseContrast
                             ? userDatabase.get('darkTheme')
-                                ? alertIndicatorColorDarkGreen
+                                ? alertIndicatorColorBrightGreen
                                 : color
-                            : userDatabase.get('darkTheme')
-                                ? color
-                                : alertIndicatorColorDarkGreen),
+                            : color),
           )
         : visibleWhenOff
             ? FaIcon(FontAwesomeIcons.solidEye,
@@ -133,8 +133,8 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget flashingText(
-      BuildContext context, String textToFlash, bool isActiveWhen, bool visibleWhenOff,
+  static Widget flashingText(BuildContext context, String textToFlash,
+      bool isActiveWhen, bool visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
@@ -156,7 +156,8 @@ class AnimatedWidgets {
               padding: const EdgeInsets.only(left: 3.0),
               child: Text(textToFlash,
                   style: Styles.googleStyle.copyWith(
-                      shadows: removeShadow ? null : Styles.shadowStrokeTextGrey,
+                      shadows:
+                          removeShadow ? null : Styles.shadowStrokeTextGrey,
                       fontSize: size,
                       color: color)),
             ),
@@ -170,11 +171,12 @@ class AnimatedWidgets {
             : const SizedBox.shrink();
   }
 
-  static Widget spinningLocation(BuildContext context, bool isActive, visibleWhenOff,
+  static Widget spinningLocation(
+      BuildContext context, bool isActive, visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
-      Color color = const Color.fromARGB(255, 51, 255, 0),
+      Color color = const Color(0xffffaa00),
       Color disabledColor = Colors.grey, // Theme.of(context).disabledColor,
       bool reverseContrast = false,
       bool sameColorBright = false,
@@ -192,21 +194,23 @@ class AnimatedWidgets {
                 color: sameColorBright
                     ? color
                     : sameColorDark
-                        ? alertIndicatorColorDarkGreen
+                        ? altHighlightColor
                         : reverseContrast
                             ? userDatabase.get('darkTheme')
-                                ? alertIndicatorColorDarkGreen
+                                ? altHighlightColor
                                 : color
                             : userDatabase.get('darkTheme')
                                 ? color
-                                : alertIndicatorColorDarkGreen),
+                                : altHighlightColor),
           )
         : visibleWhenOff
-            ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
+            ? FaIcon(FontAwesomeIcons.locationCrosshairs,
+                size: size, color: disabledColor)
             : const SizedBox.shrink();
   }
 
-  static Widget flashingInfo(BuildContext context, bool isActive, visibleWhenOff,
+  static Widget flashingInfo(
+      BuildContext context, bool isActive, visibleWhenOff,
       {bool animate = true,
       bool infinite = true,
       double size = 20,
@@ -223,17 +227,20 @@ class AnimatedWidgets {
             infinite: infinite,
             // delay: Duration(milliseconds: 1000),
             duration: const Duration(seconds: 5),
-            child: FaIcon(FontAwesomeIcons.circleInfo, size: size, color: color),
+            child:
+                FaIcon(FontAwesomeIcons.circleInfo, size: size, color: color),
           )
         : visibleWhenOff
-            ? FaIcon(FontAwesomeIcons.locationCrosshairs, size: size, color: disabledColor)
+            ? FaIcon(FontAwesomeIcons.locationCrosshairs,
+                size: size, color: disabledColor)
             : const SizedBox.shrink();
   }
 
   static Widget circularProgressWatchtower(
     BuildContext context,
     Box userDatabase,
-    bool userIsPremium, {
+    // bool userIsPremium,
+    {
     double widthAndHeight = 48,
     double strokeWidth = 5,
     bool isMarket = false,
@@ -277,7 +284,8 @@ class AnimatedWidgets {
                             repeat: ImageRepeat.repeat,
                             // fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
-                                Theme.of(context).colorScheme.background, BlendMode.color)),
+                                Theme.of(context).colorScheme.background,
+                                BlendMode.color)),
                       ),
                     ),
                   ),
@@ -297,12 +305,12 @@ class AnimatedWidgets {
                           CircularProgressIndicator(
                             strokeWidth: strokeWidth,
                             color: isLobby
-                                ? alertIndicatorColorDarkGreen
+                                ? altHighlightColor
                                 : isMarket
                                     ? Colors.white
                                     : republicanColor,
                             backgroundColor: isLobby
-                                ? const Color.fromARGB(255, 51, 255, 0)
+                                ? const Color(0xffffaa00)
                                 : isMarket
                                     ? Colors.transparent
                                     : democratColor,
@@ -316,15 +324,20 @@ class AnimatedWidgets {
                       )),
                 ),
                 isHomePage
-                    ? thisGithubNotification != null && thisGithubNotification.message.isNotEmpty
+                    ? thisGithubNotification != null &&
+                            thisGithubNotification.message.isNotEmpty
                         ? InkWell(
                             onTap: () => thisGithubNotification.url.isEmpty
                                 ? null
-                                : Functions.linkLaunch(context, thisGithubNotification.url,
-                                    userDatabase, userIsPremium),
+                                : Functions.linkLaunch(
+                                    context,
+                                    thisGithubNotification
+                                        .url, /* userDatabase ,userIsPremium*/
+                                  ),
                             child: SlideInUp(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -342,8 +355,8 @@ class AnimatedWidgets {
                                       textAlign: TextAlign.center,
                                       style: Styles.regularStyle.copyWith(
                                           fontSize: 18,
-                                          fontWeight:
-                                              FontWeight.bold /*, color: darkThemeTextColor*/),
+                                          fontWeight: FontWeight
+                                              .bold /*, color: darkThemeTextColor*/),
                                     ),
                                   ],
                                 ),
@@ -352,7 +365,8 @@ class AnimatedWidgets {
                           )
                         : SlideInUp(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -366,12 +380,12 @@ class AnimatedWidgets {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    'Thank you for downloading the US Congress App and giving us a chance to keep you informed!',
+                                    'Thank you for downloading the $appTitle App and allowing us to keep you informed!',
                                     textAlign: TextAlign.center,
                                     style: Styles.regularStyle.copyWith(
                                         fontSize: 18,
-                                        fontWeight:
-                                            FontWeight.bold /*, color: darkThemeTextColor*/),
+                                        fontWeight: FontWeight
+                                            .bold /*, color: darkThemeTextColor*/),
                                   ),
                                 ],
                               ),

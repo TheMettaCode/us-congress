@@ -54,20 +54,6 @@ class MarketActivity {
         memberId: json["member_id"],
       );
 
-  // String thisTradeTickerInfo = trade.split('_')[0];
-  // String thisTradeTickerName = thisTradeTickerInfo.split('<|:|>')[0];
-  // String thisTradeTickerDescription = thisTradeTickerInfo.split('<|:|>')[1];
-  // // String thisTradeTradeType = trade.split('_')[1];
-  // String thisTradeDollarAmount = trade.split('_')[2];
-  // String thisTradeMemberName = trade.split('_')[3];
-  // // String _thisTradeShortTitle = thisTradeMemberName.split(' ')[0];
-  // // String _thisTradeFirstName = thisTradeMemberName.split(' ')[1];
-  // DateTime thisTradeExecutionDate = DateTime.parse(trade.split('_')[4]);
-  // // DateTime thisTradeDisclosureDate = DateTime.parse(trade.split('_')[5]);
-  // // String thisTradeChamber = trade.split('_')[6];
-  // // String thisTradeOwner = trade.split('_')[7];
-  // String thisTradeMemberId = trade.split('_')[8];
-
   Map<String, dynamic> toJson() => {
         "ticker_name": tickerName,
         "ticker_description": tickerDescription,

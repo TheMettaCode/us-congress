@@ -5,8 +5,7 @@
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
-GithubData githubDataFromJson(String str) =>
-    GithubData.fromJson(json.decode(str));
+GithubData githubDataFromJson(String str) => GithubData.fromJson(json.decode(str));
 
 String githubDataToJson(GithubData data) => json.encode(data.toJson());
 
@@ -24,16 +23,15 @@ class GithubData {
   factory GithubData.fromJson(Map<String, dynamic> json) => GithubData(
         app: json["app"] ?? 'us-congress',
         status: json["status"] ?? "ERR",
-        notifications: List<GithubNotifications>.from(json["notifications"]
-                .map((x) => GithubNotifications.fromJson(x))) ??
+        notifications: List<GithubNotifications>.from(
+                json["notifications"].map((x) => GithubNotifications.fromJson(x))) ??
             [],
       );
 
   Map<String, dynamic> toJson() => {
         "app": app,
         "status": status ?? "ERR",
-        "notifications":
-            List<dynamic>.from(notifications.map((x) => x.toJson())),
+        "notifications": List<dynamic>.from(notifications.map((x) => x.toJson())),
       };
 }
 
@@ -45,6 +43,7 @@ class GithubNotifications {
     @required this.message,
     @required this.priority,
     @required this.userLevels,
+    @required this.market,
     @required this.url,
     @required this.icon,
     @required this.supportOption,
@@ -57,24 +56,24 @@ class GithubNotifications {
   final String message;
   final int priority;
   final List<String> userLevels;
+  final List<String> market;
   final String url;
   final String icon;
   final bool supportOption;
   final String additionalData;
 
-  factory GithubNotifications.fromJson(Map<String, dynamic> json) =>
-      GithubNotifications(
+  factory GithubNotifications.fromJson(Map<String, dynamic> json) => GithubNotifications(
         startDate: json["start-date"] == null || json["start-date"] == ""
             ? DateTime.now()
             : DateTime.parse(json["start-date"]),
-        expirationDate:
-            json["expiration-date"] == null || json["expiration-date"] == ""
-                ? DateTime.now().add(const Duration(days: 1))
-                : DateTime.parse(json["expiration-date"]),
+        expirationDate: json["expiration-date"] == null || json["expiration-date"] == ""
+            ? DateTime.now().add(const Duration(days: 1))
+            : DateTime.parse(json["expiration-date"]),
         title: json["title"] ?? "",
         message: json["message"] ?? "",
         priority: json["priority"],
         userLevels: List<String>.from(json["user-levels"].map((x) => x)) ?? [],
+        market: List<String>.from(json["market"].map((x) => x)) ?? [],
         url: json["url"] ?? "",
         icon: json["icon"] ?? "handshake",
         supportOption: json['support-option'] ?? false,
@@ -82,18 +81,16 @@ class GithubNotifications {
       );
 
   Map<String, dynamic> toJson() => {
-        "start-date": startDate == null
-            ? DateTime.now().toIso8601String()
-            : startDate.toIso8601String(),
+        "start-date":
+            startDate == null ? DateTime.now().toIso8601String() : startDate.toIso8601String(),
         "expiration-date": expirationDate == null
             ? DateTime.now().toIso8601String()
             : expirationDate.toIso8601String(),
         "title": title ?? "",
         "message": message ?? "",
         "priority": priority ?? 10,
-        "user-levels": userLevels == null
-            ? null
-            : List<dynamic>.from(userLevels.map((x) => x)),
+        "user-levels": userLevels == null ? [] : List<dynamic>.from(userLevels.map((x) => x)),
+        "market": market == null ? [] : List<dynamic>.from(market.map((x) => x)),
         "url": url ?? "",
         "icon": icon ?? "handshake",
         "support-option": supportOption ?? false,

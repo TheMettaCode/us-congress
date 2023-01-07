@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.uscongress.watch"
+        applicationId "com.watchtower.usa"
         minSdkVersion 21
         // targetSdkVersion 32
         targetSdkVersion rootProject.ext.targetSdkVersion // SETUP IN ANDROID/BUILD.GRADLE FILE
@@ -79,4 +79,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.amazon.device:amazon-appstore-sdk:3.0.3"
 }

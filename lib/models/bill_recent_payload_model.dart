@@ -1,16 +1,16 @@
 // To parse this JSON data, do
 //
-//     final recentbills = recentbillsFromJson(jsonString);
+//     final recentBills = recentBillsFromJson(jsonString);
 
 import 'dart:convert';
 
-Recentbills recentbillsFromJson(String str) =>
-    Recentbills.fromJson(json.decode(str));
+RecentBills recentBillsFromJson(String str) =>
+    RecentBills.fromJson(json.decode(str));
 
-String recentbillsToJson(Recentbills data) => json.encode(data.toJson());
+String recentBillsToJson(RecentBills data) => json.encode(data.toJson());
 
-class Recentbills {
-  Recentbills({
+class RecentBills {
+  RecentBills({
     this.status,
     this.copyright,
     this.results,
@@ -18,15 +18,15 @@ class Recentbills {
 
   final String status;
   final String copyright;
-  final List<RecentResult> results;
+  final List<RecentBillsResult> results;
 
-  factory Recentbills.fromJson(Map<String, dynamic> json) => Recentbills(
+  factory RecentBills.fromJson(Map<String, dynamic> json) => RecentBills(
         status: json["status"],
         copyright: json["copyright"],
         results: json["results"] == null
             ? null
-            : List<RecentResult>.from(
-                json["results"].map((x) => RecentResult.fromJson(x))),
+            : List<RecentBillsResult>.from(
+                json["results"].map((x) => RecentBillsResult.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -38,8 +38,8 @@ class Recentbills {
       };
 }
 
-class RecentResult {
-  RecentResult({
+class RecentBillsResult {
+  RecentBillsResult({
     this.congress,
     this.chamber,
     this.numResults,
@@ -53,7 +53,7 @@ class RecentResult {
   final int offset;
   final List<UpdatedBill> bills;
 
-  factory RecentResult.fromJson(Map<String, dynamic> json) => RecentResult(
+  factory RecentBillsResult.fromJson(Map<String, dynamic> json) => RecentBillsResult(
         congress: json["congress"],
         chamber: json["chamber"],
         numResults: json["num_results"],

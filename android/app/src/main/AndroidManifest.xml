@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" package="com.example.us_congress_vote_tracker">
+    xmlns:tools="http://schemas.android.com/tools" package="com.watchtower.usa">
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/> -->
@@ -34,26 +35,20 @@
         </intent>
     </queries>
 
-    <application tools:replace="android:label" android:name="${applicationName}" android:label="US Congress" android:icon="@mipmap/ic_launcher">
+    <application tools:replace="android:label" android:name="${applicationName}" android:label="Congress Watcher" android:icon="@mipmap/ic_launcher">
 
         <!-- AdMob Ad Integration -->
-        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3834929667159972~4799960334" />
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3834929667159972~5166953814" />
         <meta-data android:name="com.google.android.gms.ads.interstitial.InterstitialAd" android:value="com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback"/>
 
-        <!-- AdActivity from Google Play Services, needed by Tappx -->
-        <receiver android:name="com.tappx.sdk.android.TrackInstallReceiver" android:exported="true">
+        <receiver android:name="com.amazon.device.iap.ResponseReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.amazon.inapp.purchasing.NOTIFY" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY"/>
+            </intent-filter>
         </receiver>
+
         <!-- <activity android:name="com.google.android.gms.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:theme="@android:style/Theme.Translucent" /> -->
         <!-- <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" /> -->
-
-        <!-- START.IO ADS CODE HERE-->
-        <!-- <meta-data android:name="com.startapp.sdk.APPLICATION_ID" android:value="206209973" /> -->
-        <!-- Start.io Return Ad controlled by the android:value below -->
-        <!-- <meta-data android:name="com.startapp.sdk.RETURN_ADS_ENABLED" android:value="false" /> -->
-        <!-- Start.io Splash Ad controlled by the android:value below -->
-        <!-- <provider android:authorities="com.startapp.flutter.sdk.${applicationId}" android:name="com.startapp.flutter.sdk.StartAppFlutterHelper" android:exported="false">
-            <meta-data android:name="com.startapp.sdk.SPLASH_ADS_ENABLED" android:value="false" />
-        </provider> -->
 
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
@@ -74,6 +69,10 @@
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
+
+
+
 
             <!-- Adds Flutter Notifications Scheduling Options. -->
             <!-- <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">

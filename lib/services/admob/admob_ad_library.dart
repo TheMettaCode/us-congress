@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive/hive.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/functions/functions.dart';
 
 class AdMobLibrary {
-  List<String> testDeviceIds = [dotenv.env["DEV_TEST_DEVICE_ID"]];
-  Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+  static final List<String> testDeviceIds = [dotenv.env["DEV_TEST_DEVICE_ID"]];
+  static final Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
   defaultBanner() {
     if (!userDatabase.get('userIsPremium')) {
@@ -19,12 +19,13 @@ class AdMobLibrary {
         size: AdSize.banner,
         request: const AdRequest(
           nonPersonalizedAds: false,
-          keywords: adMobKeyWords,
+          keywords: wordsToHash, // adMobKeyWords,
         ),
         listener: BannerAdListener(
           // Called when an ad is successfully received.
           onAdLoaded: (Ad ad) {
-            logger.d('***** Ad Unit ID Loaded: ${ad.responseInfo.responseId} *****');
+            logger.d(
+                '***** Ad Unit ID Loaded: ${ad.responseInfo.responseId} *****');
             logger.d('***** Banner Results: ${ad?.responseInfo?.responseId}');
           },
           // Called when an ad request failed.
@@ -33,7 +34,8 @@ class AdMobLibrary {
                 '***** Ad failed to load, Code: ${error.code} - Domain: ${error.domain} - Message: ${error.message} *****');
           },
           // Called when an ad opens an overlay that covers the screen.
-          onAdOpened: (Ad ad) async => await Functions.processCredits(true, creditsToAdd: 5),
+          onAdOpened: (Ad ad) async =>
+              await Functions.processCredits(true, creditsToAdd: 5),
           // Called when an ad removes an overlay that covers the screen.
           onAdClosed: (Ad ad) {
             logger.d('Ad closed.');
@@ -41,7 +43,8 @@ class AdMobLibrary {
         ),
       );
 
-      logger.d('***** Default Banner Response: ${myBanner?.responseInfo?.responseId} *****');
+      logger.d(
+          '***** Default Banner Response: ${myBanner?.responseInfo?.responseId} *****');
       return myBanner;
     } else {
       logger.d('USER IS PREMIUM... NO BANNER ADS');
@@ -67,14 +70,16 @@ class AdMobLibrary {
   }
 
   static void interstitialAdShow(InterstitialAd interstitialAd) async {
-    Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+    // Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
     final bool userIsPremium = userDatabase.get('userIsPremium');
     final int adShowAttempts = userDatabase.get('adShowAttempts');
     final bool newAdId = interstitialAd == null
         ? false
-        : interstitialAd.responseInfo.responseId != userDatabase.get('interstitialAdId');
+        : interstitialAd.responseInfo.responseId !=
+            userDatabase.get('interstitialAdId');
 
-    int totalEarnedCredits = userDatabase.get('credits') + userDatabase.get('permCredits');
+    int totalEarnedCredits =
+        userDatabase.get('credits') + userDatabase.get('permCredits');
     double chanceToShow = 0;
 
     if (totalEarnedCredits <= adChanceToShowThreshold) {
@@ -85,13 +90,17 @@ class AdMobLibrary {
 
     bool willShow = random.nextDouble() < chanceToShow;
 
-    debugPrint('^^^^^ CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
-    debugPrint('^^^^^ WILL SHOW AD: $willShow ^^^^^');
+    debugPrint(
+        '[SHOW ADMOB INTERSTITIAL AD] CHANCE TO SHOW AD: ${chanceToShow * 100}% ^^^^^');
+    debugPrint('[SHOW ADMOB INTERSTITIAL AD] WILL SHOW AD: $willShow ^^^^^');
 
-    if (!userIsPremium && interstitialAd != null && newAdId && (adShowAttempts < 3 || willShow)) {
+    if (!userIsPremium &&
+        interstitialAd != null &&
+        newAdId &&
+        (adShowAttempts < 3 || willShow)) {
       interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent: (interstitialAd) =>
-            userDatabase.put('interstitialAdId', interstitialAd.responseInfo.responseId),
+        onAdShowedFullScreenContent: (interstitialAd) => userDatabase.put(
+            'interstitialAdId', interstitialAd.responseInfo.responseId),
         onAdDismissedFullScreenContent: (InterstitialAd interstitialAd) {
           userDatabase.put('interstitialAdIsNew', false);
           interstitialAd.dispose();
@@ -100,19 +109,19 @@ class AdMobLibrary {
           userDatabase.put('interstitialAdIsNew', false);
           interstitialAd.dispose();
         },
-        onAdImpression: (interstitialAd) =>
-            userDatabase.put('interstitialAdCount', userDatabase.get('interstitialAdCount') + 1),
+        onAdImpression: (interstitialAd) => userDatabase.put(
+            'interstitialAdCount', userDatabase.get('interstitialAdCount') + 1),
         onAdClicked: (interstitialAd) {
           debugPrint("Ad was clicked.");
         },
       );
       debugPrint(
-          '[INTERSTITIAL AD SHOW] DATA: User is Premium ? $userIsPremium - Ad Status = ${interstitialAd.responseInfo.responseId} - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
+          '[SHOW ADMOB INTERSTITIAL AD] DATA: User is Premium ? $userIsPremium - Ad Status = ${interstitialAd.responseInfo.responseId} - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
       userDatabase.put('adShowAttempts', 0);
       interstitialAd.show();
     } else {
       debugPrint(
-          '[INTERSTITIAL AD SHOW] DATA: User is Premium ? $userIsPremium - Ad Status = $interstitialAd - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
+          '[SHOW ADMOB INTERSTITIAL AD] DATA: User is Premium ? $userIsPremium - Ad Status = $interstitialAd - Ad Will Show ? $willShow - # of Attempts... $adShowAttempts - ');
       if (!userIsPremium) {
         userDatabase.put('adShowAttempts', adShowAttempts + 1);
       }
@@ -120,7 +129,7 @@ class AdMobLibrary {
   }
 
   void rewardedAdShow(RewardedAd ad /*, {override = false}*/) {
-    Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
+    // Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
 
     if (ad != null) {
       ad.fullScreenContentCallback = FullScreenContentCallback(
@@ -134,13 +143,14 @@ class AdMobLibrary {
           userDatabase.put('rewardedAdIsNew', false);
           ad.dispose();
         },
-        onAdImpression: (RewardedAd ad) =>
-            userDatabase.put('rewardedAdCount', userDatabase.get('rewardedAdCount') + 1),
+        onAdImpression: (RewardedAd ad) => userDatabase.put(
+            'rewardedAdCount', userDatabase.get('rewardedAdCount') + 1),
       );
       ad.show(
         onUserEarnedReward: (ad, RewardItem rewardItem) async {
           logger.d('*****\nImplementing reward now!!!\n*****'.toUpperCase());
-          await Functions.processCredits(true, isPermanent: true, creditsToAdd: 50);
+          await Functions.processCredits(true,
+              isPermanent: true, creditsToAdd: 100);
         },
       );
       return;

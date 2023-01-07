@@ -2,6 +2,8 @@
 //
 //     final topCongressionalVideos = topCongressionalVideosFromJson(jsonString);
 
+import 'dart:async';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -31,7 +33,8 @@ import '../admob/admob_ad_library.dart';
 TopCongressionalVideos topCongressionalVideosFromJson(String str) =>
     TopCongressionalVideos.fromJson(json.decode(str));
 
-String topCongressionalVideosToJson(TopCongressionalVideos data) => json.encode(data.toJson());
+String topCongressionalVideosToJson(TopCongressionalVideos data) =>
+    json.encode(data.toJson());
 
 class TopCongressionalVideos {
   TopCongressionalVideos({
@@ -42,9 +45,11 @@ class TopCongressionalVideos {
   final DateTime retrievedDate;
   final List<Channel> channels;
 
-  factory TopCongressionalVideos.fromJson(Map<String, dynamic> json) => TopCongressionalVideos(
+  factory TopCongressionalVideos.fromJson(Map<String, dynamic> json) =>
+      TopCongressionalVideos(
         retrievedDate: DateTime.parse(json["retrieved-date"]),
-        channels: List<Channel>.from(json["videos"].map((x) => Channel.fromJson(x))),
+        channels:
+            List<Channel>.from(json["videos"].map((x) => Channel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -73,8 +78,8 @@ class Channel {
         channelId: json["channel-id"],
         channelSlug: json["channel-slug"],
         channelUrl: json["channel-url"],
-        channelVideos:
-            List<ChannelVideos>.from(json["channel-videos"].map((x) => ChannelVideos.fromJson(x))),
+        channelVideos: List<ChannelVideos>.from(
+            json["channel-videos"].map((x) => ChannelVideos.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,7 +87,8 @@ class Channel {
         "channel-id": channelId,
         "channel-slug": channelSlug,
         "channel-url": channelUrl,
-        "channel-videos": List<dynamic>.from(channelVideos.map((x) => x.toJson())),
+        "channel-videos":
+            List<dynamic>.from(channelVideos.map((x) => x.toJson())),
       };
 }
 
@@ -124,8 +130,9 @@ class ChannelVideos {
 
 class YouTubeVideosApi {
   /// RETRIEVE YOUTUBE VIDEO IDs AND SAVE THEM TO DBASE
-  static Future<List<ChannelVideos>> getYoutubeVideos({BuildContext context}) async {
-    debugPrint('[YOUTUBE VIDEOS API] RETRIEVING VIDEOS');
+  static Future<List<ChannelVideos>> getYoutubeVideos(
+      {BuildContext context}) async {
+    logger.d('[YOUTUBE VIDEOS API] RETRIEVING VIDEOS');
     Box userDatabase = Hive.box(appDatabase);
     bool newUser = userDatabase.get('appOpens') < newUserThreshold;
     List<bool> userLevels = await Functions.getUserLevels();
@@ -143,119 +150,143 @@ class YouTubeVideosApi {
               .expand((element) => element)
               .toList();
       currentVideosList = await convertAllDates(xVideosList);
-      debugPrint(
+      logger.d(
           '[YouTube Videos API] ${currentVideosList.length} CURRENT VIDEOS RETRIEVED SUCCESSFULLY');
     } catch (e) {
-      debugPrint('[YouTube Videos API] CURRENT VIDEO RETRIEVAL ERROR:$e');
+      logger.d('[YouTube Videos API] CURRENT VIDEO RETRIEVAL ERROR:$e');
       userDatabase.put('youtubeVideosList', {});
     }
 
     List<ChannelVideos> finalVideosList = [];
 
     if (currentVideosList.isEmpty ||
-        DateTime.parse(userDatabase.get('lastVideosRefresh')).isBefore(DateTime.now()
-            .subtract(context == null ? const Duration(hours: 1) : const Duration(minutes: 20)))) {
-      debugPrint('[YOUTUBE VIDEOS API] GENERATING LIST OF YOUTUBE VIDEO ITEMS');
+        DateTime.parse(userDatabase.get('lastVideosRefresh')).isBefore(
+            DateTime.now().subtract(context == null
+                ? const Duration(hours: 1)
+                : const Duration(minutes: 20)))) {
+      logger.d('[YOUTUBE VIDEOS API] GENERATING LIST OF YOUTUBE VIDEO ITEMS');
 
       final rapidApiKey = dotenv.env['RAPID_API_KEY'];
       final rapidApiHost = dotenv.env['USC_VIDEOS_API_HOST'];
 
-      final url = Uri.parse('https://us-congress-latest-videos.p.rapidapi.com/latest_videos.json');
-      final response = await http.get(url, headers: {
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': rapidApiHost,
-      });
-      debugPrint('[YOUTUBE VIDEOS API] TOP VIDEOS API RESPONSE CODE: ${response.statusCode}');
+      final url = Uri.parse(
+          'https://us-congress-latest-videos.p.rapidapi.com/latest_videos.json');
+      try {
+        final response = await http.get(url, headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': rapidApiHost,
+        }).timeout(const Duration(seconds: apiResponseTimeoutSeconds));
+        logger.d(
+            '[YOUTUBE VIDEOS API] TOP VIDEOS API RESPONSE CODE: ${response.statusCode}');
 
-      if (response.statusCode == 200) {
-        debugPrint('[YOUTUBE VIDEOS API] TOP VIDEOS YOUTUBE API RETRIEVAL SUCCESS! *****');
+        if (response.statusCode == 200) {
+          logger.d(
+              '[YOUTUBE VIDEOS API] TOP VIDEOS YOUTUBE API RETRIEVAL SUCCESS! *****');
 
-        final TopCongressionalVideos newRetrievedData =
-            topCongressionalVideosFromJson(response.body);
+          final TopCongressionalVideos newRetrievedData =
+              topCongressionalVideosFromJson(response.body);
 
-        /// SAVE NEW DATA TO LOCAL DBASE
-        try {
-          debugPrint('[YOUTUBE VIDEOS API] SAVING NEWLY RETRIEVED DATA TO DBASE');
-          userDatabase.put('youtubeVideosList', topCongressionalVideosToJson(newRetrievedData));
-        } catch (e) {
-          debugPrint('[YOUTUBE VIDEOS API] NEW DATA RETRIEVAL ERROR: $e');
-        }
+          /// SAVE NEW DATA TO LOCAL DBASE
+          try {
+            logger
+                .d('[YOUTUBE VIDEOS API] SAVING NEWLY RETRIEVED DATA TO DBASE');
+            userDatabase.put('youtubeVideosList',
+                topCongressionalVideosToJson(newRetrievedData));
+          } catch (e) {
+            logger.d('[YOUTUBE VIDEOS API] NEW DATA RETRIEVAL ERROR: $e');
+          }
 
-        List<Channel> allChannelsList = newRetrievedData.channels;
+          List<Channel> allChannelsList = newRetrievedData.channels;
 
-        List<ChannelVideos> allVideosList = allChannelsList
-            .where((element) => element.channelVideos.isNotEmpty)
-            .map((e) => e.channelVideos)
-            .expand((element) => element)
-            .toList();
+          List<ChannelVideos> allVideosList = allChannelsList
+              .where((element) => element.channelVideos.isNotEmpty)
+              .map((e) => e.channelVideos)
+              .expand((element) => element)
+              .toList();
 
-        if (allVideosList.isNotEmpty) {
-          finalVideosList = await convertAllDates(allVideosList);
+          if (allVideosList.isNotEmpty) {
+            finalVideosList = await convertAllDates(allVideosList);
 
-          /// IDENTIFY ALL NEWLY ADDED VIDEOS
-          List<ChannelVideos> newVideos = [];
-          for (ChannelVideos video in finalVideosList) {
-            if (!currentVideosList.map((e) => e.id).contains(video.id)) {
-              newVideos.add(video);
+            /// IDENTIFY ALL NEWLY ADDED VIDEOS
+            List<ChannelVideos> newVideos = [];
+            for (ChannelVideos video in finalVideosList) {
+              if (!currentVideosList.map((e) => e.id).contains(video.id)) {
+                newVideos.add(video);
+              }
             }
-          }
 
-          if (newVideos.isNotEmpty) {
-            userDatabase.put('newVideos', true);
-            debugPrint('[YOUTUBE VIDEOS API] ${newVideos.length} NEW VIDEOS RETRIEVED.');
-          }
-
-          if (userIsDev && newVideos.isNotEmpty) {
-            final String messageBody = newVideos.first.title.length > 175
-                ? newVideos.first.title.replaceRange(175, null, '...')
-                : newVideos.first.title;
-            final String subject = newVideos.first.title.length > 200
-                ? newVideos.first.title.replaceRange(200, null, '...')
-                : newVideos.first.title;
-
-            List<String> capitolBabbleNotificationsList =
-                List<String>.from(userDatabase.get('capitolBabbleNotificationsList'));
-            capitolBabbleNotificationsList.add(
-                '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>https://www.youtube.com/watch?v=${newVideos.first.id}');
-            userDatabase.put('capitolBabbleNotificationsList', capitolBabbleNotificationsList);
-          }
-
-          if (!newUser && userDatabase.get('videoAlerts') && newVideos.isNotEmpty) {
-            if (context == null || !ModalRoute.of(context).isCurrent) {
-              await NotificationApi.showBigTextNotification(
-                  12,
-                  'videos',
-                  'Congressional Videos',
-                  'New congressional videos',
-                  'New video',
-                  'From ${newVideos.first.channel}',
-                  newVideos.first.title,
-                  'videos');
-            } else if (ModalRoute.of(context).isCurrent) {
-              Messages.showMessage(
-                context: context,
-                message: 'New video added',
-                networkImageUrl: newVideos.first.thumbnail,
-                isAlert: false,
-                removeCurrent: false,
-              );
+            if (newVideos.isNotEmpty) {
+              userDatabase.put('newVideos', true);
+              logger.d(
+                  '[YOUTUBE VIDEOS API] ${newVideos.length} NEW VIDEOS RETRIEVED.');
             }
+
+            if (userIsDev && newVideos.isNotEmpty) {
+              final String messageBody = newVideos.first.title.length > 175
+                  ? newVideos.first.title.replaceRange(175, null, '...')
+                  : newVideos.first.title;
+              final String subject = newVideos.first.title.length > 200
+                  ? newVideos.first.title.replaceRange(200, null, '...')
+                  : newVideos.first.title;
+
+              List<String> capitolBabbleNotificationsList = List<String>.from(
+                  userDatabase.get('capitolBabbleNotificationsList'));
+              capitolBabbleNotificationsList.add(
+                  '${DateTime.now()}<|:|>$subject<|:|>$messageBody<|:|>regular<|:|>https://www.youtube.com/watch?v=${newVideos.first.id}');
+              userDatabase.put('capitolBabbleNotificationsList',
+                  capitolBabbleNotificationsList);
+            }
+
+            if (!newUser &&
+                userDatabase.get('videoAlerts') &&
+                newVideos.isNotEmpty) {
+              if (context == null || !ModalRoute.of(context).isCurrent) {
+                await NotificationApi.showBigTextNotification(
+                    12,
+                    'videos',
+                    'Congressional Videos',
+                    'New congressional videos',
+                    'New video',
+                    'From ${newVideos.first.channel}',
+                    newVideos.first.title,
+                    'videos');
+              } else if (ModalRoute.of(context).isCurrent) {
+                Messages.showMessage(
+                  context: context,
+                  message: 'New video added',
+                  networkImageUrl: newVideos.first.thumbnail,
+                  isAlert: false,
+                  removeCurrent: false,
+                );
+              }
+            }
+          } else {
+            logger.d('[YOUTUBE VIDEOS API] NO NEW VIDEOS RETRIEVED.');
+            return currentVideosList.isNotEmpty ? currentVideosList : [];
           }
+          userDatabase.put('lastVideosRefresh', '${DateTime.now()}');
+          return finalVideosList;
         } else {
-          debugPrint('[YOUTUBE VIDEOS API] NO NEW VIDEOS RETRIEVED.');
+          logger.d('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: API CALL ERROR');
+          userDatabase.put('newVideos', false);
           return currentVideosList.isNotEmpty ? currentVideosList : [];
         }
-        userDatabase.put('lastVideosRefresh', '${DateTime.now()}');
-        return finalVideosList;
-      } else {
-        debugPrint('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: API CALL ERROR');
-        userDatabase.put('newVideos', false);
+      } on TimeoutException catch (e) {
+        debugPrint(
+            '[YOUTUBE VIDEOS API] API TIMEOUT ERROR: FETCHING YOUTUBE VIDEOS: $e');
+
+        return currentVideosList.isNotEmpty ? currentVideosList : [];
+      } catch (e) {
+        debugPrint(
+            '[YOUTUBE VIDEOS API] API ERROR FETCHING YOUTUBE VIDEOS: $e');
+
         return currentVideosList.isNotEmpty ? currentVideosList : [];
       }
     } else {
-      debugPrint(
+      logger.d(
           '[YOUTUBE VIDEOS API] CURRENT VIDEO IDs: ${currentVideosList.map((e) => e.id)} *****');
-      debugPrint('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: LIST IS CURRENT *****');
+      logger
+          .d('[YOUTUBE VIDEOS API] VIDEOS NOT UPDATED: LIST IS CURRENT *****');
       userDatabase.put('newVideos', false);
       return currentVideosList.isNotEmpty ? currentVideosList : [];
     }
@@ -283,11 +314,11 @@ class YouTubeVideosApi {
           id: video.id,
           date: convertedDateTime.toIso8601String(),
           thumbnail: video.thumbnail));
-      debugPrint(
+      logger.d(
           '[YouTube Videos API] [${video.id}] OLD DATE: ${video.date} -> NEW DATE: $convertedDateTime');
     }
     allDateCorrectedVideosList.sort((a, b) => b.date.compareTo(a.date));
-    debugPrint(
+    logger.d(
         '[YouTube Videos API] SORTED => First Date: ${allDateCorrectedVideosList.first.date} - Last Date: ${allDateCorrectedVideosList.last.date}');
     return allDateCorrectedVideosList;
   }
@@ -302,16 +333,16 @@ class YouTubeVideosApi {
       bool randomImageActivated,
       List<bool> userLevels) {
     Box userDatabase = Hive.box<dynamic>(appDatabase);
-    // bool userIsDev = userLevels[0];
-    // bool userIsPremium = userLevels[1];
-    // bool userIsLegacy = userLevels[2];
 
-    // bool darkTheme = userDatabase.get('darkTheme');
     bool isCapitolBabble = thisChannelVideo.channel == 'Capitol Babble';
-    Color capitolBabbleDark = const Color.fromARGB(255, 77, 0, 70);
+    bool isMettaCode = thisChannelVideo.channel == 'MettaCode Developers';
     // Color capitolBabbleMainColor = Colors.purple;
 
-    Color tileColor = isCapitolBabble ? capitolBabbleDark : Theme.of(context).primaryColorDark;
+    Color tileColor = isCapitolBabble
+        ? capitolBabbleDark
+        : isMettaCode
+            ? mettaCodeOrangeDark
+            : Theme.of(context).primaryColorDark;
     Color textColor = darkThemeTextColor;
 
     return Padding(
@@ -334,7 +365,8 @@ class YouTubeVideosApi {
           isScrollControlled: true,
           context: context,
           builder: (context) {
-            return BounceInUp(child: NewVideoPlayer(thisChannelVideo, channelVideos));
+            return BounceInUp(
+                child: NewVideoPlayer(thisChannelVideo, channelVideos));
             // child: videoPlayer(context, channelVideos, thisChannelVideo, userLevels));
           },
         ).then((_) async {
@@ -358,7 +390,8 @@ class YouTubeVideosApi {
                       image: AssetImage(
                           'assets/congress_pic_${randomImageActivated ? random.nextInt(4) : 0}.png'),
                       fit: BoxFit.cover,
-                      colorFilter: ColorFilter.mode(tileColor, BlendMode.color)),
+                      colorFilter:
+                          ColorFilter.mode(tileColor, BlendMode.color)),
               borderRadius: BorderRadius.circular(5),
               border: Border.all(
                   color: isCapitolBabble ? tileColor : Colors.transparent,
@@ -372,7 +405,8 @@ class YouTubeVideosApi {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -381,10 +415,11 @@ class YouTubeVideosApi {
                             child: FadeInImage(
                               image: thisChannelVideo.thumbnail == null ||
                                       thisChannelVideo.thumbnail.isEmpty
-                                  ? AssetImage("assets/congress_pic_${random.nextInt(4)}.png")
+                                  ? AssetImage(
+                                      "assets/congress_pic_${random.nextInt(4)}.png")
                                   : NetworkImage(thisChannelVideo.thumbnail),
-                              placeholder:
-                                  AssetImage("assets/congress_pic_${random.nextInt(4)}.png"),
+                              placeholder: AssetImage(
+                                  "assets/congress_pic_${random.nextInt(4)}.png"),
                               fit: BoxFit.cover,
                               placeholderFit: BoxFit.cover,
                             )),
@@ -392,9 +427,13 @@ class YouTubeVideosApi {
                             radius: 20,
                             backgroundColor: isCapitolBabble
                                 ? capitolBabbleDark.withOpacity(0.5)
-                                : Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.5),
                             child: Icon(Icons.play_arrow,
-                                size: 30, color: darkThemeTextColor.withOpacity(0.75))),
+                                size: 30,
+                                color: darkThemeTextColor.withOpacity(0.75))),
                       ],
                     ),
                   ),
@@ -416,7 +455,9 @@ class YouTubeVideosApi {
                               maxLines: 4,
                               overflow: TextOverflow.ellipsis,
                               style: Styles.regularStyle.copyWith(
-                                  fontSize: 12, fontWeight: FontWeight.bold, color: textColor),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor),
                             ),
                             Expanded(
                               child: Column(
@@ -425,7 +466,8 @@ class YouTubeVideosApi {
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text('${thisChannelVideo.channel}  ',
                                           style: Styles.regularStyle.copyWith(
@@ -466,32 +508,43 @@ class YouTubeVideosApi {
                                   maxLines: 4,
                                   overflow: TextOverflow.ellipsis,
                                   style: Styles.regularStyle.copyWith(
-                                      fontSize: 12, fontWeight: FontWeight.bold, color: textColor),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor),
                                 ),
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           Text('${thisChannelVideo.channel}  ',
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: textColor)),
-                                          const FaIcon(FontAwesomeIcons.calendar,
-                                              size: 8, color: darkThemeTextColor),
+                                              style: Styles.regularStyle
+                                                  .copyWith(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      color: textColor)),
+                                          const FaIcon(
+                                              FontAwesomeIcons.calendar,
+                                              size: 8,
+                                              color: darkThemeTextColor),
                                           Text(
                                               '  ${dateWithDayFormatter.format(DateTime.parse(thisChannelVideo.date))}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: textColor)),
+                                              style: Styles.regularStyle
+                                                  .copyWith(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      color: textColor)),
                                         ],
                                       ),
                                     ],
@@ -632,7 +685,8 @@ class YouTubeVideosApi {
 }
 
 class NewVideoPlayer extends StatefulWidget {
-  const NewVideoPlayer(this.selectedVideo, this.videoList, {Key key}) : super(key: key);
+  const NewVideoPlayer(this.selectedVideo, this.videoList, {Key key})
+      : super(key: key);
   final ChannelVideos selectedVideo;
   final List<ChannelVideos> videoList;
 
@@ -688,16 +742,17 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
 
     if (widget.videoList.isEmpty || widget.videoList == null) {
       try {
-        List<ChannelVideos> xVideosList =
-            topCongressionalVideosFromJson(userDatabase.get('youtubeVideosList'))
-                .channels
-                .map((e) => e.channelVideos)
-                .expand((element) => element)
-                .toList();
+        List<ChannelVideos> xVideosList = topCongressionalVideosFromJson(
+                userDatabase.get('youtubeVideosList'))
+            .channels
+            .map((e) => e.channelVideos)
+            .expand((element) => element)
+            .toList();
         await YouTubeVideosApi.convertAllDates(xVideosList)
             .then((value) => setState(() => youtubeVideosList = value));
       } catch (e) {
-        logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
+        logger.w(
+            '^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
         setState(() => youtubeVideosList = []);
         userDatabase.put('youtubeVideosList', {});
       }
@@ -769,11 +824,13 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return ids.isEmpty
-        ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+        ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase,
             isFullScreen: true)
         : Container(
             decoration: BoxDecoration(
-              color: isCapitolBabble ? capitolBabbleDark : Theme.of(context).colorScheme.background,
+              color: isCapitolBabble
+                  ? capitolBabbleDark
+                  : Theme.of(context).colorScheme.background,
               image: isCapitolBabble
                   ? DecorationImage(
                       opacity: 0.3,
@@ -783,10 +840,12 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                       colorFilter: ColorFilter.mode(tileColor, BlendMode.color))
                   : DecorationImage(
                       opacity: 0.3,
-                      image: AssetImage('assets/congress_pic_$headerImageCounter.png'),
+                      image: AssetImage(
+                          'assets/congress_pic_$headerImageCounter.png'),
                       repeat: ImageRepeat.repeat,
                       // fit: BoxFit.cover,
-                      colorFilter: ColorFilter.mode(tileColor, BlendMode.color)),
+                      colorFilter:
+                          ColorFilter.mode(tileColor, BlendMode.color)),
             ),
             child: ListView(
               shrinkWrap: true,
@@ -797,14 +856,18 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                     image: isCapitolBabble
                         ? DecorationImage(
                             opacity: 0.3,
-                            image: const AssetImage('assets/capitol_babble_bg.png'),
+                            image: const AssetImage(
+                                'assets/capitol_babble_bg.png'),
                             fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(tileColor, BlendMode.color))
+                            colorFilter:
+                                ColorFilter.mode(tileColor, BlendMode.color))
                         : DecorationImage(
                             opacity: 0.3,
-                            image: AssetImage('assets/congress_pic_$headerImageCounter.png'),
+                            image: AssetImage(
+                                'assets/congress_pic_$headerImageCounter.png'),
                             fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(tileColor, BlendMode.color)),
+                            colorFilter:
+                                ColorFilter.mode(tileColor, BlendMode.color)),
                   ),
                   child: ListTile(
                     tileColor: Colors.transparent,
@@ -818,22 +881,25 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                               .replaceAll("&#39;", "'"),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
+                      style: Styles.googleStyle
+                          .copyWith(color: darkThemeTextColor),
                     ),
                     trailing: IconButton(
-                        icon: const Icon(Icons.close, color: darkThemeTextColor),
+                        icon:
+                            const Icon(Icons.close, color: darkThemeTextColor),
                         onPressed: () => Navigator.pop(context)),
                   ),
                 ),
                 YoutubePlayerBuilder(
                   onExitFullScreen: () {
                     // The player forces portraitUp after exiting fullscreen. This overrides the behaviour.
-                    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+                    SystemChrome.setPreferredOrientations(
+                        DeviceOrientation.values);
                   },
                   player: YoutubePlayer(
                     controller: controller,
                     showVideoProgressIndicator: true,
-                    progressIndicatorColor: Colors.blueAccent,
+                    progressIndicatorColor: const Color(0xff990099),
                     topActions: <Widget>[
                       const SizedBox(width: 8.0),
                       Expanded(
@@ -854,7 +920,7 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                           size: 25.0,
                         ),
                         onPressed: () {
-                          debugPrint('Settings Tapped!');
+                          logger.d('Settings Tapped!');
                         },
                       ),
                     ],
@@ -862,7 +928,8 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                       isPlayerReady = true;
                     },
                     onEnded: (data) {
-                      controller.load(ids[(ids.indexOf(data.videoId) + 1)]); // % ids.length]);
+                      controller.load(ids[
+                          (ids.indexOf(data.videoId) + 1)]); // % ids.length]);
                       // _showSnackBar('Next Video Started!');
                     },
                   ),
@@ -929,20 +996,26 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.skip_previous,
-                                    color: ids.indexOf(controller.metadata.videoId) > 0
+                                    color: ids.indexOf(
+                                                controller.metadata.videoId) >
+                                            0
                                         ? darkThemeTextColor
                                         : null,
                                   ),
-                                  onPressed:
-                                      isPlayerReady && ids.indexOf(controller.metadata.videoId) > 0
-                                          ? () => controller.load(ids[
-                                              (ids.indexOf(controller.metadata.videoId) -
-                                                  1)]) //  % ids.length])
-                                          : null,
+                                  onPressed: isPlayerReady &&
+                                          ids.indexOf(
+                                                  controller.metadata.videoId) >
+                                              0
+                                      ? () => controller.load(ids[(ids.indexOf(
+                                              controller.metadata.videoId) -
+                                          1)]) //  % ids.length])
+                                      : null,
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                                    controller.value.isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow,
                                     color: darkThemeTextColor,
                                   ),
                                   onPressed: isPlayerReady
@@ -961,7 +1034,9 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                   ),
                                   onPressed: isPlayerReady
                                       ? () {
-                                          muted ? controller.unMute() : controller.mute();
+                                          muted
+                                              ? controller.unMute()
+                                              : controller.mute();
                                           setState(() {
                                             muted = !muted;
                                           });
@@ -978,10 +1053,12 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                     color: darkThemeTextColor,
                                   ),
                                   onPressed: isPlayerReady &&
-                                          ids.indexOf(controller.metadata.videoId) < ids.length
-                                      ? () => controller.load(ids[
-                                          (ids.indexOf(controller.metadata.videoId) +
-                                              1)]) //  % ids.length])
+                                          ids.indexOf(
+                                                  controller.metadata.videoId) <
+                                              ids.length
+                                      ? () => controller.load(ids[(ids.indexOf(
+                                              controller.metadata.videoId) +
+                                          1)]) //  % ids.length])
                                       : null,
                                 ),
                               ],
@@ -991,7 +1068,8 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                               children: <Widget>[
                                 Text(
                                   "Volume",
-                                  style: Styles.googleStyle.copyWith(color: darkThemeTextColor),
+                                  style: Styles.googleStyle
+                                      .copyWith(color: darkThemeTextColor),
                                   // style: TextStyle(fontWeight: FontWeight.w300),
                                 ),
                                 Expanded(
@@ -1009,7 +1087,8 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
                                             setState(() {
                                               volume = value;
                                             });
-                                            controller.setVolume(volume.round());
+                                            controller
+                                                .setVolume(volume.round());
                                           }
                                         : null,
                                   ),
@@ -1077,17 +1156,15 @@ class NewVideoPlayerState extends State<NewVideoPlayer> {
       case PlayerState.ended:
         return Colors.red;
       case PlayerState.playing:
-        return darkTheme
-            ? alertIndicatorColorBrightGreen
-            : alertIndicatorColorDarkGreen; // Colors.blueAccent;
+        return alertIndicatorColorBrightGreen;
       case PlayerState.paused:
-        return altHighlightColor; // Colors.orange;
+        return altHighlightColor;
       case PlayerState.buffering:
         return Colors.white;
       case PlayerState.cued:
-        return altHighlightColor; // Colors.blue[900];
+        return altHighlightColor;
       default:
-        return Theme.of(context).primaryColorDark; // Colors.blue;
+        return Theme.of(context).primaryColorDark;
     }
   }
 

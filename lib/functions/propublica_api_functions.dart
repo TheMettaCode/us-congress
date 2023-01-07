@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/models/bill_payload_model.dart';
-import 'package:us_congress_vote_tracker/models/bill_search_model.dart';
-import 'package:us_congress_vote_tracker/models/lobby_event_specific_model.dart';
-import 'package:us_congress_vote_tracker/models/lobby_search_model.dart';
-import 'package:us_congress_vote_tracker/models/members_model.dart';
-import 'package:us_congress_vote_tracker/models/office_expenses_member.dart';
-import 'package:us_congress_vote_tracker/models/private_funded_trips_by_member_model.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/models/bill_payload_model.dart';
+import 'package:congress_watcher/models/bill_search_model.dart';
+import 'package:congress_watcher/models/lobby_event_specific_model.dart';
+import 'package:congress_watcher/models/lobby_search_model.dart';
+import 'package:congress_watcher/models/members_model.dart';
+import 'package:congress_watcher/models/office_expenses_member.dart';
+import 'package:congress_watcher/models/private_funded_trips_by_member_model.dart';
 
 class PropublicaApi {
   var apiHeaders = <String, String>{

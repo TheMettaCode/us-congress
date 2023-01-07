@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/congress/lobby_event_detail.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
+import 'package:congress_watcher/congress/lobby_event_detail.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/themes.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:us_congress_vote_tracker/models/lobby_search_model.dart';
-import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
+import 'package:congress_watcher/models/lobby_search_model.dart';
+import 'package:congress_watcher/functions/propublica_api_functions.dart';
 
 import '../functions/functions.dart';
 
 class LobbyingSearchList extends StatefulWidget {
   final String lobbyingSearchString;
-  const LobbyingSearchList(this.lobbyingSearchString, {Key key}) : super(key: key);
+  const LobbyingSearchList(this.lobbyingSearchString, {Key key})
+      : super(key: key);
 
   @override
   LobbySearchListState createState() => LobbySearchListState();
@@ -35,11 +36,11 @@ class LobbySearchListState extends State<LobbyingSearchList> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       /// DETERMINE USER LEVEL
       await Functions.getUserLevels().then((levels) => setState(() {
-        userLevels = levels;
-        userIsDev = userLevels[0];
-        userIsPremium = userLevels[1];
-        userIsLegacy = userLevels[2];
-      }));
+            userLevels = levels;
+            userIsDev = userLevels[0];
+            userIsPremium = userLevels[1];
+            userIsLegacy = userLevels[2];
+          }));
 
       /// FETCH SEARCH ITEMS
       await getLobbyingSearchList();
@@ -145,7 +146,8 @@ class LobbySearchListState extends State<LobbyingSearchList> {
                             autofocus: true,
                             enableSuggestions: true,
                             decoration: InputDecoration.collapsed(
-                              hintText: lobbyingSearchString ?? 'Enter your search',
+                              hintText:
+                                  lobbyingSearchString ?? 'Enter your search',
                             ),
                             onChanged: (val) {
                               lobbyingSearchString = val;
@@ -180,7 +182,7 @@ class LobbySearchListState extends State<LobbyingSearchList> {
         ],
       ),
       body: _isLoading
-          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase,
               isLobby: true, isFullScreen: true)
           : lobbyingSearchList.isNotEmpty
               ? RefreshIndicator(
@@ -198,12 +200,14 @@ class LobbySearchListState extends State<LobbyingSearchList> {
                               Theme.of(context).colorScheme.background,
                               BlendMode.color)),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
                     alignment: Alignment.center,
                     child: ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       separatorBuilder: (context, index) {
-                        return const Divider(height: 0, color: Colors.transparent);
+                        return const Divider(
+                            height: 0, color: Colors.transparent);
                       },
                       itemCount: lobbyingSearchList.length,
                       // scrollDirection: Axis.vertical,
@@ -301,6 +305,9 @@ class LobbySearchListState extends State<LobbyingSearchList> {
                                           .startsWith(
                                               'lobby_${lobby.id.toLowerCase()}')),
                                       false,
+                                      color: userDatabase.get('darkTheme')
+                                          ? alertIndicatorColorBrightGreen
+                                          : alertIndicatorColorDarkGreen,
                                       size: 10),
                                 ],
                               ),
@@ -351,8 +358,7 @@ class LobbySearchListState extends State<LobbyingSearchList> {
                             lobby.signedDate == null || lobby.signedDate.isEmpty
                                 ? const Text('')
                                 : Text(
-                                    'Signed > ${formatter.format(
-                                            DateTime.parse(lobby.signedDate))}',
+                                    'Signed > ${formatter.format(DateTime.parse(lobby.signedDate))}',
                                     style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,
@@ -362,8 +368,7 @@ class LobbySearchListState extends State<LobbyingSearchList> {
                                     lobby.effectiveDate.isEmpty
                                 ? const Text('')
                                 : Text(
-                                    'Effective > ${formatter.format(DateTime.parse(
-                                            lobby.effectiveDate))}',
+                                    'Effective > ${formatter.format(DateTime.parse(lobby.effectiveDate))}',
                                     style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 10.0,

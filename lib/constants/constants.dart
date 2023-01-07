@@ -3,7 +3,8 @@ import 'package:logger/logger.dart';
 import 'dart:math';
 
 var logger = Logger();
-var loggerNoStack = Logger(printer: PrettyPrinter(colors: true, printEmojis: true, methodCount: 0));
+var loggerNoStack = Logger(
+    printer: PrettyPrinter(colors: true, printEmojis: true, methodCount: 0));
 
 /// DATE-TIME FORMATTING
 final DateFormat formatter = DateFormat.yMEd();
@@ -11,7 +12,8 @@ final DateFormat timeFormatter = DateFormat('h:mm a');
 final DateFormat localTimeFormatter = DateFormat.jm();
 final DateFormat dateWithTimeFormatter = DateFormat('E, M/d h:mm a');
 final DateFormat dateWithTimeOnlyFormatter = DateFormat('E, M/d h:mm');
-final DateFormat dateWithTimeAndSecondsFormatter = DateFormat('E, M/d h:mm:ss a');
+final DateFormat dateWithTimeAndSecondsFormatter =
+    DateFormat('E, M/d h:mm:ss a');
 final DateFormat dateWithDayFormatter = DateFormat('E, M/d');
 final DateFormat dateWithDayAndYearFormatter = DateFormat('E, M/d/y');
 final DateFormat dateFormatter = DateFormat('M/d');
@@ -20,17 +22,24 @@ final NumberFormat formatCurrency = NumberFormat.simpleCurrency();
 /// MATH
 final Random random = Random();
 const int newUserThreshold = 3;
+const int apiResponseTimeoutSeconds = 30;
 
 /// App Constants
-const String appTitle = 'US Congress';
+const String appTitle = 'Congress Watcher';
 // const String appDatabaseName = 'congress.db';
 const String appDatabase = 'congress';
 // const String appDatabaseTableName = 'congress';
-const String googleAppLink = 'https://play.google.com/store/apps/details?id=com.uscongress.watch';
-const String samsungAppLink = 'https://galaxy.store/congress';
-const String amazonAppLink = 'https://www.amazon.com/gp/product/B0B2ZBYTB7';
-const String appWebLink = 'https://us-congress.app';
-const String appShare = 'Check out this $appTitle app. I thought you might be interested.\n'
+const String googleAppLink =
+    'https://play.google.com/store/apps/details?id=com.watchtower.usa';
+const String googleInstallerStoreExample = 'com.android';
+const String samsungAppLink = ''; // 'https://galaxy.store/congress';
+const String samsungInstallerStoreExample = 'samsung';
+const String amazonAppLink =
+    ''; // 'https://www.amazon.com/gp/product/B0B2ZBYTB7';
+const String amazonInstallerStoreExample = 'amazon';
+// const String appWebLink = 'https://us-congress.app';
+const String appShare =
+    'Check out this $appTitle app. I thought you might be interested.\n'
     'Google Play App Store: $googleAppLink\n'
     // 'Samsung Galaxy App Store: $samsungAppLink\n'
     // 'Amazon App Store: $amazonAppLink'
@@ -38,6 +47,12 @@ const String appShare = 'Check out this $appTitle app. I thought you might be in
 const String appSupportEmail = 'mettacode@gmail.com';
 const String appGitHubUrl = 'https://github.com/TheMettaCode/us_congress_web';
 
+/// STRIPE CONSTANTS
+const String stripeCustomerSelfManagementUrl =
+    'https://billing.stripe.com/p/login/bIYcPg4AI3BbdygaEE';
+const int stripePurchaseVerificationWindowMinutes = 5;
+
+const int promoNotificationIntervalDays = 3;
 const double ecwidProductCreditMultiplier = 100.65;
 const int maxEcwidProductCount = 1000;
 const int capitolBabbleDelayMinutes = 20;
@@ -62,8 +77,8 @@ bool isPeakCapitolBabblePostHours = (((DateTime.now().toUtc().hour >= 13 &&
         DateTime.now().toUtc().hour <= 23 &&
         DateTime.now().toUtc().weekday == DateTime.sunday);
 
-bool isCongressFloorActive =
-    DateTime.now().weekday != DateTime.saturday && DateTime.now().weekday != DateTime.sunday;
+bool isCongressFloorActive = DateTime.now().weekday != DateTime.saturday &&
+    DateTime.now().weekday != DateTime.sunday;
 
 const List<String> wordsToHash = [
   "Abortion",
@@ -182,11 +197,12 @@ const List<String> wordsToHash = [
   "Military",
   "my body my choice",
   "my money my choice",
-  "NOW AVAILABLE",
   "NASDAQ",
+  "NOW AVAILABLE",
   "NYSE",
   "Nuclear",
   "Natural Gas",
+  "National",
   "National Defense",
   "National Security",
   "nonpartisan",
@@ -275,40 +291,48 @@ const String playlistId = 'PLhVgsjve2unNn2NgCKW0uMjgde8L20Hnb';
 /// ADSENSE CONSTANTS
 const String adSenseClientId = 'ca-pub-9188084311019420';
 
-/// ADMOB DATAApp Open	ca-app-pub-3940256099942544/3419835294
+/// ADMOB DATA
+// App Open	ca-app-pub-3940256099942544/3419835294
 const int adChanceToShowThreshold = 3000;
-const String appId = 'ca-app-pub-3834929667159972~4799960334';
-const String defaultBannerId = 'ca-app-pub-3834929667159972/8034011226';
-const String rewardedAdId = 'ca-app-pub-3834929667159972/5759618902';
-const String interstitialAdId = 'ca-app-pub-3834929667159972/9786327541';
+// const String appId = 'ca-app-pub-3834929667159972~4799960334';
+// const String defaultBannerId = 'ca-app-pub-3834929667159972/8034011226';
+// const String rewardedAdId = 'ca-app-pub-3834929667159972/5759618902';
+// const String interstitialAdId = 'ca-app-pub-3834929667159972/9786327541';
 
-const List<String> adMobKeyWords = [
-  'united states',
-  'government',
-  'voting',
-  'law',
-  'bills',
-  'independent',
-  'republican',
-  'democrat',
-  'congress',
-  'white house',
-  'judiciary',
-  'supreme court',
-  'president',
-  'vice president',
-  'speaker of the house',
-  'international',
-  'world',
-  'potus',
-  'capitol hill'
-];
+// CONGRESS WATCHER ADMOB DATA
+const String appId = 'ca-app-pub-3834929667159972~4799960334';
+const String defaultBannerId = 'ca-app-pub-3834929667159972/6870346909';
+const String rewardedAdId = 'ca-app-pub-3834929667159972/8266107486';
+const String interstitialAdId = 'ca-app-pub-3834929667159972/5760445216';
+
+// const List<String> adMobKeyWords = [
+//   'united states',
+//   'government',
+//   'voting',
+//   'law',
+//   'bills',
+//   'independent',
+//   'republican',
+//   'independent',
+//   'democrat',
+//   'congress',
+//   'white house',
+//   'judiciary',
+//   'supreme court',
+//   'president',
+//   'vice president',
+//   'speaker of the house',
+//   'international',
+//   'world',
+//   'potus',
+//   'capitol hill'
+// ];
 
 /// FREE PREMIUM DAYS CONSTANTS
 int freePremiumDaysStartDay = 1;
 int freePremiumDaysEndDay = 6;
-bool freePremiumDaysActive =
-    DateTime.now().day >= freePremiumDaysStartDay && DateTime.now().day < freePremiumDaysEndDay;
+bool freePremiumDaysActive = DateTime.now().day >= freePremiumDaysStartDay &&
+    DateTime.now().day < freePremiumDaysEndDay;
 // &&  DateTime.now().month % 3 == 0;
 int freeTrialPromoDurationDays = 5;
 
@@ -321,27 +345,42 @@ Map<String, dynamic> initialUserData = {
     "$newUserIdPrefix${DateTime.now().year.toString().padLeft(2, '0')}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}${DateTime.now().hour.toString().padLeft(2, '0')}${DateTime.now().minute.toString().padLeft(2, '0')}${DateTime.now().second.toString().padLeft(2, '0')}<|:|>${DateTime.now().toString()}"
   ],
   "appUpdatesList": [
-    //   "Premium Days<|:|>Get 5 days of free premium status during \'Premium Days\' with all features activated!<|:|>high",
-    "Data Security<|:|>Updates to app code to further protect user data and security<|:|>high",
+    "118th Congress Transition<|:|>Due to the House of Representatives transition from the 117th to 118th Congress. Some portions of the app may take some time to update or begin showing data for particular members as congressional sessions begin to move forward. The app is still working properly.<|:|>high",
+    // "Data Security<|:|>Updates to app code to further protect user data and security<|:|>medium",
     // "App Merch Shop Is Open!<|:|>All users can now begin using their points to shop for cool app merchandise. We'll be adding many more products and streamlining the process as we go! (Currently only available in the US and US Territories)\nA few quick ways to accrue points?\n- Share the app with friends, family and colleagues\n- Rating the app from the 'Support' menu\n- Or just purchase them directly when prompted!<|:|>normal",
     // "Top News<|:|>Now users can keep track of the latest US Congress news from around the world.<|:|>medium",
     "App Security<|:|>Minor updates for continued data security<|:|>normal",
     "User Interface<|:|>Minor user interface adjustments<|:|>normal",
     "Miscellaneous<|:|>Minor code upgrades and bug fixes. Earn credits for pointing them out to us!<|:|>normal",
   ],
+  "lastRefresh": "${DateTime.now()}",
+  "userProfile": {},
   "userEmailList": [],
   "userIsPremium": false,
-  "userIsSubscribed": false,
+  // "userIsSubscribed": false,
+
+  ///
   "devLegacyCode": "DLC${random.nextInt(900000) + 100000}",
   "devPremiumCode": "DPC${random.nextInt(900000) + 100000}",
   "devUpgraded": false,
+  "stripeTestMode": false,
+  "googleTestMode": false,
+  "amazonTestMode": false,
+
+  ///
   "freeTrialStartDate": "${DateTime.now()}",
   "freeTrialUsed": false,
   "freeTrialDismissed": false,
   "freeTrialCode": "FTC${random.nextInt(900000) + 100000}",
+
+  ///
   "usageInfo": false,
   "usageInfoSelected": false,
+
+  ///
   "appRated": false,
+
+  ///
   "interstitialAdId": "",
   "interstitialAdIsNew": false,
   "interstitialAdCount": 0,
@@ -349,44 +388,85 @@ Map<String, dynamic> initialUserData = {
   "rewardedAdIsNew": false,
   "rewardedAdCount": 0,
   "adShowAttempts": 0,
+
+  ///
   "credits": 0,
   "permCredits": 100,
   "purchCredits": 0,
+
+  ///
   "appOpens": 0,
   "backgroundFetches": 0,
+
+  ///
   "lastPromoNotification": "${DateTime.now()}",
+
+  ///
   "githubData": {},
   "lastGithubPromoNotificationsRefresh": "${DateTime.now()}",
-  "lastRefresh": "${DateTime.now()}",
+
+  ///
   "capitolBabbleNotificationsList": [],
   "lastCapitolBabble": "${DateTime.now()}",
+
+  ///
   "darkTheme": false,
+  "grapeTheme": false,
   "onboarding": true,
+
+  ///
+  "installerStore": "",
+  "rcIapAvailable": false,
+  "revenueCatCustomer": {},
+  "lastRevenueCatCustomerRefresh": "${DateTime.now()}",
+  "stripeCustomer": {},
+  "stripeCustomerIdList": [],
+  "stripeTestCustomer": {},
+  "stripeTestCustomerIdList": [],
+  "lastStripeCustomerRefresh": "${DateTime.now()}",
+  "stripeProductsList": {},
+  "stripeTestProductsList": {},
+  "lastStripeProductsRefresh": "${DateTime.now()}",
+  "lastStripeSearchInvoicesList": {},
+  "stripeChargesList": {},
+  "revenuecatCustomerIdList": [],
+  "revenuecatTestCustomerIdList": [],
+
+  ///
   "packageInfo": {},
   "deviceInfo": {},
-  "locationData": {},
-  "currentAddress": {"street": "", "city": "", "state": "", "country": "", "zip": ""},
+  "locationInfo": {},
+  "currentLocation": {},
+  "userAddress": {},
   "representativesMap": {},
-  "representativesLocation": {"city": "", "state": "", "country": "", "zip": ""},
-  "congress": 117,
+  "representativesLocation": {},
+
+  ///
+  "congress": 118,
   "houseMembersList": {},
   "senateMembersList": {},
   "memberAlerts": false,
-  "memberResponse": {},
+  // "memberResponse": {},
   "lastMembersRefresh": "${DateTime.now()}",
-  // "notificationsList": [],
+
+  ///
   "subscriptionAlertsList": [],
   "subscriptionAlertsListBackup": [],
+
+  ///
   "lobbyingAlerts": false,
   "lobbyingEventsList": {},
-  // "lastLobby": "",
   "lastLobbyingRefresh": "${DateTime.now()}",
   "newLobbies": false,
+
+  ///
   "privateFundedTripsAlerts": false,
   "privateFundedTripsList": {},
   "lastPrivateFundedTrip": "",
   "lastPrivateFundedTripsRefresh": "${DateTime.now()}",
   "newTrips": false,
+
+  ///
   "stockWatchAlerts": false,
   "houseStockWatchList": [],
   "lastHouseStockWatchItem": "",
@@ -401,6 +481,8 @@ Map<String, dynamic> initialUserData = {
   "marketActivityOverview": {},
   "newMarketOverview": true,
   "lastMarketOverviewRefresh": "${DateTime.now()}",
+
+  ///
   "floorAlerts": true,
   "houseFloorActions": {},
   "senateFloorActions": {},
@@ -408,31 +490,41 @@ Map<String, dynamic> initialUserData = {
   "lastSenateFloorRefresh": "${DateTime.now()}",
   "newHouseFloor": false,
   "newSenateFloor": false,
+
+  ///
   "billAlerts": true,
   "recentBills": {},
   "lastBill": "",
   "lastBillsRefresh": "${DateTime.now()}",
   "newBills": false,
+
+  ///
   "voteAlerts": true,
   "recentVotes": {},
   "lastVote": "",
   "lastVotesRefresh": "${DateTime.now()}",
   "newVotes": false,
+
+  ///
   "statementAlerts": true,
   "statementsResponse": {},
   "lastStatement": "",
   "lastStatementsRefresh": "${DateTime.now()}",
   "newStatements": false,
+
+  ///
   "newsAlerts": true,
   "newsArticles": {},
   "lastNewsArticlesRefresh": "${DateTime.now()}",
   "newNewsArticles": false,
+
+  ///
   "videoAlerts": true,
-  // "youTubePlaylist": {},
-  // "youtubeVideoIds": [],
   "youtubeVideosList": {},
   "lastVideosRefresh": "${DateTime.now()}",
   "newVideos": false,
+
+  ///
   "ecwidProducts": {},
   "newProductAlerts": true,
   "newEcwidProducts": false,

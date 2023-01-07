@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:ui';
 import 'package:animate_do/animate_do.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -10,39 +10,36 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:us_congress_vote_tracker/congress/market_activity_page.dart';
-import 'package:us_congress_vote_tracker/congress/member_details.dart';
-import 'package:us_congress_vote_tracker/congress/bill_search.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/constants/styles.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
-import 'package:us_congress_vote_tracker/constants/widgets.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
-import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
-import 'package:us_congress_vote_tracker/models/bill_recent_payload_model.dart';
-// import 'package:us_congress_vote_tracker/models/floor_actions_model.dart';
-import 'package:us_congress_vote_tracker/models/news_article_model.dart';
-import 'package:us_congress_vote_tracker/models/office_expenses_total.dart';
-import 'package:us_congress_vote_tracker/models/order_detail.dart';
-import 'package:us_congress_vote_tracker/models/private_funded_trips_model.dart';
-import 'package:us_congress_vote_tracker/models/vote_payload_model.dart';
-import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
-import 'package:us_congress_vote_tracker/models/statements_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/congress_stock_watch_api.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/market_activity_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_api.dart';
-import 'package:us_congress_vote_tracker/services/ecwid/ecwid_store_model.dart';
-import 'package:us_congress_vote_tracker/services/emailjs/emailjs_api.dart';
-import 'package:us_congress_vote_tracker/services/github/usc_app_data_api.dart';
-import 'package:us_congress_vote_tracker/services/github/usc_app_data_model.dart';
-import 'package:us_congress_vote_tracker/notifications_handler/notification_api.dart';
-import 'package:us_congress_vote_tracker/services/revenuecat/rc_purchase_api.dart';
-import 'package:us_congress_vote_tracker/services/youtube/top_congressional_videos.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:congress_watcher/congress/market_activity_page.dart';
+import 'package:congress_watcher/congress/member_details.dart';
+import 'package:congress_watcher/congress/bill_search.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/styles.dart';
+import 'package:congress_watcher/constants/themes.dart';
+import 'package:congress_watcher/constants/widgets.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/models/lobby_event_model.dart';
+import 'package:congress_watcher/models/member_payload_model.dart';
+import 'package:congress_watcher/models/bill_recent_payload_model.dart';
+import 'package:congress_watcher/models/news_article_model.dart';
+import 'package:congress_watcher/models/office_expenses_total.dart';
+import 'package:congress_watcher/models/order_detail.dart';
+import 'package:congress_watcher/models/private_funded_trips_model.dart';
+import 'package:congress_watcher/models/vote_payload_model.dart';
+import 'package:congress_watcher/services/admob/admob_ad_library.dart';
+import 'package:congress_watcher/models/statements_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/congress_stock_watch_api.dart';
+import 'package:congress_watcher/services/congress_stock_watch/house_stock_watch_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/market_activity_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/senate_stock_watch_model.dart';
+import 'package:congress_watcher/services/ecwid/ecwid_store_api.dart';
+import 'package:congress_watcher/services/ecwid/ecwid_store_model.dart';
+import 'package:congress_watcher/services/emailjs/emailjs_api.dart';
+import 'package:congress_watcher/services/github/usc_app_data_api.dart';
+import 'package:congress_watcher/services/github/usc_app_data_model.dart';
+import 'package:congress_watcher/notifications_handler/notification_api.dart';
+import 'package:congress_watcher/services/youtube/top_congressional_videos.dart';
+import 'app_user/user_profile.dart';
 import 'constants/constants.dart';
 import 'functions/propublica_api_functions.dart';
 import 'functions/rapidapi_functions.dart';
@@ -57,8 +54,15 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  bool stripeTestMode = false;
+  bool googleTestMode = false;
+  bool amazonTestMode = false;
+  bool testing = false;
   bool appLoading = false;
-  String appLoadingText = 'Loading propaganda...';
+  String appLoadingText = 'Loading. Please hold...';
+
+  UserProfile thisUser;
+
   List<bool> userLevels = [false, false, false];
   bool userIsDev = false;
   bool userIsPremium = false;
@@ -68,23 +72,20 @@ class HomePageState extends State<HomePage> {
   bool newEcwidProducts = false;
   List<EcwidStoreItem> ecwidProductsList = [];
   List<Order> productOrdersList = [];
-  // bool newVersionAvailable = false;
   String queryString = '';
 
   bool darkTheme = false;
+  bool usageInfo = false;
+
+  int initialVariablesCount = 0;
 
   Container bannerAdContainer = Container();
-  // Container rewardedAdContainer = Container();
   bool showBannerAd = true;
   bool adLoaded = false;
   RewardedAd rewardedAd;
   InterstitialAd interstitialAd;
-  // bool showSupport = false;
   bool showPremiumPromo = true;
 
-  // int numberOfPromotions = 0;
-  // int thisPromotion = 0;
-  // List<Widget> listOfPromotions = [];
   List<GithubNotifications> githubNotificationsList = [];
   GithubNotifications thisGithubNotification;
 
@@ -92,7 +93,7 @@ class HomePageState extends State<HomePage> {
   bool randomImageActivated = false;
 
   Box<dynamic> userDatabase = Hive.box<dynamic>(appDatabase);
-  int congress = 117;
+  int congress = 0;
 
   Timer thirtySecondTimer;
 
@@ -133,9 +134,6 @@ class HomePageState extends State<HomePage> {
   List<ActionsList> currentSenateFloorActions = [];
   DateTime currentSenateFloorActionsDate = DateTime.now();
 
-  // List<FloorAction> senateFloorActions = [];
-  // List<FloorAction> houseFloorActions = [];
-
   List<ChamberMember> houseMembersList = [];
   List<ChamberMember> houseRepublicansList = [];
   List<ChamberMember> houseDemocratsList = [];
@@ -146,7 +144,6 @@ class HomePageState extends State<HomePage> {
   List<ChamberMember> senateIndependentsList = [];
   List<ChamberMember> userCongressList = [];
 
-  // List<PlaylistItem> youTubePlaylist = [];
   List<ChannelVideos> youtubeVideosList = [];
 
   // AnimationController animationController;
@@ -167,9 +164,27 @@ class HomePageState extends State<HomePage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        if (Platform.isAndroid) WebView.platform = AndroidWebView();
-
         await init();
+
+        // setState(() =>
+        //     thisUser = userProfileFromJson(userDatabase.get('userProfile')));
+
+        /// CHECK FOR AND SHOW LATEST APP UPDATES
+        await Functions.showLatestUpdates(context, interstitialAd)
+            .then((value) async {
+          /// CHECK FOR USER APP USAGE REWARDS
+          await Functions.checkRewards(
+              context, interstitialAd, rewardedAd, githubNotificationsList);
+        }).then((value) async {
+          /// IF USER IS NEW, REQUEST USAGE INFORMATION APPROVAL
+          if (!userDatabase.get('usageInfo') &&
+              !userDatabase.get('usageInfoSelected')) {
+            await Functions.requestUsageInfo(context, interstitialAd);
+          }
+        });
+
+        await AppUser.buildUserProfile(updateStripeServer: true)
+            .then((value) => setState(() => thisUser = value));
 
         executeOnClickNotificationListenerActions();
       },
@@ -188,37 +203,40 @@ class HomePageState extends State<HomePage> {
     setState(() => appLoading = true);
 
     await setInitialVariables();
-    await GithubApi.getPromoMessages(context);
+
+    await GithubApi.getGithubNotifications(context);
 
     /// BEGIN VIDEO SCROLL ANIMATIONS
-    // if (youTubePlaylist.isNotEmpty) {
-    //   _videoListController.animateTo((youTubePlaylist.length.toDouble() - 1) * 150,
-    //       duration: const Duration(seconds: 30), curve: Curves.linear);
-    // }
     if (youtubeVideosList.isNotEmpty) {
-      _videoListController.animateTo((youtubeVideosList.length.toDouble() - 1) * 150,
-          duration: const Duration(seconds: 30), curve: Curves.linear);
+      _videoListController.animateTo(
+          (youtubeVideosList.length.toDouble() - 1) * 150,
+          duration: const Duration(seconds: 30),
+          curve: Curves.linear);
     }
 
     /// BEGIN NEWS SCROLL ANIMATIONS
     if (newsArticlesList.isNotEmpty) {
-      newsArticleSliderController.animateTo(newsArticlesList.length.toDouble() * 180,
-          duration: const Duration(seconds: 120), curve: Curves.linear);
+      newsArticleSliderController.animateTo(
+          newsArticlesList.length.toDouble() * 180,
+          duration: const Duration(seconds: 120),
+          curve: Curves.linear);
     }
 
-    /// USED TO LISTEN FOR CUSTOMER SUBSCRIPTION UPDATES
-    await RcPurchaseApi.getSubscriptionStatus();
-    Purchases.addCustomerInfoUpdateListener((purchaserInfo) async => {
-          // handle any changes to purchaserInfo
-          await RcPurchaseApi.getSubscriptionStatus()
-        });
-
-    /// CHECK FOR AND SHOW LATEST APP UPDATES
-    await Functions.showLatestUpdates(context);
+    // /// USED TO LISTEN FOR CUSTOMER SUBSCRIPTION UPDATES
+    // if (userDatabase.get('rcIapAvailable')) {
+    //   await RcPurchaseApi.getSubscriptionStatus();
+    //   Purchases.addCustomerInfoUpdateListener((purchaserInfo) async => {
+    //         // handle any changes to purchaserInfo
+    //         await RcPurchaseApi.getSubscriptionStatus()
+    //       });
+    // } else {
+    //   await StripeApi.getSubscriptionStatus();
+    // }
 
     /// Listen for online connection state events
     initConnectivity();
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
     /// LISTEN FOR NOTIFICATION EVENTS HERE
     listenNotifications();
@@ -235,28 +253,21 @@ class HomePageState extends State<HomePage> {
         }));
 
     // if (userIsPremium && freeTrialUsed)
-    await Functions.getTrialStatus(context, interstitialAd, userIsPremium, userIsLegacy);
+    await Functions.getTrialStatus(context, interstitialAd, userLevels);
 
     /// RETREIVE ALL MEMBERS DATA
-    await getMembers('all');
+    await getMembers('all').then((value) async => await getData());
 
     /// LOAD ALL APP DATA AND SET CONGRESS NUMBER
-    await getData().whenComplete(() => setState(() {
-          congress = userDatabase.get('congress');
-        }));
-
-    /// CHECK FOR USER APP USAGE REWARDS
-    await Functions.checkRewards(
-        context, interstitialAd, rewardedAd, userLevels, githubNotificationsList);
-
-    /// IF USER IS NEW, REQUEST USAGE INFORMATION APPROVAL
-    if (!userDatabase.get('usageInfo') && !userDatabase.get('usageInfoSelected')) {
-      await Functions.requestUsageInfo(context);
-    }
+    // await getData();
+    // .whenComplete(() => setState(() {
+    //       congress = userDatabase.get('congress');
+    //     }));
 
     /// APP 1 MINUTE TIMER FUNCTION. USE TO CREATE PERIODIC
     /// AND DERIVATIVE CLOCKS AND TIMERS
-    thirtySecondTimer = Timer.periodic(const Duration(seconds: 30), (Timer timer) async {
+    thirtySecondTimer =
+        Timer.periodic(const Duration(seconds: 30), (Timer timer) async {
       logger.d('***** Thirty Seconds Timer Minute Timer Initialized... *****');
 
       /// THIRTY SECONDS TIMER
@@ -274,12 +285,14 @@ class HomePageState extends State<HomePage> {
             freeTrialUsed &&
             ((freeTrialPromoDurationDays * 86400) -
                     DateTime.now()
-                        .difference(DateTime.parse(userDatabase.get('freeTrialStartDate')))
+                        .difference(DateTime.parse(
+                            userDatabase.get('freeTrialStartDate')))
                         .inSeconds <
                 60) &&
             ((freeTrialPromoDurationDays * 86400) -
                     DateTime.now()
-                        .difference(DateTime.parse(userDatabase.get('freeTrialStartDate')))
+                        .difference(DateTime.parse(
+                            userDatabase.get('freeTrialStartDate')))
                         .inSeconds >
                 30)) {
           await Messages.sendNotification(source: 'trial_ending');
@@ -288,10 +301,11 @@ class HomePageState extends State<HomePage> {
         /// DISABLE FREE PREMIUM TRIAL
         if ((freeTrialPromoDurationDays * 1440) -
                 DateTime.now()
-                    .difference(DateTime.parse(userDatabase.get('freeTrialStartDate')))
+                    .difference(
+                        DateTime.parse(userDatabase.get('freeTrialStartDate')))
                     .inMinutes <=
             0) {
-          await Functions.getTrialStatus(context, interstitialAd, userIsPremium, userIsLegacy);
+          await Functions.getTrialStatus(context, interstitialAd, userLevels);
         }
       }
 
@@ -304,12 +318,15 @@ class HomePageState extends State<HomePage> {
           setState(() => showPremiumPromo = !showPremiumPromo);
         }
 
-        if (_videoListController.offset >= (youtubeVideosList.length.toDouble() - 1) * 150) {
+        if (_videoListController.offset >=
+            (youtubeVideosList.length.toDouble() - 1) * 150) {
           _videoListController.animateTo(0,
               duration: const Duration(seconds: 30), curve: Curves.linear);
         } else if (_videoListController.offset <= 30) {
-          _videoListController.animateTo((youtubeVideosList.length.toDouble() - 1) * 150,
-              duration: const Duration(seconds: 30), curve: Curves.linear);
+          _videoListController.animateTo(
+              (youtubeVideosList.length.toDouble() - 1) * 150,
+              duration: const Duration(seconds: 30),
+              curve: Curves.linear);
         }
       }
 
@@ -319,11 +336,14 @@ class HomePageState extends State<HomePage> {
             '***** 2 Minute Timer Triggered (${dateWithTimeFormatter.format(DateTime.now().toLocal())}) *****');
 
         /// NEWS SLIDER ANIMATION
-        if (newsArticleSliderController.offset >= newsArticlesList.length.toDouble() * 180) {
+        if (newsArticleSliderController.offset >=
+            newsArticlesList.length.toDouble() * 180) {
           newsArticleSliderController.jumpTo(0);
         } else if (newsArticleSliderController.offset <= 30) {
-          newsArticleSliderController.animateTo(newsArticlesList.length.toDouble() * 180,
-              duration: const Duration(seconds: 120), curve: Curves.linear);
+          newsArticleSliderController.animateTo(
+              newsArticlesList.length.toDouble() * 180,
+              duration: const Duration(seconds: 120),
+              curve: Curves.linear);
         }
       }
 
@@ -383,46 +403,61 @@ class HomePageState extends State<HomePage> {
       // thisMinute += 1;
       thisThirtySeconds += 0.5;
     });
+
     setState(() => appLoading = false);
   }
 
   Future<void> setInitialVariables() async {
     await userDatabase.put('appOpens', userDatabase.get('appOpens') + 1);
-    logger.d('***** App Opens: ${userDatabase.get('appOpens')} *****');
-
-    await Functions.processCredits(true, isPurchased: false, isPermanent: false, creditsToAdd: 5);
     logger.d(
-        '*****\nCREDITS: ${userDatabase.get('credits')}\nPERMANENT CREDITS: ${userDatabase.get('permCredits')}\nPURCHASED CREDITS: ${userDatabase.get('purchCredits')} *****');
+        '[HOME PAGE SET INITIAL VARIABLES] App Opens: ${userDatabase.get('appOpens')} *****');
+
+    await Functions.processCredits(true,
+        isPurchased: false, isPermanent: false, creditsToAdd: 5);
+    logger.d(
+        '[HOME PAGE SET INITIAL VARIABLES]\nCREDITS: ${userDatabase.get('credits')}\nPERMANENT CREDITS: ${userDatabase.get('permCredits')}\nPURCHASED CREDITS: ${userDatabase.get('purchCredits')} *****');
 
     /// GITHUB NOTIFICATIONS LIST
     List<GithubNotifications> tempGithubNotificationsList = [];
     GithubNotifications tempGithubNotification;
     try {
-      tempGithubNotificationsList = await GithubApi.pruneAndSortPromoNotifications(
-          githubDataFromJson(userDatabase.get('githubData')).notifications,
-          userIsDev
-              ? "developer"
-              : userIsPremium
-                  ? "premium"
-                  : userIsLegacy
-                      ? "legacy"
-                      : "free",
-          DateTime.now());
-      // githubDataFromJson(userDatabase.get('githubData')).notifications;
-      tempGithubNotification =
-          tempGithubNotificationsList[random.nextInt(tempGithubNotificationsList.length)];
+      tempGithubNotificationsList =
+          await GithubApi.pruneAndSortPromoNotifications(
+              githubDataFromJson(userDatabase.get('githubData')).notifications,
+              userIsDev
+                  ? "developer"
+                  : userIsPremium
+                      ? "premium"
+                      : userIsLegacy
+                          ? "legacy"
+                          : "free",
+              DateTime.now());
+
+      tempGithubNotification = tempGithubNotificationsList[
+          random.nextInt(tempGithubNotificationsList.length)];
       logger.d(
-          '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
+          '[HOME PAGE SET INITIAL VARIABLES] GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
     } catch (e) {
       logger.w(
-          '^^^^^ ERROR RETRIEVING GITHUB NOTIFICATIONS LIST DATA FROM DBASE (MAIN.DART): $e ^^^^^');
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR RETRIEVING GITHUB NOTIFICATIONS LIST DATA FROM DBASE (MAIN.DART): $e');
     }
 
     logger.d(
-        '^^^^^ GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
+        '[HOME PAGE SET INITIAL VARIABLES] GITHUB NOTIFICATIONS (Home Page): ${tempGithubNotificationsList.map((e) => e.title)}');
+
     setState(() {
+      stripeTestMode = userDatabase.get('stripeTestMode');
+      googleTestMode = userDatabase.get('googleTestMode');
+      amazonTestMode = userDatabase.get('amazonTestMode');
+      testing = userDatabase.get('stripeTestMode') ||
+          userDatabase.get('googleTestMode') ||
+          userDatabase.get('amazonTestMode');
+
       devUpgraded = userDatabase.get('devUpgraded');
+      usageInfo = userDatabase.get('usageInfo');
       freeTrialUsed = userDatabase.get('freeTrialUsed');
+      // installerStoreIsValid = userDatabase.get('installerStoreIsValid');
+      // rcIapAvailable = userDatabase.get('rcIapAvailable');
       newEcwidProducts = userDatabase.get('newEcwidProducts');
       githubNotificationsList = tempGithubNotificationsList;
       thisGithubNotification = tempGithubNotification;
@@ -438,18 +473,22 @@ class HomePageState extends State<HomePage> {
       await YouTubeVideosApi.convertAllDates(xVideosList)
           .then((value) => setState(() => youtubeVideosList = value));
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING YOUTUBE PLAYLIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('youtubeVideosList', {});
     }
 
     /// NEWS ARTICLES LIST
     try {
-      List<NewsArticle> tempNewsList = newsArticleFromJson(userDatabase.get('newsArticles'));
+      List<NewsArticle> tempNewsList =
+          newsArticleFromJson(userDatabase.get('newsArticles'));
       await RapidApiFunctions.processNewsArticleDates(tempNewsList)
           .then((value) => setState(() => newsArticlesList = value));
-      debugPrint('[HOME PAGE INITIAL DATA] ${newsArticlesList.length} NEWS ARTICLES');
+      debugPrint(
+          '[HOME PAGE INITIAL DATA] ${newsArticlesList.length} NEWS ARTICLES');
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING NEWS ARTICLES LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING NEWS ARTICLES LIST INITIAL VARIABLES SETUP: $e');
       // userDatabase.put('newsArticles', {});
     }
 
@@ -459,15 +498,16 @@ class HomePageState extends State<HomePage> {
           congressFloorActionFromJson(userDatabase.get('houseFloorActions'));
 
       setState(() {
-        currentHouseFloorActionsDate =
-            DateFormat('EEE, dd MMM yyyy hh:mm:ss').parse(houseFloorAction.actionsDate);
+        currentHouseFloorActionsDate = DateFormat('EEE, dd MMM yyyy hh:mm:ss')
+            .parse(houseFloorAction.actionsDate);
         currentHouseFloorActions = houseFloorAction.actionsList;
       });
-      logger
-          .d('[SET INITIAL VALUES] SET HOUSE FLOOR ACTIONS & DATE: $currentHouseFloorActionsDate');
+      logger.d(
+          '[SET INITIAL VALUES] SET HOUSE FLOOR ACTIONS & DATE: $currentHouseFloorActionsDate');
       setState(() => houseFloorLoading = false);
     } catch (e) {
-      logger.w('[NEW FLOOR ACTION FUNCTION] CURRENT HOUSE Actions ERROR: $e - Resetting... *****');
+      logger.w(
+          '[NEW FLOOR ACTION FUNCTION] CURRENT HOUSE Actions ERROR: $e - Resetting... *****');
       userDatabase.put('houseFloorActions', {});
       // currentFloorActions = [];
     }
@@ -478,45 +518,51 @@ class HomePageState extends State<HomePage> {
           congressFloorActionFromJson(userDatabase.get('senateFloorActions'));
 
       setState(() {
-        currentSenateFloorActionsDate =
-            DateFormat('EEEE, MMMM dd, yyyy').parse(senateFloorAction.actionsDate);
+        currentSenateFloorActionsDate = DateFormat('EEEE, MMMM dd, yyyy')
+            .parse(senateFloorAction.actionsDate);
         currentSenateFloorActions = senateFloorAction.actionsList;
       });
-      logger
-          .d('[SET INITIAL VALUES] SET HOUSE FLOOR ACTIONS & DATE: $currentSenateFloorActionsDate');
+      logger.d(
+          '[SET INITIAL VALUES] SET HOUSE FLOOR ACTIONS & DATE: $currentSenateFloorActionsDate');
       setState(() => senateFloorLoading = false);
     } catch (e) {
-      logger.w('[NEW FLOOR ACTION FUNCTION] CURRENT SENATE Actions ERROR: $e - Resetting... *****');
+      logger.w(
+          '[NEW FLOOR ACTION FUNCTION] CURRENT SENATE Actions ERROR: $e - Resetting... *****');
       userDatabase.put('senateFloorActions', {});
       // currentFloorActions = [];
     }
 
     /// LOBBYING EVENTS LIST
     try {
-      setState(() => lobbyingEventsList = lobbyEventFromJson(userDatabase.get('lobbyingEventsList'))
-          .results
-          .first
-          .lobbyingRepresentations);
+      setState(() => lobbyingEventsList =
+          lobbyEventFromJson(userDatabase.get('lobbyingEventsList'))
+              .results
+              .first
+              .lobbyingRepresentations);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING LOBBY EVENTS INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING LOBBY EVENTS INITIAL VARIABLES SETUP: $e');
       userDatabase.put('lobbyingEventsList', {});
     }
 
     /// PRIVATELY FUNDED TRIPS LIST
     try {
       setState(() => privatelyFundedTripsList =
-          privateFundedTripFromJson(userDatabase.get('privateFundedTripsList')).results);
+          privateFundedTripFromJson(userDatabase.get('privateFundedTripsList'))
+              .results);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING PRIVATE TRIPS INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING PRIVATE TRIPS INITIAL VARIABLES SETUP: $e');
       userDatabase.put('privateFundedTripsList', {});
     }
 
     /// HOUSE STOCK ACTIVITY LIST
     try {
-      setState(() =>
-          houseStockWatchList = houseStockWatchFromJson(userDatabase.get('houseStockWatchList')));
+      setState(() => houseStockWatchList =
+          houseStockWatchFromJson(userDatabase.get('houseStockWatchList')));
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING HOUSE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING HOUSE STOCK TRADE INITIAL VARIABLES SETUP: $e');
       userDatabase.put('houseStockWatchList', []);
     }
 
@@ -525,7 +571,8 @@ class HomePageState extends State<HomePage> {
       setState(() => senateStockWatchList =
           senateStockWatchFromJson(userDatabase.get('senateStockWatchList')));
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING SENATE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING SENATE STOCK TRADE INITIAL VARIABLES SETUP: $e');
       userDatabase.put('senateStockWatchList', []);
     }
 
@@ -534,71 +581,88 @@ class HomePageState extends State<HomePage> {
       setState(() => marketActivityOverviewList =
           marketActivityFromJson(userDatabase.get('marketActivityOverview')));
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING MARKET ACTIVITY OVERVIEW INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING MARKET ACTIVITY OVERVIEW INITIAL VARIABLES SETUP: $e');
       userDatabase.put('marketActivityOverview', {});
     }
 
     /// RECENT VOTES
     try {
-      setState(() => voteList = payloadFromJson(userDatabase.get('recentVotes')).results.votes);
+      setState(() => voteList =
+          payloadFromJson(userDatabase.get('recentVotes')).results.votes);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING VOTE LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING VOTE LIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('recentVotes', {});
     }
 
     /// RECENT BILLS
     try {
-      setState(() =>
-          billList = recentbillsFromJson(userDatabase.get('recentBills')).results.first.bills);
+      setState(() => billList =
+          recentBillsFromJson(userDatabase.get('recentBills'))
+              .results
+              .first
+              .bills);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING BILL LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING BILL LIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('recentBills', {});
     }
 
     /// HOUSE MEMBERS LIST
     try {
       setState(() => houseMembersList =
-          memberPayloadFromJson(userDatabase.get('houseMembersList')).results.first.members);
+          memberPayloadFromJson(userDatabase.get('houseMembersList'))
+              .results
+              .first
+              .members);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING HOUSE MEMBERS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING HOUSE MEMBERS LIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('houseMembersList', {});
     }
 
     /// SENATE MEMBERS LIST
     try {
       setState(() => senateMembersList =
-          memberPayloadFromJson(userDatabase.get('senateMembersList')).results.first.members);
+          memberPayloadFromJson(userDatabase.get('senateMembersList'))
+              .results
+              .first
+              .members);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING SENATE MEMBERS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING SENATE MEMBERS LIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('senateMembersList', {});
     }
 
     /// MEMBER STATEMENTS LIST
     try {
-      setState(() =>
-          statementsList = statementsFromJson(userDatabase.get('statementsResponse')).results);
+      setState(() => statementsList =
+          statementsFromJson(userDatabase.get('statementsResponse')).results);
     } catch (e) {
-      logger.w('^^^^^ ERROR DURING MEMBER STATEMENTS LIST INITIAL VARIABLES SETUP: $e ^^^^^');
+      logger.w(
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR DURING MEMBER STATEMENTS LIST INITIAL VARIABLES SETUP: $e');
       userDatabase.put('statementsResponse', {});
     }
 
     /// ECWID STORE PRODUCTS LIST
     try {
-      setState(
-          () => ecwidProductsList = ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
+      setState(() => ecwidProductsList =
+          ecwidStoreFromJson(userDatabase.get('ecwidProducts')).items);
     } catch (e) {
       logger.w(
-          '^^^^^ ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR RETRIEVING ECWID STORE ITEMS DATA FROM DBASE (ECWID_STORE_API): $e');
       userDatabase.put('ecwidProducts', {});
     }
 
     /// PRODUCT ORDERS LIST
     try {
       setState(() => productOrdersList =
-          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders);
+          orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList'))
+              .orders);
     } catch (e) {
       logger.w(
-          '^^^^^ ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e ^^^^^');
+          '[HOME PAGE SET INITIAL VARIABLES] ERROR RETRIEVING PAST PRODUCT ORDERS DATA FROM DBASE (ECWID_STORE_API): $e');
     }
   }
 
@@ -620,12 +684,11 @@ class HomePageState extends State<HomePage> {
     //       enableDrag: true,
     //       context: context,
     //       builder: (context) {
-    //         return SharedWidgets.ecwidProductsListing(context,
-    //             ecwidProductsList, userDatabase, userLevels, productOrdersList);
+    //         return SharedWidgets.ecwidProductsListing(context, interstitialAd, ecwidProductsList,
+    //             userDatabase, userLevels, productOrdersList);
     //       }).then((_) => !userIsPremium &&
     //           rewardedAd != null &&
-    //           rewardedAd.responseInfo.responseId !=
-    //               userDatabase.get('rewardedAdId')
+    //           rewardedAd.responseInfo.responseId != userDatabase.get('rewardedAdId')
     //       ? AdMobLibrary().rewardedAdShow(rewardedAd)
     //       : null);
     // } else if (onClickAction == 'share') {
@@ -663,9 +726,11 @@ class HomePageState extends State<HomePage> {
     setState(() => _connectionType = connectedTo);
 
     if (connectedTo == 'none') {
-      Messages.showMessage(context: context, message: 'CONNECTION LOST', isAlert: true);
+      Messages.showMessage(
+          context: context, message: 'CONNECTION LOST', isAlert: true);
       setState(() => _connectionLost = true);
-    } else if (thisThirtySeconds > 0 && (connectedTo == 'mobile' || connectedTo == 'wifi')) {
+    } else if (thisThirtySeconds > 0 &&
+        (connectedTo == 'mobile' || connectedTo == 'wifi')) {
       setState(() => _connectionLost = false);
       Messages.showMessage(
         context: context,
@@ -686,6 +751,9 @@ class HomePageState extends State<HomePage> {
         randomImageActivated = false;
       });
 
+      await AppUser.buildUserProfile()
+          .then((value) => setState(() => thisUser = value));
+
       setState(() => appLoadingText = 'Checking for videos...');
       // await Youtube.getYouTubePlaylistItems(context: context)
       //     .then((value) => setState(() => youTubePlaylist = value));
@@ -696,13 +764,19 @@ class HomePageState extends State<HomePage> {
       setState(() => appLoadingText = 'Retrieving latest news...');
       await RapidApiFunctions.fetchNewsArticles(context: context)
           .then((value) => setState(() => newsArticlesList = value));
-      debugPrint('[HOME PAGE GET DATA] ${newsArticlesList.length} NEWS ARTICLES');
+      debugPrint(
+          '[HOME PAGE GET DATA] ${newsArticlesList.length} NEWS ARTICLES');
 
       setState(() => appLoadingText = 'Checking for bill activity...');
       await Functions.fetchBills(
         context: context,
       ).then((value) {
         setState(() => billList = value);
+
+        int congressFromDbase = userDatabase.get('congress');
+        if (congressFromDbase > congress) {
+          setState(() => congress = congressFromDbase);
+        }
       });
 
       setState(() => appLoadingText = 'Checking for new votes...');
@@ -717,8 +791,11 @@ class HomePageState extends State<HomePage> {
         List<LobbyingRepresentation> finalLobbyingEvents = [];
 
         for (var event in value) {
-          if (List.from(userDatabase.get('subscriptionAlertsList')).any((element) =>
-              element.toString().toLowerCase().startsWith('lobby_${event.id}'.toLowerCase()))) {
+          if (List.from(userDatabase.get('subscriptionAlertsList')).any(
+              (element) => element
+                  .toString()
+                  .toLowerCase()
+                  .startsWith('lobby_${event.id}'.toLowerCase()))) {
             watchedLobbyingEvents.add(event);
           } else {
             unwatchedLobbyingEvents.add(event);
@@ -733,30 +810,35 @@ class HomePageState extends State<HomePage> {
       await Functions.fetchPrivateFundedTravel(congress, context: context)
           .then((value) => setState(() => privatelyFundedTripsList = value));
 
-      setState(() => appLoadingText = 'Checking for Senate stock disclosures...');
+      setState(
+          () => appLoadingText = 'Checking for Senate stock disclosures...');
       await CongressStockWatchApi.fetchSenateStockDisclosures(context: context)
           .then((value) => setState(() => senateStockWatchList = value));
 
-      setState(() => appLoadingText = 'Checking for House stock disclosures...');
+      setState(
+          () => appLoadingText = 'Checking for House stock disclosures...');
       await CongressStockWatchApi.fetchHouseStockDisclosures(context: context)
           .then((value) => setState(() => houseStockWatchList = value));
 
       setState(() => appLoadingText = 'Updating market activity overview...');
       await CongressStockWatchApi.updateMarketActivityOverview(
-              context: context, allChamberMembers: houseMembersList + senateMembersList)
+              context: context,
+              allChamberMembers: houseMembersList + senateMembersList)
           .then((value) => setState(() => marketActivityOverviewList = value));
 
-      setState(() => appLoadingText = 'Checking for congressional statements...');
+      setState(
+          () => appLoadingText = 'Checking for congressional statements...');
       await Functions.fetchStatements(context: context).then((value) {
         List<StatementsResults> watchedStatements = [];
         List<StatementsResults> unwatchedStatements = [];
         List<StatementsResults> finalStatements = [];
 
         for (var statement in value) {
-          if (List.from(userDatabase.get('subscriptionAlertsList')).any((element) => element
-              .toString()
-              .toLowerCase()
-              .startsWith('member_${statement.memberId}'.toLowerCase()))) {
+          if (List.from(userDatabase.get('subscriptionAlertsList')).any(
+              (element) => element
+                  .toString()
+                  .toLowerCase()
+                  .startsWith('member_${statement.memberId}'.toLowerCase()))) {
             watchedStatements.add(statement);
           } else {
             unwatchedStatements.add(statement);
@@ -767,16 +849,20 @@ class HomePageState extends State<HomePage> {
         setState(() => statementsList = finalStatements);
       });
 
-      setState(() => appLoadingText = 'Checking for new house floor actions...');
+      setState(
+          () => appLoadingText = 'Checking for new house floor actions...');
 
-      await RapidApiFunctions.getFloorActions(context: context).then((value) => setState(() {
-            currentHouseFloorActions = value;
-            houseFloorLoading = false;
-          }));
+      await RapidApiFunctions.getFloorActions(context: context)
+          .then((value) => setState(() {
+                currentHouseFloorActions = value;
+                houseFloorLoading = false;
+              }));
 
-      setState(() => appLoadingText = 'Checking for new senate floor actions...');
+      setState(
+          () => appLoadingText = 'Checking for new senate floor actions...');
 
-      await RapidApiFunctions.getFloorActions(context: context, isHouseChamber: false)
+      await RapidApiFunctions.getFloorActions(
+              context: context, isHouseChamber: false)
           .then((value) => setState(() {
                 currentSenateFloorActions = value;
                 senateFloorLoading = false;
@@ -804,62 +890,82 @@ class HomePageState extends State<HomePage> {
           loadingSenators = true;
           loadingRepresentatives = true;
         });
-        await Functions.getMembersList(congress, 'senate',
-            context: context, memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+        await Functions.getMembersList('senate',
+            // congress: congress,
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
           setState(() {
             senateMembersList = value;
-            senateRepublicansList =
-                value.where((element) => element.party.toLowerCase() == 'r').toList();
-            senateDemocratsList =
-                value.where((element) => element.party.toLowerCase() == 'd').toList();
-            senateIndependentsList =
-                value.where((element) => element.party.toLowerCase() == 'id').toList();
+            senateRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            senateDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            senateIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
           });
           setState(() => loadingSenators = false);
         });
 
-        await Functions.getMembersList(congress, 'house',
-            context: context, memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+        await Functions.getMembersList('house',
+            // congress: congress,
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
           setState(() {
             houseMembersList = value;
-            houseRepublicansList =
-                value.where((element) => element.party.toLowerCase() == 'r').toList();
-            houseDemocratsList =
-                value.where((element) => element.party.toLowerCase() == 'd').toList();
-            houseIndependentsList =
-                value.where((element) => element.party.toLowerCase() == 'id').toList();
+            houseRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            houseDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            houseIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
           });
           setState(() => loadingRepresentatives = false);
         });
         break;
       case 'senate':
         setState(() => loadingSenators = true);
-        await Functions.getMembersList(congress, 'senate',
-            context: context, memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+        await Functions.getMembersList('senate',
+            // congress: congress,
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
           setState(() {
             senateMembersList = value;
-            senateRepublicansList =
-                value.where((element) => element.party.toLowerCase() == 'r').toList();
-            senateDemocratsList =
-                value.where((element) => element.party.toLowerCase() == 'd').toList();
-            senateIndependentsList =
-                value.where((element) => element.party.toLowerCase() == 'id').toList();
+            senateRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            senateDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            senateIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
           });
           setState(() => loadingSenators = false);
         });
         break;
       case 'house':
         setState(() => loadingRepresentatives = true);
-        await Functions.getMembersList(congress, 'house',
-            context: context, memberIdsToRemove: ['h001075', 'l000594']).then((value) {
+        await Functions.getMembersList('house',
+            // congress: congress,
+            context: context,
+            memberIdsToRemove: ['h001075', 'l000594']).then((value) {
           setState(() {
             houseMembersList = value;
-            houseRepublicansList =
-                value.where((element) => element.party.toLowerCase() == 'r').toList();
-            houseDemocratsList =
-                value.where((element) => element.party.toLowerCase() == 'd').toList();
-            houseIndependentsList =
-                value.where((element) => element.party.toLowerCase() == 'id').toList();
+            houseRepublicansList = value
+                .where((element) => element.party.toLowerCase() == 'r')
+                .toList();
+            houseDemocratsList = value
+                .where((element) => element.party.toLowerCase() == 'd')
+                .toList();
+            houseIndependentsList = value
+                .where((element) => element.party.toLowerCase() == 'id')
+                .toList();
           });
           setState(() => loadingRepresentatives = false);
         });
@@ -868,10 +974,9 @@ class HomePageState extends State<HomePage> {
         logger.d('***** ERROR: NO CHAMBER GIVEN FOR MEMBER REFRESH *****');
     }
 
-    if (userDatabase.get('usageInfo') &&
-        Map<String, dynamic>.from(userDatabase.get('representativesLocation'))['zip'].isNotEmpty) {
-      await Functions.getUserCongress(context, senateMembersList + houseMembersList,
-              Map<String, dynamic>.from(userDatabase.get('representativesLocation'))['zip'])
+    if (userDatabase.get('usageInfo') && thisUser.address.zip.isNotEmpty) {
+      await Functions.getUserCongress(context,
+              senateMembersList + houseMembersList, thisUser.address.zip)
           .then((value) {
         setState(() => userCongressList = value);
       });
@@ -885,7 +990,8 @@ class HomePageState extends State<HomePage> {
     // if (userIsPremium) {
     RewardedAd.load(
       adUnitId: rewardedAdId,
-      request: const AdRequest(nonPersonalizedAds: false, keywords: adMobKeyWords),
+      request: const AdRequest(
+          nonPersonalizedAds: false, keywords: wordsToHash /*adMobKeyWords*/),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdFailedToLoad: (LoadAdError error) {
           logger.d('***** Rewarded Ad failed to load: $error *****');
@@ -894,7 +1000,8 @@ class HomePageState extends State<HomePage> {
         },
         onAdLoaded: (RewardedAd rAd) {
           // Keep a reference to the ad so you can show it later.
-          logger.d('***** Rewarded Ad loaded ${rAd.responseInfo.responseId} *****');
+          logger.d(
+              '***** Rewarded Ad loaded ${rAd.responseInfo.responseId} *****');
           if (rAd.responseInfo.responseId != userDatabase.get('rewardedAdId')) {
             logger.d('***** Loaded Ad is NEW! *****');
             userDatabase.put('rewardedAdIsNew', true);
@@ -908,7 +1015,8 @@ class HomePageState extends State<HomePage> {
       logger.d('***** Interstitial Ad Start *****');
       InterstitialAd.load(
         adUnitId: interstitialAdId,
-        request: const AdRequest(nonPersonalizedAds: false, keywords: adMobKeyWords),
+        request: const AdRequest(
+            nonPersonalizedAds: false, keywords: wordsToHash /*adMobKeyWords*/),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdFailedToLoad: (LoadAdError error) {
             logger.d('***** Interstitial Ad failed to load: $error *****');
@@ -917,8 +1025,10 @@ class HomePageState extends State<HomePage> {
           },
           onAdLoaded: (InterstitialAd iAd) {
             // Keep a reference to the ad so you can show it later.
-            logger.d('***** Interstitial Ad loaded ${iAd.responseInfo.responseId} *****');
-            if (iAd.responseInfo.responseId != userDatabase.get('interstitialAdId')) {
+            logger.d(
+                '***** Interstitial Ad loaded ${iAd.responseInfo.responseId} *****');
+            if (iAd.responseInfo.responseId !=
+                userDatabase.get('interstitialAdId')) {
               logger.d('***** Loaded Interstitial Ad is NEW! *****');
               userDatabase.put('interstitialAdIsNew', true);
             }
@@ -944,21 +1054,33 @@ class HomePageState extends State<HomePage> {
       if (thisBanner != null) {
         setState(() {
           adLoaded = true;
-          bannerAdContainer = AdMobLibrary().bannerContainer(thisBanner, context);
+          bannerAdContainer =
+              AdMobLibrary().bannerContainer(thisBanner, context);
         });
       }
     }
 
     return ValueListenableBuilder(
-        valueListenable: Hive.box(appDatabase).listenable(keys: /*userDatabase.keys.toList()*/
-            [
-          'currentAddress',
+        valueListenable: Hive.box(appDatabase)
+            .listenable(keys: /*userDatabase.keys.toList()*/
+                [
+          'stripeTestMode',
+          'googleTestMode',
+          'amazonTestMode',
+          'userProfile',
+          'usageInfo',
+          'congress',
+          'currentLocation',
+          'userAddress',
           'representativesLocation',
+          'representativesMap',
           'userIdList',
           'subscriptionAlertsList',
           'credits',
           'permCredits',
           'purchCredits',
+          'installerStore',
+          'rcIapAvailable',
           'rewardedAdIsNew',
           'interstitialRewardedAdIsNew',
           'interstitialAdIsNew',
@@ -980,20 +1102,38 @@ class HomePageState extends State<HomePage> {
           'ecwidProductOrdersList',
         ]),
         builder: (context, box, widget) {
+          stripeTestMode = userDatabase.get('stripeTestMode');
+          googleTestMode = userDatabase.get('googleTestMode');
+          amazonTestMode = userDatabase.get('amazonTestMode');
+          testing = userDatabase.get('stripeTestMode') ||
+              userDatabase.get('googleTestMode') ||
+              userDatabase.get('amazonTestMode');
+
+          try {
+            thisUser = userProfileFromJson(userDatabase.get('userProfile'));
+            debugPrint(
+                '[HOME PAGE BUILD] USER PROFILE RETRIEVED FROM DBASE: ${thisUser.userId}');
+          } catch (e) {
+            debugPrint(
+                '[HOME PAGE BUILD] ERROR RETRIEVING USER PROFILE FROM DBASE');
+          }
+
+          usageInfo = userDatabase.get('usageInfo');
           darkTheme = userDatabase.get('darkTheme');
           freeTrialUsed = userDatabase.get('freeTrialUsed');
           newEcwidProducts = userDatabase.get('newEcwidProducts');
-          userIsDev = List.from(userDatabase.get('userIdList'))
-              .any((element) => element.toString().contains(dotenv.env['dCode']));
+          userIsDev = List.from(userDatabase.get('userIdList')).any(
+              (element) => element.toString().contains(dotenv.env['dCode']));
           userIsPremium = userDatabase.get('userIsPremium');
           userIsLegacy = !userDatabase.get('userIsPremium') &&
-                  List.from(userDatabase.get('userIdList'))
-                      .any((element) => element.toString().startsWith(oldUserIdPrefix))
+                  List.from(userDatabase.get('userIdList')).any((element) =>
+                      element.toString().startsWith(oldUserIdPrefix))
               ? true
               : false;
           try {
-            productOrdersList =
-                orderDetailListFromJson(userDatabase.get('ecwidProductOrdersList')).orders;
+            productOrdersList = orderDetailListFromJson(
+                    userDatabase.get('ecwidProductOrdersList'))
+                .orders;
           } catch (e) {
             productOrdersList = [];
             logger.w(
@@ -1003,19 +1143,25 @@ class HomePageState extends State<HomePage> {
           List<String> subscriptionAlertsList =
               List<String>.from(userDatabase.get('subscriptionAlertsList'));
 
-          List<String> memberSubs =
-              subscriptionAlertsList.where((sub) => sub.toString().startsWith('member_')).toList();
-          List<String> billSubs =
-              subscriptionAlertsList.where((sub) => sub.toString().startsWith('bill_')).toList();
-          List<String> lobbySubs =
-              subscriptionAlertsList.where((sub) => sub.toString().startsWith('lobby_')).toList();
-          List<String> otherSubs =
-              subscriptionAlertsList.where((sub) => sub.toString().startsWith('other_')).toList();
+          List<String> memberSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('member_'))
+              .toList();
+          List<String> billSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('bill_'))
+              .toList();
+          List<String> lobbySubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('lobby_'))
+              .toList();
+          List<String> otherSubs = subscriptionAlertsList
+              .where((sub) => sub.toString().startsWith('other_'))
+              .toList();
 
           return OrientationBuilder(builder: (context, orientation) {
             return Container(
               foregroundDecoration: BoxDecoration(
-                  color: !_connectionLost ? Colors.transparent : Colors.black.withOpacity(0.75),
+                  color: !_connectionLost
+                      ? Colors.transparent
+                      : Colors.black.withOpacity(0.75),
                   backgroundBlendMode: BlendMode.color),
               child: Scaffold(
                 appBar: AppBar(
@@ -1047,24 +1193,33 @@ class HomePageState extends State<HomePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('$appTitle ${congress.toString()}',
+                        Text(appTitle,
                             style: Styles.googleStyle.copyWith(fontSize: 25)),
-                        Map.from(userDatabase.get('packageInfo')).isNotEmpty &&
-                                (userDatabase.get('packageInfo')['version'] == null ||
-                                    userDatabase.get('packageInfo')['version'] == 'null')
-                            ? ''
-                            : Text(
-                                '   ${userDatabase.get('packageInfo')['version']}',
-                                style: Styles.regularStyle.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                    color: Theme.of(context).primaryColorLight),
-                              ),
+                        Baseline(
+                          baseline: -15,
+                          baselineType: TextBaseline.alphabetic,
+                          child: Text(
+                              ' ${congress == 0 ? '' : congress.toString()}',
+                              style: Styles.googleStyle.copyWith(
+                                  fontSize: 12,
+                                  fontFeatures: const [
+                                    FontFeature.superscripts()
+                                  ])),
+                        ),
+                        Text(
+                          '   ${thisUser == null ? '' : thisUser.developerStatus ? '${thisUser.packageInfo.version}: ${thisUser.packageInfo.buildNumber}' : thisUser.packageInfo.version}',
+                          style: Styles.regularStyle.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                              color: Theme.of(context).primaryColorLight),
+                        ),
                       ],
                     ),
                   ),
                   actions: <Widget>[
-                    _connectionLost ? const Icon(Icons.mobiledata_off) : const SizedBox.shrink(),
+                    _connectionLost
+                        ? const Icon(Icons.mobiledata_off)
+                        : const SizedBox.shrink(),
                     SizedBox(
                       width: 30,
                       child: IconButton(
@@ -1074,7 +1229,8 @@ class HomePageState extends State<HomePage> {
                           showModalBottomSheet(
                             context: context,
                             builder: (context) => Container(
-                              margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+                              margin: const EdgeInsets.only(
+                                  top: 5, left: 15, right: 15),
                               height: 400,
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
@@ -1083,13 +1239,16 @@ class HomePageState extends State<HomePage> {
                                   Container(
                                     height: 50,
                                     alignment: Alignment.center,
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                    margin:
-                                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
                                     decoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(10)),
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.15),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
                                     child: TextField(
                                       keyboardType: TextInputType.text,
                                       textAlign: TextAlign.center,
@@ -1097,8 +1256,9 @@ class HomePageState extends State<HomePage> {
                                       autofocus: true,
                                       enableSuggestions: true,
                                       decoration: InputDecoration.collapsed(
-                                        hintText:
-                                            queryString == '' ? 'Enter your search' : queryString,
+                                        hintText: queryString == ''
+                                            ? 'Enter your search'
+                                            : queryString,
                                       ),
                                       onChanged: (val) {
                                         queryString = val;
@@ -1114,12 +1274,15 @@ class HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => BillSearch(
-                                              queryString.toLowerCase().replaceAll('.', ''),
+                                              queryString
+                                                  .toLowerCase()
+                                                  .replaceAll('.', ''),
                                               houseStockWatchList,
                                               senateStockWatchList),
                                         ),
-                                      ).then(
-                                          (_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                      ).then((_) =>
+                                          AdMobLibrary.interstitialAdShow(
+                                              interstitialAd));
                                     },
                                     label: const Text('Search'),
                                   )
@@ -1127,45 +1290,52 @@ class HomePageState extends State<HomePage> {
                               ),
                             ),
                           ).then((value) async =>
-                              await Functions.processCredits(true, isPermanent: false));
+                              await Functions.processCredits(true,
+                                  isPermanent: false));
                         },
                       ),
                     ),
-                    SizedBox(
-                        width: 30,
-                        child: IconButton(
-                          color: newEcwidProducts ? altHighlightColor : null,
-                          onPressed: () {
-                            userDatabase.put('newEcwidProducts', false);
-                            showModalBottomSheet(
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: false,
-                                enableDrag: true,
-                                context: context,
-                                builder: (context) {
-                                  return SharedWidgets.ecwidProductsListing(
-                                      context,
-                                      interstitialAd,
-                                      ecwidProductsList,
-                                      userDatabase,
-                                      userLevels,
-                                      productOrdersList);
-                                }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                          },
-                          icon: const Icon(Icons.store),
-                        )),
+                    newEcwidProducts
+                        ? SizedBox(
+                            width: 30,
+                            child: IconButton(
+                              color: altHighlightColor,
+                              onPressed: () {
+                                userDatabase.put('newEcwidProducts', false);
+                                showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: false,
+                                        enableDrag: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return SharedWidgets
+                                              .ecwidProductsListing(
+                                                  context,
+                                                  interstitialAd,
+                                                  ecwidProductsList,
+                                                  userDatabase,
+                                                  productOrdersList);
+                                        })
+                                    .then((_) =>
+                                        AdMobLibrary.interstitialAdShow(
+                                            interstitialAd));
+                              },
+                              icon: const Icon(Icons.store),
+                            ))
+                        : const SizedBox.shrink(),
                     IconButton(
                         onPressed: () => Scaffold.of(context).openEndDrawer(),
                         icon: const Icon(Icons.more_vert))
                   ],
                 ),
-                body: appLoading
+                body: appLoading || thisUser == null
                     ? AnimatedWidgets.circularProgressWatchtower(
-                        context, userDatabase, userIsPremium,
+                        context, userDatabase,
                         isFullScreen: true,
                         isHomePage: true,
                         thisGithubNotification: thisGithubNotification,
-                        backgroundImage: 'assets/congress_pic_$headerImageCounter.png')
+                        backgroundImage:
+                            'assets/congress_pic_$headerImageCounter.png')
                     : RefreshIndicator(
                         onRefresh: getData,
                         child: Row(
@@ -1184,35 +1354,82 @@ class HomePageState extends State<HomePage> {
                                           children: [
                                             Expanded(
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2),
                                                 alignment: Alignment.center,
-                                                color: Theme.of(context).colorScheme.error,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .error,
                                                 child: Text(
                                                   'OFFLINE',
-                                                  style: Styles.regularStyle.copyWith(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: darkThemeTextColor),
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              darkThemeTextColor),
                                                 ),
                                               ),
                                             ),
                                           ],
                                         )
-                                      : const SizedBox.shrink(),
+                                      : testing
+                                          ? Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 2),
+                                                    alignment: Alignment.center,
+                                                    color: stripeTestMode
+                                                        ? Colors.blue
+                                                        : googleTestMode
+                                                            ? Colors.red
+                                                            : amazonTestMode
+                                                                ? Colors.amber
+                                                                : Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .error,
+                                                    child: Text(
+                                                      '${stripeTestMode ? 'STRIPE' : googleTestMode ? 'GOOOOOOOOOOGLE' : amazonTestMode ? 'AMAZON' : ''} TEST MODE ACTIVE',
+                                                      style: Styles.regularStyle
+                                                          .copyWith(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: amazonTestMode
+                                                                  ? Colors.black
+                                                                  : darkThemeTextColor),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : const SizedBox.shrink(),
                                   userIsDev && isPeakCapitolBabblePostHours
                                       ? Row(
                                           children: [
                                             Expanded(
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2),
                                                 alignment: Alignment.center,
-                                                color: alertIndicatorColorDarkGreen,
+                                                color:
+                                                    alertIndicatorColorDarkGreen,
                                                 child: Text(
                                                   'PEAK HOURS',
-                                                  style: Styles.regularStyle.copyWith(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: darkThemeTextColor),
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              darkThemeTextColor),
                                                 ),
                                               ),
                                             ),
@@ -1221,25 +1438,30 @@ class HomePageState extends State<HomePage> {
                                       : const SizedBox.shrink(),
                                   userIsPremium && freeTrialUsed
                                       ? InkWell(
-                                          onTap: () async => await Functions.requestInAppPurchase(
-                                              context, interstitialAd, userIsPremium,
-                                              whatToShow: 'upgrades'),
+                                          onTap: () async =>
+                                              await Functions.requestPurchase(
+                                                  context, interstitialAd,
+                                                  whatToShow: 'upgrades'),
                                           child: Container(
                                             color: altHighlightColor,
                                             alignment: Alignment.center,
-                                            padding: const EdgeInsets.fromLTRB(0, 4, 0, 3),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 4, 0, 3),
                                             child: Text(
                                                 'FREE PREMIUM TRIAL ${freeTrialPromoDurationDays - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inDays > 1 ? 'EXPIRES IN ${freeTrialPromoDurationDays - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inDays} DAYS' : (freeTrialPromoDurationDays * 24) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inHours > 1 ? 'EXPIRES IN UNDER ${(freeTrialPromoDurationDays * 24) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inHours} HOURS' : (freeTrialPromoDurationDays * 1440) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inMinutes > 0 ? 'EXPIRES IN LESS THAN ${(freeTrialPromoDurationDays * 1440) - DateTime.now().difference(DateTime.parse(userDatabase.get('freeTrialStartDate'))).inMinutes} MINUTES' : 'HAS EXPIRED'}'
                                                     .toUpperCase(),
                                                 textAlign: TextAlign.center,
                                                 style: Styles.regularStyle.copyWith(
-                                                    color: altHighlightAccentColorDarkRed,
+                                                    color:
+                                                        altHighlightAccentColorDark,
                                                     fontSize: 10,
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         )
                                       : const SizedBox.shrink(),
-                                  orientation == Orientation.landscape || youtubeVideosList.isEmpty
+                                  orientation == Orientation.landscape ||
+                                          youtubeVideosList.isEmpty
                                       ? const SizedBox.shrink()
                                       : Stack(
                                           alignment: Alignment.centerLeft,
@@ -1249,9 +1471,13 @@ class HomePageState extends State<HomePage> {
                                                 child: Image.asset(
                                                     'assets/congress_pic_$headerImageCounter.png',
                                                     height: 120,
-                                                    width: MediaQuery.of(context).size.width,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
                                                     fit: BoxFit.cover,
-                                                    color: Theme.of(context).primaryColor,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
                                                     colorBlendMode: darkTheme
                                                         ? BlendMode.color
                                                         : BlendMode.softLight),
@@ -1259,39 +1485,47 @@ class HomePageState extends State<HomePage> {
                                             ),
                                             Container(
                                               height: 100,
-                                              foregroundDecoration: BoxDecoration(
+                                              foregroundDecoration:
+                                                  BoxDecoration(
                                                 border: Border(
                                                     left: BorderSide(
                                                         width: 2,
-                                                        color: !userDatabase.get('newVideos')
+                                                        color: !userDatabase
+                                                                .get(
+                                                                    'newVideos')
                                                             ? Colors.transparent
-                                                            : userDatabase.get('darkTheme')
-                                                                ? alertIndicatorColorBrightGreen
-                                                                : altHighlightColor)),
+                                                            : altHighlightColor)),
                                               ),
                                               child: ListView.builder(
                                                   primary: false,
-                                                  physics: const BouncingScrollPhysics(),
-                                                  controller: _videoListController,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  controller:
+                                                      _videoListController,
                                                   shrinkWrap: true,
-                                                  scrollDirection: Axis.horizontal,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
                                                   itemCount: youtubeVideosList
                                                       .length, // youTubePlaylist.length,
-                                                  itemBuilder: (context, index) {
+                                                  itemBuilder:
+                                                      (context, index) {
                                                     // final PlaylistItem thisVideo =
                                                     //     youTubePlaylist[index];
-                                                    final ChannelVideos thisVideo =
-                                                        youtubeVideosList[index];
+                                                    final ChannelVideos
+                                                        thisVideo =
+                                                        youtubeVideosList[
+                                                            index];
 
-                                                    return YouTubeVideosApi.videoTile(
-                                                        context,
-                                                        youtubeVideosList,
-                                                        thisVideo,
-                                                        index,
-                                                        orientation,
-                                                        interstitialAd,
-                                                        randomImageActivated,
-                                                        userLevels);
+                                                    return YouTubeVideosApi
+                                                        .videoTile(
+                                                            context,
+                                                            youtubeVideosList,
+                                                            thisVideo,
+                                                            index,
+                                                            orientation,
+                                                            interstitialAd,
+                                                            randomImageActivated,
+                                                            userLevels);
                                                   }),
                                             ),
                                           ],
@@ -1302,20 +1536,32 @@ class HomePageState extends State<HomePage> {
                                       primary: false,
                                       physics: const BouncingScrollPhysics(),
                                       children: [
-                                        userInfo(memberSubs, billSubs, lobbySubs, otherSubs,
+                                        userInfo(
+                                            memberSubs,
+                                            billSubs,
+                                            lobbySubs,
+                                            otherSubs,
                                             subscriptionAlertsList),
                                         newsArticlesList.isEmpty
                                             ? const SizedBox.shrink()
-                                            : newsArticleSlider(newsArticlesList),
+                                            : newsArticleSlider(
+                                                newsArticlesList),
                                         // houseFloorActions.isEmpty && senateFloorActions.isEmpty
                                         githubNotificationsList.isEmpty ||
-                                                (currentHouseFloorActions.isEmpty &&
-                                                    currentSenateFloorActions.isEmpty)
+                                                (currentHouseFloorActions
+                                                        .isEmpty &&
+                                                    currentSenateFloorActions
+                                                        .isEmpty)
                                             ? const SizedBox.shrink()
                                             : floorActions(orientation),
-                                        congressInfoButtons(subscriptionAlertsList),
+                                        congressInfoButtons(
+                                            subscriptionAlertsList),
                                         marketTrades(),
-                                        userRepresentatives(orientation, subscriptionAlertsList),
+                                        // userCongressList.isEmpty
+                                        //     ? const SizedBox.shrink()
+                                        //     :
+                                        userRepresentatives(orientation,
+                                            subscriptionAlertsList),
                                         memberPublicStatements(),
                                       ],
                                     ),
@@ -1330,13 +1576,20 @@ class HomePageState extends State<HomePage> {
                                     youtubeVideosList.isEmpty
                                 ? const SizedBox.shrink()
                                 : Container(
-                                    padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
-                                    color: Theme.of(context).primaryColor.withOpacity(0.15),
-                                    width: MediaQuery.of(context).size.width * 2.5 / 6,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0.15),
+                                    width: MediaQuery.of(context).size.width *
+                                        2.5 /
+                                        6,
                                     child: Container(
                                       alignment: Alignment.topCenter,
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.background,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .background,
                                         image: DecorationImage(
                                             opacity: 0.25,
                                             image: AssetImage(
@@ -1344,7 +1597,9 @@ class HomePageState extends State<HomePage> {
                                             fit: BoxFit.cover,
                                             // repeat: ImageRepeat.repeat,
                                             colorFilter: ColorFilter.mode(
-                                                Theme.of(context).colorScheme.background,
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .background,
                                                 BlendMode.color)),
                                       ),
                                       child: Stack(
@@ -1355,37 +1610,49 @@ class HomePageState extends State<HomePage> {
                                               Expanded(
                                                 child: SlideInUp(
                                                   animate: true,
-                                                  duration: const Duration(milliseconds: 1000),
+                                                  duration: const Duration(
+                                                      milliseconds: 1000),
                                                   child: Container(
-                                                    padding: const EdgeInsets.only(top: 2),
-                                                    foregroundDecoration: BoxDecoration(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 2),
+                                                    foregroundDecoration:
+                                                        BoxDecoration(
                                                       border: Border(
                                                           top: BorderSide(
                                                               width: 5,
-                                                              color: !userDatabase.get('newVideos')
-                                                                  ? Colors.transparent
+                                                              color: !userDatabase
+                                                                      .get(
+                                                                          'newVideos')
+                                                                  ? Colors
+                                                                      .transparent
                                                                   : altHighlightColor)),
                                                     ),
                                                     child: ListView.builder(
                                                         primary: false,
-                                                        physics: const BouncingScrollPhysics(),
-                                                        controller: _videoListController,
+                                                        physics:
+                                                            const BouncingScrollPhysics(),
+                                                        controller:
+                                                            _videoListController,
                                                         shrinkWrap: true,
                                                         itemCount: youtubeVideosList
                                                             .length, // youTubePlaylist.length,
-                                                        itemBuilder: (context, index) {
+                                                        itemBuilder:
+                                                            (context, index) {
                                                           final thisVideo =
-                                                              youtubeVideosList[index];
+                                                              youtubeVideosList[
+                                                                  index];
 
-                                                          return YouTubeVideosApi.videoTile(
-                                                              context,
-                                                              youtubeVideosList,
-                                                              thisVideo,
-                                                              index,
-                                                              orientation,
-                                                              interstitialAd,
-                                                              randomImageActivated,
-                                                              userLevels);
+                                                          return YouTubeVideosApi
+                                                              .videoTile(
+                                                                  context,
+                                                                  youtubeVideosList,
+                                                                  thisVideo,
+                                                                  index,
+                                                                  orientation,
+                                                                  interstitialAd,
+                                                                  randomImageActivated,
+                                                                  userLevels);
                                                         }),
                                                   ),
                                                 ),
@@ -1409,7 +1676,7 @@ class HomePageState extends State<HomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         footerContent(orientation),
-                        SharedWidgets.createdByContainer(context, userIsPremium, userDatabase),
+                        SharedWidgets.createdByContainer(context, userDatabase),
                       ],
                     ),
                   ),
@@ -1420,104 +1687,121 @@ class HomePageState extends State<HomePage> {
         });
   }
 
-  Future<void> homePageTextInput(
-      BuildContext homeContext, Orientation orientation, String source, String titleText) async {
+  Future<void> homePageTextInput(BuildContext homeContext,
+      Orientation orientation, String source, String titleText) async {
     final formKey = GlobalKey<FormState>();
     String data;
     showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    titleText,
-                    style: GoogleFonts.bangers(fontSize: 25),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Form(
-                      key: formKey,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              keyboardType:
-                                  source == 'zipCode' ? TextInputType.number : TextInputType.text,
-                              validator: (val) => val == null || val.isEmpty
-                                  ? 'Enter text'
-                                  : (source == 'zipCode' && val.length > 5) ||
-                                          val.length < 5 ||
-                                          val.length > 13
-                                      ? source == 'zipCode'
-                                          ? 'Zip must be 5 digits'
-                                          : source == 'userId'
-                                              ? 'User must be 5 to 13 characters'
-                                              : 'Must be more that 5 characters'
-                                      : null,
-                              onChanged: (val) =>
-                                  setState(() => data = val.toLowerCase().replaceAll(' ', '')),
-                            ),
-                          ),
-                          IconButton(
-                              iconSize: 20,
-                              onPressed: () async {
-                                if (formKey.currentState.validate()) {
-                                  Navigator.pop(context);
-                                  if (source == 'zipCode') {
-                                    await Functions.getUserCongress(
-                                      homeContext,
-                                      houseMembersList + senateMembersList,
-                                      data,
-                                    ).then((value) {
-                                      setState(() => userCongressList = value);
-                                    });
-                                  } else if (source == 'userId') {
-                                    List<String> currentUserIdList =
-                                        List.from(userDatabase.get('userIdList'));
-                                    if (!currentUserIdList.any(
-                                        (element) => element.startsWith('$newUserIdPrefix$data'))) {
-                                      currentUserIdList
-                                          .add('$newUserIdPrefix$data<|:|>${DateTime.now()}');
-                                    } else if (currentUserIdList.any(
-                                        (element) => element.startsWith('$newUserIdPrefix$data'))) {
-                                      int existingUserNameIndex = currentUserIdList.indexWhere(
-                                          (element) => element.startsWith('$newUserIdPrefix$data'));
-
-                                      String existingUserName =
-                                          currentUserIdList.removeAt(existingUserNameIndex);
-
-                                      // _currentUserIdList.removeWhere(
-                                      //     (element) => element.startsWith(
-                                      //         '$newUserIdPrefix$_data'));
-
-                                      currentUserIdList.add(existingUserName);
-                                    }
-                                    userDatabase.put('userIdList', currentUserIdList);
-                                  } else {
-                                    logger.d('***** Nothing to Update *****');
-                                  }
-                                }
-                              },
-                              icon: const Icon(Icons.send))
-                        ],
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        titleText,
+                        style: GoogleFonts.bangers(fontSize: 25),
                       ),
-                    ),
-                  )
-                ]),
-          );
-        }).then((_) async => await Functions.processCredits(true, isPermanent: false));
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom),
+                        child: Form(
+                          key: formKey,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: source == 'zipCode'
+                                      ? TextInputType.number
+                                      : TextInputType.text,
+                                  validator: (val) => val == null || val.isEmpty
+                                      ? 'Enter text'
+                                      : (source == 'zipCode' &&
+                                                  val.length > 5) ||
+                                              val.length < 5 ||
+                                              val.length > 13
+                                          ? source == 'zipCode'
+                                              ? 'Zip must be 5 digits'
+                                              : source == 'userId'
+                                                  ? 'User must be 5 to 13 characters'
+                                                  : 'Must be more that 5 characters'
+                                          : null,
+                                  onChanged: (val) => setState(() => data =
+                                      val.toLowerCase().replaceAll(' ', '')),
+                                ),
+                              ),
+                              IconButton(
+                                  iconSize: 20,
+                                  onPressed: () async {
+                                    if (formKey.currentState.validate()) {
+                                      Navigator.pop(context);
+                                      if (source == 'zipCode') {
+                                        await Functions.getUserCongress(
+                                          homeContext,
+                                          houseMembersList + senateMembersList,
+                                          data,
+                                        ).then((value) {
+                                          setState(
+                                              () => userCongressList = value);
+                                        });
+                                      } else if (source == 'userId') {
+                                        List<String> currentUserIdList =
+                                            List.from(
+                                                userDatabase.get('userIdList'));
+                                        if (!currentUserIdList.any((element) =>
+                                            element.startsWith(
+                                                '$newUserIdPrefix$data'))) {
+                                          currentUserIdList.add(
+                                              '$newUserIdPrefix$data<|:|>${DateTime.now()}');
+                                        } else if (currentUserIdList.any(
+                                            (element) => element.startsWith(
+                                                '$newUserIdPrefix$data'))) {
+                                          int existingUserNameIndex =
+                                              currentUserIdList.indexWhere(
+                                                  (element) => element.startsWith(
+                                                      '$newUserIdPrefix$data'));
+
+                                          String existingUserName =
+                                              currentUserIdList.removeAt(
+                                                  existingUserNameIndex);
+
+                                          // _currentUserIdList.removeWhere(
+                                          //     (element) => element.startsWith(
+                                          //         '$newUserIdPrefix$_data'));
+
+                                          currentUserIdList
+                                              .add(existingUserName);
+                                        }
+                                        userDatabase.put(
+                                            'userIdList', currentUserIdList);
+                                      } else {
+                                        logger
+                                            .d('***** Nothing to Update *****');
+                                      }
+                                    }
+                                  },
+                                  icon: const Icon(Icons.send))
+                            ],
+                          ),
+                        ),
+                      )
+                    ]),
+              );
+            })
+        .then((_) async =>
+            await Functions.processCredits(true, isPermanent: false));
   }
 
   String membersSearchString = '';
   String stateString = '';
 
-  Widget membersListContainer(List<ChamberMember> allMembersList, String chamber,
-      {List<HouseStockWatch> houseStockWatchList, List<SenateStockWatch> senateStockWatchList}) {
+  Widget membersListContainer(
+      List<ChamberMember> allMembersList, String chamber,
+      {List<HouseStockWatch> houseStockWatchList,
+      List<SenateStockWatch> senateStockWatchList}) {
     String shortTitle = chamber == 'Representatives' ? 'rep.' : 'sen.';
     List<ChamberMember> subscribedMembersList = [];
     List<ChamberMember> notSubscribedMembersList = [];
@@ -1525,7 +1809,10 @@ class HomePageState extends State<HomePage> {
 
     for (var member in allMembersList) {
       if (List.from(userDatabase.get('subscriptionAlertsList')).any((element) =>
-          element.toString().toLowerCase().startsWith('member_${member.id.toLowerCase()}'))) {
+          element
+              .toString()
+              .toLowerCase()
+              .startsWith('member_${member.id.toLowerCase()}'))) {
         subscribedMembersList.add(member);
       } else if (member.shortTitle.toLowerCase() == shortTitle) {
         notSubscribedMembersList.add(member);
@@ -1569,8 +1856,10 @@ class HomePageState extends State<HomePage> {
     //         Hive.box(appDatabase).listenable(keys: ['subscriptionAlertsList']),
     //     builder: (context, box, widget) {
     return StatefulBuilder(builder: (context, setState) {
-      if (statesMap.entries.any((state) =>
-          state.value.trim().toLowerCase().contains(membersSearchString.trim().toLowerCase()))) {
+      if (statesMap.entries.any((state) => state.value
+          .trim()
+          .toLowerCase()
+          .contains(membersSearchString.trim().toLowerCase()))) {
         stateString = statesMap.entries
             .where((element) => element.value
                 .trim()
@@ -1591,7 +1880,10 @@ class HomePageState extends State<HomePage> {
                     .toString()
                     .toLowerCase()
                     .contains(membersSearchString.trim().toLowerCase()) ||
-                member.state.trim().toLowerCase().contains(stateString.trim().toLowerCase()))
+                member.state
+                    .trim()
+                    .toLowerCase()
+                    .contains(stateString.trim().toLowerCase()))
             .toList();
       } else if (membersSearchString.isNotEmpty && stateString.isEmpty) {
         finalMembersList = membersList
@@ -1604,12 +1896,42 @@ class HomePageState extends State<HomePage> {
       } else if (membersSearchString.isEmpty && stateString.isEmpty) {
         finalMembersList = membersList;
       }
-      List<ChamberMember> finalRepublicans =
-          finalMembersList.where((element) => element.party.toLowerCase() == 'r').toList();
-      List<ChamberMember> finalDemocrats =
-          finalMembersList.where((element) => element.party.toLowerCase() == 'd').toList();
-      List<ChamberMember> finalIndependents =
-          finalMembersList.where((element) => element.party.toLowerCase() == 'id').toList();
+
+      List<ChamberMember> finalMembersInOffice = finalMembersList
+          .where((element) =>
+              element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+              element.inOffice)
+          .toList();
+
+      List<ChamberMember> finalRepublicans = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'r')
+          .toList();
+
+      List<ChamberMember> finalRepublicansInOffice = finalRepublicans
+          .where((element) =>
+              element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+              element.inOffice)
+          .toList();
+
+      List<ChamberMember> finalDemocrats = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'd')
+          .toList();
+
+      List<ChamberMember> finalDemocratsInOffice = finalDemocrats
+          .where((element) =>
+              element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+              element.inOffice)
+          .toList();
+
+      List<ChamberMember> finalIndependents = finalMembersList
+          .where((element) => element.party.toLowerCase() == 'id')
+          .toList();
+
+      List<ChamberMember> finalIndependentsInOffice = finalIndependents
+          .where((element) =>
+              element.shortTitle.toLowerCase() == shortTitle.toLowerCase() &&
+              element.inOffice)
+          .toList();
 
       return BounceInUp(
         child: Container(
@@ -1617,10 +1939,11 @@ class HomePageState extends State<HomePage> {
             color: Theme.of(context).colorScheme.background,
             image: DecorationImage(
                 opacity: 0.15,
-                image: AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
+                image:
+                    AssetImage('assets/congress_pic_${random.nextInt(4)}.png'),
                 fit: BoxFit.cover,
-                colorFilter:
-                    ColorFilter.mode(Theme.of(context).colorScheme.background, BlendMode.color)),
+                colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.background, BlendMode.color)),
           ),
           child: Column(
             children: [
@@ -1632,15 +1955,20 @@ class HomePageState extends State<HomePage> {
                   children: [
                     Expanded(
                       child: Text(
-                          '${finalMembersList.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} $chamber',
-                          style: GoogleFonts.bangers(color: Colors.white, fontSize: 25)),
+                          '${finalMembersInOffice.isEmpty ? '' : finalMembersInOffice.length} $chamber ${finalMembersInOffice.isEmpty ? '(In Transition)' : ''}',
+                          style: GoogleFonts.bangers(
+                              color: Colors.white, fontSize: 25)),
                     ),
-                    Text(
-                        '${finalRepublicans.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Rep | '
-                        '${finalDemocrats.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Dem | '
-                        '${finalIndependents.where((element) => element.shortTitle.toLowerCase() == shortTitle.toLowerCase() && element.inOffice).length} Ind',
-                        style: const TextStyle(
-                            color: Color(0xffffffff), fontStyle: FontStyle.italic, fontSize: 12)),
+                    finalMembersInOffice.isEmpty
+                        ? const SizedBox.shrink()
+                        : Text(
+                            '${finalRepublicansInOffice.length} Rep | '
+                            '${finalDemocratsInOffice.length} Dem | '
+                            '${finalIndependentsInOffice.length} Ind',
+                            style: const TextStyle(
+                                color: Color(0xffffffff),
+                                fontStyle: FontStyle.italic,
+                                fontSize: 12)),
                   ],
                 ),
               ),
@@ -1667,9 +1995,13 @@ class HomePageState extends State<HomePage> {
                         fillColor: const Color(0xaaffffff),
                         hintText: 'Search',
                         hintStyle: TextStyle(
-                            fontSize: 14, color: thisPartyColor, fontWeight: FontWeight.bold),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                        icon: const Icon(Icons.search, color: Color(0xffffffff), size: 20),
+                            fontSize: 14,
+                            color: thisPartyColor,
+                            fontWeight: FontWeight.bold),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 2, horizontal: 5),
+                        icon: const Icon(Icons.search,
+                            color: Color(0xffffffff), size: 20),
                       ),
                     )),
                   ],
@@ -1686,13 +2018,15 @@ class HomePageState extends State<HomePage> {
                     itemBuilder: (BuildContext context, int index) {
                       final thisMember = finalMembersList[index];
                       final String thisMemberImageUrl =
-                          '${PropublicaApi().memberImageRootUrl}${thisMember.id}.jpg'.toLowerCase();
+                          '${PropublicaApi().memberImageRootUrl}${thisMember.id}.jpg'
+                              .toLowerCase();
                       logger.d('**** Image Url: $thisMemberImageUrl *****');
-                      final Color thisMemberColor = thisMember.party.toLowerCase() == 'd'
-                          ? democratColor
-                          : thisMember.party.toLowerCase() == 'r'
-                              ? republicanColor
-                              : independentColor;
+                      final Color thisMemberColor =
+                          thisMember.party.toLowerCase() == 'd'
+                              ? democratColor
+                              : thisMember.party.toLowerCase() == 'r'
+                                  ? republicanColor
+                                  : independentColor;
                       return SharedWidgets.congressionalMemberCard(
                           thisMemberColor,
                           thisMemberImageUrl,
@@ -1714,7 +2048,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget bottomSheetContent() {
-    return appLoading
+    return appLoading || thisUser == null
         ? Container(
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -1725,7 +2059,8 @@ class HomePageState extends State<HomePage> {
             width: MediaQuery.of(context).size.width.toDouble(),
             height: 35,
             child: Text(appLoadingText,
-                style: Styles.googleStyle.copyWith(fontSize: 18, color: darkThemeTextColor)))
+                style: Styles.googleStyle
+                    .copyWith(fontSize: 18, color: darkThemeTextColor)))
         : Container(
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -1758,20 +2093,20 @@ class HomePageState extends State<HomePage> {
                                   size: 13,
                                   color: darkTheme
                                       ? altHighlightColor
-                                      : altHighlightAccentColorDarkRed,
+                                      : Theme.of(context).primaryColorDark,
                                   removeShadow: true)
                               : FaIcon(
                                   FontAwesomeIcons.store,
                                   size: 13,
                                   color: darkTheme
                                       ? darkThemeTextColor
-                                      : altHighlightAccentColorDarkRed,
+                                      : Theme.of(context).primaryColorDark,
                                 ),
                           label: Text('Shop Merch',
                               style: TextStyle(
                                   color: darkTheme
                                       ? darkThemeTextColor
-                                      : altHighlightAccentColorDarkRed,
+                                      : Theme.of(context).primaryColorDark,
                                   fontWeight: FontWeight.bold)),
                           onPressed: ecwidProductsList.isEmpty
                               ? null
@@ -1783,15 +2118,17 @@ class HomePageState extends State<HomePage> {
                                           enableDrag: true,
                                           context: context,
                                           builder: (context) {
-                                            return SharedWidgets.ecwidProductsListing(
-                                                context,
-                                                interstitialAd,
-                                                ecwidProductsList,
-                                                userDatabase,
-                                                userLevels,
-                                                productOrdersList);
+                                            return SharedWidgets
+                                                .ecwidProductsListing(
+                                                    context,
+                                                    interstitialAd,
+                                                    ecwidProductsList,
+                                                    userDatabase,
+                                                    productOrdersList);
                                           })
-                                      .then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                      .then((_) =>
+                                          AdMobLibrary.interstitialAdShow(
+                                              interstitialAd));
                                   // .then((_) => !userIsPremium &&
                                   //     interstitialAd != null &&
                                   //     interstitialAd.responseInfo.responseId !=
@@ -1819,29 +2156,32 @@ class HomePageState extends State<HomePage> {
                           icon: Icon(
                             Icons.volunteer_activism,
                             size: 15,
-                            color: darkTheme ? darkThemeTextColor : altHighlightAccentColorDarkRed,
+                            color: darkTheme
+                                ? darkThemeTextColor
+                                : Theme.of(context).primaryColorDark,
                           ),
                           label: Text('Support Options',
                               style: TextStyle(
                                   color: darkTheme
                                       ? darkThemeTextColor
-                                      : altHighlightAccentColorDarkRed,
+                                      : Theme.of(context).primaryColorDark,
                                   fontWeight: FontWeight.bold)),
                           onPressed: () async {
                             showModalBottomSheet(
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: false,
-                                enableDrag: true,
-                                context: context,
-                                builder: (context) {
-                                  return SharedWidgets.supportOptions(
-                                      context,
-                                      interstitialAd,
-                                      userDatabase,
-                                      rewardedAd,
-                                      userLevels,
-                                      githubNotificationsList);
-                                }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: false,
+                                    enableDrag: true,
+                                    context: context,
+                                    builder: (context) {
+                                      return SharedWidgets.supportOptions(
+                                          context,
+                                          interstitialAd,
+                                          userDatabase,
+                                          rewardedAd,
+                                          githubNotificationsList);
+                                    })
+                                .then((_) => AdMobLibrary.interstitialAdShow(
+                                    interstitialAd));
                             // .then((_) => !userIsPremium &&
                             //     interstitialAd != null &&
                             //     interstitialAd.responseInfo.responseId !=
@@ -1897,15 +2237,19 @@ class HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       NewsArticle thisArticle = newsArticles[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 2.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2.5, vertical: 2.5),
                         child: InkWell(
-                            onTap: () => Functions.linkLaunch(
-                                context, thisArticle.url, userDatabase, userIsPremium,
-                                appBarTitle: thisArticle.source, interstitialAd: interstitialAd),
+                            onTap: () =>
+                                Functions.linkLaunch(context, thisArticle.url,
+                                    /* userDatabase ,userIsPremium, */
+                                    appBarTitle: thisArticle.source,
+                                    interstitialAd: interstitialAd),
                             child: FadeInRight(
                               child: Container(
                                   // width: 190,
-                                  constraints: const BoxConstraints(minWidth: 100, maxWidth: 250),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 100, maxWidth: 250),
                                   padding: const EdgeInsets.all(5),
                                   // decoration: BoxDecoration(
                                   //     color: Theme.of(context)
@@ -1933,7 +2277,8 @@ class HomePageState extends State<HomePage> {
                                             decoration: BoxDecoration(
                                               // shape: BoxShape.circle,
                                               // border: Border.all(width: 1),
-                                              borderRadius: BorderRadius.circular(5),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
 
                                               image: DecorationImage(
                                                   image: AssetImage(
@@ -1943,10 +2288,12 @@ class HomePageState extends State<HomePage> {
                                             foregroundDecoration: BoxDecoration(
                                               // shape: BoxShape.circle,
                                               border: Border.all(width: 1),
-                                              borderRadius: BorderRadius.circular(5),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
 
                                               image: DecorationImage(
-                                                  image: NetworkImage(thisArticle.imageUrl),
+                                                  image: NetworkImage(
+                                                      thisArticle.imageUrl),
                                                   fit: BoxFit.cover),
                                             ),
                                             // child: FadeInImage(
@@ -1969,27 +2316,35 @@ class HomePageState extends State<HomePage> {
                                       const SizedBox(width: 10),
                                       Flexible(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               thisArticle.title,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 12,
-                                                  color: darkTheme ? darkThemeTextColor : null,
-                                                  fontWeight: FontWeight.bold),
+                                              style: Styles.regularStyle
+                                                  .copyWith(
+                                                      fontSize: 12,
+                                                      color: darkTheme
+                                                          ? darkThemeTextColor
+                                                          : null,
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                             ),
                                             Text(
                                               '${thisArticle.source} ${dateWithDayFormatter.format(DateTime.parse(thisArticle.date))}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 9,
-                                                  color: darkTheme
-                                                      ? darkThemeTextColor.withOpacity(0.85)
-                                                      : null,
-                                                  fontWeight: FontWeight.normal),
+                                              style: Styles.regularStyle
+                                                  .copyWith(
+                                                      fontSize: 9,
+                                                      color: darkTheme
+                                                          ? darkThemeTextColor
+                                                              .withOpacity(0.85)
+                                                          : null,
+                                                      fontWeight:
+                                                          FontWeight.normal),
                                             ),
                                           ],
                                         ),
@@ -2003,8 +2358,12 @@ class HomePageState extends State<HomePage> {
         ));
   }
 
-  Widget userInfo(List<String> memberSubs, List<String> billSubs, List<String> lobbySubs,
-      List<String> otherSubs, List<String> subscriptionAlertsList) {
+  Widget userInfo(
+      List<String> memberSubs,
+      List<String> billSubs,
+      List<String> lobbySubs,
+      List<String> otherSubs,
+      List<String> subscriptionAlertsList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2031,11 +2390,15 @@ class HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: OutlinedButton.icon(
-                              style: ButtonStyle(foregroundColor: MaterialStateProperty.all<Color>(
-                                  // darkTheme
-                                  //     ? null
-                                  //     :
-                                  Theme.of(context).primaryColorDark.withOpacity(0.5))),
+                              style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          // darkTheme
+                                          //     ? null
+                                          //     :
+                                          Theme.of(context)
+                                              .primaryColorDark
+                                              .withOpacity(0.5))),
                               icon: AnimatedWidgets.flashingEye(
                                   context,
                                   memberSubs.isNotEmpty ||
@@ -2052,9 +2415,7 @@ class HomePageState extends State<HomePage> {
                                       fontStyle: FontStyle.italic,
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
-                                      color: darkTheme
-                                          ? darkThemeTextColor
-                                          : Theme.of(context).primaryColorDark)),
+                                      color: darkThemeTextColor)),
                               // label: Text(
                               //     ' 🧑🏽‍💼  ${memberSubs.length}   📜  ${billSubs.length}   💰  ${lobbySubs.length}' //   ✍🏽  ${otherSubs.length}'
                               //         .toUpperCase(),
@@ -2065,15 +2426,21 @@ class HomePageState extends State<HomePage> {
                               //             ? darkThemeTextColor
                               //             : Theme.of(context)
                               //                 .primaryColorDark)),
-                              onPressed: (subscriptionAlertsList.any((element) =>
-                                              element.toString().startsWith('member_')) &&
+                              onPressed: (subscriptionAlertsList.any(
+                                              (element) => element
+                                                  .toString()
+                                                  .startsWith('member_')) &&
                                           (houseMembersList.isEmpty ||
                                               senateMembersList.isEmpty)) ||
                                       (subscriptionAlertsList.any((element) =>
-                                              element.toString().startsWith('lobby_')) &&
+                                              element
+                                                  .toString()
+                                                  .startsWith('lobby_')) &&
                                           lobbyingEventsList.isEmpty) ||
                                       (subscriptionAlertsList.any((element) =>
-                                              element.toString().startsWith('bill_')) &&
+                                              element
+                                                  .toString()
+                                                  .startsWith('bill_')) &&
                                           billList.isEmpty)
                                   ? null
                                   : () => showModalBottomSheet(
@@ -2085,7 +2452,8 @@ class HomePageState extends State<HomePage> {
                                         return SharedWidgets.subscriptionsList(
                                             context,
                                             userDatabase,
-                                            senateMembersList + houseMembersList,
+                                            senateMembersList +
+                                                houseMembersList,
                                             billList,
                                             lobbyingEventsList,
                                             houseStockWatchList,
@@ -2116,12 +2484,13 @@ class HomePageState extends State<HomePage> {
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                       child: InkWell(
-                          onTap: () async => Functions.requestInAppPurchase(
-                              context, interstitialAd, userIsPremium,
+                          onTap: () async => Functions.requestPurchase(
+                              context, interstitialAd,
                               whatToShow: 'upgrades'),
                           child: BounceInDown(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 5),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                   image: DecorationImage(
@@ -2129,12 +2498,14 @@ class HomePageState extends State<HomePage> {
                                       image: AssetImage(
                                           'assets/stock${randomImageActivated ? random.nextInt(3) : headerImageCounter}.png'),
                                       fit: BoxFit.cover,
-                                      colorFilter:
-                                          const ColorFilter.mode(Colors.grey, BlendMode.color)),
+                                      colorFilter: const ColorFilter.mode(
+                                          Colors.grey, BlendMode.color)),
                                   color: Colors.grey,
-                                  border: Border.all(width: 2, color: Colors.grey[600]),
+                                  border: Border.all(
+                                      width: 2, color: Colors.grey[600]),
                                   borderRadius: BorderRadius.circular(5)),
-                              child: Text('GET LATEST CONGRESSIONAL MEMBER MARKET TRADES',
+                              child: Text(
+                                  'GET LATEST CONGRESSIONAL MEMBER MARKET TRADES',
                                   style: Styles.googleStyle.copyWith(
                                       fontSize: 18,
                                       color: darkTheme
@@ -2151,8 +2522,8 @@ class HomePageState extends State<HomePage> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 5),
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                           image: DecorationImage(
@@ -2162,24 +2533,31 @@ class HomePageState extends State<HomePage> {
                                               fit: BoxFit.cover,
                                               colorFilter: ColorFilter.mode(
                                                   darkTheme
-                                                      ? Theme.of(context).primaryColorDark
+                                                      ? Theme.of(context)
+                                                          .primaryColorDark
                                                       : stockWatchColor,
                                                   BlendMode.color)),
                                           color: darkTheme
-                                              ? Theme.of(context).primaryColorDark
+                                              ? Theme.of(context)
+                                                  .primaryColorDark
                                               : stockWatchColor,
                                           border: Border.all(
                                               width: 2,
                                               color: darkTheme
-                                                  ? Theme.of(context).primaryColorDark
+                                                  ? Theme.of(context)
+                                                      .primaryColorDark
                                                   : stockWatchColor),
-                                          borderRadius: BorderRadius.circular(5)),
-                                      child: Text('TAP HERE TO REFRESH MARKET TRADE DATA',
-                                          style: Styles.googleStyle
-                                              .copyWith(fontSize: 18, color: darkThemeTextColor)),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Text(
+                                          'TAP HERE TO REFRESH MARKET TRADE DATA',
+                                          style: Styles.googleStyle.copyWith(
+                                              fontSize: 18,
+                                              color: darkThemeTextColor)),
                                     ),
                                     dataRefresh
-                                        ? const LinearProgressIndicator(color: stockWatchColor)
+                                        ? const LinearProgressIndicator(
+                                            color: stockWatchColor)
                                         : const SizedBox.shrink()
                                   ],
                                 ),
@@ -2192,8 +2570,10 @@ class HomePageState extends State<HomePage> {
                               // const SizedBox(height: 5),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                child: Text('LATEST MARKET TRADES BY CHAMBER (Reported)',
-                                    style: Styles.googleStyle.copyWith(fontSize: 18)),
+                                child: Text(
+                                    'LATEST MARKET TRADES BY CHAMBER (Reported)',
+                                    style: Styles.googleStyle
+                                        .copyWith(fontSize: 18)),
                               ),
                               Row(
                                 children: [
@@ -2202,20 +2582,24 @@ class HomePageState extends State<HomePage> {
                                       : Expanded(
                                           child: InkWell(
                                             onTap: () {
-                                              userDatabase.put('newSenateStock', false);
+                                              userDatabase.put(
+                                                  'newSenateStock', false);
                                               showModalBottomSheet(
-                                                  backgroundColor: Colors.transparent,
+                                                  backgroundColor:
+                                                      Colors.transparent,
                                                   isScrollControlled: false,
                                                   enableDrag: true,
                                                   context: context,
                                                   builder: (context) {
-                                                    return SharedWidgets.stockWatchList(
+                                                    return SharedWidgets
+                                                        .stockWatchList(
                                                       context,
                                                       false,
                                                       userDatabase,
                                                       houseStockWatchList,
                                                       senateStockWatchList,
-                                                      senateMembersList + houseMembersList,
+                                                      senateMembersList +
+                                                          houseMembersList,
                                                       userIsPremium,
                                                     );
                                                   });
@@ -2239,54 +2623,81 @@ class HomePageState extends State<HomePage> {
                                                                     ? Theme.of(context)
                                                                         .primaryColorDark
                                                                     : stockWatchColor,
-                                                                BlendMode.color)),
+                                                                BlendMode
+                                                                    .color)),
                                                         color: darkTheme
-                                                            ? Theme.of(context).primaryColorDark
+                                                            ? Theme.of(context)
+                                                                .primaryColorDark
                                                             : stockWatchColor,
                                                         border: Border.all(
                                                             width: 2,
                                                             color: darkTheme
-                                                                ? Theme.of(context).primaryColorDark
+                                                                ? Theme.of(
+                                                                        context)
+                                                                    .primaryColorDark
                                                                 : stockWatchColor),
-                                                        borderRadius: BorderRadius.circular(3)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(3)),
                                                     child: Padding(
-                                                      padding: const EdgeInsets.all(8.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
                                                       child: FadeInRight(
                                                         child: Column(
                                                           crossAxisAlignment:
-                                                              CrossAxisAlignment.start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                                 'Sen. ${senateStockWatchList.first.senator}',
                                                                 maxLines: 1,
-                                                                overflow: TextOverflow.ellipsis,
-                                                                style: Styles.regularStyle.copyWith(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.bold,
-                                                                    color: darkThemeTextColor)),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: Styles
+                                                                    .regularStyle
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color:
+                                                                            darkThemeTextColor)),
                                                             Text(
                                                               'Exec. ${dateWithDayAndYearFormatter.format(senateStockWatchList.first.transactionDate)}',
-                                                              style: Styles.regularStyle.copyWith(
-                                                                  fontSize: 11,
-                                                                  fontWeight: FontWeight.normal,
-                                                                  color: darkThemeTextColor),
+                                                              style: Styles
+                                                                  .regularStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          11,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          darkThemeTextColor),
                                                             ),
                                                             Row(
                                                               crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
+                                                                  CrossAxisAlignment
+                                                                      .center,
                                                               children: [
                                                                 Flexible(
                                                                   child: Text(
                                                                     '${senateStockWatchList.first.type == null || senateStockWatchList.first.type == 'N/A' ? '' : senateStockWatchList.first.type.toLowerCase().contains('sale') ? sellIndicator : senateStockWatchList.first.type.toLowerCase().contains('purchase') ? buyIndicator : ''} ${senateStockWatchList.first.ticker == null || senateStockWatchList.first.ticker == '--' || senateStockWatchList.first.ticker == 'N/A' ? senateStockWatchList.first.assetType : '\$${senateStockWatchList.first.ticker}'}',
                                                                     maxLines: 1,
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    style: Styles.regularStyle
-                                                                        .copyWith(
-                                                                            fontSize: 12,
-                                                                            fontWeight:
-                                                                                FontWeight.normal,
-                                                                            color:
-                                                                                darkThemeTextColor),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: Styles.regularStyle.copyWith(
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            darkThemeTextColor),
                                                                   ),
                                                                 )
                                                               ],
@@ -2297,30 +2708,37 @@ class HomePageState extends State<HomePage> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    child: userDatabase.get('newSenateStock')
-                                                        ? AnimatedWidgets.flashingText(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: userDatabase.get(
+                                                            'newSenateStock')
+                                                        ? AnimatedWidgets
+                                                            .flashingText(
                                                             context,
                                                             '!!!',
-                                                            userDatabase.get('newSenateStock'),
+                                                            userDatabase.get(
+                                                                'newSenateStock'),
                                                             false,
                                                             size: 14,
-                                                            color: darkTheme
-                                                                ? altHighlightColor
-                                                                : darkThemeTextColor)
-                                                        : FaIcon(Icons.more_vert,
-                                                            size: 14,
                                                             color:
-                                                                userDatabase.get('newSenateStock')
-                                                                    ? altHighlightColor
-                                                                    : darkThemeTextColor),
+                                                                altHighlightColor,
+                                                          )
+                                                        : FaIcon(
+                                                            Icons.more_vert,
+                                                            size: 14,
+                                                            color: userDatabase.get(
+                                                                    'newSenateStock')
+                                                                ? altHighlightColor
+                                                                : darkThemeTextColor),
                                                   )
                                                 ],
                                               ),
                                             ),
                                           ),
                                         ),
-                                  houseStockWatchList.isEmpty || senateStockWatchList.isEmpty
+                                  houseStockWatchList.isEmpty ||
+                                          senateStockWatchList.isEmpty
                                       ? const SizedBox.shrink()
                                       : const SizedBox(width: 5),
                                   houseStockWatchList.isEmpty
@@ -2328,21 +2746,25 @@ class HomePageState extends State<HomePage> {
                                       : Expanded(
                                           child: InkWell(
                                             onTap: () {
-                                              userDatabase.put('newHouseStock', false);
+                                              userDatabase.put(
+                                                  'newHouseStock', false);
                                               showModalBottomSheet(
-                                                  backgroundColor: Colors.transparent,
+                                                  backgroundColor:
+                                                      Colors.transparent,
                                                   isScrollControlled: false,
                                                   enableDrag: true,
                                                   context: context,
                                                   builder: (context) {
-                                                    return SharedWidgets.stockWatchList(
-                                                        context,
-                                                        true,
-                                                        userDatabase,
-                                                        houseStockWatchList,
-                                                        senateStockWatchList,
-                                                        senateMembersList + houseMembersList,
-                                                        userIsPremium);
+                                                    return SharedWidgets
+                                                        .stockWatchList(
+                                                            context,
+                                                            true,
+                                                            userDatabase,
+                                                            houseStockWatchList,
+                                                            senateStockWatchList,
+                                                            senateMembersList +
+                                                                houseMembersList,
+                                                            userIsPremium);
                                                   });
 
                                               // userDatabase.put(
@@ -2364,42 +2786,67 @@ class HomePageState extends State<HomePage> {
                                                                     ? Theme.of(context)
                                                                         .primaryColorDark
                                                                     : stockWatchColor,
-                                                                BlendMode.color)),
+                                                                BlendMode
+                                                                    .color)),
                                                         color: darkTheme
-                                                            ? Theme.of(context).primaryColorDark
+                                                            ? Theme.of(context)
+                                                                .primaryColorDark
                                                             : stockWatchColor,
                                                         border: Border.all(
                                                             width: 2,
                                                             color: darkTheme
-                                                                ? Theme.of(context).primaryColorDark
+                                                                ? Theme.of(
+                                                                        context)
+                                                                    .primaryColorDark
                                                                 : stockWatchColor),
-                                                        borderRadius: BorderRadius.circular(3)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(3)),
                                                     child: Padding(
-                                                      padding: const EdgeInsets.all(8.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
                                                       child: FadeInRight(
                                                         child: Column(
                                                           crossAxisAlignment:
-                                                              CrossAxisAlignment.start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                                 houseStockWatchList
-                                                                    .first.representative,
+                                                                    .first
+                                                                    .representative,
                                                                 maxLines: 1,
-                                                                overflow: TextOverflow.ellipsis,
-                                                                style: Styles.regularStyle.copyWith(
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.bold,
-                                                                    color: darkThemeTextColor)),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: Styles
+                                                                    .regularStyle
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color:
+                                                                            darkThemeTextColor)),
                                                             Text(
                                                               'Exec. ${dateWithDayAndYearFormatter.format(houseStockWatchList.first.transactionDate)}',
-                                                              style: Styles.regularStyle.copyWith(
-                                                                  fontSize: 11,
-                                                                  fontWeight: FontWeight.normal,
-                                                                  color: darkThemeTextColor),
+                                                              style: Styles
+                                                                  .regularStyle
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          11,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          darkThemeTextColor),
                                                             ),
                                                             Row(
                                                               crossAxisAlignment:
-                                                                  CrossAxisAlignment.center,
+                                                                  CrossAxisAlignment
+                                                                      .center,
                                                               // mainAxisAlignment:
                                                               //     MainAxisAlignment
                                                               //         .center,
@@ -2411,14 +2858,17 @@ class HomePageState extends State<HomePage> {
                                                                     //     TextAlign
                                                                     //         .center,
                                                                     maxLines: 1,
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    style: Styles.regularStyle
-                                                                        .copyWith(
-                                                                            fontSize: 12,
-                                                                            fontWeight:
-                                                                                FontWeight.normal,
-                                                                            color:
-                                                                                darkThemeTextColor),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: Styles.regularStyle.copyWith(
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            darkThemeTextColor),
                                                                   ),
                                                                 )
                                                               ],
@@ -2429,20 +2879,27 @@ class HomePageState extends State<HomePage> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    child: userDatabase.get('newHouseStock')
-                                                        ? AnimatedWidgets.flashingText(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: userDatabase.get(
+                                                            'newHouseStock')
+                                                        ? AnimatedWidgets
+                                                            .flashingText(
                                                             context,
                                                             '!!!',
-                                                            userDatabase.get('newHouseStock'),
+                                                            userDatabase.get(
+                                                                'newHouseStock'),
                                                             false,
                                                             size: 14,
-                                                            color: darkTheme
-                                                                ? altHighlightColor
-                                                                : darkThemeTextColor)
-                                                        : FaIcon(Icons.more_vert,
+                                                            color:
+                                                                altHighlightColor,
+                                                          )
+                                                        : FaIcon(
+                                                            Icons.more_vert,
                                                             size: 14,
-                                                            color: userDatabase.get('newHouseStock')
+                                                            color: userDatabase.get(
+                                                                    'newHouseStock')
                                                                 ? altHighlightColor
                                                                 : darkThemeTextColor),
                                                   )
@@ -2460,17 +2917,42 @@ class HomePageState extends State<HomePage> {
                                           senateStockWatchList.isEmpty)
                                       ? null
                                       : () {
-                                          setState(() => _marketPageLoading = true);
-                                          userDatabase.put('newMarketOverview', false);
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => MarketActivityPage(
-                                                      houseMembersList + senateMembersList,
-                                                      houseStockWatchList,
-                                                      senateStockWatchList,
-                                                      marketActivityOverviewList))).then(
-                                              (_) => setState(() => _marketPageLoading = false));
+                                          setState(
+                                              () => _marketPageLoading = true);
+                                          userDatabase.put(
+                                              'newMarketOverview', false);
+
+                                          showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  isScrollControlled: true,
+                                                  enableDrag: false,
+                                                  context: context,
+                                                  builder: (context) => Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 75),
+                                                        child: MarketActivityPage(
+                                                            houseMembersList +
+                                                                senateMembersList,
+                                                            houseStockWatchList,
+                                                            senateStockWatchList,
+                                                            marketActivityOverviewList),
+                                                      ))
+
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) =>
+                                              //             MarketActivityPage(
+                                              //                 houseMembersList +
+                                              //                     senateMembersList,
+                                              //                 houseStockWatchList,
+                                              //                 senateStockWatchList,
+                                              //                 marketActivityOverviewList)))
+
+                                              .then((_) => setState(() =>
+                                                  _marketPageLoading = false));
                                         },
                                   child: Container(
                                     alignment: Alignment.center,
@@ -2486,29 +2968,32 @@ class HomePageState extends State<HomePage> {
                                             fit: BoxFit.cover,
                                             colorFilter: ColorFilter.mode(
                                                 darkTheme
-                                                    ? Theme.of(context).primaryColorDark
+                                                    ? Theme.of(context)
+                                                        .primaryColorDark
                                                     : stockWatchColor,
                                                 BlendMode.color)),
                                         border: Border.all(
                                             width: 2,
                                             color: darkTheme
-                                                ? Theme.of(context).primaryColorDark
+                                                ? Theme.of(context)
+                                                    .primaryColorDark
                                                 : stockWatchColor),
                                         borderRadius: BorderRadius.circular(3)),
                                     child: TextButton.icon(
                                       icon:
-                                      // userDatabase.get('newMarketOverview')
-                                      //     ? AnimatedWidgets.flashingText(context, '!!!',
-                                      //         userDatabase.get('newMarketOverview'), false,
-                                      //         size: 13,
-                                      //         color: userDatabase.get('newSenateStock')
-                                      //             ? altHighlightColor
-                                      //             : darkThemeTextColor,
-                                      //         sameColor: true)
-                                      //     :
-                                      _marketPageLoading
+                                          // userDatabase.get('newMarketOverview')
+                                          //     ? AnimatedWidgets.flashingText(context, '!!!',
+                                          //         userDatabase.get('newMarketOverview'), false,
+                                          //         size: 13,
+                                          //         color: userDatabase.get('newSenateStock')
+                                          //             ? altHighlightColor
+                                          //             : darkThemeTextColor,
+                                          //         sameColor: true)
+                                          //     :
+                                          _marketPageLoading
                                               ? const FaIcon(
-                                                  FontAwesomeIcons.solidHourglass,
+                                                  FontAwesomeIcons
+                                                      .solidHourglass,
                                                   size: 11,
                                                   color: darkThemeTextColor,
                                                 )
@@ -2546,17 +3031,18 @@ class HomePageState extends State<HomePage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
           child: (currentHouseFloorActions.isNotEmpty &&
-                      currentHouseFloorActionsDate
-                          .isBefore(DateTime.now().subtract(const Duration(hours: 36)))) &&
+                      currentHouseFloorActionsDate.isBefore(DateTime.now()
+                          .subtract(const Duration(hours: 36)))) &&
                   (currentSenateFloorActions.isNotEmpty &&
-                      currentSenateFloorActionsDate
-                          .isBefore(DateTime.now().subtract(const Duration(hours: 36))))
+                      currentSenateFloorActionsDate.isBefore(
+                          DateTime.now().subtract(const Duration(hours: 36))))
               ? const SizedBox.shrink()
-              : Text('Latest Floor Actions', style: GoogleFonts.bangers(fontSize: 18)),
+              : Text('Latest Floor Actions',
+                  style: GoogleFonts.bangers(fontSize: 18)),
         ),
         currentHouseFloorActions.isNotEmpty &&
-                currentHouseFloorActionsDate
-                    .isBefore(DateTime.now().subtract(const Duration(hours: 36)))
+                currentHouseFloorActionsDate.isBefore(
+                    DateTime.now().subtract(const Duration(hours: 36)))
             ? const SizedBox.shrink()
             : Container(
                 padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
@@ -2568,7 +3054,7 @@ class HomePageState extends State<HomePage> {
                         currentHouseFloorActions == null ||
                         currentHouseFloorActions.isEmpty
                     ? AnimatedWidgets.circularProgressWatchtower(
-                        context, userDatabase, userIsPremium,
+                        context, userDatabase,
                         widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
                     : BounceInRight(
                         from: 75,
@@ -2580,14 +3066,18 @@ class HomePageState extends State<HomePage> {
                                   quarterTurns: -1,
                                   child: Container(
                                     alignment: Alignment.center,
-                                    padding: const EdgeInsets.symmetric(vertical: 2.5),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 2.5),
                                     decoration: BoxDecoration(
                                         color: userDatabase.get('newHouseFloor')
                                             ? Theme.of(context).primaryColorDark
-                                            : Theme.of(context).highlightColor.withOpacity(0.125),
+                                            : Theme.of(context)
+                                                .highlightColor
+                                                .withOpacity(0.125),
                                         borderRadius: BorderRadius.circular(3)),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Expanded(
                                           child: Text(
@@ -2596,9 +3086,11 @@ class HomePageState extends State<HomePage> {
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
-                                              color: userDatabase.get('newHouseFloor')
-                                                  ? userDatabase.get('darkTheme')
-                                                      ? alertIndicatorColorBrightGreen
+                                              color: userDatabase
+                                                      .get('newHouseFloor')
+                                                  ? userDatabase
+                                                          .get('darkTheme')
+                                                      ? altHighlightColor
                                                       : darkThemeTextColor
                                                   : Colors.grey,
                                             ),
@@ -2620,18 +3112,22 @@ class HomePageState extends State<HomePage> {
                                       child: InkWell(
                                         onTap: () {
                                           showModalBottomSheet(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               isScrollControlled: false,
                                               enableDrag: true,
                                               context: context,
-                                              builder: (context) => SharedWidgets.floorActionsList(
-                                                  context,
-                                                  'House',
-                                                  currentHouseFloorActions,
-                                                  userDatabase,
-                                                  houseStockWatchList,
-                                                  senateStockWatchList)).then((_) =>
-                                              AdMobLibrary.interstitialAdShow(interstitialAd));
+                                              builder: (context) =>
+                                                  SharedWidgets.floorActionsList(
+                                                      context,
+                                                      'House',
+                                                      currentHouseFloorActions,
+                                                      userDatabase,
+                                                      houseStockWatchList,
+                                                      senateStockWatchList)).then(
+                                              (_) => AdMobLibrary
+                                                  .interstitialAdShow(
+                                                      interstitialAd));
                                           // .then((_) => !userIsPremium &&
                                           //     interstitialAd != null &&
                                           //     interstitialAd.responseInfo.responseId !=
@@ -2639,45 +3135,65 @@ class HomePageState extends State<HomePage> {
                                           // ? AdMobLibrary().interstitialAdShow(interstitialAd)
                                           // : null);
 
-                                          userDatabase.put('newHouseFloor', false);
+                                          userDatabase.put(
+                                              'newHouseFloor', false);
                                         },
                                         // onHorizontalDragEnd: (swipe) =>
                                         //     userDatabase.put('newHouseFloor', false),
                                         child: Container(
-                                          width: orientation == Orientation.landscape
-                                              ? MediaQuery.of(context).size.width * 0.5
-                                              : MediaQuery.of(context).size.width * 0.85,
+                                          width: orientation ==
+                                                  Orientation.landscape
+                                              ? MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5
+                                              : MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.85,
                                           decoration: BoxDecoration(
-                                            color:
-                                                Theme.of(context).highlightColor.withOpacity(0.125),
+                                            color: Theme.of(context)
+                                                .highlightColor
+                                                .withOpacity(0.125),
                                             shape: BoxShape.rectangle,
-                                            borderRadius: BorderRadius.circular(3),
+                                            borderRadius:
+                                                BorderRadius.circular(3),
                                           ),
                                           alignment: Alignment.center,
                                           padding: const EdgeInsets.all(10.0),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               SizedBox(
-                                                width: MediaQuery.of(context).size.width,
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
                                                 child: Wrap(
                                                   children: [
                                                     Text(
-                                                      currentHouseFloorActions[index].header == '--'
-                                                          ? dateWithTimeOnlyFormatter.format(
-                                                              DateFormat('EEE, dd MMM yyyy h:mm:ss')
+                                                      currentHouseFloorActions[
+                                                                      index]
+                                                                  .header ==
+                                                              '--'
+                                                          ? dateWithTimeOnlyFormatter
+                                                              .format(DateFormat(
+                                                                      'EEE, dd MMM yyyy h:mm:ss')
                                                                   .parse(currentHouseFloorActions[
                                                                           index]
                                                                       .actionTimeStamp)
                                                                   .toLocal())
-                                                          : currentHouseFloorActions[index]
+                                                          : currentHouseFloorActions[
+                                                                  index]
                                                               .header
                                                               .toUpperCase(),
                                                       maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       style: const TextStyle(
                                                         fontSize: 11,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: Colors.grey,
                                                       ),
                                                     ),
@@ -2688,9 +3204,12 @@ class HomePageState extends State<HomePage> {
                                               const SizedBox(height: 5),
                                               Flexible(
                                                 child: Text(
-                                                  currentHouseFloorActions[index].actionItem,
+                                                  currentHouseFloorActions[
+                                                          index]
+                                                      .actionItem,
                                                   maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.bold,
@@ -2710,8 +3229,8 @@ class HomePageState extends State<HomePage> {
               ),
         // const SizedBox(height: 5),
         currentSenateFloorActions.isNotEmpty &&
-                currentSenateFloorActionsDate
-                    .isBefore(DateTime.now().subtract(const Duration(hours: 36)))
+                currentSenateFloorActionsDate.isBefore(
+                    DateTime.now().subtract(const Duration(hours: 36)))
             ? const SizedBox.shrink()
             : Container(
                 padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -2723,7 +3242,7 @@ class HomePageState extends State<HomePage> {
                         currentSenateFloorActions == null ||
                         currentSenateFloorActions.isEmpty
                     ? AnimatedWidgets.circularProgressWatchtower(
-                        context, userDatabase, userIsPremium,
+                        context, userDatabase,
                         widthAndHeight: 20, strokeWidth: 3, isFullScreen: false)
                     : BounceInRight(
                         from: 75,
@@ -2739,14 +3258,21 @@ class HomePageState extends State<HomePage> {
                                     quarterTurns: -1,
                                     child: Container(
                                       alignment: Alignment.center,
-                                      padding: const EdgeInsets.symmetric(vertical: 2.5),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2.5),
                                       decoration: BoxDecoration(
-                                          color: userDatabase.get('newSenateFloor')
-                                              ? Theme.of(context).primaryColorDark
-                                              : Theme.of(context).highlightColor.withOpacity(0.125),
-                                          borderRadius: BorderRadius.circular(3)),
+                                          color:
+                                              userDatabase.get('newSenateFloor')
+                                                  ? Theme.of(context)
+                                                      .primaryColorDark
+                                                  : Theme.of(context)
+                                                      .highlightColor
+                                                      .withOpacity(0.125),
+                                          borderRadius:
+                                              BorderRadius.circular(3)),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Expanded(
                                             child: Text(
@@ -2755,9 +3281,11 @@ class HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.bold,
-                                                color: userDatabase.get('newSenateFloor')
-                                                    ? userDatabase.get('darkTheme')
-                                                        ? alertIndicatorColorBrightGreen
+                                                color: userDatabase
+                                                        .get('newSenateFloor')
+                                                    ? userDatabase
+                                                            .get('darkTheme')
+                                                        ? altHighlightColor
                                                         : darkThemeTextColor
                                                     : Colors.grey,
                                               ),
@@ -2773,14 +3301,17 @@ class HomePageState extends State<HomePage> {
                                       shrinkWrap: true,
                                       scrollDirection: Axis.horizontal,
                                       physics: const BouncingScrollPhysics(),
-                                      itemCount: currentSenateFloorActions.length,
+                                      itemCount:
+                                          currentSenateFloorActions.length,
                                       itemBuilder: (context, index) {
                                         return Padding(
-                                          padding: const EdgeInsets.only(right: 5),
+                                          padding:
+                                              const EdgeInsets.only(right: 5),
                                           child: InkWell(
                                             onTap: () {
                                               showModalBottomSheet(
-                                                  backgroundColor: Colors.transparent,
+                                                  backgroundColor:
+                                                      Colors.transparent,
                                                   isScrollControlled: false,
                                                   enableDrag: true,
                                                   context: context,
@@ -2791,8 +3322,10 @@ class HomePageState extends State<HomePage> {
                                                           currentSenateFloorActions,
                                                           userDatabase,
                                                           houseStockWatchList,
-                                                          senateStockWatchList)).then((_) =>
-                                                  AdMobLibrary.interstitialAdShow(interstitialAd));
+                                                          senateStockWatchList)).then(
+                                                  (_) => AdMobLibrary
+                                                      .interstitialAdShow(
+                                                          interstitialAd));
                                               // .then((_) => !userIsPremium &&
                                               //     interstitialAd != null &&
                                               //     interstitialAd.responseInfo.responseId !=
@@ -2800,54 +3333,71 @@ class HomePageState extends State<HomePage> {
                                               // ? AdMobLibrary().interstitialAdShow(interstitialAd)
                                               // : null);
 
-                                              userDatabase.put('newSenateFloor', false);
+                                              userDatabase.put(
+                                                  'newSenateFloor', false);
                                             },
                                             // onHorizontalDragEnd: (swipe) =>
                                             //     userDatabase.put('newSenateFloor', false),
                                             child: Container(
-                                              width: orientation == Orientation.landscape
-                                                  ? MediaQuery.of(context).size.width * 0.5
-                                                  : MediaQuery.of(context).size.width * 0.85,
+                                              width: orientation ==
+                                                      Orientation.landscape
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.5
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.85,
                                               decoration: BoxDecoration(
                                                 color: Theme.of(context)
                                                     .highlightColor
                                                     .withOpacity(0.125),
                                                 shape: BoxShape.rectangle,
-                                                borderRadius: BorderRadius.circular(3),
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
                                               ),
                                               alignment: Alignment.center,
-                                              padding: const EdgeInsets.all(10.0),
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   SizedBox(
-                                                    width: MediaQuery.of(context).size.width,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
                                                     child: Row(
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.spaceBetween,
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
                                                         Text(
-                                                          currentSenateFloorActions[index]
+                                                          currentSenateFloorActions[
+                                                                          index]
                                                                       .actionTimeStamp ==
                                                                   '--'
-                                                              ? currentSenateFloorActions[index]
+                                                              ? currentSenateFloorActions[
+                                                                      index]
                                                                   .header
                                                                   .toUpperCase()
-                                                              : dateWithTimeFormatter.format(
-                                                                  DateFormat(
-                                                                          'EEE, dd MMM yyyy h:mm:ss')
-                                                                      .parse(
-                                                                          currentSenateFloorActions[
-                                                                                  index]
-                                                                              .actionTimeStamp)
-                                                                      .toLocal()),
+                                                              : dateWithTimeFormatter.format(DateFormat(
+                                                                      'EEE, dd MMM yyyy h:mm:ss')
+                                                                  .parse(currentSenateFloorActions[
+                                                                          index]
+                                                                      .actionTimeStamp)
+                                                                  .toLocal()),
                                                           // dateWithTimeFormatter.format(
                                                           //     senateFloorActions[index]
                                                           //         .timestamp
                                                           //         .toLocal()),
-                                                          style: const TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 11,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                             color: Colors.grey,
                                                           ),
                                                         ),
@@ -2858,12 +3408,16 @@ class HomePageState extends State<HomePage> {
                                                   const SizedBox(height: 5),
                                                   Flexible(
                                                     child: Text(
-                                                      currentSenateFloorActions[index].actionItem,
+                                                      currentSenateFloorActions[
+                                                              index]
+                                                          .actionItem,
                                                       maxLines: 2,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       style: const TextStyle(
                                                         fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
                                                   ),
@@ -2886,204 +3440,348 @@ class HomePageState extends State<HomePage> {
 
   Widget congressInfoButtons(List<String> subscriptionAlertsList) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-        child: SizedBox(
-          height: 30,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: FlipInY(
-                  child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark)),
-                      onPressed: billList == null || billList.isEmpty
-                          ? null
-                          : () async {
-                              showModalBottomSheet(
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: false,
-                                  enableDrag: true,
-                                  context: context,
-                                  builder: (context) {
-                                    return SharedWidgets.recentBillsList(context, userDatabase,
-                                        billList, houseStockWatchList, senateStockWatchList);
-                                  }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                              // .then((_) => !userIsPremium &&
-                              //     interstitialAd != null &&
-                              //     interstitialAd.responseInfo.responseId !=
-                              //         userDatabase.get('interstitialAdId')
-                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                              // : null);
+      voteList.isEmpty && billList.isEmpty
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    billList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                    backgroundColor: billList.isEmpty
+                                        ? disabledMSPColorGray
+                                        : MaterialStateProperty.all<Color>(
+                                            Theme.of(context).primaryColorDark),
+                                    side: !darkTheme ||
+                                            !userDatabase.get('newBills')
+                                        ? null
+                                        : MaterialStateProperty.all<BorderSide>(
+                                            const BorderSide(
+                                                width: 0.5,
+                                                color: altHighlightColor)),
+                                  ),
+                                  onPressed: billList == null ||
+                                          billList.isEmpty
+                                      ? null
+                                      : () async {
+                                          showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return SharedWidgets
+                                                        .recentBillsList(
+                                                            context,
+                                                            userDatabase,
+                                                            billList,
+                                                            houseStockWatchList,
+                                                            senateStockWatchList);
+                                                  })
+                                              .then((_) => AdMobLibrary
+                                                  .interstitialAdShow(
+                                                      interstitialAd));
+                                          // .then((_) => !userIsPremium &&
+                                          //     interstitialAd != null &&
+                                          //     interstitialAd.responseInfo.responseId !=
+                                          //         userDatabase.get('interstitialAdId')
+                                          // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                          // : null);
 
-                              userDatabase.put('newBills', false);
-                              await Functions.processCredits(true, isPermanent: false);
-                            },
-                      icon: userDatabase.get('newBills')
-                          ? AnimatedWidgets.flashingText(
-                              context, '!!!', userDatabase.get('newBills'), false,
-                              size: 13, sameColor: true)
-                          : const FaIcon(FontAwesomeIcons.scroll,
-                              color: darkThemeTextColor, size: 12.5),
-                      label:
-                          const Text('Recent Bills', style: TextStyle(color: darkThemeTextColor))),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: FlipInY(
-                  child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Theme.of(context).primaryColorDark)),
-                      onPressed: voteList.isEmpty
-                          ? null
-                          : () async {
-                              showModalBottomSheet(
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: false,
-                                  enableDrag: true,
-                                  context: context,
-                                  builder: (context) {
-                                    return SharedWidgets.recentVotesList(
-                                        context,
-                                        userDatabase,
-                                        userIsPremium,
-                                        voteList,
-                                        houseStockWatchList,
-                                        senateStockWatchList);
-                                  }).then((_) => AdMobLibrary.interstitialAdShow(interstitialAd));
-                              // .then((_) => !userIsPremium &&
-                              //     interstitialAd != null &&
-                              //     interstitialAd.responseInfo.responseId !=
-                              //         userDatabase.get('interstitialAdId')
-                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                              // : null);
-
-                              userDatabase.put('newVotes', false);
-                              await Functions.processCredits(true, isPermanent: false);
-                            },
-                      icon: userDatabase.get('newVotes')
-                          ? AnimatedWidgets.flashingText(
-                              context, '!!!', userDatabase.get('newVotes'), false,
-                              size: 13, sameColor: true)
-                          : const FaIcon(FontAwesomeIcons.gavel,
-                              color: darkThemeTextColor, size: 13),
-                      label:
-                          const Text('Recent Votes', style: TextStyle(color: darkThemeTextColor))),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: SizedBox(
-          height: 30,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: FlipInY(
-                  child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                          enableFeedback: true,
-                          backgroundColor: darkTheme
-                              ? primaryMSPColorDark
-                              : senateRepublicansList.length > senateDemocratsList.length
-                                  ? republicanMSPColor
-                                  : senateRepublicansList.length < senateDemocratsList.length
-                                      ? democratMSPColor
-                                      : null),
-                      onPressed: senateMembersList.isEmpty
-                          ? null
-                          : () async {
-                              showModalBottomSheet(
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: false,
-                                  enableDrag: true,
-                                  context: context,
-                                  builder: (context) {
-                                    return membersListContainer(senateMembersList, 'Senators',
-                                        houseStockWatchList: houseStockWatchList,
-                                        senateStockWatchList: senateStockWatchList);
-                                  }).then((_) {
-                                Functions.processCredits(true, isPermanent: false);
-                                AdMobLibrary.interstitialAdShow(interstitialAd);
-                              }).whenComplete(() => setState(() => membersSearchString = ''));
-                            },
-                      icon: loadingSenators
-                          ? const SizedBox(
-                              width: 15,
-                              height: 15,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1,
-                                color: republicanColor,
-                                backgroundColor: democratColor,
-                              ),
-                            )
-                          : const FaIcon(FontAwesomeIcons.peopleGroup,
-                              size: 13, color: Color(0xffffffff)),
-                      label: const Text('Senators', style: TextStyle(color: Color(0xffffffff)))),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: FlipInY(
-                  child: ElevatedButton.icon(
-                    icon: loadingRepresentatives
-                        ? const SizedBox(
-                            width: 15,
-                            height: 15,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1,
-                              color: republicanColor,
-                              backgroundColor: democratColor,
+                                          userDatabase.put('newBills', false);
+                                          await Functions.processCredits(true,
+                                              isPermanent: false);
+                                        },
+                                  icon: billList.isNotEmpty &&
+                                          userDatabase.get('newBills')
+                                      ? AnimatedWidgets.flashingText(
+                                          context,
+                                          '!!!',
+                                          userDatabase.get('newBills'),
+                                          false,
+                                          color: altHighlightColor,
+                                          size: 13,
+                                          // sameColor: true,
+                                        )
+                                      : const FaIcon(FontAwesomeIcons.scroll,
+                                          color: darkThemeTextColor,
+                                          size: 12.5),
+                                  label: const Text('Recent Bills',
+                                      style: TextStyle(
+                                          color: darkThemeTextColor))),
                             ),
-                          )
-                        : const FaIcon(FontAwesomeIcons.peopleGroup,
-                            size: 13, color: Color(0xffffffff)),
-                    label:
-                        const Text('Representatives', style: TextStyle(color: Color(0xffffffff))),
-                    style: ButtonStyle(
-                        enableFeedback: true,
-                        backgroundColor: darkTheme
-                            ? primaryMSPColorDark
-                            : houseRepublicansList.length > houseDemocratsList.length
-                                ? republicanMSPColor
-                                : houseRepublicansList.length < houseDemocratsList.length
-                                    ? democratMSPColor
-                                    : null),
-                    onPressed: houseMembersList.isEmpty
-                        ? null
-                        : () async {
-                            showModalBottomSheet(
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: false,
-                                enableDrag: true,
-                                context: context,
-                                builder: (context) {
-                                  return membersListContainer(houseMembersList, 'Representatives',
-                                      houseStockWatchList: houseStockWatchList,
-                                      senateStockWatchList: senateStockWatchList);
-                                }).then((value) {
-                              Functions.processCredits(true, isPermanent: false);
-                              AdMobLibrary.interstitialAdShow(interstitialAd);
-                            }).whenComplete(() => setState(() => membersSearchString = ''));
-                          },
-                  ),
+                          ),
+                    voteList.isEmpty || billList.isEmpty
+                        ? const SizedBox.shrink()
+                        : const SizedBox(width: 5),
+                    voteList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                    backgroundColor: voteList.isEmpty
+                                        ? disabledMSPColorGray
+                                        : MaterialStateProperty.all<Color>(
+                                            Theme.of(context).primaryColorDark),
+                                    side: !darkTheme ||
+                                            !userDatabase.get('newVotes')
+                                        ? null
+                                        : MaterialStateProperty.all<BorderSide>(
+                                            const BorderSide(
+                                                width: 0.5,
+                                                color: altHighlightColor)),
+                                  ),
+                                  onPressed: voteList.isEmpty
+                                      ? null
+                                      : () async {
+                                          showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  isScrollControlled: false,
+                                                  enableDrag: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return SharedWidgets
+                                                        .recentVotesList(
+                                                            context,
+                                                            userDatabase,
+                                                            userIsPremium,
+                                                            voteList,
+                                                            houseStockWatchList,
+                                                            senateStockWatchList);
+                                                  })
+                                              .then((_) => AdMobLibrary
+                                                  .interstitialAdShow(
+                                                      interstitialAd));
+                                          // .then((_) => !userIsPremium &&
+                                          //     interstitialAd != null &&
+                                          //     interstitialAd.responseInfo.responseId !=
+                                          //         userDatabase.get('interstitialAdId')
+                                          // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                          // : null);
+
+                                          userDatabase.put('newVotes', false);
+                                          await Functions.processCredits(true,
+                                              isPermanent: false);
+                                        },
+                                  icon: voteList.isNotEmpty &&
+                                          userDatabase.get('newVotes')
+                                      ? AnimatedWidgets.flashingText(
+                                          context, '!!!',
+                                          userDatabase.get('newVotes'), false,
+                                          color: altHighlightColor,
+                                          size: 13,
+                                          // sameColor: true,
+                                        )
+                                      : const FaIcon(FontAwesomeIcons.gavel,
+                                          color: darkThemeTextColor, size: 13),
+                                  label: const Text('Recent Votes',
+                                      style: TextStyle(
+                                          color: darkThemeTextColor))),
+                            ),
+                          ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-      !userIsPremium && freeTrialUsed
+            ),
+      senateMembersList.isEmpty && houseMembersList.isEmpty
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    senateMembersList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                    enableFeedback: true,
+                                    backgroundColor: senateMembersList.isEmpty
+                                        ? disabledMSPColorGray
+                                        : darkTheme
+                                            ? primaryMSPColorDark
+                                            : senateRepublicansList.length >
+                                                    senateDemocratsList.length
+                                                ? republicanMSPColor
+                                                : senateRepublicansList.length <
+                                                        senateDemocratsList
+                                                            .length
+                                                    ? democratMSPColor
+                                                    : null,
+                                    // shadowColor: !darkTheme
+                                    //     ? null
+                                    //     : senateRepublicansList.length > senateDemocratsList.length
+                                    //         ? republicanMSPColor
+                                    //         : senateRepublicansList.length < senateDemocratsList.length
+                                    //             ? democratMSPColor
+                                    //             : null,
+                                    side: !darkTheme
+                                        ? null
+                                        : MaterialStateProperty.all<BorderSide>(
+                                            BorderSide(
+                                                width: 0.5,
+                                                color: senateRepublicansList
+                                                            .length >
+                                                        senateDemocratsList
+                                                            .length
+                                                    ? republicanColor
+                                                    : senateRepublicansList
+                                                                .length <
+                                                            senateDemocratsList
+                                                                .length
+                                                        ? democratColor
+                                                        : null)),
+                                  ),
+                                  onPressed: senateMembersList.isEmpty
+                                      ? null
+                                      : () async {
+                                          showModalBottomSheet(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              isScrollControlled: false,
+                                              enableDrag: true,
+                                              context: context,
+                                              builder: (context) {
+                                                return membersListContainer(
+                                                    senateMembersList,
+                                                    'Senators',
+                                                    houseStockWatchList:
+                                                        houseStockWatchList,
+                                                    senateStockWatchList:
+                                                        senateStockWatchList);
+                                              }).then((_) {
+                                            Functions.processCredits(true,
+                                                isPermanent: false);
+                                            AdMobLibrary.interstitialAdShow(
+                                                interstitialAd);
+                                          }).whenComplete(() => setState(
+                                              () => membersSearchString = ''));
+                                        },
+                                  icon: loadingSenators
+                                      ? const SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 1,
+                                            color: republicanColor,
+                                            backgroundColor: democratColor,
+                                          ),
+                                        )
+                                      : const FaIcon(
+                                          FontAwesomeIcons.peopleGroup,
+                                          size: 13,
+                                          color: Color(0xffffffff)),
+                                  label: const Text('Senators',
+                                      style:
+                                          TextStyle(color: Color(0xffffffff)))),
+                            ),
+                          ),
+                    senateMembersList.isEmpty || houseMembersList.isEmpty
+                        ? const SizedBox.shrink()
+                        : const SizedBox(width: 5),
+                    houseMembersList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                icon: loadingRepresentatives
+                                    ? const SizedBox(
+                                        width: 15,
+                                        height: 15,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                          color: republicanColor,
+                                          backgroundColor: democratColor,
+                                        ),
+                                      )
+                                    : const FaIcon(FontAwesomeIcons.peopleGroup,
+                                        size: 13, color: Color(0xffffffff)),
+                                label: const Text('Representatives',
+                                    style: TextStyle(color: Color(0xffffffff))),
+                                style: ButtonStyle(
+                                  enableFeedback: true,
+                                  backgroundColor: houseMembersList.isEmpty
+                                      ? disabledMSPColorGray
+                                      : darkTheme
+                                          ? primaryMSPColorDark
+                                          : houseRepublicansList.length >
+                                                  houseDemocratsList.length
+                                              ? republicanMSPColor
+                                              : houseRepublicansList.length <
+                                                      houseDemocratsList.length
+                                                  ? democratMSPColor
+                                                  : null,
+                                  // shadowColor: !darkTheme
+                                  //     ? null
+                                  //     : houseRepublicansList.length > houseDemocratsList.length
+                                  //         ? republicanMSPColor
+                                  //         : houseRepublicansList.length < houseDemocratsList.length
+                                  //             ? democratMSPColor
+                                  //             : null,
+                                  side: !darkTheme
+                                      ? null
+                                      : MaterialStateProperty.all<BorderSide>(
+                                          BorderSide(
+                                              width: 0.5,
+                                              color: houseRepublicansList
+                                                          .length >
+                                                      houseDemocratsList.length
+                                                  ? republicanColor
+                                                  : houseRepublicansList
+                                                              .length <
+                                                          houseDemocratsList
+                                                              .length
+                                                      ? democratColor
+                                                      : null)),
+                                ),
+                                onPressed: houseMembersList.isEmpty
+                                    ? null
+                                    : () async {
+                                        showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: false,
+                                            enableDrag: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return membersListContainer(
+                                                  houseMembersList,
+                                                  'Representatives',
+                                                  houseStockWatchList:
+                                                      houseStockWatchList,
+                                                  senateStockWatchList:
+                                                      senateStockWatchList);
+                                            }).then((value) {
+                                          Functions.processCredits(true,
+                                              isPermanent: false);
+                                          AdMobLibrary.interstitialAdShow(
+                                              interstitialAd);
+                                        }).whenComplete(() => setState(
+                                            () => membersSearchString = ''));
+                                      },
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ),
+      (lobbyingEventsList.isEmpty && privatelyFundedTripsList.isEmpty) ||
+              (!userIsPremium && freeTrialUsed)
           ? const SizedBox.shrink()
           : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -3093,89 +3791,115 @@ class HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: FlipInY(
-                        child: ElevatedButton.icon(
-                            style: ButtonStyle(
-                              backgroundColor: !userIsPremium && !userIsLegacy
-                                  ? disabledMSPColorGray
-                                  : darkTheme
-                                      ? primaryMSPColorDark
-                                      : lobbyingEventsList.isEmpty
-                                          ? disabledMSPColorGray
-                                          : alertIndicatorMSPColorDarkGreen,
-                            ),
-                            icon: (userIsPremium || userIsLegacy) && userDatabase.get('newLobbies')
-                                ? AnimatedWidgets.flashingText(
-                                    context, '!!!', userDatabase.get('newLobbies'), false,
-                                    size: 13, sameColor: true)
-                                : FaIcon(
-                                    FontAwesomeIcons.moneyBills,
-                                    size: 13,
-                                    color:
-                                        userIsPremium || userIsLegacy ? darkThemeTextColor : null,
-                                  ),
-                            label: Text('Lobbying',
-                                style: TextStyle(
-                                  color: userIsPremium || userIsLegacy ? darkThemeTextColor : null,
-                                )),
-                            onPressed: !userIsPremium && !userIsLegacy
-                                ? () async => Functions.requestInAppPurchase(
-                                    context, interstitialAd, userIsPremium,
-                                    whatToShow: 'upgrades')
-                                : lobbyingEventsList.isEmpty
-                                    ? null
-                                    : () async {
-                                        showModalBottomSheet(
-                                                backgroundColor: Colors.transparent,
-                                                isScrollControlled: false,
-                                                enableDrag: true,
-                                                context: context,
-                                                builder: (context) {
-                                                  return SharedWidgets.lobbyingList(
-                                                    context,
-                                                    userDatabase,
-                                                    lobbyingEventsList,
-                                                  );
-                                                })
-                                            .then((_) =>
-                                                AdMobLibrary.interstitialAdShow(interstitialAd));
-                                        // .then((_) => !userIsPremium &&
-                                        //     interstitialAd != null &&
-                                        //     interstitialAd.responseInfo.responseId !=
-                                        //         userDatabase.get('interstitialAdId')
-                                        // ? AdMobLibrary().interstitialAdShow(interstitialAd)
-                                        // : null);
-
-                                        userDatabase.put('newLobbies', false);
-                                        await Functions.processCredits(true, isPermanent: false);
-                                      }),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
+                    lobbyingEventsList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
                             child: FlipInY(
                               child: ElevatedButton.icon(
                                   style: ButtonStyle(
-                                    backgroundColor: !userIsPremium && !userIsLegacy
+                                    backgroundColor: !userIsPremium &&
+                                            !userIsLegacy
+                                        ? disabledMSPColorGray
+                                        : darkTheme
+                                            ? primaryMSPColorDark
+                                            : lobbyingEventsList.isEmpty
+                                                ? disabledMSPColorGray
+                                                : alertIndicatorMSPColorDarkGreen,
+                                  ),
+                                  icon: (userIsPremium || userIsLegacy) &&
+                                          userDatabase.get('newLobbies')
+                                      ? AnimatedWidgets.flashingText(
+                                          context, '!!!',
+                                          userDatabase.get('newLobbies'), false,
+                                          color: altHighlightColor,
+                                          size: 13,
+                                          // sameColor: true,
+                                        )
+                                      : FaIcon(
+                                          FontAwesomeIcons.moneyBills,
+                                          size: 13,
+                                          color: userIsPremium || userIsLegacy
+                                              ? darkThemeTextColor
+                                              : null,
+                                        ),
+                                  label: Text('Lobbying',
+                                      style: TextStyle(
+                                        color: userIsPremium || userIsLegacy
+                                            ? darkThemeTextColor
+                                            : null,
+                                      )),
+                                  onPressed: !userIsPremium && !userIsLegacy
+                                      ? () async => Functions.requestPurchase(
+                                          context, interstitialAd,
+                                          whatToShow: 'upgrades')
+                                      : lobbyingEventsList.isEmpty
+                                          ? null
+                                          : () async {
+                                              showModalBottomSheet(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      isScrollControlled: false,
+                                                      enableDrag: true,
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return SharedWidgets
+                                                            .lobbyingList(
+                                                          context,
+                                                          userDatabase,
+                                                          lobbyingEventsList,
+                                                        );
+                                                      })
+                                                  .then((_) => AdMobLibrary
+                                                      .interstitialAdShow(
+                                                          interstitialAd));
+                                              // .then((_) => !userIsPremium &&
+                                              //     interstitialAd != null &&
+                                              //     interstitialAd.responseInfo.responseId !=
+                                              //         userDatabase.get('interstitialAdId')
+                                              // ? AdMobLibrary().interstitialAdShow(interstitialAd)
+                                              // : null);
+
+                                              userDatabase.put(
+                                                  'newLobbies', false);
+                                              await Functions.processCredits(
+                                                  true,
+                                                  isPermanent: false);
+                                            }),
+                            ),
+                          ),
+                    lobbyingEventsList.isEmpty ||
+                            privatelyFundedTripsList.isEmpty
+                        ? const SizedBox.shrink()
+                        : const SizedBox(width: 5),
+                    privatelyFundedTripsList.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: FlipInY(
+                              child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                    backgroundColor: !userIsPremium &&
+                                            !userIsLegacy
                                         ? disabledMSPColorGray
                                         : darkTheme
                                             ? primaryMSPColorDark
                                             : privatelyFundedTripsList.isEmpty
                                                 ? disabledMSPColorGray
-                                                : MaterialStateProperty.all<Color>(
-                                                    const Color.fromARGB(255, 0, 80, 100)),
+                                                : MaterialStateProperty.all<
+                                                        Color>(
+                                                    const Color.fromARGB(
+                                                        255, 0, 80, 100)),
                                   ),
                                   icon: (userIsPremium || userIsLegacy) &&
                                           userDatabase.get('newTrips')
                                       ? AnimatedWidgets.flashingText(
-                                          context, '!!!', userDatabase.get('newTrips'), false,
-                                          size: 13, sameColor: true)
+                                          context,
+                                          '!!!',
+                                          userDatabase.get('newTrips'),
+                                          false,
+                                          color: altHighlightColor,
+                                          size: 13,
+                                          // sameColor: true,
+                                        )
                                       : FaIcon(
                                           FontAwesomeIcons.planeDeparture,
                                           size: 13,
@@ -3190,37 +3914,39 @@ class HomePageState extends State<HomePage> {
                                             : null,
                                       )),
                                   onPressed: !userIsPremium && !userIsLegacy
-                                      ? () async => Functions.requestInAppPurchase(
-                                          context, interstitialAd, userIsPremium,
+                                      ? () async => Functions.requestPurchase(
+                                          context, interstitialAd,
                                           whatToShow: 'upgrades')
                                       : privatelyFundedTripsList.isEmpty
                                           ? null
                                           : () async {
                                               showModalBottomSheet(
-                                                  backgroundColor: Colors.transparent,
+                                                  backgroundColor:
+                                                      Colors.transparent,
                                                   isScrollControlled: false,
                                                   enableDrag: true,
                                                   context: context,
                                                   builder: (context) {
-                                                    return SharedWidgets.privateFundedTripsList(
-                                                        context,
-                                                        userDatabase,
-                                                        privatelyFundedTripsList,
-                                                        senateMembersList + houseMembersList,
-                                                        houseStockWatchList,
-                                                        senateStockWatchList,
-                                                        userIsPremium);
+                                                    return SharedWidgets
+                                                        .privateFundedTripsList(
+                                                            context,
+                                                            userDatabase,
+                                                            privatelyFundedTripsList,
+                                                            senateMembersList +
+                                                                houseMembersList,
+                                                            houseStockWatchList,
+                                                            senateStockWatchList,
+                                                            userIsPremium);
                                                   });
 
-                                              userDatabase.put('newTrips', false);
-                                              await Functions.processCredits(true,
+                                              userDatabase.put(
+                                                  'newTrips', false);
+                                              await Functions.processCredits(
+                                                  true,
                                                   isPermanent: false);
                                             }),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
+                          )
                   ],
                 ),
               ),
@@ -3228,44 +3954,47 @@ class HomePageState extends State<HomePage> {
     ]);
   }
 
-  Widget userRepresentatives(Orientation orientation, List<String> subscriptionAlertsList) {
+  Widget userRepresentatives(
+      Orientation orientation, List<String> subscriptionAlertsList) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      userCongressList.isEmpty || userDatabase.get('usageInfo') == false
+      userCongressList.isEmpty || !userDatabase.get('usageInfo')
           ? ZoomIn(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                    child:
-                        Text('FIND YOUR REPRESENTATIVES', style: GoogleFonts.bangers(fontSize: 18)),
+                    child: Text('FIND YOUR REPRESENTATIVES',
+                        style: GoogleFonts.bangers(fontSize: 18)),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                    padding: const EdgeInsets.all(5.0),
                     child: SizedBox(
                       height: 30,
-                      child: userDatabase.get('usageInfo') == false ||
-                              /* (!userIsPremium &&
-                                                                !userIsLegacy) ||*/
-                              (!statesMap.keys.contains(Map<String, dynamic>.from(
-                                      userDatabase.get('currentAddress'))['state']) &&
-                                  !statesMap.keys.contains(Map<String, dynamic>.from(
-                                      userDatabase.get('representativesLocation'))['state']))
+                      child: !userDatabase.get('usageInfo')
+                          // ||
+                          //     !statesMap.keys.contains(thisUser.address.state)
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 Expanded(
-                                  child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(
-                                              Theme.of(context).primaryColorDark)),
-                                      label: const Text('Enter Zip',
-                                          style: TextStyle(color: darkThemeTextColor)),
-                                      icon: const FaIcon(FontAwesomeIcons.solidCompass,
-                                          size: 13, color: darkThemeTextColor),
-                                      onPressed: () async =>
-                                          await Functions.requestUsageInfo(context)),
-                                ),
+                                    child: ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Theme.of(context)
+                                                  .primaryColorDark)),
+                                  label: const Text('Enable Location Features',
+                                      style:
+                                          TextStyle(color: darkThemeTextColor)),
+                                  icon: const FaIcon(
+                                      FontAwesomeIcons.solidCompass,
+                                      size: 13,
+                                      color: darkThemeTextColor),
+                                  onPressed: () async =>
+                                      await Functions.requestUsageInfo(
+                                          context, interstitialAd),
+                                )),
                               ],
                             )
                           : Row(
@@ -3274,14 +4003,20 @@ class HomePageState extends State<HomePage> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                       style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(
-                                              Theme.of(context).primaryColorDark)),
+                                          backgroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  Theme.of(context)
+                                                      .primaryColorDark)),
                                       label: const Text('Enter Zip',
-                                          style: TextStyle(color: darkThemeTextColor)),
+                                          style: TextStyle(
+                                              color: darkThemeTextColor)),
                                       icon: const Icon(Icons.location_pin,
                                           size: 15, color: darkThemeTextColor),
                                       onPressed: () {
-                                        return homePageTextInput(context, orientation, 'zipCode',
+                                        return homePageTextInput(
+                                            context,
+                                            orientation,
+                                            'zipCode',
                                             'Enter your 5 digit U.S. Zip Code');
                                       }),
                                 ),
@@ -3290,25 +4025,39 @@ class HomePageState extends State<HomePage> {
                                     const SizedBox(width: 5),
                                     ElevatedButton.icon(
                                         style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all<Color>(
-                                                Theme.of(context).primaryColorDark)),
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                        Color>(
+                                                    Theme.of(context)
+                                                        .primaryColorDark)),
                                         label: Text(
-                                            'Use ${Map<String, dynamic>.from(userDatabase.get('currentAddress'))['zip']}',
-                                            style: const TextStyle(color: darkThemeTextColor)),
-                                        icon: const Icon(Icons.location_searching,
-                                            size: 15, color: darkThemeTextColor),
+                                            'Use ${thisUser.currentLocation.zip}',
+                                            style: const TextStyle(
+                                                color: darkThemeTextColor)),
+                                        icon: const Icon(
+                                            Icons.location_searching,
+                                            size: 15,
+                                            color: darkThemeTextColor),
                                         onPressed: () async {
-                                          String zip = Map<String, dynamic>.from(
-                                              userDatabase.get('currentAddress'))['zip'];
-                                          logger.d(
-                                              '***** DBase update to $zip will happen here. *****');
-                                          await Functions.getUserCongress(context,
-                                                  houseMembersList + senateMembersList, zip)
+                                          UserAddress userAddress =
+                                              UserAddress.fromJson(userDatabase
+                                                  .get('currentLocation'));
+
+                                          String addressString =
+                                              "${userAddress.street} ${userAddress.city} ${userAddress.state} ${userAddress.zip}";
+
+                                          await Functions.getUserCongress(
+                                                  context,
+                                                  houseMembersList +
+                                                      senateMembersList,
+                                                  addressString)
                                               .then((value) {
-                                            setState(() => userCongressList = value);
+                                            setState(
+                                                () => userCongressList = value);
                                           });
                                           Functions.processCredits(true,
-                                              isPurchased: false, isPermanent: false);
+                                              isPurchased: false,
+                                              isPermanent: false);
                                         }),
                                   ],
                                 ),
@@ -3333,18 +4082,28 @@ class HomePageState extends State<HomePage> {
                       child: Row(
                         children: [
                           Text(
-                              'REPRESENTATIVES FOR ZIP CODE ${Map<String, dynamic>.from(userDatabase.get('representativesLocation'))['zip']}',
+                              'REPRESENTATIVES FOR ZIP CODE ${UserAddress.fromJson(userDatabase.get('representativesLocation')).zip}',
                               style: GoogleFonts.bangers(fontSize: 18)),
                           const Spacer(),
                           SizedBox(
                             height: 20,
                             child: OutlinedButton(
-                                child: const Text('Update Zip', style: TextStyle(fontSize: 10)),
-                                onPressed: () {
+                                child: const Text('Update Zip',
+                                    style: TextStyle(fontSize: 10)),
+                                onPressed: () async {
+                                  UserAddress address = UserAddress(
+                                      street: '',
+                                      city: '',
+                                      state: '',
+                                      country: '',
+                                      zip: '',
+                                      latitude: 0,
+                                      longitude: 0);
                                   setState(() => userCongressList = []);
                                   userDatabase.put('representativesLocation',
-                                      initialUserData['representativesLocation']);
+                                      address.toJson());
                                   userDatabase.put('representativesMap', {});
+                                  await AppUser.buildUserProfile();
                                 }),
                           ),
                         ],
@@ -3355,17 +4114,21 @@ class HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: userCongressList
                             .map<Widget>((official) => Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0, vertical: 3),
                                   child: GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => MemberDetail(official.id,
-                                              houseStockWatchList, senateStockWatchList),
+                                          builder: (context) => MemberDetail(
+                                              official.id,
+                                              houseStockWatchList,
+                                              senateStockWatchList),
                                         ),
-                                      ).then(
-                                          (_) => AdMobLibrary.interstitialAdShow(interstitialAd));
+                                      ).then((_) =>
+                                          AdMobLibrary.interstitialAdShow(
+                                              interstitialAd));
                                       // .then((_) => !userIsPremium &&
                                       //     interstitialAd != null &&
                                       //     interstitialAd.responseInfo.responseId !=
@@ -3375,7 +4138,8 @@ class HomePageState extends State<HomePage> {
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
                                           gradient: LinearGradient(
                                             begin: Alignment.topRight,
                                             end: Alignment.bottomLeft,
@@ -3386,21 +4150,33 @@ class HomePageState extends State<HomePage> {
                                                       ? democratColor
                                                       : independentColor,
                                               // Colors.white,
-                                              Theme.of(context).highlightColor.withOpacity(0.15),
-                                              Theme.of(context).highlightColor.withOpacity(0.15),
-                                              Theme.of(context).highlightColor.withOpacity(0.15)
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15),
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15),
+                                              Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.15)
                                             ],
                                           )),
                                       child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Padding(
-                                              padding: const EdgeInsets.all(4.0),
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
                                               child: Container(
-                                                width: official.shortTitle.toLowerCase() == 'rep.'
+                                                width: official.shortTitle
+                                                            .toLowerCase() ==
+                                                        'rep.'
                                                     ? 30
                                                     : 20,
-                                                height: official.shortTitle.toLowerCase() == 'rep.'
+                                                height: official.shortTitle
+                                                            .toLowerCase() ==
+                                                        'rep.'
                                                     ? 30
                                                     : 20,
                                                 decoration: BoxDecoration(
@@ -3410,7 +4186,8 @@ class HomePageState extends State<HomePage> {
                                                           'assets/congress_pic_$headerImageCounter.png'),
                                                       fit: BoxFit.cover),
                                                 ),
-                                                foregroundDecoration: BoxDecoration(
+                                                foregroundDecoration:
+                                                    BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   image: DecorationImage(
                                                       image: NetworkImage(
@@ -3422,27 +4199,41 @@ class HomePageState extends State<HomePage> {
                                             const SizedBox(width: 5),
                                             Text(
                                                 '${official.shortTitle} ${official.firstName} ${official.lastName} ${official.suffix ?? ''}',
-                                                style:
-                                                    const TextStyle(fontWeight: FontWeight.bold)),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                             AnimatedWidgets.flashingEye(
                                                 context,
-                                                subscriptionAlertsList.any((element) => element
-                                                    .toLowerCase()
-                                                    .startsWith(
-                                                        'member_${official.id}'.toLowerCase())),
+                                                subscriptionAlertsList.any(
+                                                    (element) => element
+                                                        .toLowerCase()
+                                                        .startsWith(
+                                                            'member_${official.id}'
+                                                                .toLowerCase())),
                                                 false,
+                                                color: thisUser.darkTheme
+                                                    ? null
+                                                    : Theme.of(context)
+                                                        .primaryColorDark,
                                                 size: 8,
                                                 reverseContrast: false),
                                             const SizedBox(width: 5),
                                             Text(official.title,
                                                 style: const TextStyle(
-                                                    fontWeight: FontWeight.normal, fontSize: 12)),
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 12)),
                                             const Spacer(),
                                             Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                    horizontal: 8.0, vertical: 3),
-                                                child: const Icon(Icons.person_pin_circle_rounded,
-                                                    color: Color(0xffffffff), size: 20))
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0,
+                                                        vertical: 3),
+                                                child: const Icon(
+                                                    Icons
+                                                        .person_pin_circle_rounded,
+                                                    color: Color(0xffffffff),
+                                                    size: 20))
                                           ]),
                                     ),
                                   ),
@@ -3478,14 +4269,18 @@ class HomePageState extends State<HomePage> {
                       height: 50,
                       width: MediaQuery.of(context).size.width,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5.0, vertical: 10),
                         child: Column(
                           children: [
                             Text('No Public Statements',
                                 style: GoogleFonts.bangers(
-                                    color: altHighlightColor,
-                                    fontSize: 25,
-                                    shadows: Styles.shadowStrokeTextGrey),
+                                  color: thisUser.darkTheme
+                                      ? altHighlightColor
+                                      : Theme.of(context).primaryColorDark,
+                                  fontSize: 25,
+                                  // shadows: Styles.shadowStrokeTextGrey,
+                                ),
                                 textAlign: TextAlign.center),
                           ],
                         ),
@@ -3505,7 +4300,8 @@ class HomePageState extends State<HomePage> {
                         return Column(
                           children: [
                             Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 3.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 3.0),
                                 child: SharedWidgets.statementTile(
                                     context,
                                     headerImageCounter,
@@ -3535,8 +4331,8 @@ class HomePageState extends State<HomePage> {
             : !userIsPremium && showBannerAd
                 ? showPremiumPromo
                     ? BounceInUp(
-                        child: SharedWidgets.premiumUpgradeContainer(context, interstitialAd,
-                            userIsPremium, userIsLegacy, devUpgraded, freeTrialUsed, userDatabase,
+                        child: SharedWidgets.premiumUpgradeContainer(context,
+                            interstitialAd, freeTrialUsed, userDatabase,
                             color: Theme.of(context).colorScheme.primary),
                       )
                     : bannerAdContainer

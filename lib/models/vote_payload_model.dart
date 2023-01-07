@@ -4,12 +4,12 @@
 
 import 'dart:convert';
 
-Payload payloadFromJson(String str) => Payload.fromJson(json.decode(str));
+RecentVotes payloadFromJson(String str) => RecentVotes.fromJson(json.decode(str));
 
-String payloadToJson(Payload data) => json.encode(data.toJson());
+String payloadToJson(RecentVotes data) => json.encode(data.toJson());
 
-class Payload {
-  Payload({
+class RecentVotes {
+  RecentVotes({
     this.status,
     this.copyright,
     this.results,
@@ -17,13 +17,13 @@ class Payload {
 
   final String status;
   final String copyright;
-  final Results results;
+  final VoteResults results;
 
-  factory Payload.fromJson(Map<String, dynamic> json) => Payload(
+  factory RecentVotes.fromJson(Map<String, dynamic> json) => RecentVotes(
         status: json["status"],
         copyright: json["copyright"],
         results:
-            json["results"] == null ? null : Results.fromJson(json["results"]),
+            json["results"] == null ? null : VoteResults.fromJson(json["results"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -33,8 +33,8 @@ class Payload {
       };
 }
 
-class Results {
-  Results({
+class VoteResults {
+  VoteResults({
     this.chamber,
     this.offset,
     this.numResults,
@@ -46,7 +46,7 @@ class Results {
   final int numResults;
   final List<Vote> votes;
 
-  factory Results.fromJson(Map<String, dynamic> json) => Results(
+  factory VoteResults.fromJson(Map<String, dynamic> json) => VoteResults(
         chamber:
             json["chamber"] == null ? null : chamberValues.map[json["chamber"]],
         offset: json["offset"],

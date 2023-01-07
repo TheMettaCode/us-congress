@@ -4,21 +4,22 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/styles.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
-import 'package:us_congress_vote_tracker/constants/widgets.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/lobby_event_model.dart';
-import 'package:us_congress_vote_tracker/models/lobby_event_specific_model.dart';
-import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
-import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/styles.dart';
+import 'package:congress_watcher/constants/themes.dart';
+import 'package:congress_watcher/constants/widgets.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/models/lobby_event_model.dart';
+import 'package:congress_watcher/models/lobby_event_specific_model.dart';
+import 'package:congress_watcher/services/admob/admob_ad_library.dart';
+import 'package:congress_watcher/functions/propublica_api_functions.dart';
 
 class LobbyEventDetail extends StatefulWidget {
   // final LobbyingRepresentation thisLobbyEvent;
   final String thisLobbyEventId;
-  const LobbyEventDetail(/*this.thisLobbyEvent,*/ {Key key, this.thisLobbyEventId = ''})
+  const LobbyEventDetail(
+      /*this.thisLobbyEvent,*/ {Key key, this.thisLobbyEventId = ''})
       : super(key: key);
 
   @override
@@ -36,7 +37,8 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
   Container bannerAdContainer = Container();
   bool showBannerAd = true;
   bool adLoaded = false;
-  String randomBackgroundImageString = 'assets/lobbying${random.nextInt(2)}.png';
+  String randomBackgroundImageString =
+      'assets/lobbying${random.nextInt(2)}.png';
 
   LobbyingRepresentation thisLobbyEvent;
   SpecificLobbyResult thisSpecificLobbyEvent;
@@ -67,7 +69,8 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
   }
 
   Future<void> init() async {
-    if (/*widget.thisLobbyEvent == null && */ widget.thisLobbyEventId.isNotEmpty) {
+    if (/*widget.thisLobbyEvent == null && */ widget
+        .thisLobbyEventId.isNotEmpty) {
       await PropublicaApi.fetchSingleLobbyEvent(widget.thisLobbyEventId)
           .then((value) => setState(() {
                 thisSpecificLobbyEvent = value;
@@ -89,7 +92,8 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
         // '***** This Banner Unit ID: ${thisBanner.adUnitId} - Key Words: ${thisBanner.request.keywords}');
         setState(() {
           adLoaded = true;
-          bannerAdContainer = AdMobLibrary().bannerContainer(thisBanner, context);
+          bannerAdContainer =
+              AdMobLibrary().bannerContainer(thisBanner, context);
         });
 
         // logger.d('***** Song Catalog Ad Loaded: ${thisBanner.adUnitId} *****');
@@ -101,7 +105,9 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
         backgroundColor: alertIndicatorColorDarkGreen,
         centerTitle: true,
         title: Text('Lobbying Details',
-            maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.bangers(fontSize: 25)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.bangers(fontSize: 25)),
         actions: <Widget>[
           IconButton(
               icon: const Icon(Icons.share),
@@ -121,10 +127,17 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
                   Theme.of(context).colorScheme.background, BlendMode.color)),
         ),
         child: thisSpecificLobbyEvent == null || _isLoading
-            ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+            ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase,
                 isLobby: true, isFullScreen: true)
-            : fetchedEventDetails(context, userDatabase, _darkTheme, _thisPanelColor,
-                thisSpecificLobbyEvent, userIsPremium, userIsLegacy, randomBackgroundImageString),
+            : fetchedEventDetails(
+                context,
+                userDatabase,
+                _darkTheme,
+                _thisPanelColor,
+                thisSpecificLobbyEvent,
+                userIsPremium,
+                userIsLegacy,
+                randomBackgroundImageString),
       ),
       bottomNavigationBar: BottomAppBar(
         elevation: 3,
@@ -133,8 +146,10 @@ class LobbyEventDetailState extends State<LobbyEventDetail> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              !showBannerAd || userIsPremium ? const SizedBox.shrink() : bannerAdContainer,
-              SharedWidgets.createdByContainer(context, userIsPremium, userDatabase),
+              !showBannerAd || userIsPremium
+                  ? const SizedBox.shrink()
+                  : bannerAdContainer,
+              SharedWidgets.createdByContainer(context, userDatabase),
             ],
           ),
         ),
@@ -153,10 +168,15 @@ fetchedEventDetails(
     bool userIsLegacy,
     String randomBackgroundImageString) {
   return ValueListenableBuilder(
-      valueListenable: Hive.box(appDatabase)
-          .listenable(keys: ['darkTheme', 'userIsPremium', 'userIdList', 'subscriptionAlertsList']),
+      valueListenable: Hive.box(appDatabase).listenable(keys: [
+        'darkTheme',
+        'userIsPremium',
+        'userIdList',
+        'subscriptionAlertsList'
+      ]),
       builder: (context, box, widget) {
-        List<String> subscriptionAlertsList = List.from(userDatabase.get('subscriptionAlertsList'));
+        List<String> subscriptionAlertsList =
+            List.from(userDatabase.get('subscriptionAlertsList'));
         final String thisLobbyEventString =
             'lobby_${thisSpecificLobbyEvent.id}_${thisSpecificLobbyEvent.lobbyingClient.name}_${thisSpecificLobbyEvent.specificIssues.first}_${thisSpecificLobbyEvent.lobbyingRegistrant.name}_${thisSpecificLobbyEvent.filings.first.filingDate}_lobby';
 
@@ -190,7 +210,9 @@ fetchedEventDetails(
                               margin: const EdgeInsets.all(10.0),
                               child: Text(
                                 'Lobbying ID#: ${thisSpecificLobbyEvent.id}',
-                                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                             // ),
@@ -199,40 +221,49 @@ fetchedEventDetails(
                                     height: 20,
                                     child: ElevatedButton.icon(
                                       style: ButtonStyle(
-                                        backgroundColor: alertIndicatorMSPColorDarkGreen,
+                                        backgroundColor:
+                                            alertIndicatorMSPColorDarkGreen,
                                       ),
                                       icon: AnimatedWidgets.flashingEye(
                                           context,
-                                          List<String>.from(
-                                                  userDatabase.get('subscriptionAlertsList'))
-                                              .any((element) => element.toLowerCase().startsWith(
-                                                  'lobby_${thisSpecificLobbyEvent.id}'
-                                                      .toLowerCase())),
+                                          List<String>.from(userDatabase.get(
+                                                  'subscriptionAlertsList'))
+                                              .any((element) => element
+                                                  .toLowerCase()
+                                                  .startsWith(
+                                                      'lobby_${thisSpecificLobbyEvent.id}'
+                                                          .toLowerCase())),
                                           true,
                                           size: 11,
                                           sameColorBright: true),
                                       label: Text(
-                                        List<String>.from(
-                                                    userDatabase.get('subscriptionAlertsList'))
-                                                .any((element) => element.toLowerCase().startsWith(
-                                                    'lobby_${thisSpecificLobbyEvent.id}'
-                                                        .toLowerCase()))
+                                        List<String>.from(userDatabase.get(
+                                                    'subscriptionAlertsList'))
+                                                .any((element) => element
+                                                    .toLowerCase()
+                                                    .startsWith(
+                                                        'lobby_${thisSpecificLobbyEvent.id}'
+                                                            .toLowerCase()))
                                             ? 'ON'
                                             : 'OFF',
-                                        style:
-                                            GoogleFonts.bangers(color: Colors.white, fontSize: 17),
+                                        style: GoogleFonts.bangers(
+                                            color: Colors.white, fontSize: 17),
                                       ),
                                       onPressed: () async {
-                                        if (!subscriptionAlertsList.any((element) => element
-                                            .toLowerCase()
-                                            .startsWith('lobby_${thisSpecificLobbyEvent.id}'
-                                                .toLowerCase()))) {
-                                          subscriptionAlertsList.add(thisLobbyEventString);
+                                        if (!subscriptionAlertsList.any((element) =>
+                                            element.toLowerCase().startsWith(
+                                                'lobby_${thisSpecificLobbyEvent.id}'
+                                                    .toLowerCase()))) {
+                                          subscriptionAlertsList
+                                              .add(thisLobbyEventString);
                                           userDatabase.put(
-                                              'subscriptionAlertsList', subscriptionAlertsList);
+                                              'subscriptionAlertsList',
+                                              subscriptionAlertsList);
 
-                                          if (!userDatabase.get('lobbyingAlerts')) {
-                                            userDatabase.put('lobbyingAlerts', true);
+                                          if (!userDatabase
+                                              .get('lobbyingAlerts')) {
+                                            userDatabase.put(
+                                                'lobbyingAlerts', true);
                                           }
 
                                           await Functions.processCredits(true);
@@ -240,12 +271,15 @@ fetchedEventDetails(
                                           logger.d(
                                               '^^^^^ SUBSCRIPTIONS (add) TO DBASE: ${userDatabase.get('subscriptionAlertsList')} ^^^^^');
                                         } else {
-                                          subscriptionAlertsList.removeWhere((element) => element
-                                              .toLowerCase()
-                                              .startsWith('lobby_${thisSpecificLobbyEvent.id}'
-                                                  .toLowerCase()));
+                                          subscriptionAlertsList.removeWhere(
+                                              (element) => element
+                                                  .toLowerCase()
+                                                  .startsWith(
+                                                      'lobby_${thisSpecificLobbyEvent.id}'
+                                                          .toLowerCase()));
                                           userDatabase.put(
-                                              'subscriptionAlertsList', subscriptionAlertsList);
+                                              'subscriptionAlertsList',
+                                              subscriptionAlertsList);
 
                                           logger.d(
                                               '^^^^^ SUBSCRIPTIONS (remove) FROM DBASE: ${userDatabase.get('subscriptionAlertsList')} ^^^^^');
@@ -266,48 +300,71 @@ fetchedEventDetails(
                         children: <Widget>[
                           Expanded(
                             child: Container(
-                              color: alertIndicatorColorDarkGreen.withOpacity(0.15),
+                              color: alertIndicatorColorDarkGreen
+                                  .withOpacity(0.15),
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     /// CLIENT INFORMATION
-                                    thisSpecificLobbyEvent.lobbyingClient.name.isEmpty
+                                    thisSpecificLobbyEvent
+                                            .lobbyingClient.name.isEmpty
                                         ? const SizedBox.shrink()
                                         : ListTile(
                                             // isThreeLine: true,
                                             dense: true,
-                                            contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                            contentPadding:
+                                                const EdgeInsets.fromLTRB(
+                                                    0, 0, 0, 0),
                                             enableFeedback: true,
                                             enabled: true,
                                             title: Text('Client'.toUpperCase(),
                                                 // maxLines: 1,
                                                 // overflow: TextOverflow
                                                 //     .ellipsis,
-                                                style: Styles.regularStyle.copyWith(
+                                                style: Styles.regularStyle
+                                                    .copyWith(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
-                                                  color: darkTheme ? null : thisPanelColor,
+                                                  color: darkTheme
+                                                      ? null
+                                                      : thisPanelColor,
                                                 )),
                                             subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Text(thisSpecificLobbyEvent.lobbyingClient.name,
-                                                    style: Styles.regularStyle.copyWith(
-                                                        fontSize: 20, fontWeight: FontWeight.bold)),
+                                                Text(
+                                                    thisSpecificLobbyEvent
+                                                        .lobbyingClient.name,
+                                                    style: Styles.regularStyle
+                                                        .copyWith(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
                                                 thisSpecificLobbyEvent
-                                                        .lobbyingClient.generalDescription.isEmpty
+                                                        .lobbyingClient
+                                                        .generalDescription
+                                                        .isEmpty
                                                     ? const SizedBox.shrink()
                                                     : Text(
                                                         thisSpecificLobbyEvent
-                                                            .lobbyingClient.generalDescription,
+                                                            .lobbyingClient
+                                                            .generalDescription,
                                                         maxLines: 2,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: Styles.regularStyle.copyWith(
-                                                            fontSize: 14,
-                                                            fontWeight: FontWeight.bold)),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: Styles
+                                                            .regularStyle
+                                                            .copyWith(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                               ],
                                             ),
                                           ),
@@ -330,7 +387,8 @@ fetchedEventDetails(
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   enableFeedback: true,
                                   enabled: true,
                                   title: Text('Registrant'.toUpperCase(),
@@ -339,26 +397,35 @@ fetchedEventDetails(
                                       style: Styles.regularStyle.copyWith(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
-                                        color: darkTheme ? null : thisPanelColor,
+                                        color:
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(thisSpecificLobbyEvent.lobbyingRegistrant.name,
+                                      Text(
+                                          thisSpecificLobbyEvent
+                                              .lobbyingRegistrant.name,
                                           // maxLines: 3,
                                           // overflow: TextOverflow.ellipsis,
-                                          style: Styles.regularStyle
-                                              .copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      thisSpecificLobbyEvent
-                                              .lobbyingRegistrant.generalDescription.isEmpty
+                                          style: Styles.regularStyle.copyWith(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      thisSpecificLobbyEvent.lobbyingRegistrant
+                                              .generalDescription.isEmpty
                                           ? const SizedBox.shrink()
                                           : Text(
                                               thisSpecificLobbyEvent
-                                                  .lobbyingRegistrant.generalDescription,
+                                                  .lobbyingRegistrant
+                                                  .generalDescription,
                                               // maxLines: 3,
                                               // overflow: TextOverflow.ellipsis,
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 14, fontWeight: FontWeight.normal)),
+                                              style: Styles.regularStyle
+                                                  .copyWith(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.normal)),
                                     ],
                                   ),
                                 ),
@@ -369,7 +436,8 @@ fetchedEventDetails(
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   enableFeedback: true,
                                   enabled: true,
                                   title: Text('Specific Issues'.toUpperCase(),
@@ -378,19 +446,25 @@ fetchedEventDetails(
                                       style: Styles.regularStyle.copyWith(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
-                                        color: darkTheme ? null : thisPanelColor,
+                                        color:
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: thisSpecificLobbyEvent.specificIssues
-                                        .map(
-                                          (e) => Text('• $e',
-                                              // maxLines: 3,
-                                              // overflow: TextOverflow.ellipsis,
-                                              style: Styles.regularStyle.copyWith(
-                                                  fontSize: 14, fontWeight: FontWeight.bold)),
-                                        )
-                                        .toList(),
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children:
+                                        thisSpecificLobbyEvent.specificIssues
+                                            .map(
+                                              (e) => Text('• $e',
+                                                  // maxLines: 3,
+                                                  // overflow: TextOverflow.ellipsis,
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                            )
+                                            .toList(),
                                   )),
 
                           /// LIST OF LOBBYISTS INFO
@@ -399,7 +473,8 @@ fetchedEventDetails(
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   enableFeedback: true,
                                   enabled: true,
                                   title: Text('Lobbyists'.toUpperCase(),
@@ -408,24 +483,35 @@ fetchedEventDetails(
                                       style: Styles.regularStyle.copyWith(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
-                                        color: darkTheme ? null : thisPanelColor,
+                                        color:
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: thisSpecificLobbyEvent.lobbyists
                                         .map((e) => Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(e.name,
-                                                    style: Styles.regularStyle.copyWith(
-                                                        fontSize: 14, fontWeight: FontWeight.bold)),
+                                                    style: Styles.regularStyle
+                                                        .copyWith(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
                                                 Wrap(
                                                   children: [
                                                     // SizedBox(width: 3),
                                                     Text(e.coveredPosition,
-                                                        style: Styles.regularStyle.copyWith(
-                                                            fontSize: 12,
-                                                            fontWeight: FontWeight.normal)),
+                                                        style: Styles
+                                                            .regularStyle
+                                                            .copyWith(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal)),
                                                   ],
                                                 ),
                                                 const SizedBox(height: 3),
@@ -439,7 +525,8 @@ fetchedEventDetails(
                           ListTile(
                               // isThreeLine: true,
                               dense: true,
-                              contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 0, 0, 0),
                               enableFeedback: true,
                               enabled: true,
                               title: Text('Lobby Ids'.toUpperCase(),
@@ -454,8 +541,9 @@ fetchedEventDetails(
                                   'Event ID: ${thisSpecificLobbyEvent.id.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.id.toString()}\nHouse ID: ${thisSpecificLobbyEvent.houseId.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.houseId.toString()}\nSenate ID: ${thisSpecificLobbyEvent.senateId.isEmpty ? 'Not Available' : thisSpecificLobbyEvent.senateId.toString()}',
                                   // maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
-                                  style: Styles.regularStyle
-                                      .copyWith(fontSize: 14, fontWeight: FontWeight.bold))),
+                                  style: Styles.regularStyle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold))),
 
                           /// EFFECTIVE DATES
                           thisSpecificLobbyEvent.signedDate.isEmpty &&
@@ -464,7 +552,8 @@ fetchedEventDetails(
                               : ListTile(
                                   // isThreeLine: true,
                                   dense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   enableFeedback: true,
                                   enabled: true,
                                   title: Text('Effective Dates'.toUpperCase(),
@@ -473,19 +562,22 @@ fetchedEventDetails(
                                       style: Styles.regularStyle.copyWith(
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
-                                        color: darkTheme ? null : thisPanelColor,
+                                        color:
+                                            darkTheme ? null : thisPanelColor,
                                       )),
                                   subtitle: Text(
                                       'Signed: ${thisSpecificLobbyEvent.signedDate.isEmpty ? 'Date Not Available' : thisSpecificLobbyEvent.signedDate.toString()}\nEffective: ${thisSpecificLobbyEvent.effectiveDate.isEmpty ? 'Date Not Available' : thisSpecificLobbyEvent.effectiveDate.toString()}',
                                       // maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
-                                      style: Styles.regularStyle
-                                          .copyWith(fontSize: 16, fontWeight: FontWeight.bold))),
+                                      style: Styles.regularStyle.copyWith(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold))),
 
                           /// LATEST FILING INFORMATION
                           ListTile(
                             dense: true,
-                            contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             enableFeedback: true,
                             enabled: true,
                             title: Text('Filings'.toUpperCase(),
@@ -500,22 +592,33 @@ fetchedEventDetails(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: thisSpecificLobbyEvent.filings
                                   .map((thisFiling) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 2),
                                         child: InkWell(
-                                          onTap: () => Functions.linkLaunch(context,
-                                              thisFiling.pdfUrl, userDatabase, userIsPremium,
-                                              appBarTitle: 'Lobbying #${thisSpecificLobbyEvent.id}',
+                                          onTap: () => Functions.linkLaunch(
+                                              context, thisFiling.pdfUrl,
+                                              /* userDatabase ,
+                                                      userIsPremium,*/
+                                              appBarTitle:
+                                                  'Lobbying #${thisSpecificLobbyEvent.id}',
                                               source: 'lobby',
                                               isPdf: false),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                   '• Date: ${dateWithDayFormatter.format(thisFiling.filingDate)} - ${thisFiling.reportType} - ${thisFiling.reportYear}',
-                                                  style: Styles.regularStyle.copyWith(
-                                                      fontSize: 14, fontWeight: FontWeight.bold)),
-                                              FaIcon(FontAwesomeIcons.solidFileLines,
-                                                  size: 10, color: thisPanelColor)
+                                                  style: Styles.regularStyle
+                                                      .copyWith(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                              FaIcon(
+                                                  FontAwesomeIcons
+                                                      .solidFileLines,
+                                                  size: 10,
+                                                  color: thisPanelColor)
                                             ],
                                           ),
                                         ),

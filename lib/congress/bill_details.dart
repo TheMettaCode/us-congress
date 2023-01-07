@@ -7,23 +7,26 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/congress/member_details.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
-import 'package:us_congress_vote_tracker/constants/widgets.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/bill_payload_model.dart';
-import 'package:us_congress_vote_tracker/services/admob/admob_ad_library.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/functions/propublica_api_functions.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/congress/member_details.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/themes.dart';
+import 'package:congress_watcher/constants/widgets.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/models/bill_payload_model.dart';
+import 'package:congress_watcher/services/admob/admob_ad_library.dart';
+import 'package:congress_watcher/services/congress_stock_watch/house_stock_watch_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/senate_stock_watch_model.dart';
+import 'package:congress_watcher/functions/propublica_api_functions.dart';
 
 class BillDetail extends StatefulWidget {
   final String url;
   final List<HouseStockWatch> houseStockWatchList;
   final List<SenateStockWatch> senateStockWatchList;
-  const BillDetail(this.url, this.houseStockWatchList, this.senateStockWatchList, {Key key}) : super(key: key);
+  const BillDetail(
+      this.url, this.houseStockWatchList, this.senateStockWatchList,
+      {Key key})
+      : super(key: key);
 
   @override
   BillDetailState createState() => BillDetailState();
@@ -59,13 +62,14 @@ class BillDetailState extends State<BillDetail> {
     setState(() {
       userIsPremium = userDatabase.get('userIsPremium');
       userIsLegacy = !userDatabase.get('userIsPremium') &&
-          List.from(userDatabase.get('userIdList')).any(
-              (element) => element.toString().startsWith(oldUserIdPrefix));
+          List.from(userDatabase.get('userIdList'))
+              .any((element) => element.toString().startsWith(oldUserIdPrefix));
       houseStockWatchList = widget.houseStockWatchList;
       senateStockWatchList = widget.senateStockWatchList;
     });
 
-    setState(() => randomAssetImageUrl = 'assets/congress_pic_${random.nextInt(4)}.png');
+    setState(() =>
+        randomAssetImageUrl = 'assets/congress_pic_${random.nextInt(4)}.png');
   }
 
   Future<void> getBillData() async {
@@ -107,8 +111,7 @@ class BillDetailState extends State<BillDetail> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title:
-            Text('Bill Detail', style: GoogleFonts.bangers(fontSize: 25)),
+        title: Text('Bill Detail', style: GoogleFonts.bangers(fontSize: 25)),
         actions: <Widget>[
           IconButton(
               icon: const Icon(Icons.share),
@@ -116,7 +119,7 @@ class BillDetailState extends State<BillDetail> {
         ],
       ),
       body: _isLoading || bill == null
-          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase, userIsPremium,
+          ? AnimatedWidgets.circularProgressWatchtower(context, userDatabase,
               isFullScreen: true)
           : ValueListenableBuilder(
               valueListenable: Hive.box(appDatabase).listenable(keys: [
@@ -144,7 +147,8 @@ class BillDetailState extends State<BillDetail> {
                           repeat: ImageRepeat.repeat,
                           // fit: BoxFit.cover,
                           colorFilter: ColorFilter.mode(
-                              Theme.of(context).colorScheme.background, BlendMode.color)),
+                              Theme.of(context).colorScheme.background,
+                              BlendMode.color)),
                     ),
                     child: ListView(
                       physics: const BouncingScrollPhysics(),
@@ -600,7 +604,6 @@ class BillDetailState extends State<BillDetail> {
                                         child: const Text(
                                           'Latest Action:',
                                           style: TextStyle(
-                                              // color: Colors.blue[900],
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -617,8 +620,7 @@ class BillDetailState extends State<BillDetail> {
                                         margin: const EdgeInsets.fromLTRB(
                                             10, 0, 10, 0),
                                         child: Text(
-                                          '${bill.first.latestMajorAction}  ${formatter.format(bill
-                                                  .first.latestMajorActionDate)}',
+                                          '${bill.first.latestMajorAction}  ${formatter.format(bill.first.latestMajorActionDate)}',
                                           style: const TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.normal),
@@ -681,7 +683,6 @@ class BillDetailState extends State<BillDetail> {
                                         child: const Text(
                                           'Passage:',
                                           style: TextStyle(
-                                              // color: Colors.blue[900],
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -695,15 +696,14 @@ class BillDetailState extends State<BillDetail> {
                                   children: <Widget>[
                                     Expanded(
                                       child: Container(
-                                        margin: const EdgeInsets.only(left: 10.0),
+                                        margin:
+                                            const EdgeInsets.only(left: 10.0),
                                         child: bill.first.housePassage == null
                                             ? const Text(
                                                 'Introduced: Date not available')
                                             : Text(
-                                                'Introduced: ${formatter.format(bill
-                                                        .first.introducedDate)}',
+                                                'Introduced: ${formatter.format(bill.first.introducedDate)}',
                                                 style: const TextStyle(
-                                                    // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
                                                         FontWeight.normal),
@@ -718,15 +718,14 @@ class BillDetailState extends State<BillDetail> {
                                   children: <Widget>[
                                     Expanded(
                                       child: Container(
-                                        margin: const EdgeInsets.only(left: 10.0),
+                                        margin:
+                                            const EdgeInsets.only(left: 10.0),
                                         child: bill.first.housePassage == null
                                             ? const Text(
                                                 'House: Date not available')
                                             : Text(
-                                                'House: ${formatter.format(bill
-                                                        .first.housePassage)}',
+                                                'House: ${formatter.format(bill.first.housePassage)}',
                                                 style: const TextStyle(
-                                                    // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
                                                         FontWeight.normal),
@@ -741,15 +740,14 @@ class BillDetailState extends State<BillDetail> {
                                   children: <Widget>[
                                     Expanded(
                                       child: Container(
-                                        margin: const EdgeInsets.only(left: 10.0),
+                                        margin:
+                                            const EdgeInsets.only(left: 10.0),
                                         child: bill.first.senatePassage == null
                                             ? const Text(
                                                 'Senate: Date not available')
                                             : Text(
-                                                'Senate: ${formatter.format(bill
-                                                        .first.senatePassage)}',
+                                                'Senate: ${formatter.format(bill.first.senatePassage)}',
                                                 style: const TextStyle(
-                                                    // color: Colors.blue[900],
                                                     fontSize: 14.0,
                                                     fontWeight:
                                                         FontWeight.normal),
@@ -821,8 +819,12 @@ class BillDetailState extends State<BillDetail> {
                                       const SizedBox(width: 10),
                                       RichText(
                                         text: TextSpan(
-                                          style: const TextStyle(
-                                              color: Colors.blue,
+                                          style: TextStyle(
+                                              color:
+                                                  userDatabase.get('darkTheme')
+                                                      ? null
+                                                      : Theme.of(context)
+                                                          .primaryColorDark,
                                               fontSize: 12.0,
                                               decoration:
                                                   TextDecoration.underline,
@@ -842,12 +844,14 @@ class BillDetailState extends State<BillDetail> {
                                           : RichText(
                                               text: TextSpan(
                                                 style: TextStyle(
-                                                    color:
-                                                        bill.first.gpoPdfUri ==
+                                                    color: userDatabase.get(
+                                                                'darkTheme') ||
+                                                            bill.first
+                                                                    .gpoPdfUri ==
                                                                 null
-                                                            ? null
-                                                            : Colors.blue,
-                                                    // color: bill.first.gpoPdfUri == null ? Colors.grey[400] : Colors.blue,
+                                                        ? null
+                                                        : Theme.of(context)
+                                                            .primaryColorDark,
                                                     fontSize: 12.0,
                                                     decoration:
                                                         bill.first.gpoPdfUri ==
@@ -869,8 +873,8 @@ class BillDetailState extends State<BillDetail> {
                                                                   context,
                                                                   bill.first
                                                                       .gpoPdfUri,
-                                                                  userDatabase,
-                                                                  userIsPremium,
+                                                                  /* userDatabase ,
+                                                      userIsPremium,*/
                                                                   isPdf: true),
                                               ),
                                             ),
@@ -897,8 +901,7 @@ class BillDetailState extends State<BillDetail> {
               !showBannerAd || userIsPremium
                   ? const SizedBox.shrink()
                   : bannerAdContainer,
-              SharedWidgets.createdByContainer(
-                  context, userIsPremium, userDatabase),
+              SharedWidgets.createdByContainer(context, userDatabase),
             ],
           ),
         ),

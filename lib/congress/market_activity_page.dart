@@ -1,20 +1,16 @@
-import 'dart:io';
-
-// import 'package:fl_chart/fl_chart.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:us_congress_vote_tracker/constants/animated_widgets.dart';
-import 'package:us_congress_vote_tracker/constants/constants.dart';
-import 'package:us_congress_vote_tracker/constants/styles.dart';
-import 'package:us_congress_vote_tracker/constants/themes.dart';
-import 'package:us_congress_vote_tracker/constants/widgets.dart';
-import 'package:us_congress_vote_tracker/functions/functions.dart';
-import 'package:us_congress_vote_tracker/models/member_payload_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/house_stock_watch_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/market_activity_model.dart';
-import 'package:us_congress_vote_tracker/services/congress_stock_watch/senate_stock_watch_model.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:congress_watcher/constants/animated_widgets.dart';
+import 'package:congress_watcher/constants/constants.dart';
+import 'package:congress_watcher/constants/styles.dart';
+import 'package:congress_watcher/constants/themes.dart';
+import 'package:congress_watcher/constants/widgets.dart';
+import 'package:congress_watcher/functions/functions.dart';
+import 'package:congress_watcher/models/member_payload_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/house_stock_watch_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/market_activity_model.dart';
+import 'package:congress_watcher/services/congress_stock_watch/senate_stock_watch_model.dart';
 
 class MarketActivityPage extends StatefulWidget {
   final List<ChamberMember> membersList;
@@ -79,8 +75,6 @@ class MarketActivityPageState extends State<MarketActivityPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        if (Platform.isAndroid) WebView.platform = AndroidWebView();
-
         await init();
       },
     );
@@ -92,6 +86,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
 
   Future<void> init() async {
     setState(() => _loading = true);
+
     await setInitialValues();
     await processChartData(daysOfData);
     await buildCalendarData(allMarketActivityOverviewList, dailyTradeNumDays)
@@ -132,11 +127,11 @@ class MarketActivityPageState extends State<MarketActivityPage> {
           allHouseStockWatchList =
               houseStockWatchFromJson(userDatabase.get('houseStockWatchList'));
           logger.i(
-              '^^^^^ HOUSE STOCK TRADE INITIAL VARIABLES SETUP SUCCESS ^^^^^');
+              '[MARKET ACTIVITY PAGE] HOUSE STOCK TRADE INITIAL VARIABLES SETUP SUCCESS [MARKET ACTIVITY PAGE]');
         });
       } catch (e) {
         logger.w(
-            '^^^^^ ERROR DURING HOUSE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+            '[MARKET ACTIVITY PAGE] ERROR DURING HOUSE STOCK TRADE INITIAL VARIABLES SETUP: $e [MARKET ACTIVITY PAGE]');
         // userDatabase.put('houseStockWatchList', []);
       }
     }
@@ -148,11 +143,11 @@ class MarketActivityPageState extends State<MarketActivityPage> {
           allSenateStockWatchList = senateStockWatchFromJson(
               userDatabase.get('senateStockWatchList'));
           logger.i(
-              '^^^^^ SENATE STOCK TRADE INITIAL VARIABLES SETUP SUCCESS ^^^^^');
+              '[MARKET ACTIVITY PAGE] SENATE STOCK TRADE INITIAL VARIABLES SETUP SUCCESS [MARKET ACTIVITY PAGE]');
         });
       } catch (e) {
         logger.w(
-            '^^^^^ ERROR DURING SENATE STOCK TRADE INITIAL VARIABLES SETUP: $e ^^^^^');
+            '[MARKET ACTIVITY PAGE] ERROR DURING SENATE STOCK TRADE INITIAL VARIABLES SETUP: $e [MARKET ACTIVITY PAGE]');
         // userDatabase.put('senateStockWatchList', []);
       }
     }
@@ -166,7 +161,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
         });
       } catch (e) {
         logger.w(
-            '^^^^^ ERROR RETRIEVING MARKET ACTIVITY OVERVIEW DATA TO DBASE (MARKET_ACTIVITY_PAGE): $e ^^^^^');
+            '[MARKET ACTIVITY PAGE] ERROR RETRIEVING MARKET ACTIVITY OVERVIEW DATA TO DBASE (MARKET_ACTIVITY_PAGE): $e [MARKET ACTIVITY PAGE]');
         userDatabase.put('marketActivityOverview', {});
       }
     }
@@ -279,7 +274,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
       if (localRangeBuyCount + localRangeSellCount > localMaxRangeTrades) {
         localMaxRangeTrades = localRangeBuyCount + localRangeSellCount;
         debugPrint(
-            '^^^^^ MAX RANGE TRADES FOR THIS PERIOD: $localMaxRangeTrades');
+            '[MARKET ACTIVITY PAGE] MAX RANGE TRADES FOR THIS PERIOD: $localMaxRangeTrades');
       }
 
       if (localThisMember != null &&
@@ -464,7 +459,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
               ),
               body: _loading
                   ? AnimatedWidgets.circularProgressWatchtower(
-                      context, userDatabase, userIsPremium,
+                      context, userDatabase,
                       isMarket: true, isFullScreen: true)
                   : Padding(
                       padding: const EdgeInsets.all(0),
@@ -595,9 +590,9 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                           String
                                                                               localThisDate =
                                                                               dateWithDayFormatter.format(calendarData[index].date);
-                                                                          double
-                                                                              localThisBarHeightPercent =
-                                                                              (localThisDay.trades.length / dailyTradeBarHeight);
+                                                                          double localThisBarHeightPercent = (localThisDay.trades.length / dailyTradeBarHeight) >= 0.9
+                                                                              ? 0.9
+                                                                              : (localThisDay.trades.length / dailyTradeBarHeight);
 
                                                                           return BounceInDown(
                                                                             duration:
@@ -757,7 +752,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(localThisTicker.tickerPurchaseCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisTicker.tickerSaleCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxTickerTrades - (localThisTicker.tickerPurchaseCount + localThisTicker.tickerSaleCount)) + (maxTickerTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisTicker.tickerPurchaseCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisTicker.tickerSaleCount * 10, (_) => Theme.of(context).colorScheme.error) + List.generate((maxTickerTrades - (localThisTicker.tickerPurchaseCount + localThisTicker.tickerSaleCount)) + (maxTickerTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -853,22 +848,22 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                 List<SenateStockWatch> localThisSenatorList = [];
                                                                                 String localThisChamber = localThisMember.member.shortTitle.toLowerCase().startsWith('r') || localThisMember.member.shortTitle.toLowerCase().startsWith('h') ? 'house' : 'senate';
 
-                                                                                debugPrint('^^^^^ CHAMBER IS: $localThisChamber');
+                                                                                debugPrint('[MARKET ACTIVITY PAGE] CHAMBER IS: $localThisChamber');
 
                                                                                 if (localThisChamber == 'house') {
                                                                                   try {
                                                                                     localThisRepresentativeList = thisHouseStockWatchList.where((element) => element.representative.toLowerCase().split(' ')[1][0] == localThisMember.member.firstName.toLowerCase()[0] && element.representative.toLowerCase().contains(localThisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
-                                                                                    debugPrint('^^^^^ HOUSE STOCK LIST: ${localThisRepresentativeList.length}');
+                                                                                    debugPrint('[MARKET ACTIVITY PAGE] HOUSE STOCK LIST: ${localThisRepresentativeList.length}');
                                                                                   } catch (e) {
-                                                                                    debugPrint('^^^^^ HOUSE STOCK LIST ERROR $e');
+                                                                                    debugPrint('[MARKET ACTIVITY PAGE] HOUSE STOCK LIST ERROR $e');
                                                                                     localThisRepresentativeList = [];
                                                                                   }
                                                                                 } else if (localThisChamber == 'senate') {
                                                                                   try {
                                                                                     localThisSenatorList = thisSenateStockWatchList.where((element) => element.senator.toLowerCase().split(' ')[0][0] == localThisMember.member.firstName.toLowerCase()[0] && element.senator.toLowerCase().contains(localThisMember.member.lastName.toLowerCase()) && element.ticker != null && element.ticker != '--' && element.ticker != 'N/A').toList();
-                                                                                    debugPrint('^^^^^ SENATE STOCK LIST: ${localThisSenatorList.length}');
+                                                                                    debugPrint('[MARKET ACTIVITY PAGE] SENATE STOCK LIST: ${localThisSenatorList.length}');
                                                                                   } catch (e) {
-                                                                                    debugPrint('^^^^^ SENATE STOCK LIST ERROR $e');
+                                                                                    debugPrint('[MARKET ACTIVITY PAGE] SENATE STOCK LIST ERROR $e');
                                                                                     localThisSenatorList = [];
                                                                                   }
                                                                                 }
@@ -890,7 +885,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(localThisMember.memberBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisMember.memberSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxMemberTrades - (localThisMember.memberBuyCount + localThisMember.memberSellCount)) + (maxMemberTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisMember.memberBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisMember.memberSellCount * 10, (_) => Theme.of(context).colorScheme.error) + List.generate((maxMemberTrades - (localThisMember.memberBuyCount + localThisMember.memberSellCount)) + (maxMemberTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -1011,7 +1006,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                                                                   gradient: LinearGradient(
                                                                                     begin: Alignment.centerLeft,
                                                                                     end: Alignment.centerRight,
-                                                                                    colors: List.generate(localThisDollarRange.rangeBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisDollarRange.rangeSellCount * 10, (_) => altHighlightAccentColorDarkRed) + List.generate((maxRangeTrades - (localThisDollarRange.rangeBuyCount + localThisDollarRange.rangeSellCount)) + (maxRangeTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
+                                                                                    colors: List.generate(localThisDollarRange.rangeBuyCount * 10, (_) => alertIndicatorColorDarkGreen) + List.generate(localThisDollarRange.rangeSellCount * 10, (_) => Theme.of(context).colorScheme.error) + List.generate((maxRangeTrades - (localThisDollarRange.rangeBuyCount + localThisDollarRange.rangeSellCount)) + (maxRangeTrades ~/ 15) * 10, (_) => darkTheme ? Theme.of(context).primaryColorDark.withOpacity(0.75) : stockWatchColor.withOpacity(0.75)),
                                                                                   )),
                                                                               child: Padding(
                                                                                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -1056,9 +1051,7 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                           _dataLoading
                                               ? AnimatedWidgets
                                                   .circularProgressWatchtower(
-                                                      context,
-                                                      userDatabase,
-                                                      userIsPremium,
+                                                      context, userDatabase,
                                                       isMarket: true,
                                                       isFullScreen: true)
                                               : const SizedBox.shrink()
@@ -1101,13 +1094,13 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                     MaterialStateProperty.all(daysOfData != 30
                                         ? darkTheme
                                             ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
+                                            : stockWatchColor.withOpacity(0.3)
                                         : darkTheme
                                             ? Theme.of(context).primaryColorDark
                                             : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context, userDatabase, userIsPremium,
+                                    context, userDatabase,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
@@ -1137,13 +1130,13 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                     MaterialStateProperty.all(daysOfData != 60
                                         ? darkTheme
                                             ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
+                                            : stockWatchColor.withOpacity(0.3)
                                         : darkTheme
                                             ? Theme.of(context).primaryColorDark
                                             : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context, userDatabase, userIsPremium,
+                                    context, userDatabase,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
@@ -1170,13 +1163,13 @@ class MarketActivityPageState extends State<MarketActivityPage> {
                                     MaterialStateProperty.all(daysOfData != 90
                                         ? darkTheme
                                             ? Theme.of(context).primaryColor
-                                            : null // Theme.of(context).disabledColor
+                                            : stockWatchColor.withOpacity(0.3)
                                         : darkTheme
                                             ? Theme.of(context).primaryColorDark
                                             : stockWatchColor)),
                             child: _dataLoading
                                 ? AnimatedWidgets.circularProgressWatchtower(
-                                    context, userDatabase, userIsPremium,
+                                    context, userDatabase,
                                     isMarket: true,
                                     widthAndHeight: 10,
                                     strokeWidth: 2,
